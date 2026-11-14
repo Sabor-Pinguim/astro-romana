@@ -1,0 +1,18 @@
+{
+  "name": "astro-romana-tools",
+  "private": true,
+  "description": "Tooling for the astro-romana game: procedural low-poly avatar generator and validator.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "models:build": "node tools/modeling/build-avatars.mjs",
+    "models:validate": "node tools/modeling/validate.mjs",
+    "models": "npm run models:build && npm run models:validate"
+  },
+  "devDependencies": {
+    "gltf-validator": "2.0.0-dev.3.10",
+    "three": "0.186.1"
+  }
+}

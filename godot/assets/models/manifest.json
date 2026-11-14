@@ -1,0 +1,447 @@
+{
+  "generatedAt": "2026-11-14T22:31:26.585Z",
+  "generator": "tools/modeling/build-avatars.mjs",
+  "conventions": {
+    "units": "meters",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "between the feet, on the ground",
+    "pivots": [
+      "Hips",
+      "Torso",
+      "Head",
+      "UpperArm_L",
+      "LowerArm_L",
+      "Hand_L",
+      "UpperArm_R",
+      "LowerArm_R",
+      "Hand_R",
+      "UpperLeg_L",
+      "LowerLeg_L",
+      "Foot_L",
+      "UpperLeg_R",
+      "LowerLeg_R",
+      "Foot_R"
+    ],
+    "requiredClips": [
+      "idle_loop",
+      "walk_loop",
+      "wave",
+      "action_loop"
+    ],
+    "fxAnchorPrefix": "FX_"
+  },
+  "fxPresets": {
+    "thrust": {
+      "description": "Jato de gás frio do propulsor (inspirado no SAFER da NASA)",
+      "colors": [
+        "#E6F6FF",
+        "#5AA9FF"
+      ],
+      "blending": "additive",
+      "rate": 140,
+      "life": [
+        0.25,
+        0.45
+      ],
+      "speed": [
+        2.5,
+        4
+      ],
+      "spread": 9,
+      "size": [
+        0.08,
+        0.02
+      ],
+      "gravity": 0
+    },
+    "sparks": {
+      "description": "Faíscas da ferramenta de reparo",
+      "colors": [
+        "#FFF3B0",
+        "#FF7A00"
+      ],
+      "blending": "additive",
+      "rate": 90,
+      "life": [
+        0.3,
+        0.7
+      ],
+      "speed": [
+        1.2,
+        2.6
+      ],
+      "spread": 55,
+      "size": [
+        0.035,
+        0.01
+      ],
+      "gravity": 3.71
+    },
+    "signal": {
+      "description": "Pulsos de sinal saindo da antena",
+      "colors": [
+        "#B8F0FF",
+        "#1FA2FF"
+      ],
+      "blending": "additive",
+      "rate": 60,
+      "life": [
+        0.9,
+        1.3
+      ],
+      "speed": [
+        0.5,
+        0.8
+      ],
+      "spread": 90,
+      "size": [
+        0.05,
+        0.015
+      ],
+      "gravity": 0
+    },
+    "dust": {
+      "description": "Poeira marciana levantada pela coleta de amostra",
+      "colors": [
+        "#D08A55",
+        "#8E5A3A"
+      ],
+      "blending": "normal",
+      "rate": 55,
+      "life": [
+        0.8,
+        1.6
+      ],
+      "speed": [
+        0.3,
+        0.9
+      ],
+      "spread": 70,
+      "size": [
+        0.06,
+        0.16
+      ],
+      "gravity": 3.71
+    },
+    "footdust": {
+      "description": "Poeira levantada pelos passos",
+      "colors": [
+        "#C17E4E",
+        "#7A4B33"
+      ],
+      "blending": "normal",
+      "rate": 20,
+      "life": [
+        0.6,
+        1.1
+      ],
+      "speed": [
+        0.2,
+        0.5
+      ],
+      "spread": 80,
+      "size": [
+        0.05,
+        0.13
+      ],
+      "gravity": 3.71
+    }
+  },
+  "references": [
+    {
+      "id": "as17-134-20425",
+      "note": "Apollo 17: Harrison Schmitt com ancinho de coleta, mochila com antena",
+      "url": "https://images.nasa.gov/details/as17-134-20425"
+    },
+    {
+      "id": "NHQ201910150003",
+      "note": "xEMU (2019): capacete bolha, mochila azul-marinho com borda vermelha, anel de quadril",
+      "url": "https://images.nasa.gov/details/NHQ201910150003"
+    },
+    {
+      "id": "axemu-axiom-suitcover-20230621-dgb-axp00653",
+      "note": "AxEMU (Artemis): faixa azul na perna, pontas das luvas cinza",
+      "url": "https://images.nasa.gov/details/axemu-axiom-suitcover-20230621-dgb-axp00653"
+    },
+    {
+      "id": "jsc2024e055570",
+      "note": "EMU (ISS): luzes e câmeras nas laterais do capacete, anel do pescoço",
+      "url": "https://images.nasa.gov/details/jsc2024e055570"
+    },
+    {
+      "id": "iss069e003918",
+      "note": "EMU (ISS): módulo de display no peito, painéis da mochila",
+      "url": "https://images.nasa.gov/details/iss069e003918"
+    }
+  ],
+  "models": [
+    {
+      "id": "helena",
+      "name": "Helena",
+      "role": "Comandante e Piloto",
+      "accent": "#D7263D",
+      "file": "characters/helena.glb",
+      "summary": "Faixas vermelhas como as de comandante da Apollo e de EV1 na ISS, visor dourado e propulsor de emergência nas costas.",
+      "equipment": [
+        {
+          "item": "Faixas vermelhas nas pernas e braços",
+          "basis": "Comandantes da Apollo e o EV1 na ISS usam faixas vermelhas para identificação"
+        },
+        {
+          "item": "Visor dourado",
+          "basis": "Visor com camada de ouro dos capacetes Apollo/EMU"
+        },
+        {
+          "item": "Propulsor sob a mochila com 4 bocais",
+          "basis": "SAFER, propulsor de resgate preso à base da mochila do EMU"
+        },
+        {
+          "item": "Controle de mão no peito",
+          "basis": "Controle manual do SAFER, montado no módulo de display do peito"
+        },
+        {
+          "item": "Checklist no pulso esquerdo",
+          "basis": "Cuff checklist usado em caminhadas espaciais"
+        }
+      ],
+      "animations": {
+        "idle_loop": "Parada, respirando",
+        "walk_loop": "Caminhada em baixa gravidade",
+        "wave": "Aceno",
+        "action_loop": "Pairando com o propulsor (partículas nos bocais)"
+      },
+      "fx": [
+        {
+          "anchor": "FX_Thruster_L",
+          "preset": "thrust",
+          "clips": [
+            "action_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Thruster_R",
+          "preset": "thrust",
+          "clips": [
+            "action_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_L",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_R",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        }
+      ],
+      "budget": {
+        "triangles": 3000
+      },
+      "stats": {
+        "triangles": 2384,
+        "meshes": 45,
+        "bytes": 238440
+      }
+    },
+    {
+      "id": "lucas",
+      "name": "Lucas",
+      "role": "Engenheiro de Sistemas",
+      "accent": "#F2A900",
+      "file": "characters/lucas.glb",
+      "summary": "Cor âmbar de engenharia, painel solar enrolado e bateria na mochila, cinto de ferramentas e furadeira de mão.",
+      "equipment": [
+        {
+          "item": "Painel solar enrolado sobre a mochila",
+          "basis": "ROSA, painel solar que se desenrola, testado na ISS"
+        },
+        {
+          "item": "Módulo de bateria com LEDs de carga",
+          "basis": "Baterias que cobrem picos de consumo (Perseverance)"
+        },
+        {
+          "item": "Furadeira de mão",
+          "basis": "Pistol Grip Tool, ferramenta motorizada das caminhadas espaciais na ISS"
+        },
+        {
+          "item": "Cinto com bolsas de ferramentas",
+          "basis": "Ferramentas presas ao traje por cabos e bolsas nas EVAs"
+        },
+        {
+          "item": "Joelheiras e biqueiras âmbar",
+          "basis": "Reforço de abrasão (estilizado)"
+        }
+      ],
+      "animations": {
+        "idle_loop": "Parado, respirando",
+        "walk_loop": "Caminhada em baixa gravidade",
+        "wave": "Aceno",
+        "action_loop": "Consertando com a furadeira (faíscas na ponta)"
+      },
+      "fx": [
+        {
+          "anchor": "FX_Sparks",
+          "preset": "sparks",
+          "clips": [
+            "action_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_L",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_R",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        }
+      ],
+      "budget": {
+        "triangles": 3000
+      },
+      "stats": {
+        "triangles": 2560,
+        "meshes": 49,
+        "bytes": 255332
+      }
+    },
+    {
+      "id": "oscar",
+      "name": "Oscar",
+      "role": "Especialista de Dados e Telecom",
+      "accent": "#1FA2FF",
+      "file": "characters/oscar.glb",
+      "summary": "Antena de chicote na mochila como a da Apollo, mini-antena parabólica, tablet no pulso e câmera no capacete.",
+      "equipment": [
+        {
+          "item": "Antena de chicote no topo da mochila",
+          "basis": "Antena de rádio da mochila (PLSS) das EVAs da Apollo"
+        },
+        {
+          "item": "Mini-antena parabólica",
+          "basis": "Antenas de alto ganho (estilizado)"
+        },
+        {
+          "item": "Tablet no antebraço esquerdo",
+          "basis": "Display no pulso, evolução do cuff checklist"
+        },
+        {
+          "item": "Câmera extra no capacete",
+          "basis": "Câmera HD do conjunto de luzes e câmeras do capacete (EHIP) na ISS"
+        }
+      ],
+      "animations": {
+        "idle_loop": "Parado, respirando",
+        "walk_loop": "Caminhada em baixa gravidade",
+        "wave": "Aceno",
+        "action_loop": "Transmitindo pelo tablet (pulsos na antena)"
+      },
+      "fx": [
+        {
+          "anchor": "FX_Antenna",
+          "preset": "signal",
+          "clips": [
+            "action_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_L",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_R",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        }
+      ],
+      "budget": {
+        "triangles": 3000
+      },
+      "stats": {
+        "triangles": 2452,
+        "meshes": 45,
+        "bytes": 238548
+      }
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Cientista de Missão e Oficial Médica",
+      "accent": "#2BB673",
+      "file": "characters/maya.glb",
+      "summary": "Pá de coleta como a da Apollo 17, bolsas de amostra, câmera no peito e símbolo de primeiros socorros.",
+      "equipment": [
+        {
+          "item": "Pá/ancinho de coleta com cabo longo",
+          "basis": "Ferramentas de geologia de Harrison Schmitt na Apollo 17"
+        },
+        {
+          "item": "Bolsas de amostra no quadril e na mochila",
+          "basis": "Bolsas de coleta penduradas na mochila nas EVAs da Apollo"
+        },
+        {
+          "item": "Câmera no peito",
+          "basis": "Câmera Hasselblad presa ao peito na Apollo"
+        },
+        {
+          "item": "Símbolo de primeiros socorros (cruz branca em fundo verde)",
+          "basis": "Oficial médica; padrão ISO 7010 de primeiros socorros"
+        }
+      ],
+      "animations": {
+        "idle_loop": "Parada, respirando",
+        "walk_loop": "Caminhada em baixa gravidade",
+        "wave": "Aceno",
+        "action_loop": "Agachando para coletar amostra (poeira na pá)"
+      },
+      "fx": [
+        {
+          "anchor": "FX_Scoop",
+          "preset": "dust",
+          "clips": [
+            "action_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_L",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_R",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        }
+      ],
+      "budget": {
+        "triangles": 3000
+      },
+      "stats": {
+        "triangles": 2404,
+        "meshes": 46,
+        "bytes": 242252
+      }
+    }
+  ]
+}
