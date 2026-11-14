@@ -1,101 +1,101 @@
-Evento
-2026 Desafio de Aplicativos Espaciais da NASA
-Dificuldade
-Intermediário
-Iniciante/Juventude
-Assuntos
-Jogos
+Event
+2026 NASA Space Apps Challenge
+Difficulty
+Intermediate
+Beginner/Youth
+Subjects
+Games
 
-Projetar uma missão espacial requer uma consideração cuidadosa das demandas concorrentes, incluindo objetivos de missão, projeto de espaçonave, instrumentos científicos, veículos de lançamento, orçamentos, energia, massa, comunicações e restrições orbitais. Para os estudantes que raramente experimentam uma missão inteira, do conceito à operação, esses trade-offs geralmente permanecem abstratos. Seu desafio é criar um jogo interativo que permita aos participantes projetar, gerenciar e simular uma missão espacial completa enquanto tomam decisões de engenharia, gerenciam recursos limitados e avaliam como cada escolha molda o sucesso de sua missão.
+Designing a space mission requires careful consideration of competing demands, including mission objectives, spacecraft design, scientific instruments, launch vehicles, budgets, power, mass, communications, and orbital constraints. For students who rarely get to experiment with an entire mission from concept to operation, these trade-offs often remain abstract. Your challenge is to create an interactive game that allows participants to design, manage, and simulate a complete space mission while making engineering decisions, managing limited resources, and evaluating how each choice shapes the success of their mission.
 
-Fundo
+Background
 
-As missões espaciais são sistemas complexos em que os objetivos científicos, os requisitos de engenharia, os recursos disponíveis e as restrições operacionais devem trabalhar juntos. Projetar uma missão envolve decisões sobre a espaçonave, instrumentos científicos, veículo de lançamento, órbita, energia, massa, comunicações, orçamento e vida útil da missão. Uma decisão que melhora um aspecto de uma missão pode criar limitações em outra. Por exemplo, adicionar um instrumento mais capaz pode aumentar o valor científico, além de aumentar a massa, o consumo de energia, o volume de dados e o custo. Compreender esses trade-offs é essencial para o desenvolvimento de missões espaciais bem-sucedidas.
+Space missions are complex systems in which scientific objectives, engineering requirements, available resources, and operational constraints must work together. Designing a mission involves decisions about the spacecraft, scientific instruments, launch vehicle, orbit, power, mass, communications, budget, and mission lifetime. A decision that improves one aspect of a mission can create limitations in another. For example, adding a more capable instrument may increase scientific value while also increasing mass, power consumption, data volume, and cost. Understanding these trade-offs is essential to developing successful space missions.
 
-No entanto, o design da missão espacial de aprendizagem é muitas vezes limitado a exercícios teóricos porque os alunos e aspirantes a engenheiros raramente têm acesso a um ambiente onde podem experimentar uma missão inteira, do conceito à operação. As ferramentas existentes geralmente se concentram em tópicos individuais, como mecânica orbital, projeto de espaçonave ou lançamentos de foguetes, sem demonstrar como esses elementos interagem como um sistema completo. Isso deixa uma lacuna entre aprender conceitos de espaço individuais e entender como as equipes de missão tomam decisões de engenharia integradas.
+However, learning space mission design is often limited to theoretical exercises because students and aspiring engineers rarely have access to an environment where they can experiment with an entire mission from concept to operation. Existing tools often focus on individual topics such as orbital mechanics, spacecraft design, or rocket launches without demonstrating how these elements interact as a complete system. This leaves a gap between learning individual space concepts and understanding how mission teams make integrated engineering decisions.
 
-Um jogo interativo pode ajudar a resolver essa lacuna, permitindo que os participantes experimentem, tomem decisões, encontrem restrições e aprendam com missões bem-sucedidas e mal sucedidas. Os jogadores podem projetar missões individualmente ou colaborar em equipes de até quatro pessoas, com cada participante contribuindo para a estratégia de missão e trabalhando juntos para alcançar o melhor resultado possível. As abordagens potenciais podem incluir planejamento de missão, configuração de espaçonaves, seleção de instrumentos, gerenciamento de recursos, seleção orbital, planejamento de lançamento, comunicações e simulação de missão. Você é encorajado a desenvolver alternativas criativas que tornem a experiência envolvente, preservando os trade-offs fundamentais do design de missões espaciais do mundo real.
-Objetivos
+An interactive game can help address this gap by allowing participants to experiment, make decisions, encounter constraints, and learn from both successful and unsuccessful missions. Players could design missions individually or collaborate in teams of up to four people, with each participant contributing to the mission strategy and working together to achieve the best possible result. Potential approaches could include mission planning, spacecraft configuration, instrument selection, resource management, orbital selection, launch planning, communications, and mission simulation. You are encouraged to develop creative alternatives that make the experience engaging while preserving the fundamental trade-offs of real-world space mission design.
+Objectives
 
-Seu desafio é criar um Space Mission Design Game interativo que permita aos participantes experimentar o processo de projetar e gerenciar uma missão espacial completa. Você pode considerar permitir que um jogador participe individualmente ou colabore com uma equipe de até quatro pessoas, com os participantes trabalhando juntos para tomar decisões estratégicas e alcançar o melhor desempenho de missão possível.
+Your challenge is to create an interactive Space Mission Design Game that allows participants to experience the process of designing and managing a complete space mission. You may consider enabling a player to participate individually or collaborate with a team of up to four people, with participants working together to make strategic decisions and achieve the highest possible mission performance.
 
-O jogo poderia permitir que os participantes definam um objetivo de missão, estabelecessem requisitos de missão, projetassem uma espaçonave, selecionassem instrumentos científicos, escolhessem um veículo de lançamento e orbitassem e gerenciassem restrições importantes, como orçamento, massa, energia, comunicações, dados e vida útil da missão. Os jogadores se beneficiam de ver como suas decisões afetam outras partes da missão e da compreensão dos trade-offs envolvidos no design da missão espacial do mundo real.
+The game could allow participants to define a mission objective, establish mission requirements, design a spacecraft, select scientific instruments, choose a launch vehicle and orbit, and manage key constraints such as budget, mass, power, communications, data, and mission lifetime. Players benefit from seeing how their decisions affect other parts of the mission, and from understanding the trade-offs involved in real-world space mission design.
 
-Uma solução forte pode incluir um jogo ou simulação interativa funcional com uma interface de usuário clara, sistema de configuração de missão, mecanismos de gerenciamento de recursos, colaboração ou funcionalidade multiplayer para até quatro participantes e um sistema de simulação e avaliação de missão. O jogo poderia fornecer feedback sobre o desempenho da missão e recompensar decisões de engenharia eficazes, gerenciamento eficiente de recursos, colaboração bem-sucedida e alcance dos objetivos da missão. Os participantes são encorajados a desenvolver mecânicas criativas de jogos, visualizações, sistemas de pontuação e cenários de missão que tornam a experiência envolvente enquanto exigem que os jogadores resolvam problemas, façam trade-offs e colaborem para alcançar o sucesso da missão.
-Considerações Potenciais
+A strong solution might include a functional interactive game or simulation with a clear user interface, mission configuration system, resource management mechanisms, collaboration or multiplayer functionality for up to four participants, and a mission simulation and evaluation system. The game could provide feedback on mission performance and reward effective engineering decisions, efficient resource management, successful collaboration, and achievement of mission objectives. Participants are encouraged to develop creative game mechanics, visualizations, scoring systems, and mission scenarios that make the experience engaging while requiring players to solve problems, make trade-offs, and collaborate to achieve mission success.
+Potential Considerations
 
-Você pode (mas não é obrigado a) considerar o seguinte:
+You may (but are not required to) consider the following:
 
-Design e experiência de jogo
+Game design and experience
 
-    O jogo pode ser acessível aos participantes com diferentes níveis de conhecimento sobre ciência espacial e engenharia.
-    O jogo poderia apoiar tanto o single-player quanto o jogo da equipe, permitindo que até quatro participantes colaborassem na mesma missão.
-    Os membros da equipe podem ter responsabilidades diferentes, como planejamento de missões, projeto de espaçonave, ciência, comunicações ou gerenciamento de recursos.
-    Objetivos claros e feedback ajudam os participantes a entender por que uma missão tem sucesso ou falha.
-    Considere tornar o jogo interativo, permitindo que os participantes modifiquem seu design de missão e o simulem várias vezes.
-    Um sistema de pontuação poderia recompensar o sucesso da missão, o valor científico, o uso eficiente dos recursos e a tomada de decisões eficazes.
-    O jogo pode incluir diferentes níveis de dificuldade, tipos de missão ou cenários.
+    The game could be accessible to participants with different levels of knowledge about space science and engineering.
+    The game could support both single-player and team play, allowing up to four participants to collaborate on the same mission.
+    Team members could have different responsibilities, such as mission planning, spacecraft design, science, communications, or resource management.
+    Clear objectives and feedback help participants understand why a mission succeeds or fails.
+    Consider making the game interactive, allowing participants to modify their mission design and simulate it multiple times.
+    A scoring system could reward mission success, scientific value, efficient use of resources, and effective decision making.
+    The game could include different difficulty levels, mission types, or scenarios.
 
-Projeto da missão
+Mission design
 
-    Os participantes poderiam começar por definir um objetivo de missão antes de tomar decisões de espaçonave e engenharia.
-    Considere dar uma consequência a cada decisão de design importante. Por exemplo, aumentar o número de instrumentos pode aumentar as capacidades científicas, mas também aumentar a massa, o consumo de energia, o custo e a geração de dados.
-    Considere demonstrar que raramente há uma solução perfeita. Diferentes combinações de naves espaciais, instrumentos, órbitas e veículos de lançamento poderiam atingir o mesmo objetivo de missão.
-    Considere incluir restrições realistas, como orçamento limitado, massa de espaçonave, energia disponível, capacidade de comunicação e vida útil da missão.
+    Participants could begin by defining a mission objective before making spacecraft and engineering decisions.
+    Consider giving every major design decision a consequence. For example, increasing the number of instruments could increase scientific capabilities but also increase mass, power consumption, cost, and data generation.
+    Consider demonstrating that there is rarely a single perfect solution. Different combinations of spacecraft, instruments, orbits, and launch vehicles could achieve the same mission objective.
+    Consider including realistic constraints such as limited budget, spacecraft mass, available power, communications capacity, and mission lifetime.
 
-Espaçonave e carga útil
+Spacecraft and payload
 
-    A espaçonave pode incluir componentes como estrutura, sistemas de energia, baterias, comunicações, computadores a bordo, controle de atitude e instrumentos científicos.
-    Os instrumentos científicos podem ter características diferentes, incluindo massa, consumo de energia, custo, geração de dados e valor científico.
-    Considere permitir que os participantes escolham entre componentes de naves espaciais simples e avançados, dependendo do nível de dificuldade.
+    The spacecraft could include components such as structure, power systems, batteries, communications, onboard computers, attitude control, and scientific instruments.
+    Scientific instruments could have different characteristics, including mass, power consumption, cost, data generation, and scientific value.
+    Consider allowing participants to choose between simple and advanced spacecraft components depending on the difficulty level.
 
-Órbita e lançamento
+Orbit and launch
 
-    O jogo poderia fornecer várias opções orbitais e explicar suas características básicas.
-    Os participantes puderam considerar como a órbita selecionada afeta a cobertura, as oportunidades de observação, as comunicações, a vida útil da missão e outros requisitos da missão.
-    Veículos de lançamento podem ter diferentes capacidades de carga útil, custos e capacidades orbitais.
-    Considere construir em uma verificação que a massa da espaçonave e a órbita selecionada são compatíveis com o veículo de lançamento escolhido.
+    The game could provide several orbital options and explain their basic characteristics.
+    Participants could consider how the selected orbit affects coverage, observation opportunities, communications, mission lifetime, and other mission requirements.
+    Launch vehicles could have different payload capacities, costs, and orbital capabilities.
+    Consider building in a check that the spacecraft mass and selected orbit are compatible with the chosen launch vehicle.
 
-Gestão de Recursos
+Resource Management
 
-    O jogo deve exibir claramente os principais recursos disponíveis para a equipe de missão.
-    Recursos importantes podem incluir:
-        Massa: a massa total da espaçonave e carga útil.
-        Potência: a energia disponível para operar sistemas e instrumentos de naves espaciais.
-        Orçamento: os recursos financeiros disponíveis para desenvolver e operar a missão.
-        Dados: a quantidade de informações geradas por instrumentos científicos.
-        Comunicações: a capacidade da espaçonave de transmitir dados para estações terrestres.
-        Tempo: O desenvolvimento planejado e a vida útil operacional da missão.
-    Você pode considerar identificar quais recursos são mais críticos para sua missão específica.
+    The game should clearly display the main resources available to the mission team.
+    Important resources could include:
+        Mass: the total mass of the spacecraft and payload.
+        Power: the energy available to operate spacecraft systems and instruments.
+        Budget: the financial resources available to develop and operate the mission.
+        Data: the amount of information generated by scientific instruments.
+        Communications: the spacecraft's ability to transmit data to ground stations.
+        Time: The planned development and operational lifetime of the mission.
+    You may consider identifying which resources are most critical to your specific mission.
 
-Colaboração
+Collaboration
 
-    No modo de equipe, até quatro participantes poderiam trabalhar juntos na mesma missão.
-    Considere dar aos membros da equipe diferentes funções ou responsabilidades, enquanto pede que eles tomem decisões coletivamente.
-    O jogo pode incluir situações em que os membros da equipe devem negociar entre prioridades concorrentes.
-    O resultado final da missão pode depender da eficácia com que a equipe coordena suas decisões.
+    In team mode, up to four participants could work together on the same mission.
+    Consider giving team members different roles or responsibilities while asking them to make decisions collectively.
+    The game could include situations where team members must negotiate between competing priorities.
+    The final mission result could depend on how effectively the team coordinates its decisions.
 
-Valor educativo
+Educational value
 
-    Conceitos científicos e de engenharia funcionam melhor quando explicados em termos simples, em vez de assumir conhecimentos avançados.
-    Conceitos complexos, como altitude orbital, capacidade de carga útil, consumo de energia, taxa de dados e comunicações, podem ser introduzidos através do próprio jogo.
-    Considere incluir explicações curtas, tutoriais, indicadores visuais ou recursos opcionais de aprendizado.
-    Considere ensinar aos participantes por que uma determinada decisão afeta o desempenho da missão, em vez de simplesmente indicar se a decisão está correta ou incorreta.
+    Scientific and engineering concepts work best when explained in simple terms rather than assuming advanced knowledge.
+    Complex concepts such as orbital altitude, payload capacity, power consumption, data rate, and communications could be introduced through the game itself.
+    Consider including short explanations, tutorials, visual indicators, or optional learning resources.
+    Consider teaching participants why a particular decision affects mission performance, rather than simply indicating whether the decision is correct or incorrect.
 
-Você pode considerar a adição de recursos como:
+You may consider adding features such as:
 
-    Múltiplos cenários de missão com objetivos diferentes
-    Eventos aleatórios ou restrições de missão inesperadas
-    Diferentes níveis de dificuldade
-    Modelos de naves espaciais realistas ou simplificados
-    Visualizações interativas de espaçonaves
-    Painéis de missão mostrando o consumo de recursos em tempo real
-    Tabelas de classificação ou classificações de missões
-    Relatórios de missão gerados no final de cada simulação
-    A capacidade de salvar, compartilhar e comparar projetos de missão
-    Missões cooperativas para equipes de até quatro participantes
-    Cenários competitivos em que diferentes equipes projetam missões para resolver o mesmo objetivo
-    Um modo sandbox que permite aos participantes experimentar sem restrições predefinidas
-    Uma análise pós-missão explicando por que a missão teve sucesso ou falhou
+    Multiple mission scenarios with different objectives
+    Random events or unexpected mission constraints
+    Different difficulty levels
+    Realistic or simplified spacecraft models
+    Interactive spacecraft visualizations
+    Mission dashboards showing real-time resource consumption
+    Leaderboards or mission rankings
+    Mission reports generated at the end of each simulation
+    The ability to save, share, and compare mission designs
+    Cooperative missions for teams of up to four participants
+    Competitive scenarios where different teams design missions to solve the same objective
+    A sandbox mode that allows participants to experiment without predefined constraints
+    A post-mission analysis explaining why the mission succeeded or failed
 
-Para dados e recursos relacionados a esse desafio, consulte a guia Recursos na parte superior da página. Mais recursos podem ser adicionados antes do hackathon começar.
+For data and resources related to this challenge, refer to the Resources tab at the top of the page. More resources may be added before the hackathon begins.
