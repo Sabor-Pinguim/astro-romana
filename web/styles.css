@@ -194,9 +194,9 @@
     .detail-view{--crew:var(--amethyst);position:relative;flex:1;min-height:300px;overflow:hidden;background:linear-gradient(170deg,#1c1d48 0 40%,var(--bg-viewport) 40% 72%,#131431 72%);clip-path:var(--chamfer)}
     .detail-view::after{content:"";position:absolute;left:50%;bottom:7%;width:min(46%,220px);height:34px;translate:-50% 0;background:color-mix(in srgb,var(--crew) 34%,var(--f2));clip-path:polygon(18% 0,82% 0,100% 50%,82% 100%,18% 100%,0 50%)}
     .detail-view>canvas{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%}
-    .detail-site{position:absolute;inset:0}
+    .detail-site{position:absolute;inset:0;z-index:2} /* above the avatar canvas (z-index 1) */
     .detail-site svg{display:block;width:100%;height:100%}
-    .detail-view.site>canvas,.detail-view.site::after,.detail-view:not(.site) .detail-site{display:none}
+    .detail-view.site>canvas,.detail-view.site::after,.detail-view:not(.site) .detail-site{display:none!important}
     .detail-extra{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
     .detail-extra .perk{flex-basis:100%;padding:.8rem 1rem;background:var(--f1)}
     .perk strong{font-family:var(--heading);letter-spacing:.06em;color:var(--solar-amber)}
