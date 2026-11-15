@@ -1,0 +1,369 @@
+{
+  "retrieved": "2026-11-15",
+  "files": {
+    "ESP_045994_1985_RED.LBL": {
+      "file": "ESP_045994_1985_RED.LBL",
+      "url": "https://hirise-pds.lpl.arizona.edu/PDS/RDR/ESP/ORB_045900_045999/ESP_045994_1985/ESP_045994_1985_RED.LBL",
+      "role": "sun position of the photo (PDS label of the HiRISE observation)",
+      "license": "NASA PDS public data",
+      "credit": "NASA/JPL-Caltech/University of Arizona (HiRISE on MRO); DTM by the University of Arizona, distributed by USGS Astrogeology"
+    },
+    "ctx1_dtm": {
+      "file": "ctx1_dtm.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_dtm.tif",
+      "product": "J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/Malin Space Science Systems (CTX on MRO); DTM and orthoimage by USGS Astrogeology (Ames Stereo Pipeline)",
+      "role": "horizon heights ~1.8\u201345 km (CTX DTM 1, Digital Terrain Model)",
+      "size": [
+        521,
+        1127
+      ],
+      "encoding": {
+        "bits": 16,
+        "offset": -3036.471923828125,
+        "scale": 0.5
+      },
+      "georeference": {
+        "x0": 0,
+        "y0": 82,
+        "originX": 4569315.518267624,
+        "originY": 1145257.5306046489,
+        "resX": 80.54915989088894,
+        "resY": -80.54915989088894
+      }
+    },
+    "ctx1_ortho": {
+      "file": "ctx1_ortho.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_orthoimage.tif",
+      "product": "J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/Malin Space Science Systems (CTX on MRO); DTM and orthoimage by USGS Astrogeology (Ames Stereo Pipeline)",
+      "role": "horizon texture ~1.8\u201345 km (CTX orthoimage 1)",
+      "size": [
+        1042,
+        2245
+      ],
+      "encoding": {
+        "bits": 8,
+        "offset": -0.023643724620342255,
+        "scale": 0.0034474514307468894
+      },
+      "georeference": {
+        "x0": 0,
+        "y0": 169,
+        "originX": 4569315.518267624,
+        "originY": 1145257.5306046489,
+        "resX": 40.27457994544447,
+        "resY": -40.27457994544447
+      }
+    },
+    "ctx2_dtm": {
+      "file": "ctx2_dtm.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W_dtm.tif",
+      "product": "K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/Malin Space Science Systems (CTX on MRO); DTM and orthoimage by USGS Astrogeology (Ames Stereo Pipeline)",
+      "role": "horizon heights ~1.8\u201345 km (CTX DTM 2, Digital Terrain Model)",
+      "size": [
+        678,
+        1131
+      ],
+      "encoding": {
+        "bits": 16,
+        "offset": -3126.060791015625,
+        "scale": 0.5
+      },
+      "georeference": {
+        "x0": 0,
+        "y0": 631,
+        "originX": 4550834.507926002,
+        "originY": 1189283.512965346,
+        "resX": 80.2337314248507,
+        "resY": -80.2337314248507
+      }
+    },
+    "ctx2_ortho": {
+      "file": "ctx2_ortho.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W_orthoimage.tif",
+      "product": "K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/Malin Space Science Systems (CTX on MRO); DTM and orthoimage by USGS Astrogeology (Ames Stereo Pipeline)",
+      "role": "horizon texture ~1.8\u201345 km (CTX orthoimage 2)",
+      "size": [
+        1355,
+        2252
+      ],
+      "encoding": {
+        "bits": 8,
+        "offset": -0.013170817866921425,
+        "scale": 0.003715244253848012
+      },
+      "georeference": {
+        "x0": 0,
+        "y0": 1266,
+        "originX": 4550834.507926002,
+        "originY": 1189283.512965346,
+        "resX": 40.14647225538655,
+        "resY": -40.14647225538655
+      }
+    },
+    "ctx3_dtm": {
+      "file": "ctx3_dtm.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W_dtm.tif",
+      "product": "F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/Malin Space Science Systems (CTX on MRO); DTM and orthoimage by USGS Astrogeology (Ames Stereo Pipeline)",
+      "role": "horizon heights ~1.8\u201345 km (CTX DTM 3, Digital Terrain Model)",
+      "size": [
+        867,
+        874
+      ],
+      "encoding": {
+        "bits": 16,
+        "offset": -2701.829345703125,
+        "scale": 0.5
+      },
+      "georeference": {
+        "x0": 0,
+        "y0": 2976,
+        "originX": 4548761.427899021,
+        "originY": 1377391.1178098568,
+        "resX": 80.24027340283966,
+        "resY": -80.24027340283966
+      }
+    },
+    "ctx3_ortho": {
+      "file": "ctx3_ortho.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W_orthoimage.tif",
+      "product": "F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/Malin Space Science Systems (CTX on MRO); DTM and orthoimage by USGS Astrogeology (Ames Stereo Pipeline)",
+      "role": "horizon texture ~1.8\u201345 km (CTX orthoimage 3)",
+      "size": [
+        1734,
+        1744
+      ],
+      "encoding": {
+        "bits": 8,
+        "offset": 0.21987448632717133,
+        "scale": 0.002799462908365595
+      },
+      "georeference": {
+        "x0": 0,
+        "y0": 5955,
+        "originX": 4548761.427899021,
+        "originY": 1377391.1178098568,
+        "resX": 40.12013670141983,
+        "resY": -40.12013670141983
+      }
+    },
+    "global_dem": {
+      "file": "global_dem.png",
+      "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif",
+      "product": "Mars MGS MOLA - MEX HRSC Blended DEM Global 200m v2",
+      "catalog": "https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m",
+      "citation": "Fergason, R.L., Hare, T.M., Laura, J. (2018). HRSC and MOLA Blended Digital Elevation Model at 200m v2. Astrogeology PDS Annex, U.S. Geological Survey.",
+      "license": "MOLA data CC0-1.0; HRSC data CC BY-SA 3.0 IGO (attribution required)",
+      "credit": "MOLA: NASA/GSFC (Mars Global Surveyor); HRSC: ESA/DLR/FU Berlin (Mars Express); blend by USGS Astrogeology (Fergason, Hare & Laura 2018)",
+      "role": "horizon heights beyond the CTX strips (meters); also shaded with the photo sun for the far texture",
+      "size": [
+        1078,
+        1022
+      ],
+      "encoding": {
+        "bits": 16,
+        "offset": -4283,
+        "scale": 1
+      },
+      "georeference": {
+        "col0": 75763,
+        "row0": 20697,
+        "lon0": -180,
+        "lat0": 90,
+        "resLon": 0.003374120830641,
+        "resLat": -0.003374120830641,
+        "radius": 3396190
+      }
+    },
+    "hirise_dtm": {
+      "file": "hirise_dtm.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/DTEEC_045994_1985_046060_1985_U01.tif",
+      "product": "DTEEC_045994_1985_046060_1985_U01",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_045994_1985_046060_1985_U01",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/University of Arizona (HiRISE on MRO); DTM by the University of Arizona, distributed by USGS Astrogeology",
+      "role": "heights of the walkable terrain (HiRISE DTM, meters)",
+      "size": [
+        539,
+        511
+      ],
+      "encoding": {
+        "bits": 16,
+        "offset": -2573.74072265625,
+        "scale": 0.00014530565717795342
+      },
+      "georeference": {
+        "x0": 3663,
+        "y0": 5792,
+        "originX": 4586874.845967728,
+        "originY": 1099451.5897741036,
+        "resX": 1.0165533020257713,
+        "resY": -1.0165533020257713
+      }
+    },
+    "hirise_dtm_near": {
+      "file": "hirise_dtm_near.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/DTEEC_045994_1985_046060_1985_U01.tif",
+      "product": "DTEEC_045994_1985_046060_1985_U01",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_045994_1985_046060_1985_U01",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/University of Arizona (HiRISE on MRO); DTM by the University of Arizona, distributed by USGS Astrogeology",
+      "role": "horizon heights up to ~1.8 km (HiRISE DTM overview)",
+      "size": [
+        241,
+        230
+      ],
+      "encoding": {
+        "bits": 16,
+        "offset": -2634.296142578125,
+        "scale": 0.05
+      },
+      "georeference": {
+        "x0": 125,
+        "y0": 263,
+        "originX": 4586874.845967728,
+        "originY": 1099451.5897741036,
+        "resX": 16.26485283241234,
+        "resY": -16.26485283241234
+      }
+    },
+    "hirise_ortho": {
+      "file": "hirise_ortho.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/ESP_045994_1985_RED_A_01_ORTHO.tif",
+      "product": "ESP_045994_1985_RED_A_01_ORTHO",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_045994_1985_046060_1985_U01",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/University of Arizona (HiRISE on MRO); DTM by the University of Arizona, distributed by USGS Astrogeology",
+      "role": "texture of the walkable terrain (HiRISE orthoimage, the photo itself)",
+      "size": [
+        1070,
+        1015
+      ],
+      "encoding": {
+        "bits": 8,
+        "offset": 49,
+        "scale": 0.6023622047244095
+      },
+      "georeference": {
+        "x0": 7327,
+        "y0": 11585,
+        "originX": 4586876.54522392,
+        "originY": 1099450.2009349486,
+        "resX": 0.5082764522038012,
+        "resY": -0.5082764522038012
+      }
+    },
+    "hirise_ortho_near": {
+      "file": "hirise_ortho_near.png",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/ESP_045994_1985_RED_A_01_ORTHO.tif",
+      "product": "ESP_045994_1985_RED_A_01_ORTHO",
+      "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_045994_1985_046060_1985_U01",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/University of Arizona (HiRISE on MRO); DTM by the University of Arizona, distributed by USGS Astrogeology",
+      "role": "horizon texture up to ~1.8 km (HiRISE orthoimage overview)",
+      "size": [
+        475,
+        451
+      ],
+      "encoding": {
+        "bits": 8,
+        "offset": 13,
+        "scale": 0.7480314960629921
+      },
+      "georeference": {
+        "x0": 254,
+        "y0": 530,
+        "originX": 4586876.54522392,
+        "originY": 1099450.2009349486,
+        "resX": 8.13242323526082,
+        "resY": -8.13242323526082
+      }
+    },
+    "overview.png": {
+      "file": "overview.png",
+      "role": "reference image: the whole HiRISE DTM shaded (light from the north-west), the site square in red",
+      "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/DTEEC_045994_1985_046060_1985_U01.tif",
+      "license": "CC0-1.0",
+      "credit": "NASA/JPL-Caltech/University of Arizona (HiRISE on MRO); DTM by the University of Arizona, distributed by USGS Astrogeology"
+    },
+    "stac_ctx1": {
+      "file": "stac_ctx1.json",
+      "url": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+      "role": "STAC item of CTX DTM 1 (projection, assets, provenance)",
+      "license": "CC0-1.0"
+    },
+    "stac_ctx2": {
+      "file": "stac_ctx2.json",
+      "url": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W",
+      "role": "STAC item of CTX DTM 2 (projection, assets, provenance)",
+      "license": "CC0-1.0"
+    },
+    "stac_ctx3": {
+      "file": "stac_ctx3.json",
+      "url": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W",
+      "role": "STAC item of CTX DTM 3 (projection, assets, provenance)",
+      "license": "CC0-1.0"
+    },
+    "stac_hirise": {
+      "file": "stac_hirise.json",
+      "url": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_045994_1985_046060_1985_U01",
+      "role": "STAC item of the HiRISE DTM (projection, assets, description)",
+      "license": "CC0-1.0"
+    }
+  },
+  "versions": {
+    "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif": {
+      "etag": "94ec792407f5a3da2f8b87aba42613eb-1358",
+      "lastModified": "Wed, 09 Nov 2022 14:59:19 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W_dtm.tif": {
+      "etag": "d5f9de355d05b9c5d9465ac08e55f78a-9",
+      "lastModified": "Sun, 14 May 2023 03:00:45 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W_orthoimage.tif": {
+      "etag": "ca7031a035cf06d201b85561a83f370c-11",
+      "lastModified": "Sun, 14 May 2023 03:00:46 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_dtm.tif": {
+      "etag": "ce14580e7081932a4e014b847b78149f-3",
+      "lastModified": "Sun, 14 May 2023 03:27:39 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_orthoimage.tif": {
+      "etag": "e254d54f8cb70f87d8c83b2c47f64860-4",
+      "lastModified": "Sun, 14 May 2023 03:27:40 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W_dtm.tif": {
+      "etag": "ddf5020b8543188665c749f7c653aa2a-5",
+      "lastModified": "Sun, 14 May 2023 03:44:33 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W_orthoimage.tif": {
+      "etag": "924c67df604931e636fc5cf4bd70359b-7",
+      "lastModified": "Sun, 14 May 2023 03:44:33 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/DTEEC_045994_1985_046060_1985_U01.tif": {
+      "etag": "9921ecbc8fe910627983c82a5282db31-19",
+      "lastModified": "Sat, 08 Jul 2023 05:04:17 GMT"
+    },
+    "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/ESP_045994_1985_RED_A_01_ORTHO.tif": {
+      "etag": "368080df20d6a92003fbaad60c1656bd-121",
+      "lastModified": "Sat, 08 Jul 2023 05:04:18 GMT"
+    }
+  }
+}

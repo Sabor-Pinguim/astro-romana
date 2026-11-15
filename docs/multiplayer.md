@@ -19,7 +19,7 @@ Partida cooperativa online de 1 a 4 jogadores. O **servidor de salas** já está
 | `lobby` | Vagas falsas (`state.friends`), `site`, `difficulty` | Vagas reais (`peers`). `site` e `difficulty` vão em `state lobby`; convidados mudam via `act` |
 | `planner` | `togglePart`, `addStage`, `removeStage` mudam `state.rocket` | Convidado manda `act`; o host aplica e manda `state planner` |
 | `cockpit` | `startFlight` + `flightTick`; ações em `handleCockpitAction` | O host roda o voo e manda `state flight` (~10 Hz); as ações dos convidados chegam por `act` |
-| `surface` | `surfaceTick` (timer) + `step()` em `views.js` | O host manda `state surface` (locais, timer, feitos, ~2 Hz); cada um manda `pose` (~10 Hz) |
+| `surface` | `surfaceTick` (timer) + `step()` em `views.js`; a IA move os colegas | O host manda `state surface` (locais, timer, feitos, quem controla quem, ~2 Hz) e roda a IA; cada um manda `pose` (~10 Hz) dos astronautas que controla |
 | `results` | `showResults` | O host manda `event results`; cada cliente roda o mesmo `showResults` |
 
 Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só volta quem caiu (`resume`). Essas fases são os padrões do servidor, e o host pode mudá-las no `create`.
@@ -89,23 +89,70 @@ Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só vol
 | `pump_fuel` | oscar |
 | `shield_storm` | maya |
 
-### 6. Superfície: `web/views.js` e `web/app.js`
-- **Entrada:** o host roda `startSurface()`. Os locais dos experimentos são sorteados no host: hoje `placeBlocks()` usa `Math.random`, e passa a ser `placeBlocks(spots)`. Eles vão em `state surface` com o timer. O convidado entra com os mesmos locais.
-- **Cada jogador começa no próprio astronauta:** `land({ site, crew })` recebe `crew = room.you.seat`.
-- **Pose:**
-  - A cada ~100 ms, manda `{id, x, y, z, yaw, spd, emote}` do avatar que controla.
-  - Ao receber uma pose, `ASTRO_SURFACE.setRemote(id, pose)` (novo) guarda o alvo.
-  - O laço dos colegas em `step()` interpola a posição e o ângulo até o alvo e acerta o peso da caminhada pela velocidade.
-- **Trocar de personagem** (teclas 1–4, `switchCrew`): no multiplayer, só para personagens da IA.
-  - O pedido é `act('control', id)`, e o host responde com o mapa `control` (personagem → peer) em `state surface`.
-  - Assim, dois jogadores não pegam o mesmo astronauta da IA.
-- **Experimentos:**
-  - O minigame roda no navegador de quem controla o dono do experimento.
-  - Ao terminar, manda `act('task', id)`.
-  - Em `completeSurfaceTask`, o host passa a conferir o dono pelo `control` de quem enviou, e não mais por `surf.activeCrew`.
-  - O visual de bloco concluído sai de `finishExperiment` para uma função `ASTRO_SURFACE.markDone(id)`, chamada também quando o `state surface` traz um experimento novo em `completed`.
-- **Timer (regra nova, `game-balance`):** no multiplayer, o timer da janela de retorno **não pausa** durante os minigames, porque um jogador não pode congelar os outros. Ele só pausa enquanto o terreno carrega. No solo, continua como hoje.
-- **Embarque:** só o host decide, pelo botão ou pelo timer. `distanceToLander` já usa `a.pos` dos avatares, que no host passa a vir das poses. Por isso a regra de quem fica para trás funciona sem mudança.
+### 6. Superfície (mundo aberto): `web/views.js` e `web/app.js`
+
+**Problema de hoje:** cada navegador roda a IA dos três colegas (passear, `action_loop` com as ferramentas, acenar de volta) com `Math.random`. Sem mudança, cada tela mostraria os NPCs em lugares diferentes. Os locais dos experimentos também são sorteados em cada navegador. A regra passa a ser: **a IA e os sorteios rodam só no host**.
+
+O servidor não muda. A `pose` é livre e fica guardada por participante, então o host manda num só pacote o astronauta dele e os da IA.
+
+**Quem controla cada astronauta.** Cada avatar de `world.avatars` ganha `a.ctrl`:
+
+| `a.ctrl` | Quem | Como se move |
+|---|---|---|
+| `local` | O meu (`world.avatar`) | `step()` com teclado e toque, como hoje |
+| `ai` | Só no host, para personagens sem jogador | A IA de hoje (`pickNpcTarget`, estados `idle`, `walk`, `action`, `wave`) |
+| `remote` | Outro jogador, ou a IA vista de um convidado | Interpola as poses recebidas |
+
+O mapa `control` (personagem → id do peer, ou `null` para a IA) vem do host em `state surface`. A vaga (`seat`) diz quem você é na sala; `control` diz qual corpo você move agora.
+
+**Entrada.**
+- O host roda `startSurface()`. Os locais vêm de `placeBlocks(spots)`, sorteados no host, e vão em `state surface {site, spots, timerSec, completed, control}`.
+- O convidado vê `phase = 'surface'` e o `state surface` e chama `land({ site, crew, spots })`, com `crew = room.you.seat`. `CREW_START` já é fixo, então todos começam no mesmo lugar.
+- **O timer só começa quando todos carregaram o terreno.** Cada um manda `act('loaded')`, e o host espera no máximo 20 s (`game-balance`). Hoje o host já pausa o timer enquanto `running()` é falso; ele passa a contar também os convidados que ainda carregam.
+
+**Pose (~10 Hz).**
+- Cada peer manda `{av: {<personagem>: {x, y, z, yaw, anim, spd}}}` com todos os astronautas que controla: o convidado manda o dele; o host manda o dele e os da IA.
+- `anim` é `idle`, `walk`, `wave` ou `action`. Vale para os emotes do jogador e para os estados da IA. Os `Prop_*` aparecem com `action`, e `spd` acerta o `walk.timeScale`. O pulo vai no `y`.
+- Manda só quando algo mudou, e no mínimo 1 vez por segundo. São uns 300 B por pacote, bem abaixo do limite do servidor (60 mensagens/s).
+- Quem entra ou volta recebe as últimas poses de todos no `welcome`, e os astronautas já aparecem no lugar certo.
+
+**Interpolação (`remote`).**
+- `ASTRO_SURFACE.setRemote(personagem, pose)` (novo) guarda as poses com a hora de chegada.
+- O `step()` desenha cerca de 100 ms atrás e interpola entre as duas últimas poses. O ângulo usa o `stepYaw`, que já existe. Os pesos de `idle`, `walk` e `action` reaproveitam o bloco de mistura da IA.
+- Um salto maior que 5 m (por exemplo `goTo`) não interpola: o astronauta aparece direto no destino.
+- Se as poses de um jogador param de chegar, o astronauta fica parado onde está. Depois de 30 s a vaga fica livre, e no host o personagem volta para a IA a partir dali.
+
+**IA no host (`ai`).**
+- Usa o mesmo código de hoje. Ao fugir de aglomeração e de colisão, considera todos os astronautas, inclusive os remotos.
+- **Aceno de volta:** hoje o NPC acena quando a câmera do jogador local olha para ele. No convidado, a mesma checagem manda `act('greet', personagem)`, no máximo uma vez a cada 8 s por NPC (o `waveCd`). O host faz o NPC acenar virado para quem pediu, e todos veem o mesmo aceno.
+
+**Trocar de personagem (teclas 1–4).**
+- No multiplayer, só vale para personagens da IA. O pedido é `act('control', personagem)`.
+- O host confere se o personagem está livre e atualiza `control`. O personagem que você largou volta para a IA no lugar onde estava, como o `useCrew` já faz com `prev.ai`.
+- O convidado só troca quando chega o `control` novo. Assim, dois jogadores não pegam o mesmo astronauta.
+- Tecla de um personagem que já tem dono: toast "Lucas is controlled by another player".
+
+**Minigames sem congelar o mundo.**
+- Hoje o `frame()` só chama `step()` com o diálogo fechado (`if (!dlg.open) step(dt)`). No multiplayer, isso congelaria a IA e as poses do host enquanto ele joga, e os colegas na tela do convidado.
+- O `step()` se divide em duas partes:
+  - `stepLocal`: entrada e movimento do meu astronauta, pausada durante o minigame;
+  - `stepOthers`: remotos e IA, que roda sempre.
+- Enquanto o minigame está aberto, a pose leva `busy: '<experimento>'`, e os outros veem uma etiqueta sobre o astronauta.
+- **Timer (regra nova, `game-balance`):** no multiplayer, o timer da janela de retorno **não pausa** durante os minigames, porque um jogador não pode congelar os outros. No solo, continua como hoje.
+
+**Experimentos.**
+- O minigame roda no navegador de quem controla o dono do experimento. Os prompts (`run`, `locked`) já comparam com o personagem que você move (`s.crew`).
+- Ao terminar, o jogador manda `act('task', id)`. Em `completeSurfaceTask`, o host passa a conferir o dono pelo `control` de quem enviou (`from.id`), e não mais por `surf.activeCrew`.
+- O visual de bloco concluído sai de `finishExperiment` para uma função `ASTRO_SURFACE.markDone(id)`, chamada também quando o `state surface` traz um experimento novo em `completed`.
+
+**Embarque (regra do time, `game-balance`).**
+- **Só embarca com todos os jogadores no lander.** Hoje, qualquer um que aperta E no lander encerra a missão de todos.
+- No multiplayer, o E só funciona quando todos os jogadores online estão a até `BOARD_REACH` do lander. Antes disso, o prompt mostra "Waiting for crew · 2/3 at the lander".
+- Quem aperta manda `act('board')`. O host confere as distâncias pelas poses e embarca. Os personagens da IA embarcam junto, como no solo.
+- Um jogador offline não trava o embarque. Se ele não voltar em 30 s, o personagem dele vira IA.
+- **Se o tempo acabar, fica em Marte quem não voltou.** É a regra que já vale no solo: no timeout, quem está a mais de 35 m do lander fica para trás, jogador ou IA. Ela funciona sem mudança, porque `distanceToLander` já usa `a.pos` dos avatares, que no host vem das poses.
+
+**Fica local em cada cliente:** câmera (primeira e terceira pessoa), capacete, bússola, lista de objetivos e distâncias, etiquetas dos blocos, emote wheel e movimento reduzido. As etiquetas com o nome dos outros jogadores sobre os astronautas são opcionais (`meta.name`).
 
 ### 7. Resultados
 - O host chama `showResults` e manda `event {k:'results', forced, score, completed, stranded, timerSec}`.
@@ -137,7 +184,7 @@ Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só vol
 
 ## Ordem sugerida e testes
 
-1. Itens 1 e 2: entrar na sala e ver as vagas. 3 e 4: planner compartilhado. 5: cockpit. 6 e 7: superfície e resultados. Cada um num commit, jogável.
+1. Itens 1 e 2: entrar na sala e ver as vagas. 3 e 4: planner compartilhado. 5: cockpit. 6 em duas partes (primeiro astronautas, poses e IA no host; depois experimentos, minigames e embarque). 7: resultados. Cada um num commit, jogável.
 2. A cada passo, testar com o servidor local (`cd multiplayer && npm start`) e duas janelas:
    - o host em `index.html`;
    - o convidado em `index.html?room=CODE&server=ws://localhost:8787/ws`.
@@ -146,7 +193,10 @@ Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só vol
    - o planner fica igual nos dois;
    - o Lucas reseta os breakers e a Helena pilota;
    - cada um anda e o outro vê;
+   - os NPCs (Oscar e Maya, da IA) estão no mesmo lugar e no mesmo estado nas duas telas;
+   - com o minigame aberto num navegador, o outro continua vendo todos se mexerem;
    - L-S1 só fecha pelo Lucas;
+   - o embarque só acontece com os dois no lander, e no timeout fica em Marte quem estiver longe;
    - o placar fica igual.
 
    Sem erros no console em 1440 e 390 px e com movimento reduzido. O solo em `file://`, sem servidor, continua como hoje.

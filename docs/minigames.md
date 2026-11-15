@@ -82,6 +82,12 @@ As quatro etapas do cockpit têm um minigame cronometrado. Os tempos, os limites
 | 03 · Orbital docking | Oscar e Maya | manter a nave alinhada com o tanque na câmera externa do monitor central; depois, transferir propelente | aproximação ruim dificulta a injeção transmarciana; a janela vencida usa captura automática com penalidade |
 | 04 · Mars landing | Helena | repetir o navball da decolagem durante o pouso em Marte | pouco tempo na faixa reduz a pontuação da missão |
 
+**Telemetria do cockpit** (`updateTelemetry` em `web/app.js`), coerente com o foguete montado e com a ordem real de um voo:
+- **Subida:** a velocidade segue o Δv gasto pelo foguete montado (Tsiolkovsky, estágio a estágio) e chega a 7.670 m/s numa órbita de 400 km (`derived`: √(GM/r)). A altitude é uma curva de jogo. A etapa 01 esvazia o estágio 1. Os primeiros 6 s da etapa 02 completam a subida com o estágio de cima. A leitura de propelente é a do tanque do estágio que está queimando.
+- **Órbita:** motores desligados. O reabastecimento enche o tanque do estágio que vai a Marte.
+- **Pouso:** o perfil de entrada, descida e pouso (EDL) do Perseverance comprimido no minigame, com dados reais de `references/experiments/mars-experiments.md`. Entrada a 125 km e 19.500 km/h; paraquedas a 11 km e 1.512 km/h; retrofoguetes a partir de 2,1 km; toque no solo a ~0 m/s. O tanque de descida só é gasto com os retrofoguetes.
+- **Radiação:** só aparece em Marte, com a mediana real do RAD do Curiosity em período calmo (165 µGy/dia, detector E). Marte só aparece na janela nesta etapa.
+
 ---
 
 ## 1. Helena: Comandante e Piloto

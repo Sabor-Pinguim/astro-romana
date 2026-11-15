@@ -698,6 +698,7 @@
       .cockpit-viewport.slab,.podium-viewport.slab{min-height:360px}
       .app-foot{flex-wrap:wrap}
       .app-foot .hint{order:2;width:100%}
+      .scout-order{gap:4px;padding:6px 8px}.scout-order-chip{min-width:28px;padding:.22rem .45rem}
       .orbit-map.slab{min-height:380px}
       .orbit-map h3{top:18px;left:20px;font-size:1.15rem}
       .orbit-marker{display:none}
@@ -723,4 +724,5 @@
       .moxie-bars,.bio-tools{grid-template-columns:1fr}
       .bio-cell{min-height:32px;font-size:.54rem}
     }
+    @media (max-width:360px){.scout-order-label{display:none}}
     @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}

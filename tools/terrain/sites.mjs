@@ -1,7 +1,8 @@
 // Fixed terrain sites built from real Mars data (HiRISE stereo DTMs, USGS catalog).
 // To add a site: pick a DTM in the STAC catalog (collection mro_hirise_socet_dtms),
 // set its item id, one of its orthoimages and a center inside the DTM footprint, then
-// run `npm run terrain:build -- <id> --preview` and look at tools/terrain/preview/.
+// run `npm run terrain:fetch -- <id> --preview` (sources go to references/datasets/mars-terrain/<id>/)
+// and look at tools/terrain/preview/ and at the overview.png it stores with the sources.
 //
 // Values marked "game" are art/balance choices, not data.
 

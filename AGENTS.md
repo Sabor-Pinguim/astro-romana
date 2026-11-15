@@ -21,6 +21,7 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 | [references/parts/parts.md](references/parts/parts.md) | Peças reais de foguete (motores, tanques): tiers, dados, fotos e instruções low poly |
 | [references/datasets/msl-rad/](references/datasets/msl-rad/) | Radiação medida pelo detector RAD do Curiosity, com fonte |
 | [references/datasets/earth/](references/datasets/earth/) | Grades globais da Terra (cobertura do solo, relevo, gelo marinho) que geram o planeta low poly |
+| [references/datasets/mars-terrain/](references/datasets/mars-terrain/) | Fontes dos terrenos reais de Marte (HiRISE, CTX, HRSC–MOLA): recortes usados pelo build, imagens, versões, licenças e créditos |
 | [docs/visual-identity.md](docs/visual-identity.md) | Identidade visual (low poly facetado): paleta, fontes, formas, arte gerada |
 | [docs/audio.md](docs/audio.md) | Paisagem sonora gerada a partir desses dados de radiação |
 | [docs/multiplayer.md](docs/multiplayer.md) | Multiplayer: servidor de salas (`multiplayer/`) e o plano de integração do cliente |

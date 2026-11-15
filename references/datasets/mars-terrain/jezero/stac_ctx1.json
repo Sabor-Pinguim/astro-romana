@@ -1,0 +1,509 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+  "properties": {
+    "start_datetime": "2023-04-18T12:00:00.000000Z",
+    "end_datetime": "2023-04-18T12:00:00.000000Z",
+    "title": "DTM: J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+    "description": "This is a digital terrain model (DTM) extracted from Context Camera (CTX) stereo images from the Mars Reconnaissance Orbiter mission. This data product is a DTM from stereo images acquired at approximately 6 meters/pixel resolution, which allows an output DTM resolution of 20 meters/pixel. The DTM was generated using the Ames Stereo Pipeline software (https://github.com/NeoGeographyToolkit/StereoPipeline)and using automated methods. All MRO CTX images were relatively controlled to one another before DTM generation. The final DTM is absolutely aligned to MOLA. Therefore,these are absolutely controlled DTMs and orthoimages. The isis_provenance and asp_provenance metadata files provide reproducible workflows for the generation of these DTM products. Input data were first relatively aligned and photogrammetrically controlled at the Mars quad level. Next, community sensor model (CSM) Image Support Data (ISDs) were created to support processing using the CSM in ASP. Low resolution, 100mpp DTMs were then generated for each stereopair and used to seed the generation of a high resolution DTM. This high resolution DTM was aligned to MOLA using a two step pc_align process. Fro the aligned point cloud the final DEM was extracted at the described post spacing and a final adjustment made to align with the Mars aeroid (geoid). All products for release were then converted to cloud optimized geotiffs (COGs) and appropriate metadata generated.",
+    "missions": [
+      "Mars Reconnaissance Orbiter (MRO)"
+    ],
+    "instruments": [
+      "Context Camera (CTX)"
+    ],
+    "gsd": 20.137289972722236,
+    "license": "CC0-1.0",
+    "proj:epsg": null,
+    "proj:wkt2": "PROJCS[\"Mars (2015) - Sphere / Ocentric / Equirectangular, clon = 0\",GEOGCS[\"Mars (2015) - Sphere / Ocentric\",DATUM[\"Mars (2015) - Sphere\",SPHEROID[\"Mars (2015) - Sphere\",3396190,0]],PRIMEM[\"Reference Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Equirectangular\"],PARAMETER[\"standard_parallel_1\",0],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+    "proj:projjson": {
+      "$schema": "https://proj.org/schemas/v0.5/projjson.schema.json",
+      "type": "ProjectedCRS",
+      "name": "Mars (2015) - Sphere / Ocentric / Equirectangular, clon = 0",
+      "base_crs": {
+        "name": "Mars (2015) - Sphere / Ocentric",
+        "datum": {
+          "type": "GeodeticReferenceFrame",
+          "name": "Mars (2015) - Sphere",
+          "ellipsoid": {
+            "name": "Mars (2015) - Sphere",
+            "radius": 3396190
+          },
+          "prime_meridian": {
+            "name": "Reference Meridian",
+            "longitude": 0
+          }
+        },
+        "coordinate_system": {
+          "subtype": "ellipsoidal",
+          "axis": [
+            {
+              "name": "Latitude",
+              "abbreviation": "lat",
+              "direction": "north",
+              "unit": "degree"
+            },
+            {
+              "name": "Longitude",
+              "abbreviation": "lon",
+              "direction": "east",
+              "unit": "degree"
+            }
+          ]
+        }
+      },
+      "conversion": {
+        "name": "Equidistant Cylindrical",
+        "method": {
+          "name": "Equidistant Cylindrical",
+          "id": {
+            "authority": "EPSG",
+            "code": 1028
+          }
+        },
+        "parameters": [
+          {
+            "name": "Latitude of 1st standard parallel",
+            "value": 0,
+            "unit": "degree",
+            "id": {
+              "authority": "EPSG",
+              "code": 8823
+            }
+          },
+          {
+            "name": "Latitude of natural origin",
+            "value": 0,
+            "unit": {
+              "type": "Unit",
+              "name": "",
+              "conversion_factor": 1
+            },
+            "id": {
+              "authority": "EPSG",
+              "code": 8801
+            }
+          },
+          {
+            "name": "Longitude of natural origin",
+            "value": 0,
+            "unit": "degree",
+            "id": {
+              "authority": "EPSG",
+              "code": 8802
+            }
+          },
+          {
+            "name": "False easting",
+            "value": 0,
+            "unit": "metre",
+            "id": {
+              "authority": "EPSG",
+              "code": 8806
+            }
+          },
+          {
+            "name": "False northing",
+            "value": 0,
+            "unit": "metre",
+            "id": {
+              "authority": "EPSG",
+              "code": 8807
+            }
+          }
+        ]
+      },
+      "coordinate_system": {
+        "subtype": "Cartesian",
+        "axis": [
+          {
+            "name": "Easting",
+            "abbreviation": "",
+            "direction": "east",
+            "unit": "metre"
+          },
+          {
+            "name": "Northing",
+            "abbreviation": "",
+            "direction": "north",
+            "unit": "metre"
+          }
+        ]
+      }
+    },
+    "proj:bbox": [
+      77.07897867016655,
+      17.52972432895822,
+      77.7967373013001,
+      19.32388900063904
+    ],
+    "proj:centroid": {
+      "lat": 18.42859808653811,
+      "lon": 77.43876944917116
+    },
+    "proj:shape": [
+      5250,
+      2084
+    ],
+    "proj:transform": [
+      4569315.518267624,
+      20.137289972722236,
+      0,
+      1145257.5306046489,
+      0,
+      -20.137289972722236
+    ],
+    "cube:dimensions": {
+      "x": {
+        "type": "spatial",
+        "axis": "x",
+        "extent": [
+          77.07897867016655,
+          77.7967373013001
+        ]
+      },
+      "y": {
+        "type": "spatial",
+        "axis": "y",
+        "extent": [
+          17.52972432895822,
+          19.32388900063904
+        ]
+      }
+    },
+    "ssys:targets": [
+      "Mars"
+    ],
+    "datetime": "2023-04-18T12:00:00Z",
+    "created": "2023-04-20T18:03:10.651Z",
+    "updated": "2023-04-20T18:03:10.651Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          77.3008708874562,
+          17.59021999476783
+        ],
+        [
+          77.28655294395978,
+          17.702028480610785
+        ],
+        [
+          77.27167235081228,
+          17.813698751647802
+        ],
+        [
+          77.25676739853606,
+          17.925405330197247
+        ],
+        [
+          77.24182295089909,
+          18.037112465432077
+        ],
+        [
+          77.22695383552453,
+          18.148847074314883
+        ],
+        [
+          77.21221580400974,
+          18.26058692514488
+        ],
+        [
+          77.1970958970242,
+          18.372261083446165
+        ],
+        [
+          77.18237106135167,
+          18.48401975127597
+        ],
+        [
+          77.16730226173249,
+          18.59569992725787
+        ],
+        [
+          77.15233825281719,
+          18.70740870571691
+        ],
+        [
+          77.13773214043938,
+          18.81909118037942
+        ],
+        [
+          77.12296293731526,
+          18.930799859058286
+        ],
+        [
+          77.10814663469198,
+          19.042481074929665
+        ],
+        [
+          77.09372280316971,
+          19.154151409137338
+        ],
+        [
+          77.07897867016655,
+          19.265809748076656
+        ],
+        [
+          77.12974765639878,
+          19.271881931379333
+        ],
+        [
+          77.24069220168286,
+          19.285041975387728
+        ],
+        [
+          77.35211248829708,
+          19.298174880038605
+        ],
+        [
+          77.46297594857023,
+          19.31116412828227
+        ],
+        [
+          77.5720910187591,
+          19.32388900063904
+        ],
+        [
+          77.5799033716829,
+          19.26335454728067
+        ],
+        [
+          77.5941706116116,
+          19.15168341450206
+        ],
+        [
+          77.60853645930305,
+          19.04003316122299
+        ],
+        [
+          77.62296360617611,
+          18.92834011461107
+        ],
+        [
+          77.63747879427493,
+          18.81667391155744
+        ],
+        [
+          77.65188926884602,
+          18.704965377960804
+        ],
+        [
+          77.66633048616872,
+          18.593212572214554
+        ],
+        [
+          77.68075753192676,
+          18.481484477104207
+        ],
+        [
+          77.69517828821354,
+          18.369734513558814
+        ],
+        [
+          77.70961418117287,
+          18.257998763056552
+        ],
+        [
+          77.72413963378911,
+          18.146261189738624
+        ],
+        [
+          77.73865589282372,
+          18.034560036849037
+        ],
+        [
+          77.75315625160785,
+          17.922842190542998
+        ],
+        [
+          77.76767327230097,
+          17.811137178339667
+        ],
+        [
+          77.78219384556758,
+          17.69941880504346
+        ],
+        [
+          77.7967373013001,
+          17.5876584452048
+        ],
+        [
+          77.74696121073735,
+          17.581766611989742
+        ],
+        [
+          77.63783449644767,
+          17.56886284798381
+        ],
+        [
+          77.52766974152253,
+          17.555782783601863
+        ],
+        [
+          77.41772824075005,
+          17.54266989277096
+        ],
+        [
+          77.30961699877962,
+          17.52972432895822
+        ],
+        [
+          77.3008708874562,
+          17.59021999476783
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod/collections/mro_ctx_controlled_usgs_dtms/items/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W"
+    },
+    {
+      "rel": "parent",
+      "type": "application/json",
+      "href": "https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod/collections/mro_ctx_controlled_usgs_dtms"
+    },
+    {
+      "rel": "collection",
+      "type": "application/json",
+      "href": "https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod/collections/mro_ctx_controlled_usgs_dtms"
+    },
+    {
+      "rel": "root",
+      "type": "application/json",
+      "href": "https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod"
+    }
+  ],
+  "assets": {
+    "image": {
+      "roles": [
+        "data",
+        "overview"
+      ],
+      "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_hillshade.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Hillshade",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "nodata": 0,
+          "statistics": {
+            "mean": 135.248,
+            "maximum": 255,
+            "stddev": 36.093,
+            "minimum": 1
+          }
+        }
+      ],
+      "key": "image"
+    },
+    "thumbnail": {
+      "roles": [
+        "thumbnail"
+      ],
+      "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W.jpg",
+      "type": "image/jpeg",
+      "title": "Thumbnail",
+      "key": "thumbnail"
+    },
+    "orthoimage": {
+      "roles": [
+        "data"
+      ],
+      "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_orthoimage.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Orthoimage",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": -32767,
+          "statistics": {
+            "mean": 0.412,
+            "maximum": 1.012,
+            "stddev": 0.119,
+            "minimum": -0.29
+          }
+        }
+      ],
+      "key": "orthoimage"
+    },
+    "qa_metrics": {
+      "roles": [
+        "metadata"
+      ],
+      "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/qa_metrics.txt",
+      "type": "text/plain",
+      "title": "ASP Generated Quality Assurance Metrics",
+      "key": "qa_metrics"
+    },
+    "dtm": {
+      "roles": [
+        "data"
+      ],
+      "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_dtm.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Digital Terrain Model",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": -32767,
+          "statistics": {
+            "mean": -2174.027,
+            "maximum": -1337.556,
+            "stddev": 352.735,
+            "minimum": -3041.795
+          }
+        }
+      ],
+      "key": "dtm"
+    },
+    "mola_csv": {
+      "roles": [
+        "metadata"
+      ],
+      "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_mola_shots.csv",
+      "type": "text/plain",
+      "title": "MOLA Spot Observations Used for initial pc-align",
+      "key": "mola_csv"
+    },
+    "intersection_error": {
+      "roles": [
+        "metadata"
+      ],
+      "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_intersection_error.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Intersection Error",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": -32767,
+          "statistics": {
+            "mean": 2.395,
+            "maximum": 10.132,
+            "stddev": 1.788,
+            "minimum": 0
+          }
+        }
+      ],
+      "key": "intersection_error"
+    }
+  },
+  "bbox": [
+    77.07897867016655,
+    17.52972432895822,
+    77.7967373013001,
+    19.32388900063904
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/datacube/v1.0.0/schema.json",
+    "https://raw.githubusercontent.com/thareUSGS/ssys/main/json-schema/schema.json"
+  ],
+  "collection": "mro_ctx_controlled_usgs_dtms"
+}

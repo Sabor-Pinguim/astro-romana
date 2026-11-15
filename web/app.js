@@ -13,8 +13,9 @@
     jezero:{name:'Jezero Crater',mission:'Biosignature Hunters',tag:'Ancient delta · biosignatures',desc:'An ancient lake with a river delta, a target in the search for biosignatures. The Perseverance rover has explored the crater since 2021.'},
     gale:{name:'Gale Crater',mission:'Gale Climate Archive',tag:'Layered rocks · climate',desc:'The rock layers of Mount Sharp hold the history of the Martian climate. The Curiosity rover has explored the crater since 2012.'}
   };
-  // Budget multipliers per difficulty (game-balance); the base budget comes from missionRules.
-  const difficulty = {easy:{factor:1.2,risk:'−10% FAILURE'},normal:{factor:1,risk:'STANDARD RISK'},hard:{factor:.8,risk:'+15% FAILURE'}};
+  // Per difficulty (game-balance): budget multiplier (the base budget comes from missionRules) and the surface
+  // window in seconds. The badge shows exactly these two effects.
+  const difficulty = {easy:{factor:1.2,surfaceS:210},normal:{factor:1,surfaceS:180},hard:{factor:.8,surfaceS:140}};
   const EQUIPMENT_GROUPS = [['power','Power',/^power-/],['data','Data & comms',/^(comm|data)-/],['science','Science',/^(sci|drill|truss)-/],['edl','Landing',/^edl-/],['systems','Systems',/^(attitude|isru|hab)-/]];
   const CABIN_GROUPS = [['helena','Helena',['cabin-launch-seats','cabin-orion-cockpit','cabin-idss-docking']],['lucas','Lucas',['cabin-pcdu-thermal','cabin-eva-airlock','cabin-eclss-wrs']],['oscar','Oscar',['cabin-hera-dosimetry','cabin-scan-console','cabin-autonav-conjunction']],['maya','Maya',['cabin-ared-exercise','cabin-storm-shelter','cabin-msg-minion']]];
   const CREW_MODELS = { helena: 'characters/helena.glb', lucas: 'characters/lucas.glb', oscar: 'characters/oscar.glb', maya: 'characters/maya.glb' };
@@ -1275,7 +1276,7 @@
     function startSurface() {
       flight.design ||= captureDesign();
       surf.active = true;
-      surf.timerSec = state.difficulty === 'easy' ? 210 : state.difficulty === 'hard' ? 140 : 180;
+      surf.timerSec = difficulty[state.difficulty].surfaceS;
       surf.activeCrew = state.detail.kind === 'crew' ? state.detail.id : 'maya';
       surf.completed = new Set();
       surf.stranded = [];
@@ -1452,7 +1453,7 @@
   })();
   window.ASTRO_SIM = SIM;
   // Shared with the 3D modules below.
-  function renderBadge(){$('#modifier-badge').textContent=`${money(budgetOf(state.difficulty))} · ${difficulty[state.difficulty].risk}`;}
+  function renderBadge(){const s=difficulty[state.difficulty].surfaceS;$('#modifier-badge').textContent=`${money(budgetOf(state.difficulty))} · ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} on Mars`;}
   window.ASTRO_ART={RAMPS,PLANETS};
   window.ASTRO={state,crew,sites:SITES_INFO,toast,show:showScreen,showScreen,land:()=>SIM.startSurface(),data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL};
   paintArt();renderLobby();renderBadge();renderPlanner();setupStars();

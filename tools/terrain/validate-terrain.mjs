@@ -53,6 +53,12 @@ async function validateSite(site) {
   if (site.shadingCheck && !(site.shadingCheck.photoSun > site.shadingCheck.oppositeSun)) {
     problems.push('texture and relief do not line up (shading check)');
   }
+  try {
+    const stored = JSON.parse(await readFile(path.join(ROOT, 'references/datasets/mars-terrain', site.id, 'sources.json'), 'utf8'));
+    for (const name of ['hirise_dtm', 'hirise_ortho']) if (!stored.files?.[name]) problems.push(`source ${name} missing in references/datasets/mars-terrain/${site.id}`);
+  } catch {
+    problems.push(`references/datasets/mars-terrain/${site.id}/sources.json missing (npm run terrain:fetch)`);
+  }
   const d = site.deshading;
   if (!d) problems.push('de-shading not recorded');
   else if (d.ambientRatio !== null && !(Math.abs(d.textureVsRelief) < Math.abs(d.photoVsRelief))) {

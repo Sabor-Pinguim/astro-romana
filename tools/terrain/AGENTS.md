@@ -4,7 +4,8 @@ Regras só desta pasta. Elas **somam** às do [AGENTS.md da raiz](../../AGENTS.m
 
 ## O que é
 - **Fonte da verdade:** `sites.mjs` (sítios fixos). Os arquivos em `assets/terrain/` são gerados: nunca edite à mão.
-- **Dados:** o DTM estéreo do HiRISE (~1 m) dá o relevo, e a ortoimagem do mesmo par dá a textura. Vêm do catálogo STAC do USGS (CC0) em COG; o build baixa só os bytes do recorte, por *range request*. Fontes e ressalvas: [references/terrain/terrain-sources.md](../../references/terrain/terrain-sources.md).
+- **Dados:** o DTM estéreo do HiRISE (~1 m) dá o relevo, e a ortoimagem do mesmo par dá a textura. Vêm do catálogo STAC do USGS (CC0) em COG.
+- **Fontes no repositório:** o build lê só os recortes guardados em [references/datasets/mars-terrain/](../../references/datasets/mars-terrain/) (um README por sítio, gerado, com produto, links, versão, licença e crédito de cada arquivo), sem rede: o mesmo terreno em qualquer máquina. `npm run terrain:fetch` baixa de novo (só os bytes de cada recorte, por *range request*) e reescreve a pasta.
 - **Horizonte** (sítios com `horizonKm`): segundo nó `Horizon` no mesmo GLB, um anel polar até 100 km com a curvatura de Marte e uma textura polar (u = azimute, v = distância em escala log). Três fontes, a mais fina por cima: o próprio HiRISE até ~1,8 km; DTMs e ortoimagens do CTX (`ctx` em `sites.mjs`, ~20 m / ~6 m, mesmo catálogo STAC) até ~45 km; o DEM global HRSC–MOLA de 200 m até o fim (GeoTIFF de 11 GB sem COG: `lib/global-dem.mjs` lê uma linha por *range request*), com o sombreamento do relevo calculado com o sol da foto.
 - **Sítios atuais:**
   - `jezero`: pouso do Perseverance, recorte de 512 × 512 m (área para andar), desnível de 9 m;
@@ -27,13 +28,14 @@ Regras só desta pasta. Elas **somam** às do [AGENTS.md da raiz](../../AGENTS.m
   - horizonte de 128 anéis × 385 vértices (97 mil triângulos) e textura de 2048 × 1024 (JPEG q85);
   - GLB ≤ 5 MB.
 - **Checagem de alinhamento:** o build compara a foto com o relevo sombreado pelo sol da foto. Se a correlação não for maior que com o sol invertido, DTM e textura estão desalinhados.
-- **Números reais:** as elevações e o desnível do manifesto são medidos no DTM, com a fonte (URL e ETag) em `source`. A cor (`tint`) é de jogo.
-- **Rede com inspeção de HTTPS** (erro `SELF_SIGNED_CERT_IN_CHAIN`): rode com `NODE_OPTIONS=--use-system-ca`.
+- **Números reais:** as elevações e o desnível do manifesto são medidos no DTM, com a fonte (URL e ETag) em `source` e o arquivo guardado em `references/datasets/mars-terrain/`. A cor (`tint`) é de jogo.
+- **Rede com inspeção de HTTPS** (erro `SELF_SIGNED_CERT_IN_CHAIN`, só no `terrain:fetch`): rode com `NODE_OPTIONS=--use-system-ca`.
 
 ## Fluxo ao mudar um terreno
-1. `npm run terrain`: baixa o recorte, gera e valida. O build é determinístico: os mesmos dados geram os mesmos bytes. Para um sítio novo, rode `npm run terrain:build -- <id> --preview` e confira `tools/terrain/preview/` (ignorada pelo git).
-2. `npm run web:models`: regenera `index.terrain.<id>.js` dos locais de pouso.
-3. Faça commit junto do código, dos GLBs (a textura vai dentro deles), do `manifest.json` e dos `index.terrain.*.js`.
+1. Mudou a escolha de dados (sítio, recorte, resolução, produtos)? `npm run terrain:fetch -- <id>` baixa as fontes para `references/datasets/mars-terrain/<id>/`. Só mudou o processamento? Pule este passo.
+2. `npm run terrain`: gera (offline) e valida. O build é determinístico: os mesmos dados geram os mesmos bytes. Com `npm run terrain:build -- <id> --preview`, confira `tools/terrain/preview/` (ignorada pelo git).
+3. `npm run web:models`: regenera `index.terrain.<id>.js` dos locais de pouso.
+4. Faça commit junto do código, das fontes em `references/datasets/mars-terrain/`, dos GLBs, do `manifest.json` e dos `index.terrain.*.js`.
 
 ## Pendências conhecidas
 - **Horizonte:** as fotos do CTX são de outros dias, com sol parecido mas não igual ao da foto do HiRISE (a de Jezero `J03_045994…` é da mesma órbita). Fora das faixas do CTX (~11% do anel até 45 km) e além de 45 km o relevo é o do DEM de 200 m, mais suave. A silhueta segue a malha (~1° entre vértices).
