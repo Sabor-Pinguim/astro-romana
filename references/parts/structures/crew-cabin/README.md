@@ -12,7 +12,7 @@ status: game module (checked 2026-11)
 
 # Crew cabin
 
-The required top module: the pressurized cabin with **4 module slots** on two decks (`web/views.js` `CABIN_SLOTS`; modules from [cabin-equipment.md](../../cabin-equipment.md) at half scale), under a capsule cone, a docking ring and a launch abort tower. It replaces the old hand-made `rocket/cabin_cutaway.glb`, which had no source code. Real data on crew capsules (size, volume, crew) is in [crew-cabins.md](../../crew-cabins.md).
+The required top module: the pressurized cabin with **4 module slots** on two decks (`web/views.js` `CABIN_SLOTS`; modules from [cabin-equipment.md](../../cabin-equipment.md) at half scale), under a capsule cone, a docking ring and a launch abort tower. Real data on crew capsules (size, volume, crew) is in [crew-cabins.md](../../crew-cabins.md).
 
 **Two versions in one model:** the front half of the hull sits on the `Closed` node. The builder hides it (open cutaway: the crew sees the installed modules); the launch pad and other outside views show it (closed cabin, with the hatch and the windows). The middle stage module (`stage-module`) follows the same rule.
 

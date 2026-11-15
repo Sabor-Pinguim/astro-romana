@@ -1,6 +1,6 @@
 # Equipamentos dos Estágios do Meio (Catálogo de Gameplay e Missões)
 
-Este documento descreve os **16 módulos reais de equipamento** pesquisados para serem instalados nos **estágios internos do meio do foguete** (`internal_stage_cutaway.glb`) durante a Fase 3 (construção por *drag and drop*) e utilizados nas Fases 5 a 7 da missão.
+Este documento descreve os **16 módulos reais de equipamento** pesquisados para serem instalados nos **estágios internos do meio do foguete** (`parts/structures/stage-module.glb`) durante a Fase 3 (construção por *drag and drop*) e utilizados nas Fases 5 a 7 da missão.
 
 Enquanto os 21 modelos de motores e tanques de [references/parts/parts.md](../../references/parts/parts.md) compõem o **Main Booster** (Base), os **1 a 7 estágios intermediários idênticos** ficam entre o *Main Booster* e a *Cabine* e abrigam a carga útil: energia, comunicação, navegação de pouso, perfuração, suporte à vida e instrumentos científicos.
 
