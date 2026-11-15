@@ -19,6 +19,7 @@ references/parts/
   tanks/<id>/README.md     one folder per tank, with its photos
   structures/<id>/README.md  builder hull modules (booster thrust section, middle stage), no engine or tank of their own
   cockpit/<id>/README.md     first-person pilot panel (Orion layout)
+  fins/<id>/README.md        optional Main Booster fins (passive stability; damp the liftoff gusts)
   stage-equipment.md       middle-stage equipment modules
 ```
 

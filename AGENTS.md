@@ -216,7 +216,7 @@ O glTF não transporta partículas, então o projeto usa âncoras:
   - **⚠** = fontes divergem: confira antes de usar como fato.
   - **n/f** = não encontrado: use um valor de jogo e marque como fictício.
 - **Marcas extras:** `derived` = calculado a partir de outros valores (com a fórmula); `est.` = estimado por nós (diz como).
-- **Peças de foguete:** pasta `references/parts/<engines|tanks|structures|cockpit>/<id>/` com `README.md` no formato de `_template.md` (mesmas seções e chaves) e fotos. Os números de jogo e de simulação de cada peça (com a fonte de cada um) ficam em `tools/modeling/parts/specs.mjs` e saem no `manifest.json` das peças.
+- **Peças de foguete:** pasta `references/parts/<engines|tanks|structures|cockpit|fins>/<id>/` com `README.md` no formato de `_template.md` (mesmas seções e chaves) e fotos. Os números de jogo e de simulação de cada peça (com a fonte de cada um) ficam em `tools/modeling/parts/specs.mjs` e saem no `manifest.json` das peças.
 - **Fotos de referência:** só com licença livre (domínio público, CC0, CC BY, CC BY-SA), com fonte, autor e licença na tabela do README. As demais entram só como link.
 - **Cards "Fato real":** nunca invente fatos.
 - **Datas:** o "hoje" do projeto segue a data real. Status de missões (operando, perdida, cancelada) devem ser conferidos quando forem usados.

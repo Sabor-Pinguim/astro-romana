@@ -141,12 +141,17 @@ const cockpitPilot = {
       const a = deg * DEG;
       pin('Navball', 'Hull', ring(NAV_R * Math.cos(a) * 1.005, 0.0022, 20, 3), [0, NAV_R * Math.sin(a), 0]);
     }
-    const front = NAV_R + 0.012, edge = NAV_R * Math.sin(NAV_BAND_DEG * DEG);
-    on(NAV, 'LedAmber', box(0.012, 0.012, 0.004), 0, 0, front);
-    for (const sx of [-1, 1]) on(NAV, 'LedAmber', box(0.04, 0.007, 0.004), sx * 0.036, 0, front);
+    // A meridian shows yaw; the green target on the front of the ball is what the pilot keeps centred.
+    pin('Navball', 'Hull', ring(NAV_R * 1.01, 0.0022, 24, 3), [0, 0, 0], [0, 0, 90]);
+    pin('Navball', 'LedGreen', ring(0.013, 0.0025, 12, 3), [0, 0, NAV_R + 0.002], [90, 0, 0]);
+    for (const [x, y] of [[0, 0.02], [-0.02, 0], [0.02, 0]]) pin('Navball', 'LedGreen', box(x ? 0.012 : 0.003, x ? 0.003 : 0.012, 0.004), [x, y, NAV_R - 0.002]);
+    // Fixed: the aircraft symbol (where the nose points) and the corners of the band, a square around it.
+    const front = NAV_R + 0.012, edge = NAV_R * Math.sin(NAV_BAND_DEG * DEG), arm = 0.014, bar = 0.004;
+    on(NAV, 'LedAmber', box(0.008, 0.008, 0.004), 0, 0, front);
+    for (const sx of [-1, 1]) on(NAV, 'LedAmber', box(0.016, 0.005, 0.004), sx * 0.016, 0, front);
     for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
-      on(NAV, 'LedGreen', box(0.03, 0.005, 0.004), sx * 0.082, sy * edge, front - 0.01);
-      on(NAV, 'LedGreen', box(0.005, 0.016, 0.004), sx * 0.0945, sy * (edge - 0.0055), front - 0.01);
+      on(NAV, 'LedGreen', box(arm, bar, 0.004), sx * (edge - arm / 2 + bar / 2), sy * edge, front);
+      on(NAV, 'LedGreen', box(bar, arm, 0.004), sx * edge, sy * (edge - arm / 2 + bar / 2), front);
     }
     [[0.15, 'LedGreen'], [0.11, 'LedGreen'], [0.17, 'Lamp'], [0.08, 'LedAmber'], [0.13, 'LedGreen']].forEach(([h, mat], i) => {
       on(PANEL, mat, box(0.035, h, 0.002), -0.12 + i * 0.06, -0.035 + h / 2, S);

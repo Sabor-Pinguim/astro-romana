@@ -889,6 +889,36 @@ export const PART_SPECS = {
   // =========================================================================
   // 6. BUILDER STRUCTURES (2) — hull modules with Attach_* mounting points, no engine or tank of their own
   // =========================================================================
+  // Fins (optional, Main Booster only): passive aerodynamic stability through Max-Q. aeroDriftFactor scales the
+  // gusts of the liftoff minigame (1 = no fins). All values game-balance; real basis in references/parts/fins/.
+  'fins-small': {
+    massDryKg: 180,
+    propellantMassKg: 0,
+    powerW: 0,
+    costM: 2.0,
+    dataRateKbps: 0,
+    aeroDriftFactor: 0.8,
+    sources: {
+      massDryKg: 'game-balance (est.; normalized booster, small fixed fins)',
+      powerW: 'game-balance (passive)',
+      costM: 'game-balance',
+      aeroDriftFactor: 'game-balance (fixed fins move the centre of pressure aft: passive stability)',
+    },
+  },
+  'fins-large': {
+    massDryKg: 900,
+    propellantMassKg: 0,
+    powerW: 0,
+    costM: 5.5,
+    dataRateKbps: 0,
+    aeroDriftFactor: 0.6,
+    sources: {
+      massDryKg: 'game-balance (est.; normalized booster, large fins with fairings as on the S-IC)',
+      powerW: 'game-balance (passive)',
+      costM: 'game-balance',
+      aeroDriftFactor: 'game-balance (larger fin area, more passive stability)',
+    },
+  },
   'booster-thrust-section': {
     massDryKg: 1200,
     propellantMassKg: 0,

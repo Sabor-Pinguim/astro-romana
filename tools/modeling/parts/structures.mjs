@@ -29,7 +29,7 @@ const boosterThrustSection = {
   displayName: 'Booster Thrust Section',
   vehicle: 'Main Booster (required base)',
   role: 'Aft skirt with thrust plate: takes the engine cluster below and the tank above',
-  summary: 'Slightly conical white skirt with a black band, four fins, a steel thrust plate and a hexagonal engine mounting boss.',
+  summary: 'Slightly conical white skirt with a black band, a steel thrust plate and a hexagonal engine mounting boss; fins are an optional part.',
   originNote: 'Bottom plane of the thrust plate; engines hang below y = 0',
   references: ['references/parts/structures/booster-thrust-section/README.md'],
   build() {
@@ -57,14 +57,7 @@ const boosterThrustSection = {
       .add('Root', 'Hull', cylOpen(0.5, 0.53, 0.42, 12), { p: [0, 0.27, 0] })
       .add('Root', 'HullBlack', cylOpen(0.535, 0.535, 0.08, 12), { p: [0, 0.1, 0] })
       .add('Root', 'Aluminum', flatRing(0.52, 0.44, 0.04, 12), { p: [0, 0.48, 0] });
-    for (let k = 0; k < 4; k++) {
-      const a = 45 + k * 90;
-      const rad = (a * Math.PI) / 180;
-      p.add('Root', 'HullBlack', box(0.03, 0.34, 0.24), {
-        p: [Math.sin(rad) * 0.64, 0.19, Math.cos(rad) * 0.64],
-        r: [0, a, 0],
-      });
-    }
+    // No fins of its own: fins are an optional booster part (fins.mjs), bolted on the same skirt.
     return p;
   },
 };
