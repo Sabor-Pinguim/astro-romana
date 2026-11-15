@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T12:27:23.294Z",
+  "generatedAt": "2026-11-15T18:09:38.798Z",
   "generator": "tools/modeling/build-avatars.mjs",
   "conventions": {
     "units": "meters",
@@ -320,7 +320,7 @@
       "role": "Comandante e Piloto",
       "accent": "#D7263D",
       "file": "characters/helena.glb",
-      "summary": "Faixa central vermelha no capacete, listras no arnês do peito, duplas faixas horizontais nas coxas, visor dourado e propulsor SAFER nas costas.",
+      "summary": "Faixa central vermelha no capacete, listras no arnês do peito, duplas faixas horizontais nas coxas, visor dourado, propulsor SAFER nas costas e kit de manutenção com chave de fenda.",
       "equipment": [
         {
           "item": "Faixa vermelha central no capacete, no arnês e duplas faixas nas coxas",
@@ -341,91 +341,17 @@
         {
           "item": "Checklist no pulso esquerdo",
           "basis": "Cuff checklist usado em caminhadas espaciais"
+        },
+        {
+          "item": "Chave de fenda EVA e painel de manutenção da nave (ação)",
+          "basis": "Ferramenta manual de reparo e caixa de junção usadas em manutenção de espaçonaves e EVAs"
         }
       ],
       "animations": {
         "idle_loop": "Parada, respirando",
         "walk_loop": "Caminhada em baixa gravidade",
         "wave": "Aceno",
-        "action_loop": "Pairando com o propulsor (partículas nos bocais)"
-      },
-      "fx": [
-        {
-          "anchor": "FX_Thruster_L",
-          "preset": "thrust",
-          "clips": [
-            "action_loop"
-          ]
-        },
-        {
-          "anchor": "FX_Thruster_R",
-          "preset": "thrust",
-          "clips": [
-            "action_loop"
-          ]
-        },
-        {
-          "anchor": "FX_Foot_L",
-          "preset": "footdust",
-          "clips": [
-            "walk_loop"
-          ]
-        },
-        {
-          "anchor": "FX_Foot_R",
-          "preset": "footdust",
-          "clips": [
-            "walk_loop"
-          ]
-        }
-      ],
-      "budget": {
-        "triangles": 3000
-      },
-      "stats": {
-        "triangles": 2740,
-        "meshes": 44,
-        "bytes": 263148
-      }
-    },
-    {
-      "id": "lucas",
-      "name": "Lucas",
-      "role": "Engenheiro de Sistemas",
-      "accent": "#F2A900",
-      "file": "characters/lucas.glb",
-      "summary": "Duas listras paralelas âmbar no capacete, joelheiras e biqueiras reforçadas, faixas duplas nas canelas e faixa no antebraço, painel ROSA e furadeira.",
-      "equipment": [
-        {
-          "item": "Duas listras paralelas no capacete, faixas duplas nas canelas e faixa no antebraço",
-          "basis": "Marcações âmbar de alta visibilidade para identificação do engenheiro"
-        },
-        {
-          "item": "Painel solar enrolado sobre a mochila",
-          "basis": "ROSA, painel solar que se desenrola, testado na ISS"
-        },
-        {
-          "item": "Módulo de bateria com LEDs de carga",
-          "basis": "Baterias que cobrem picos de consumo (Perseverance)"
-        },
-        {
-          "item": "Furadeira de mão",
-          "basis": "Pistol Grip Tool, ferramenta motorizada das caminhadas espaciais na ISS"
-        },
-        {
-          "item": "Cinto com bolsas de ferramentas",
-          "basis": "Ferramentas presas ao traje por cabos e bolsas nas EVAs"
-        },
-        {
-          "item": "Joelheiras e biqueiras âmbar",
-          "basis": "Reforço de abrasão (estilizado)"
-        }
-      ],
-      "animations": {
-        "idle_loop": "Parado, respirando",
-        "walk_loop": "Caminhada em baixa gravidade",
-        "wave": "Aceno",
-        "action_loop": "Consertando com a furadeira (faíscas na ponta)"
+        "action_loop": "Usa a chave de fenda para ajustar um painel de manutenção da nave"
       },
       "fx": [
         {
@@ -454,9 +380,73 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2956,
+        "triangles": 2952,
         "meshes": 49,
-        "bytes": 283500
+        "bytes": 284924
+      }
+    },
+    {
+      "id": "lucas",
+      "name": "Lucas",
+      "role": "Engenheiro de Sistemas",
+      "accent": "#F2A900",
+      "file": "characters/lucas.glb",
+      "summary": "Duas listras paralelas âmbar no capacete, joelheiras e biqueiras reforçadas, faixas duplas nas canelas e faixa no antebraço, painel ROSA e computador portátil de campo.",
+      "equipment": [
+        {
+          "item": "Duas listras paralelas no capacete, faixas duplas nas canelas e faixa no antebraço",
+          "basis": "Marcações âmbar de alta visibilidade para identificação do engenheiro"
+        },
+        {
+          "item": "Painel solar enrolado sobre a mochila",
+          "basis": "ROSA, painel solar que se desenrola, testado na ISS"
+        },
+        {
+          "item": "Módulo de bateria com LEDs de carga",
+          "basis": "Baterias que cobrem picos de consumo (Perseverance)"
+        },
+        {
+          "item": "Computador portátil rugerizado de campo (EVA)",
+          "basis": "Laptops de operação e diagnóstico usados em EVAs / estação espacial"
+        },
+        {
+          "item": "Cinto com bolsas de ferramentas",
+          "basis": "Ferramentas presas ao traje por cabos e bolsas nas EVAs"
+        },
+        {
+          "item": "Joelheiras e biqueiras âmbar",
+          "basis": "Reforço de abrasão (estilizado)"
+        }
+      ],
+      "animations": {
+        "idle_loop": "Parado, respirando",
+        "walk_loop": "Caminhada em baixa gravidade",
+        "wave": "Aceno",
+        "action_loop": "Segura o computador portátil de campo e digita comandos de diagnóstico"
+      },
+      "fx": [
+        {
+          "anchor": "FX_Foot_L",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_R",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        }
+      ],
+      "budget": {
+        "triangles": 3000
+      },
+      "stats": {
+        "triangles": 2936,
+        "meshes": 50,
+        "bytes": 284180
       }
     },
     {
@@ -465,7 +455,7 @@
       "role": "Especialista de Dados e Telecom",
       "accent": "#1FA2FF",
       "file": "characters/oscar.glb",
-      "summary": "Faixa azul frontal na aba do capacete, ombreiras e bandas triplas de telemetria nos braços, antenas na mochila e tablet no pulso.",
+      "summary": "Faixa azul frontal na aba do capacete, ombreiras e bandas triplas de telemetria nos braços, antenas na mochila, tablet no pulso e antena portátil de solo.",
       "equipment": [
         {
           "item": "Listra frontal no capacete, ombreiras azuis, bandas triplas nos braços e faixa alta nas coxas",
@@ -486,13 +476,17 @@
         {
           "item": "Câmera extra no capacete",
           "basis": "Câmera HD do conjunto de luzes e câmeras do capacete (EHIP) na ISS"
+        },
+        {
+          "item": "Antena parabólica portátil de solo com tripé (ação)",
+          "basis": "Terminais portáteis de solo e antenas de alto ganho usadas para enlace orbital"
         }
       ],
       "animations": {
         "idle_loop": "Parado, respirando",
         "walk_loop": "Caminhada em baixa gravidade",
         "wave": "Aceno",
-        "action_loop": "Transmitindo pelo tablet (pulsos na antena)"
+        "action_loop": "Agacha para alinhar uma antena portátil de solo"
       },
       "fx": [
         {
@@ -521,9 +515,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2876,
-        "meshes": 47,
-        "bytes": 269820
+        "triangles": 2972,
+        "meshes": 50,
+        "bytes": 285504
       }
     },
     {
@@ -588,9 +582,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2800,
-        "meshes": 48,
-        "bytes": 271672
+        "triangles": 2892,
+        "meshes": 50,
+        "bytes": 279812
       }
     }
   ],
@@ -604,16 +598,6 @@
     "minBareLiftoffTwr": 1,
     "maxInternalStages": 7,
     "cabinModuleSlots": 4,
-    "cabinHull": {
-      "massDryKg": 3000,
-      "powerW": -300,
-      "costM": 12,
-      "sources": {
-        "massDryKg": "game-balance",
-        "powerW": "game-balance (base life support)",
-        "costM": "game-balance"
-      }
-    },
     "mandatoryOrbitalRefuelingForMars": true,
     "note": "g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5."
   },
@@ -3729,9 +3713,9 @@
       "category": "structures",
       "tier": 1,
       "vehicle": "Middle stages (0 to 7, stackable)",
-      "role": "Open cutaway bay with a mounting point for 1 equipment item",
+      "role": "Cutaway bay with a mounting point for 1 equipment item; the front half (node Closed) closes it",
       "file": "parts/structures/stage-module.glb",
-      "summary": "White half shell open to the front, dark inner wall, aluminum decks and a gold hexagonal mounting plate at the bay center.",
+      "summary": "White half shell open to the front, dark inner wall, aluminum decks and a gold hexagonal mounting plate at the bay center; the Closed node adds the front half with its black band and an access panel.",
       "originNote": "Bottom interface (y = 0); next module fits at y = 1",
       "requiredNodes": [
         "Attach_Top",
@@ -3742,7 +3726,7 @@
       "dimensions": {
         "width": 1.01,
         "height": 1,
-        "depth": 1.005,
+        "depth": 1.01,
         "minY": 0,
         "maxY": 1
       },
@@ -3760,15 +3744,63 @@
       },
       "budget": {
         "triangles": 700,
-        "meshes": 8
+        "meshes": 10
       },
       "stats": {
-        "triangles": 264,
-        "meshes": 6,
-        "bytes": 24012
+        "triangles": 324,
+        "meshes": 9,
+        "bytes": 30156
       },
       "references": [
         "references/parts/structures/stage-module/README.md"
+      ]
+    },
+    {
+      "id": "crew-cabin",
+      "name": "Crew Cabin",
+      "nodeName": "CrewCabin",
+      "category": "structures",
+      "tier": 1,
+      "vehicle": "Crew cabin (required top)",
+      "role": "Pressurized cabin with 4 module slots under a launch abort tower; the front half (node Closed) closes it",
+      "file": "parts/structures/crew-cabin.glb",
+      "summary": "White cylinder and capsule cone cut open to the front, dark inner wall, two aluminum decks, a gold-foil upper bulkhead, a docking ring and a launch abort tower; the Closed node adds the front half with the hatch and two windows.",
+      "originNote": "Center of the cabin floor (y = 0); the cutaway opening faces +Z",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 1.01,
+        "height": 2.15,
+        "depth": 1.018,
+        "minY": 0,
+        "maxY": 2.15
+      },
+      "specs": {
+        "massDryKg": 3000,
+        "propellantMassKg": 0,
+        "powerW": -300,
+        "costM": 12,
+        "dataRateKbps": 0,
+        "sources": {
+          "massDryKg": "game-balance (references/parts/structures/crew-cabin/README.md: normalized pressurized cabin and abort tower)",
+          "powerW": "game-balance (base life support)",
+          "costM": "game-balance (mandatory crew cabin)"
+        }
+      },
+      "budget": {
+        "triangles": 1400,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 792,
+        "meshes": 9,
+        "bytes": 64008
+      },
+      "references": [
+        "references/parts/structures/crew-cabin/README.md"
       ]
     },
     {

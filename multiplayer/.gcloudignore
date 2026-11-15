@@ -1,0 +1,4 @@
+# Files not uploaded by `gcloud run deploy --source multiplayer` (Cloud Build installs dependencies itself).
+.gcloudignore
+node_modules/
+test/

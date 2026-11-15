@@ -1,7 +1,8 @@
 // Bundles what index.html loads into index.models.js, so the prototype also works when opened
 // straight from disk (browsers block fetch() on file://):
 //   - GLBs named in the page (`rocket/…`, `parts/…`, `characters/…` string literals);
-//   - every part the rocket builder offers (booster engines and tanks, equipment, cabin modules, structures);
+//   - every part the rocket builder offers (booster and upper-stage engines, stage tanks, equipment, cabin
+//     modules, structures);
 //   - the part specs and mission rules (window.ASTRO_FILES['parts/manifest.json'], trimmed);
 //   - the terrain of each landing site, one index.terrain.<site>.js per site (window.ASTRO_TERRAIN).
 // Usage: npm run web:models
@@ -13,8 +14,8 @@ const modelsDir = path.join(root, 'assets/models');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const sources = [html, ...fs.readdirSync(path.join(root, 'web')).filter((file) => file.endsWith('.js')).map((file) => fs.readFileSync(path.join(root, 'web', file), 'utf8'))].join('\n');
 const manifest = JSON.parse(fs.readFileSync(path.join(modelsDir, 'parts/manifest.json'), 'utf8'));
-// Same filter as the builder in index.html.
-const offered = manifest.parts.filter((p) => (p.category === 'engines' ? p.specs?.engineRole === 'booster'
+// Same filter as the builder (partsFor in web/app.js): stage 1 takes booster engines, upper stages the vacuum ones.
+const offered = manifest.parts.filter((p) => (p.category === 'engines' ? ['booster', 'upper-stage'].includes(p.specs?.engineRole)
   : p.category === 'tanks' ? p.specs?.tankRole === 'stage'
     : ['equipment', 'cabin', 'structures', 'fins'].includes(p.category)));
 const files = [...new Set([

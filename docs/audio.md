@@ -51,7 +51,7 @@ Os cliques são disparados pelo jogo:
   - toque `rad_storm_2024_05_20` por cima do fundo;
   - se quiser, baixe o fundo ~6 dB enquanto ela toca;
   - para sincronizar o medidor de dose e os cliques com o som, use `stems[1].envelope`: a dose (µGy/dia) a cada `stepS` segundos do arquivo.
-- **Multiplayer:** a dose é estado do jogo e quem decide é o servidor. O som é local: cada cliente toca o seu a partir do estado recebido.
+- **Multiplayer:** a dose é estado do jogo e quem decide é o host (ver [multiplayer.md](multiplayer.md)). O som é local: cada cliente toca o seu a partir do estado recebido.
 - **Web:** o jogo só toca os WAV prontos e ajusta o volume; nada de síntese ou efeitos em tempo real.
 
 ---

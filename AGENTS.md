@@ -23,6 +23,7 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 | [references/datasets/earth/](references/datasets/earth/) | Grades globais da Terra (cobertura do solo, relevo, gelo marinho) que geram o planeta low poly |
 | [docs/visual-identity.md](docs/visual-identity.md) | Identidade visual (low poly facetado): paleta, fontes, formas, arte gerada |
 | [docs/audio.md](docs/audio.md) | Paisagem sonora gerada a partir desses dados de radiação |
+| [docs/multiplayer.md](docs/multiplayer.md) | Multiplayer: servidor de salas (`multiplayer/`) e o plano de integração do cliente |
 
 ---
 
@@ -47,6 +48,7 @@ tools/
   terrain/              terrenos a partir de DTMs do HiRISE; regras em tools/terrain/AGENTS.md
   web/                  empacota modelos e specs usados pelo index.html (index.models.js)
 package.json            dependências e scripts dos geradores (npm run models, npm run audio)
+multiplayer/            servidor de salas (Node + ws, Cloud Run), cliente RoomClient e página de teste; pacote próprio
 ```
 
 ---
@@ -59,7 +61,7 @@ package.json            dependências e scripts dos geradores (npm run models, n
 | Assets | `assets/` (models, audio, terrain), saída dos geradores offline | Um só lugar para o jogo, o visualizador e os pacotes da página |
 | Linguagem (código do jogo MVP) | **HTML / CSS / JS (ES modules CDN)** sem etapa de build | Edição imediata, zero dependências de runtime além do Three.js 0.186.1 |
 | Godot | Não é mais usado (removido em 2026-11) | O MVP é só web |
-| Multiplayer, protótipo web / futuro | Simulação cooperativa local com tripulação IA em `index.html` (multiplayer P2P/WebSocket opcional pós-hackathon) | Garante entrega jogável das 7 fases no prazo do desafio |
+| Multiplayer | Servidor de salas em `multiplayer/` (WebSocket, Cloud Run) que só repassa mensagens; o host (Helena) roda as regras. Integração do cliente: [docs/multiplayer.md](docs/multiplayer.md) | O fluxo e o game loop atuais seguem no navegador; vaga sem jogador fica com a IA |
 | Ferramentas | Node ≥ 20; `three` fixado em **0.186.1** (mesma versão nos import maps do visualizador e do `index.html`) | Builds reprodutíveis |
 
 ---
@@ -125,7 +127,7 @@ Hips > Torso > Head
      > UpperLeg_R > LowerLeg_R > Foot_R
 ```
 
-- Pivôs são nós vazios na articulação. As meshes ficam como filhas e se chamam `<Pivô>_<Material>`.
+- Pivôs são nós vazios na articulação. As meshes ficam como filhas e se chamam `<Pivô>_<Material>`. Itens temporários de `action_loop` usam nós `Prop_<Nome>` (via `avatar.prop()`), exibidos apenas enquanto `action_loop` toca.
 - **Não renomeie pivôs.** Para adicionar um, atualize juntos:
   - `RIG` em `lib/avatar.mjs`;
   - `validate.mjs`;
@@ -150,15 +152,14 @@ Hips > Torso > Head
 ### 5.6 Partículas
 O glTF não transporta partículas, então o projeto usa âncoras:
 - **Âncoras:** nós vazios chamados `FX_<Nome>`. Emitem ao longo do seu **+Y local** e guardam `userData.fx = "<preset>"`, que vira `extras` no glTF.
-- **Registro:** cada âncora é registrada com `clips`, a lista de animações em que fica ativa. Exemplo: o propulsor da Helena só liga em `action_loop`.
+- **Registro:** cada âncora é registrada com `clips`, a lista de animações em que fica ativa. Exemplo: as faíscas (`FX_Sparks`) da Helena só ligam em `action_loop`.
 - **Presets:** ficam em `lib/fx-presets.mjs`, em unidades SI, com a gravidade de Marte de 3,71 m/s². O gerador os copia para o `manifest.json`.
 - **No jogo:** as partículas devem ser criadas a partir desses mesmos números.
 - **Âncoras atuais:**
 
   | Âncora | Personagem | Preset |
   |---|---|---|
-  | `FX_Thruster_L/R` | Helena | thrust |
-  | `FX_Sparks` | Lucas | sparks |
+  | `FX_Sparks` | Helena | sparks |
   | `FX_Antenna` | Oscar | signal |
   | `FX_Scoop` | Maya | dust |
   | `FX_Foot_L/R` | todos | footdust |
@@ -271,6 +272,7 @@ npm run models:build:bodies    # gera os planetas (ex.: -- earth)
 npm run audio                  # gera a paisagem sonora e valida
 npm run audio:fetch            # baixa de novo os dados do RAD (só para mudar as janelas de dados)
 npm run terrain                # terrenos reais de Marte (regras em tools/terrain/AGENTS.md)
+cd multiplayer && npm install && npm start   # servidor de salas + página de teste (localhost:8787); npm test valida
 ```
 
 ---

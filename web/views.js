@@ -119,6 +119,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     const mine = ++token, gltf = await loadGLTF(AVATARS[id]);
     if (mine !== token) return;
     const model = gltf.scene.clone(true);
+    model.traverse(o => { if (o.name.startsWith('Prop_')) o.visible = false; });
     holder.clear(); holder.add(model);
     mixer = new THREE.AnimationMixer(model);
     const clip = name => THREE.AnimationClip.findByName(gltf.animations, name);
@@ -151,7 +152,10 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   if (!view) return;
   blueprint.classList.add('is-3d');
   const { scene, camera, renderer } = view, overlay = blueprint.querySelector('#stack-overlay');
-  const HULL = { booster: 'parts/structures/booster-thrust-section.glb', stage: 'parts/structures/stage-module.glb', cabin: 'rocket/cabin_cutaway.glb' };
+  const HULL = { booster: 'parts/structures/booster-thrust-section.glb', stage: 'parts/structures/stage-module.glb', cabin: 'parts/structures/crew-cabin.glb' };
+  // Two versions of each hull: open here (the front half, node `Closed`, hidden so the bay shows) and closed
+  // for outside views (launch pad), where the equipment is stowed inside and not loaded.
+  const hullOf = async (file, closed) => { const h = await loadGLB(file), cover = h.getObjectByName('Closed'); if (cover) cover.visible = closed; return h; };
   const CABIN_SLOTS = [[-.2, .03], [.2, .03], [-.2, .5], [.2, .5]]; // x, y on the cabin deck; modules at half scale
   const GAP = .36, TANK_CAP = 3.2;
   const stack = new THREE.Group(); scene.add(stack);
@@ -199,20 +203,21 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     g.userData.top = top;
     return g;
   }
-  async function stage(r, i, parts) {
+  async function stage(r, i, parts, closed = false) {
     if (r.stages[i].type === 'booster') return booster({ booster: r.stages[i] }, parts, `stage-${i}`);
-    const g = new THREE.Group(), hull = await loadGLB(HULL.stage), key = `stage-${i}`, item = r.stages[i].item;
+    const g = new THREE.Group(), hull = await hullOf(HULL.stage, closed), key = `stage-${i}`, item = r.stages[i].item;
     g.userData.module = key; g.add(hull);
     const bay = attach(hull, 'Attach_Bay', .1);
-    if (item) { const e = await loadGLB(parts[item].file); e.position.y = bay; g.add(e); }
+    if (closed) { /* equipment stowed inside the closed bay */ }
+    else if (item) { const e = await loadGLB(parts[item].file); e.position.y = bay; g.add(e); }
     else { const m = mountPoint(.16, { module: key }); m.position.y = bay + .01; g.add(m); }
     g.userData.top = attach(hull, 'Attach_Top', 1);
     return g;
   }
-  async function cabin(r, parts) {
+  async function cabin(r, parts, closed = false) {
     const g = new THREE.Group();
-    g.userData.module = 'cabin'; g.add(await loadGLB(HULL.cabin));
-    for (let k = 0; k < CABIN_SLOTS.length; k++) {
+    g.userData.module = 'cabin'; g.add(await hullOf(HULL.cabin, closed));
+    for (let k = 0; k < (closed ? 0 : CABIN_SLOTS.length); k++) {
       const [x, y] = CABIN_SLOTS[k], id = r.cabin[k];
       if (id) { const e = await loadGLB(parts[id].file); e.scale.setScalar(.5); e.position.set(x, y, 0); g.add(e); }
       else { const m = mountPoint(.08, { module: 'cabin' }); m.position.set(x, y + .01, 0); g.add(m); }
@@ -275,6 +280,24 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   }
   window.addEventListener('astro:rocket', rebuild);
   rebuild();
+  // Launch pad (web/launch.js) and other outside views: the same assembly, closed, stacked without gaps,
+  // mounting points or selection rings.
+  window.ASTRO_BUILD_ROCKET = async () => {
+    const data = ui.data(), r = ui.state.rocket;
+    const groups = await Promise.all([booster(r, data.parts), ...r.stages.map((_, i) => stage(r, i, data.parts, true)), cabin(r, data.parts, true)]);
+    const rocket = new THREE.Group();
+    let y = 0;
+    for (const g of groups) {
+      g.traverse(o => { if (o.userData.pulse) o.visible = false; });
+      g.position.y = y; rocket.add(g); y += g.userData.top;
+    }
+    const cab = groups[groups.length - 1], mark = cab.getObjectByName('View_Window') ?? new THREE.Object3D(); // the pilot's windows
+    if (!mark.parent) { mark.position.y = cab.userData.top / 2; cab.add(mark); }
+    rocket.updateMatrixWorld(true);
+    const minY = new THREE.Box3().setFromObject(rocket).min.y;
+    rocket.userData = { height: y, minY, cabin: mark, cabinMid: cab.position.y + cab.userData.top / 2 };
+    return rocket;
+  };
 
   // Clicks: a mounting point selects its module and catalog tab; anything else selects its module.
   const ray = new THREE.Raycaster(), pointer = new THREE.Vector2();
@@ -618,23 +641,48 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     const wave = mixer.clipAction(clip('wave')), action = mixer.clipAction(clip('action_loop'));
     idle.play(); walk.play(); walk.setEffectiveWeight(0);
     wave.setLoop(THREE.LoopOnce, 1);
-    mixer.addEventListener('finished', e => { if (e.action === wave && world.avatar?.id === id && s.emote?.kind === 'wave') endEmote(); });
+    const props = [];
+    body.traverse(o => {
+      if (o.isMesh) o.castShadow = true;
+      if (o.name.startsWith('Prop_')) { o.visible = false; props.push(o); }
+    });
     const head = body.getObjectByName('Head'), helmet = [];
-    body.traverse(o => { if (o.isMesh) o.castShadow = true; });
     head.traverse(o => { if (o.isMesh) { o.userData.mat = o.material; helmet.push(o); } });
     body.updateMatrixWorld(true);
-    const a = { id, body, mixer, idle, walk, wave, action, emoteAction: null, emoteW: 0, head, helmet, walkW: 0, eyeY: head.getWorldPosition(new THREE.Vector3()).y, pos: new THREE.Vector3(), bodyYaw: 0 };
+    const idx = world.avatars.size;
+    const a = { id, body, mixer, idle, walk, wave, action, props, emoteAction: null, emoteW: 0, actW: 0, head, helmet, walkW: 0,
+      eyeY: head.getWorldPosition(new THREE.Vector3()).y, pos: new THREE.Vector3(), bodyYaw: 0,
+      ai: { state: 'idle', last: 'idle', timer: 1.5 + idx * 0.9, tx: 0, tz: 0, waveCd: 0 } };
+    mixer.addEventListener('finished', e => {
+      if (e.action !== wave) return;
+      if (world.avatar?.id === id && s.emote?.kind === 'wave') endEmote();
+      else if (world.avatar?.id !== id && a.ai.state === 'wave') {
+        wave.stop();
+        idle.setEffectiveWeight(1);
+        a.ai.state = 'idle'; a.ai.timer = 1.8 + Math.random() * 2;
+      }
+    });
     world.avatars.set(id, a); world.scene.add(body);
     return a;
   }
-  // Every crew member stands on the surface; the player controls one (keys 1–4), the others wait where they were left.
+  // Every crew member stands on the surface; the player controls one (keys 1–4), while others run simple autonomous AI.
   async function useCrew(id) {
     endEmote();
     const prev = world.avatar;
     s.crew = id; renderCrewBar();
     const a = await loadCrew(id);
     if (s.crew !== id) return;
-    if (prev && prev !== a) { prev.pos.copy(s.pos); prev.bodyYaw = s.bodyYaw; }
+    if (prev && prev !== a) {
+      prev.pos.copy(s.pos); prev.bodyYaw = s.bodyYaw;
+      prev.action.stop(); prev.wave.stop();
+      prev.emoteAction = null; prev.emoteW = 0; prev.actW = 0;
+      for (const p of prev.props) p.visible = false;
+      prev.ai = { state: 'idle', last: 'idle', timer: 2 + Math.random() * 2, tx: prev.pos.x, tz: prev.pos.z, waveCd: 3 };
+    }
+    a.action.stop(); a.wave.stop();
+    a.emoteAction = null; a.emoteW = 0; a.actW = 0;
+    for (const p of a.props) p.visible = false;
+    a.ai.state = 'idle';
     world.avatar = a;
     s.pos.copy(a.pos); s.bodyYaw = a.bodyYaw; s.yaw = a.bodyYaw - Math.PI; s.vy = 0; s.grounded = true;
     if (sim()) sim().surf.activeCrew = id;
@@ -715,7 +763,14 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       world.lander.position.set(0, t.hf.at(0, 0), 0);
       placeBlocks(); buildCompass();
       await Promise.all(ui.crew.map(c => loadCrew(c.id)));
-      for (const [id, [x, z]] of Object.entries(CREW_START)) { const a = world.avatars.get(id); a.pos.set(x, t.hf.at(x, z), z); a.bodyYaw = 0; }
+      let idx = 0;
+      for (const [id, [x, z]] of Object.entries(CREW_START)) {
+        const a = world.avatars.get(id);
+        a.pos.set(x, t.hf.at(x, z), z); a.bodyYaw = 0;
+        a.action.stop(); a.wave.stop(); a.emoteAction = null; a.emoteW = 0; a.actW = 0; a.walkW = 0;
+        for (const p of a.props) p.visible = false;
+        a.ai = { state: 'idle', last: 'idle', timer: 1.2 + idx++ * 0.85, tx: x, tz: z, waveCd: 1.5 };
+      }
       world.avatar = null; s.pitch = -.1;
       await useCrew(crew);
       const first = world.blocks.find(b => b.userData.exp.crew === crew)?.position ?? world.blocks[0].position;
@@ -732,8 +787,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
 
   // Emote wheel: the animations every avatar has (AGENTS.md §5.5). Hold Q, aim with the mouse and release;
   // or click/tap the 😀 button and pick. In first person the camera steps back while the emote plays.
-  // Helena's action_loop (jet-pack hover) makes no sense on the Martian surface, so she has no action emote.
-  const ACTION_EMOTE = { lucas: ['🔧', 'Repair'], oscar: ['📡', 'Transmit'], maya: ['🧪', 'Sample'] };
+  const ACTION_EMOTE = { helena: ['🪛', 'Tinker'], lucas: ['💻', 'Computer'], oscar: ['📡', 'Antenna'], maya: ['🧪', 'Sample'] };
   const wheelEl = $s('emote-wheel');
   const emotes = () => [['wave', '👋', 'Wave'], ...(ACTION_EMOTE[s.crew] ? [['action', ...ACTION_EMOTE[s.crew]]] : []), ['walk', '🚶', 'Walk'], ['idle', '🧍', 'Idle']];
   const wheel = { open: false, hold: false, pick: -1, x: 0, y: 0 };
@@ -772,11 +826,14 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     endEmote();
     if (kind === 'idle') return;
     s.emote = { kind };
+    for (const p of a.props) p.visible = (kind === 'action');
     if (kind === 'wave' || kind === 'action') { a.emoteAction = a[kind]; a.emoteAction.reset().play(); }
     if (s.mode === 'first') { s.emoteCam = true; setMode('third'); }
   }
   function endEmote() {
     if (!s.emote) return;
+    const a = world?.avatar;
+    if (a) for (const p of a.props) p.visible = false;
     s.emote = null;
     if (s.emoteCam) { s.emoteCam = false; setMode('first'); }
   }
@@ -920,6 +977,28 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   });
 
   const fwd = new THREE.Vector3(), eye = new THREE.Vector3(), look = new THREE.Vector3(), tmp = new THREE.Vector3();
+  const camDir = new THREE.Vector3(), toNpc = new THREE.Vector3();
+  const stepYaw = (cur, target, alpha) => cur + Math.atan2(Math.sin(target - cur), Math.cos(target - cur)) * Math.min(1, alpha);
+  function pickNpcTarget(o, active) {
+    const hf = world.hf, lim = hf.half - 16;
+    for (let attempt = 0; attempt < 32; attempt++) {
+      const nearShip = o.id === 'helena' && attempt < 24 && Math.random() < 0.55;
+      const r = nearShip ? 4.6 + Math.random() * 2.6 : 6 + Math.random() * 18;
+      const ang = Math.random() * Math.PI * 2;
+      const tx = Math.sin(ang) * r, tz = Math.cos(ang) * r;
+      if (Math.abs(tx) >= lim || Math.abs(tz) >= lim || hf.slope(tx, tz) >= 0.35) continue;
+      if (Math.hypot(tx - o.pos.x, tz - o.pos.z) < 3.0) continue;
+      if (world.colliders.some(c => Math.hypot(tx - c.x, tz - c.z) < c.r + 1.0)) continue;
+      let crowded = false;
+      for (const other of world.avatars.values()) {
+        if (other === o) continue;
+        const op = other === active ? s.pos : other.pos;
+        if (Math.hypot(tx - op.x, tz - op.z) < 1.2) { crowded = true; break; }
+      }
+      if (!crowded) return [tx, tz];
+    }
+    return [o.pos.x, o.pos.z];
+  }
   function step(dt) {
     const k = s.keys, a = world.avatar, hf = world.hf;
     let ix = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
@@ -955,11 +1034,88 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     a.walk.setEffectiveWeight(a.walkW * (1 - a.emoteW)); a.idle.setEffectiveWeight((1 - a.walkW) * (1 - a.emoteW));
     a.emoteAction?.setEffectiveWeight(a.emoteW);
     a.walk.timeScale = marching ? 1 : clamp(speed / STRIDE, .6, 2.6);
+    const showPlayerProps = s.emote?.kind === 'action';
+    for (const p of a.props) p.visible = showPlayerProps;
     a.mixer.update(reduce && !speed && !s.emote ? 0 : dt);
-    for (const o of world.avatars.values()) { // teammates idle where they were left
+    world.camera.getWorldDirection(camDir);
+    for (const o of world.avatars.values()) { // teammates wander, work in role animations, and wave back when looked at while stopped
       if (o === a) continue;
+      o.ai.waveCd = Math.max(0, o.ai.waveCd - dt);
+      if (!reduce && (o.ai.state === 'idle' || o.ai.state === 'action') && o.ai.waveCd <= 0) {
+        const pdist = Math.hypot(o.pos.x - s.pos.x, o.pos.z - s.pos.z);
+        if (pdist > 1.0 && pdist < 18) {
+          toNpc.set(o.pos.x, o.pos.y + 1.35, o.pos.z).sub(world.camera.position).normalize();
+          if (camDir.dot(toNpc) > 0.94) {
+            o.action.stop(); o.actW = 0;
+            o.wave.reset().setEffectiveWeight(1).play();
+            o.ai.state = 'wave'; o.ai.timer = 2.35; o.ai.waveCd = 8;
+          }
+        }
+      }
+      o.ai.timer -= dt;
+      if (o.ai.state === 'wave') {
+        o.bodyYaw = stepYaw(o.bodyYaw, Math.atan2(s.pos.x - o.pos.x, s.pos.z - o.pos.z), dt * 7);
+        o.walkW = 0; o.actW = 0;
+        o.idle.setEffectiveWeight(0); o.walk.setEffectiveWeight(0); o.action.setEffectiveWeight(0); o.wave.setEffectiveWeight(1);
+        if (o.ai.timer <= 0) { o.wave.stop(); o.idle.setEffectiveWeight(1); o.ai.state = 'idle'; o.ai.timer = 1.8 + Math.random() * 2; }
+      } else {
+        if (o.ai.state === 'action') {
+          if (o.id === 'helena' && Math.hypot(o.pos.x, o.pos.z) < 8) {
+            o.bodyYaw = stepYaw(o.bodyYaw, Math.atan2(-o.pos.x, -o.pos.z), dt * 6);
+          }
+          if (o.ai.timer <= 0) {
+            o.ai.state = 'idle'; o.ai.last = 'action'; o.ai.timer = 1.5 + Math.random() * 2.2;
+          }
+        } else if (o.ai.state === 'idle') {
+          if (!reduce && o.ai.timer <= 0) {
+            if (o.ai.last !== 'action' && Math.random() < 0.55) {
+              o.ai.state = 'action'; o.ai.timer = 4.5 + Math.random() * 3.5; o.action.reset().play();
+            } else {
+              const [tx, tz] = pickNpcTarget(o, a);
+              o.ai.state = 'walk'; o.ai.tx = tx; o.ai.tz = tz; o.ai.timer = 8;
+            }
+          }
+        } else if (o.ai.state === 'walk') {
+          const spd = WALK * 0.68, dx = o.ai.tx - o.pos.x, dz = o.ai.tz - o.pos.z, dist = Math.hypot(dx, dz);
+          const stepDist = Math.min(dist, spd * dt);
+          let nx = clamp(o.pos.x + (dist > 1e-4 ? dx / dist : 0) * stepDist, -lim, lim);
+          let nz = clamp(o.pos.z + (dist > 1e-4 ? dz / dist : 0) * stepDist, -lim, lim);
+          let blocked = false;
+          for (const c of world.colliders) {
+            const cx = nx - c.x, cz = nz - c.z, cd = Math.hypot(cx, cz), minR = c.r + 0.6;
+            if (cd < minR && cd > 1e-4) { nx = c.x + cx / cd * minR; nz = c.z + cz / cd * minR; blocked = true; }
+          }
+          for (const other of world.avatars.values()) {
+            if (other === o) continue;
+            const op = other === a ? s.pos : other.pos;
+            const cx = nx - op.x, cz = nz - op.z, cd = Math.hypot(cx, cz), minR = 0.9;
+            if (cd < minR && cd > 1e-4) { nx = op.x + cx / cd * minR; nz = op.z + cz / cd * minR; blocked = true; }
+          }
+          if (dist < 0.45 || o.ai.timer <= 0 || blocked) {
+            if (blocked) { o.pos.x = nx; o.pos.z = nz; o.pos.y = hf.at(nx, nz); }
+            if (Math.random() < 0.75) {
+              o.ai.state = 'action'; o.ai.timer = 4.5 + Math.random() * 3.5; o.action.reset().play();
+            } else {
+              o.ai.state = 'idle'; o.ai.last = 'walk'; o.ai.timer = 1.8 + Math.random() * 2;
+            }
+          } else {
+            o.pos.x = nx; o.pos.z = nz; o.pos.y = hf.at(nx, nz);
+            o.bodyYaw = stepYaw(o.bodyYaw, Math.atan2(dx, dz), dt * 8);
+          }
+        }
+        const targetWalk = o.ai.state === 'walk' ? 1 : 0;
+        const targetAct = o.ai.state === 'action' ? 1 : 0;
+        o.walkW += (targetWalk - o.walkW) * Math.min(1, dt * 8);
+        o.actW += (targetAct - o.actW) * Math.min(1, dt * 8);
+        if (!targetAct && o.actW < 0.02) { o.action.stop(); o.actW = 0; }
+        o.walk.setEffectiveWeight(o.walkW * (1 - o.actW));
+        o.idle.setEffectiveWeight((1 - o.walkW) * (1 - o.actW));
+        o.action.setEffectiveWeight(o.actW);
+        o.walk.timeScale = WALK * 0.68 / STRIDE;
+      }
+      const showProps = o.ai.state === 'action';
+      for (const p of o.props) p.visible = showProps;
       o.body.position.copy(o.pos); o.body.rotation.y = o.bodyYaw;
-      o.walkW += (0 - o.walkW) * Math.min(1, dt * 8); o.walk.setEffectiveWeight(o.walkW); o.idle.setEffectiveWeight(1 - o.walkW);
       o.mixer.update(reduce ? 0 : dt);
     }
   }

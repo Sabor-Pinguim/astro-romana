@@ -1,6 +1,6 @@
 # Crew Cabins and Control Panels: Real References (`crew-cabins.md`)
 
-Technical data on real crew capsules and their control panels, for the game's crew cabin (`rocket/cabin_cutaway.glb`, [cabin-equipment.md](cabin-equipment.md)) and the first-person pilot panel ([pilot-cockpit.md](pilot-cockpit.md)). Checked 2026-11. Rules as in the rest of `references/`: every number has a source in section 5; `⚠` = sources disagree (both values given); `n/f` = not found; `derived` = calculated here.
+Technical data on real crew capsules and their control panels, for the game's crew cabin (`parts/structures/crew-cabin.glb`, [cabin-equipment.md](cabin-equipment.md)) and the first-person pilot panel ([pilot-cockpit.md](pilot-cockpit.md)). Checked 2026-11. Rules as in the rest of `references/`: every number has a source in section 5; `⚠` = sources disagree (both values given); `n/f` = not found; `derived` = calculated here.
 
 ## 1. Cabins compared
 
