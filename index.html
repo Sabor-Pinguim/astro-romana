@@ -386,6 +386,24 @@
     .surface-inv-label{margin:10px 0 6px}
     .surface-inventory{display:flex;flex-wrap:wrap;gap:3px}
     .surface-inventory .inv-slot{flex:0 1 auto;min-width:0;padding:.3rem .5rem;font-size:.58rem}
+    .surface-compass{position:relative;flex:1 1 0;min-width:160px;max-width:520px;margin:0 auto}
+    .compass-strip{position:relative;height:34px;overflow:hidden;background:#11071fd9;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+    .compass-strip span{position:absolute;top:0;translate:-50% 0}
+    .compass-strip span[hidden]{display:none}
+    .compass-strip .cmp-tick{width:2px;height:7px;background:var(--muted);opacity:.55}
+    .compass-strip .cmp-card{top:8px;font:700 .7rem/1 var(--heading);letter-spacing:.06em;color:var(--starlight-cream)}
+    .compass-strip .cmp-card.north{color:var(--solar-amber)}
+    .compass-strip .cmp-mark{top:21px;width:10px;height:10px;background:var(--crew,var(--starlight-cream));clip-path:var(--hex)}
+    .compass-strip .cmp-mark.lander{background:var(--text-white);clip-path:polygon(50% 0,100% 100%,0 100%)}
+    .compass-strip .cmp-mark.done{background:var(--safe);clip-path:var(--diamond)}
+    .compass-needle{position:absolute;left:50%;top:0;width:2px;height:34px;margin-left:-1px;background:var(--mars-orange)}
+    .compass-readout{display:block;margin-top:5px;text-align:center;font:700 .64rem var(--heading);letter-spacing:.14em;color:var(--starlight-cream);text-shadow:0 1px 3px #000c}
+    .emote-wheel{position:absolute;z-index:7;left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px;background:#11071ff0;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%)}
+    .emote-wheel[hidden]{display:none}
+    .emote-wheel button{--a:0deg;position:absolute;left:50%;top:50%;width:86px;height:86px;margin:-43px 0 0 -43px;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:2rem/1 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;color:var(--starlight-cream);background:var(--f3);clip-path:var(--hex);transform:rotate(var(--a)) translateY(-98px) rotate(calc(-1 * var(--a)));cursor:pointer}
+    .emote-wheel button small{font:700 .52rem var(--heading);letter-spacing:.1em;text-transform:uppercase}
+    .emote-wheel button.on,.emote-wheel button:hover{color:var(--bg-void);background:var(--solar-amber)}
+    .emote-name{position:absolute;left:50%;top:50%;translate:-50% -50%;font:700 .72rem var(--heading);letter-spacing:.14em;text-transform:uppercase;color:var(--starlight-cream)}
     .surface-goals{width:min(330px,46vw);padding:14px 14px 12px}
     .surface-goals ol{display:grid;gap:3px;margin:0;padding:0;list-style:none}
     .surface-goals li{--crew:var(--muted);display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:.55rem;padding:.42rem .55rem;background:var(--f1);font-size:.74rem;line-height:1.25}
@@ -424,7 +442,7 @@
     .minigame-note{padding:.6rem .8rem;font-size:.8rem;background:repeating-linear-gradient(-45deg,var(--f1) 0 10px,var(--f2) 10px 20px)}
     @media (pointer:coarse){
       .surface-jump{position:absolute;z-index:3;right:16px;bottom:70px;display:block;width:72px;height:72px;border:0;font:700 .7rem var(--heading);letter-spacing:.1em;text-transform:uppercase;color:var(--bg-void);background:var(--solar-amber);clip-path:var(--hex)}
-      .surface-actions .button:first-child{display:none}
+      #surface-camera{display:none}
     }
 
     @keyframes wipe{from{clip-path:polygon(0 0,0 0,-20% 100%,0 100%)}to{clip-path:polygon(0 0,120% 0,100% 100%,0 100%)}}
@@ -472,6 +490,9 @@
       .surface-hud{top:10px;left:10px;right:10px;flex-direction:column;gap:6px}
       .surface-site{padding:10px 14px 8px}
       .surface-goals{width:100%;padding:10px}
+      .surface-compass{width:100%;max-width:none;flex:none}
+      .surface-actions .label{display:none}
+      .emote-wheel{top:64%}
       .surface-goals li{padding:.3rem .5rem}
       .goal-name small{display:none}
       .surface-crew{left:10px;bottom:62px}
@@ -601,14 +622,16 @@
     <div class="surface-view" id="surface-view">
       <div class="surface-hud">
         <div class="surface-site slab"><span class="eyebrow">Phase 07 / Mars surface EVA</span><h2 id="surface-title">Landing site</h2><span class="micro" id="surface-coords"></span><div class="surface-status"><div class="timer-readout" id="surface-timer" aria-live="polite">03:00</div><span class="tag" id="surface-rad-badge">RAD: 232 µGy/sol · CALM</span><button class="button quiet" id="audio-toggle-surface" type="button">Audio: On</button></div></div>
+        <div class="surface-compass" aria-hidden="true"><div class="compass-strip" id="surface-compass-strip"></div><span class="compass-needle"></span><span class="compass-readout" id="surface-compass-readout">HDG 000°</span></div>
         <div class="surface-goals slab"><div class="block-label"><span class="micro">Experiments</span><span class="tag" id="surface-count">0/4 DONE</span></div><ol id="surface-goals"></ol><div class="block-label surface-inv-label"><span class="micro">Inventory</span></div><div class="surface-inventory" id="surface-inventory"></div></div>
       </div>
       <div class="surface-tags" id="surface-tags" aria-hidden="true"></div>
       <button class="surface-prompt" id="surface-prompt" type="button" hidden></button>
       <div class="surface-crew" id="surface-crew" aria-label="Crew member you control"></div>
-      <div class="surface-actions"><button class="button quiet" id="surface-camera" type="button">Camera · V</button><button class="button quiet" id="surface-leave" type="button">← Planner</button><button class="button primary" id="surface-board" type="button">Board &amp; depart ↗</button></div>
+      <div class="surface-actions"><button class="button quiet" id="surface-emote" type="button" aria-haspopup="true"><span aria-hidden="true">😀</span><span class="label"> Emotes · Q</span></button><button class="button quiet" id="surface-camera" type="button">Camera · V</button><button class="button quiet" id="surface-leave" type="button">← Planner</button><button class="button primary" id="surface-board" type="button">Board &amp; depart ↗</button></div>
       <div class="surface-stick" id="surface-stick" aria-hidden="true"><span></span></div>
       <button class="surface-jump" id="surface-jump" type="button">Jump</button>
+      <div class="emote-wheel" id="emote-wheel" role="menu" aria-label="Emotes" hidden><span class="emote-name" id="emote-name">Emotes</span></div>
       <div class="surface-start" id="surface-start"><div class="slab"><span class="eyebrow" id="surface-start-kicker">Touchdown</span><h3 id="surface-start-title">Loading terrain…</h3><p class="surface-keys" id="surface-keys"></p></div></div>
     </div>
   </section>
@@ -629,8 +652,7 @@
     <div class="results-grid">
       <div class="podium-viewport slab" id="podium-viewport">
         <div class="cockpit-hud-top">
-          <span class="tag">CREW PODIUM · 3D LOW-POLY</span>
-          <span class="tag" id="podium-site-tag">JEZERO CRATER EXPEDITION</span>
+          <span class="tag" id="podium-site-tag" style="margin-left:auto">JEZERO CRATER EXPEDITION</span>
         </div>
         <div class="podium-fallback" id="podium-fallback"></div>
       </div>
@@ -2106,10 +2128,10 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   const tasks = () => sim()?.surf.tasks ?? [];
   const isDone = id => !!sim()?.surf.completed.has(id);
   const touch = matchMedia('(pointer: coarse)').matches, clamp = (x, a, b) => Math.min(b, Math.max(a, x));
-  const s = { site: null, crew: null, mode: 'first', yaw: 0, pitch: -.1, bodyYaw: 0, speed: 0, vy: 0, grounded: true, jump: false,
+  const s = { site: null, crew: null, emote: null, emoteCam: false, mode: 'first', yaw: 0, pitch: -.1, bodyYaw: 0, speed: 0, vy: 0, grounded: true, jump: false,
     pos: new THREE.Vector3(), keys: new Set(), stick: null, look: null, drag: null, ready: false, prompt: '' };
   const KEYS_HELP = touch ? 'Left thumb walks, right thumb looks. Look down to see your suit.'
-    : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · mouse looks<br><kbd>E</kbd> run experiment or board · <kbd>V</kbd> camera · <kbd>1</kbd>–<kbd>4</kbd> crew · <kbd>Esc</kbd> pause<br>Look down to see your suit.';
+    : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · mouse looks<br><kbd>E</kbd> run experiment or board · <kbd>V</kbd> camera · <kbd>Q</kbd> emotes · <kbd>1</kbd>–<kbd>4</kbd> crew · <kbd>Esc</kbd> pause<br>Look down to see your suit.';
   let world = null;
 
   const hiddenMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // still casts a shadow
@@ -2274,17 +2296,21 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     const gltf = await loadGLTF(`characters/${id}.glb`), body = gltf.scene.clone(true); // pivot rig, no skinning
     const mixer = new THREE.AnimationMixer(body), clip = name => gltf.animations.find(a => a.name === name);
     const idle = mixer.clipAction(clip('idle_loop')), walk = mixer.clipAction(clip('walk_loop'));
+    const wave = mixer.clipAction(clip('wave')), action = mixer.clipAction(clip('action_loop'));
     idle.play(); walk.play(); walk.setEffectiveWeight(0);
+    wave.setLoop(THREE.LoopOnce, 1);
+    mixer.addEventListener('finished', e => { if (e.action === wave && world.avatar?.id === id && s.emote?.kind === 'wave') endEmote(); });
     const head = body.getObjectByName('Head'), helmet = [];
     body.traverse(o => { if (o.isMesh) o.castShadow = true; });
     head.traverse(o => { if (o.isMesh) { o.userData.mat = o.material; helmet.push(o); } });
     body.updateMatrixWorld(true);
-    const a = { id, body, mixer, idle, walk, head, helmet, walkW: 0, eyeY: head.getWorldPosition(new THREE.Vector3()).y, pos: new THREE.Vector3(), bodyYaw: 0 };
+    const a = { id, body, mixer, idle, walk, wave, action, emoteAction: null, emoteW: 0, head, helmet, walkW: 0, eyeY: head.getWorldPosition(new THREE.Vector3()).y, pos: new THREE.Vector3(), bodyYaw: 0 };
     world.avatars.set(id, a); world.scene.add(body);
     return a;
   }
   // Every crew member stands on the surface; the player controls one (keys 1–4), the others wait where they were left.
   async function useCrew(id) {
+    endEmote();
     const prev = world.avatar;
     s.crew = id; renderCrewBar();
     const a = await loadCrew(id);
@@ -2362,7 +2388,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       if (s.site !== site) return;
       setTerrain(t);
       world.lander.position.set(0, t.hf.at(0, 0), 0);
-      placeBlocks();
+      placeBlocks(); buildCompass();
       await Promise.all(ui.crew.map(c => loadCrew(c.id)));
       for (const [id, [x, z]] of Object.entries(CREW_START)) { const a = world.avatars.get(id); a.pos.set(x, t.hf.at(x, z), z); a.bodyYaw = 0; }
       world.avatar = null; s.pitch = -.1;
@@ -2378,11 +2404,88 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   }
   window.addEventListener('astro:land', e => land(e.detail));
 
+  // Emote wheel: the animations every avatar has (AGENTS.md §5.5). Hold Q, aim with the mouse and release;
+  // or click/tap the 😀 button and pick. In first person the camera steps back while the emote plays.
+  // Helena's action_loop (jet-pack hover) makes no sense on the Martian surface, so she has no action emote.
+  const ACTION_EMOTE = { lucas: ['🔧', 'Repair'], oscar: ['📡', 'Transmit'], maya: ['🧪', 'Sample'] };
+  const wheelEl = $s('emote-wheel');
+  const emotes = () => [['wave', '👋', 'Wave'], ...(ACTION_EMOTE[s.crew] ? [['action', ...ACTION_EMOTE[s.crew]]] : []), ['walk', '🚶', 'Walk'], ['idle', '🧍', 'Idle']];
+  const wheel = { open: false, hold: false, pick: -1, x: 0, y: 0 };
+  function openWheel(hold) {
+    if (!world?.avatar || dlg.open) return;
+    const list = emotes();
+    wheelEl.querySelectorAll('button').forEach(b => b.remove());
+    list.forEach(([kind, icon, label], i) => wheelEl.insertAdjacentHTML('beforeend', `<button type="button" role="menuitem" data-emote="${kind}" style="--a:${i * 360 / list.length}deg">${icon}<small>${label}</small></button>`));
+    Object.assign(wheel, { open: true, hold, pick: -1, x: 0, y: 0 });
+    $s('emote-name').textContent = 'Emotes'; wheelEl.hidden = false; s.keys.clear();
+  }
+  function closeWheel(play) {
+    if (!wheel.open) return;
+    const kind = wheel.pick >= 0 ? emotes()[wheel.pick][0] : null;
+    wheel.open = false; wheelEl.hidden = true;
+    if (play && kind) playEmote(kind);
+  }
+  function aimWheel(dx, dy) { // mouse direction picks the nearest slot (slot 0 at the top, clockwise)
+    wheel.x += dx; wheel.y += dy;
+    if (Math.hypot(wheel.x, wheel.y) < 20) return;
+    const n = emotes().length, ang = (Math.atan2(wheel.x, -wheel.y) + Math.PI * 2) % (Math.PI * 2);
+    wheel.pick = Math.round(ang / (Math.PI * 2 / n)) % n;
+    wheelEl.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === wheel.pick));
+    $s('emote-name').textContent = emotes()[wheel.pick][2];
+  }
+  wheelEl.addEventListener('pointerover', e => { // without pointer lock, hovering a slot picks it (hold Q, hover, release)
+    const b = e.target.closest('[data-emote]'), all = [...wheelEl.querySelectorAll('button')];
+    if (!b) return;
+    wheel.pick = all.indexOf(b); all.forEach((x, i) => x.classList.toggle('on', i === wheel.pick)); $s('emote-name').textContent = emotes()[wheel.pick][2];
+  });
+  wheelEl.addEventListener('click', e => { const b = e.target.closest('[data-emote]'); if (b) { wheel.pick = [...wheelEl.querySelectorAll('button')].indexOf(b); closeWheel(true); } });
+  $s('surface-emote').addEventListener('click', () => (wheel.open ? closeWheel(false) : openWheel(false)));
+  function playEmote(kind) {
+    const a = world?.avatar;
+    if (!a) return;
+    endEmote();
+    if (kind === 'idle') return;
+    s.emote = { kind };
+    if (kind === 'wave' || kind === 'action') { a.emoteAction = a[kind]; a.emoteAction.reset().play(); }
+    if (s.mode === 'first') { s.emoteCam = true; setMode('third'); }
+  }
+  function endEmote() {
+    if (!s.emote) return;
+    s.emote = null;
+    if (s.emoteCam) { s.emoteCam = false; setMode('first'); }
+  }
+
+  // Compass strip: ±90° around the view heading; cardinal points, 15° ticks, the lander and each experiment.
+  const compassEl = $s('surface-compass-strip'), CARDINAL = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  let compassItems = [];
+  function buildCompass() {
+    compassEl.innerHTML = Array.from({ length: 24 }, (_, i) => i * 15).map(d => d % 45
+      ? `<span class="cmp-tick" data-deg="${d}"></span>`
+      : `<span class="cmp-card${d ? '' : ' north'}" data-deg="${d}">${CARDINAL[d / 45]}</span>`).join('')
+      + '<span class="cmp-mark lander" title="Lander"></span>'
+      + world.blocks.map(b => `<span class="cmp-mark" data-mark="${b.userData.exp.id}" style="--crew:${ui.crew.find(c => c.id === b.userData.exp.crew).color}"></span>`).join('');
+    compassItems = [...compassEl.children].map(el => ({ el, deg: el.dataset.deg == null ? null : +el.dataset.deg,
+      at: el.classList.contains('lander') ? new THREE.Vector3() : world.blocks.find(b => b.userData.exp.id === el.dataset.mark)?.position, id: el.dataset.mark }));
+  }
+  function updateCompass() {
+    const heading = ((-s.yaw * 180 / Math.PI) % 360 + 360) % 360, half = compassEl.clientWidth / 2;
+    for (const it of compassItems) {
+      const bearing = it.deg ?? (Math.atan2(it.at.x - s.pos.x, -(it.at.z - s.pos.z)) * 180 / Math.PI + 360) % 360;
+      const d = ((bearing - heading + 540) % 360) - 180;
+      it.el.hidden = Math.abs(d) > 90;
+      if (!it.el.hidden) it.el.style.left = `${half + d / 90 * (half - 8)}px`;
+      if (it.id) it.el.classList.toggle('done', isDone(it.id));
+    }
+    $s('surface-compass-readout').textContent = `HDG ${String(Math.round(heading) % 360).padStart(3, '0')}°`;
+  }
+
   // Input: keyboard + mouse (pointer lock, or drag when the lock is not available), touch stick + look.
   function bindInput(canvas) {
     const live = () => isActive('surface') && s.ready && !dlg.open;
     addEventListener('keydown', e => {
       if (!live()) return;
+      if (e.code === 'KeyQ') { if (!e.repeat) openWheel(true); return; }
+      if (wheel.open) { if (e.code === 'Escape') closeWheel(false); return; }
       s.keys.add(e.code);
       if (e.code === 'Space') { s.jump = true; e.preventDefault(); }
       if (e.code.startsWith('Arrow')) e.preventDefault();
@@ -2391,7 +2494,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       const n = /^Digit([1-4])$/.exec(e.code)?.[1];
       if (n) switchCrew(ui.crew[n - 1].id);
     });
-    addEventListener('keyup', e => s.keys.delete(e.code));
+    addEventListener('keyup', e => { s.keys.delete(e.code); if (e.code === 'KeyQ' && wheel.hold) closeWheel(true); });
     addEventListener('blur', () => s.keys.clear());
     const turn = (dx, dy, k) => { s.yaw -= dx * k; s.pitch -= dy * k; clampPitch(); };
     let settle = false; // the first move after locking can carry a large jump (Chrome)
@@ -2402,6 +2505,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     addEventListener('mousemove', e => {
       if (document.pointerLockElement === canvas) {
         if (settle || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) { settle = false; return; }
+        if (wheel.open) return aimWheel(e.movementX, e.movementY);
         turn(e.movementX, e.movementY, .0022);
       }
       else if (s.drag) { turn(e.clientX - s.drag.x, e.clientY - s.drag.y, .004); s.drag = { x: e.clientX, y: e.clientY }; }
@@ -2500,11 +2604,15 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     const d = Math.atan2(Math.sin(target - s.bodyYaw), Math.cos(target - s.bodyYaw));
     s.bodyYaw += s.mode === 'first' ? d : d * Math.min(1, dt * 10);
     a.body.position.copy(s.pos); a.body.rotation.y = s.bodyYaw;
-    const walking = s.grounded && speed > 0 ? 1 : 0;
+    if (s.emote && (speed || !s.grounded)) endEmote();
+    const marching = s.emote?.kind === 'walk', walking = marching || (s.grounded && speed > 0) ? 1 : 0;
     a.walkW += (walking - a.walkW) * Math.min(1, dt * 8);
-    a.walk.setEffectiveWeight(a.walkW); a.idle.setEffectiveWeight(1 - a.walkW);
-    a.walk.timeScale = clamp(speed / STRIDE, .6, 2.6);
-    a.mixer.update(reduce && !speed ? 0 : dt);
+    a.emoteW += ((s.emote && a.emoteAction ? 1 : 0) - a.emoteW) * Math.min(1, dt * 10);
+    if (!s.emote && a.emoteAction && a.emoteW < .02) { a.emoteAction.stop(); a.emoteAction = null; a.emoteW = 0; }
+    a.walk.setEffectiveWeight(a.walkW * (1 - a.emoteW)); a.idle.setEffectiveWeight((1 - a.walkW) * (1 - a.emoteW));
+    a.emoteAction?.setEffectiveWeight(a.emoteW);
+    a.walk.timeScale = marching ? 1 : clamp(speed / STRIDE, .6, 2.6);
+    a.mixer.update(reduce && !speed && !s.emote ? 0 : dt);
     for (const o of world.avatars.values()) { // teammates idle where they were left
       if (o === a) continue;
       o.body.position.copy(o.pos); o.body.rotation.y = o.bodyYaw;
@@ -2576,13 +2684,13 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     placeCamera();
     world.sky.position.copy(world.camera.position);
     world.sun.target.position.copy(s.pos); world.sun.position.copy(s.pos).addScaledVector(world.sunDir, 90);
-    placeTags(now);
+    placeTags(now); updateCompass();
     if ((hudClock += dt) > .12) { hudClock = 0; updateHud(); }
     world.renderer.render(world.scene, world.camera);
   }
   requestAnimationFrame(frame);
   // Test and debug hook (Playwright, console): state, and a teleport next to a block.
-  window.ASTRO_SURFACE = { state: s, world: () => world,
+  window.ASTRO_SURFACE = { state: s, world: () => world, emote: kind => playEmote(kind), wheel: open => (open ? openWheel(false) : closeWheel(false)),
     running: () => !!(s.ready && startEl.hidden && !dlg.open),
     distanceToLander(id) { const a = world?.avatars.get(id); if (!a) return 0; const p = a === world.avatar ? s.pos : a.pos; return Math.hypot(p.x, p.z); },
     goTo(id) { const b = world?.blocks.find(x => x.userData.exp.id === id); if (b) { s.pos.x = b.position.x + 2.2; s.pos.z = b.position.z + 1.2; s.yaw = Math.atan2(-(b.position.x - s.pos.x), -(b.position.z - s.pos.z)); s.grounded = false; } } };
