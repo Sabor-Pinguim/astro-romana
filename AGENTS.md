@@ -18,6 +18,7 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 | [docs/characters.md](docs/characters.md) | Os 4 personagens jogáveis e os recursos de cada um |
 | [docs/minigames.md](docs/minigames.md) | Experimentos e minigames por personagem |
 | [references/experiments/](references/experiments/) | Dados reais de missões, com fontes |
+| [references/parts/parts.md](references/parts/parts.md) | Peças reais de foguete (motores, tanques): tiers, dados, fotos e instruções low poly |
 
 ---
 
@@ -189,6 +190,9 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 - **Marcas nas referências:**
   - **⚠** = fontes divergem: confira antes de usar como fato.
   - **n/f** = não encontrado: use um valor de jogo e marque como fictício.
+- **Marcas extras:** `derived` = calculado a partir de outros valores (com a fórmula); `est.` = estimado por nós (diz como).
+- **Peças de foguete:** cada peça tem uma pasta em `references/parts/<engines|tanks>/<id>/` com um `README.md` que segue `references/parts/_template.md` (mesmas seções e chaves) e as fotos.
+- **Fotos de referência:** só com licença livre (domínio público, CC0, CC BY, CC BY-SA), com fonte, autor e licença na tabela do README. As demais entram só como link.
 - **Cards "Fato real":** nunca invente fatos.
 - **Datas:** o "hoje" do projeto segue a data real. Status de missões (operando, perdida, cancelada) devem ser conferidos quando forem usados.
 
