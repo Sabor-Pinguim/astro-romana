@@ -5,7 +5,8 @@
     "axes": "+X east, +Y up, -Z north (true north at the site center)",
     "origin": "site center; y = 0 is the DTM elevation at the center (elevation.centerM)",
     "sunAzimuth": "degrees clockwise from north, as seen from the ground",
-    "ground": "the game reads heights from the mesh grid (row 0 = north edge, column 0 = west edge)"
+    "ground": "the game reads heights from the mesh grid (row 0 = north edge, column 0 = west edge)",
+    "horizon": "optional 2nd node \"Horizon\": polar ring (rings x (segments + 1), ring-major, last column repeats azimuth 0), Mars curvature applied, no normals; polar texture u = azimuth, v = log distance, relief shading baked in (light it as level ground)"
   },
   "sites": [
     {
@@ -58,6 +59,142 @@
       "shadingCheck": {
         "photoSun": 0.227,
         "oppositeSun": -0.206
+      },
+      "deshading": {
+        "ambientRatio": 0.25,
+        "castShadowFraction": 0,
+        "photoVsRelief": 0.227,
+        "textureVsRelief": 0.031
+      },
+      "horizon": {
+        "innerM": 256,
+        "radiusM": 100000,
+        "rings": 128,
+        "segments": 384,
+        "vertices": 49280,
+        "triangles": 97536,
+        "textureSize": [
+          2048,
+          1024
+        ],
+        "fadeM": {
+          "near": [
+            1000,
+            1800
+          ],
+          "middle": [
+            38000,
+            45000
+          ]
+        },
+        "globalDemShiftM": 0.8,
+        "farTextureMatch": {
+          "offset": -347.92,
+          "gain": 5.0538
+        },
+        "textureStretch": {
+          "site": [
+            60.95,
+            160.61
+          ],
+          "region": [
+            57.64,
+            215.58
+          ],
+          "blendM": [
+            1200,
+            4000
+          ]
+        },
+        "shading": {
+          "ambientRatio": 0.25,
+          "castShadows": true,
+          "lighting": "the game lights the ring as level ground; the texture carries the relief shading"
+        },
+        "highestDeg": 4.87,
+        "highestAzimuthDeg": 263,
+        "source": {
+          "near": "HiRISE DTM and orthoimage of this site (coarse overviews)",
+          "middle": [
+            {
+              "item": "J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+              "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W",
+              "dtm": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_dtm.tif",
+                "etag": "ce14580e7081932a4e014b847b78149f-3",
+                "lastModified": "Sun, 14 May 2023 03:27:39 GMT"
+              },
+              "ortho": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W/J03_045994_1986_XN_18N282W__J03_046060_1986_XN_18N282W_orthoimage.tif",
+                "etag": "e254d54f8cb70f87d8c83b2c47f64860-4",
+                "lastModified": "Sun, 14 May 2023 03:27:40 GMT"
+              },
+              "license": "CC0-1.0",
+              "heightShiftM": -30.9,
+              "brightness": {
+                "ctxMean": 0.31,
+                "ctxSpread": 0.04,
+                "gain": 365.9594,
+                "correlation": 0.693
+              }
+            },
+            {
+              "item": "K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W",
+              "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W",
+              "dtm": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W_dtm.tif",
+                "etag": "ddf5020b8543188665c749f7c653aa2a-5",
+                "lastModified": "Sun, 14 May 2023 03:44:33 GMT"
+              },
+              "ortho": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W/K14_058996_1985_XN_18N282W__K14_058930_1986_XN_18N282W_orthoimage.tif",
+                "etag": "924c67df604931e636fc5cf4bd70359b-7",
+                "lastModified": "Sun, 14 May 2023 03:44:33 GMT"
+              },
+              "license": "CC0-1.0",
+              "heightShiftM": -19.2,
+              "brightness": {
+                "ctxMean": 0.32,
+                "ctxSpread": 0.06,
+                "gain": 199.1675,
+                "correlation": 0.354
+              }
+            },
+            {
+              "item": "F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W",
+              "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W",
+              "dtm": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W_dtm.tif",
+                "etag": "d5f9de355d05b9c5d9465ac08e55f78a-9",
+                "lastModified": "Sun, 14 May 2023 03:00:45 GMT"
+              },
+              "ortho": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W/F05_037752_2008_XN_20N282W__F05_037607_2008_XN_20N282W_orthoimage.tif",
+                "etag": "ca7031a035cf06d201b85561a83f370c-11",
+                "lastModified": "Sun, 14 May 2023 03:00:46 GMT"
+              },
+              "license": "CC0-1.0",
+              "heightShiftM": -24.7,
+              "brightness": {
+                "ctxMean": 0.52,
+                "ctxSpread": 0.03,
+                "gain": 445.7724,
+                "correlation": 0.683
+              }
+            }
+          ],
+          "far": {
+            "name": "Mars MGS MOLA - MEX HRSC Blended DEM Global 200m v2",
+            "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif",
+            "page": "https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m",
+            "citation": "Fergason, R.L., Hare, T.M., Laura, J. (2018). HRSC and MOLA Blended Digital Elevation Model at 200m v2. Astrogeology PDS Annex, U.S. Geological Survey.",
+            "license": "MOLA data CC0-1.0; HRSC data CC BY-SA 3.0 IGO (attribution required)",
+            "pixelM": 200,
+            "etag": "94ec792407f5a3da2f8b87aba42613eb-1358",
+            "lastModified": "Wed, 09 Nov 2022 14:59:19 GMT"
+          },
+          "planetRadiusM": 3396190
+        }
       },
       "holesFilled": 0,
       "tint": [
@@ -135,6 +272,142 @@
         "photoSun": 0.663,
         "oppositeSun": -0.662
       },
+      "deshading": {
+        "ambientRatio": 0.499,
+        "castShadowFraction": 0,
+        "photoVsRelief": 0.663,
+        "textureVsRelief": -0.006
+      },
+      "horizon": {
+        "innerM": 256,
+        "radiusM": 100000,
+        "rings": 128,
+        "segments": 384,
+        "vertices": 49280,
+        "triangles": 97536,
+        "textureSize": [
+          2048,
+          1024
+        ],
+        "fadeM": {
+          "near": [
+            1000,
+            1800
+          ],
+          "middle": [
+            38000,
+            45000
+          ]
+        },
+        "globalDemShiftM": -8.9,
+        "farTextureMatch": {
+          "offset": -606.04,
+          "gain": 4.6876
+        },
+        "textureStretch": {
+          "site": [
+            140.89,
+            179.3
+          ],
+          "region": [
+            -32.73,
+            293
+          ],
+          "blendM": [
+            1200,
+            4000
+          ]
+        },
+        "shading": {
+          "ambientRatio": 0.499,
+          "castShadows": true,
+          "lighting": "the game lights the ring as level ground; the texture carries the relief shading"
+        },
+        "highestDeg": 12.32,
+        "highestAzimuthDeg": 135,
+        "source": {
+          "near": "HiRISE DTM and orthoimage of this site (coarse overviews)",
+          "middle": [
+            {
+              "item": "P22_009571_1756_XI_04S222W__D04_028612_1764_XN_03S222W",
+              "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/P22_009571_1756_XI_04S222W__D04_028612_1764_XN_03S222W",
+              "dtm": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/P22_009571_1756_XI_04S222W__D04_028612_1764_XN_03S222W/P22_009571_1756_XI_04S222W__D04_028612_1764_XN_03S222W-DEM-geoid-adj.tif",
+                "etag": "3b82395a3490e2602ac6509184da2d74-5",
+                "lastModified": "Tue, 19 Nov 2024 04:06:59 GMT"
+              },
+              "ortho": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/P22_009571_1756_XI_04S222W__D04_028612_1764_XN_03S222W/P22_009571_1756_XI_04S222W__D04_028612_1764_XN_03S222W-DRG.tif",
+                "etag": "0bd301945ec39e15cff1b2eb9b8c82d4-5",
+                "lastModified": "Tue, 19 Nov 2024 04:07:02 GMT"
+              },
+              "license": "CC0-1.0",
+              "heightShiftM": 117.2,
+              "brightness": {
+                "ctxMean": 0.41,
+                "ctxSpread": 0.06,
+                "gain": 273.688,
+                "correlation": 0.844
+              }
+            },
+            {
+              "item": "P22_009716_1773_XI_02S223W__J09_048273_1747_XN_05S222W",
+              "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/P22_009716_1773_XI_02S223W__J09_048273_1747_XN_05S222W",
+              "dtm": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/P22_009716_1773_XI_02S223W__J09_048273_1747_XN_05S222W/P22_009716_1773_XI_02S223W__J09_048273_1747_XN_05S222W-DEM-geoid-adj.tif",
+                "etag": "f8d08a35c7395a96f83dd49a3516848d-1",
+                "lastModified": "Fri, 07 Feb 2025 04:30:44 GMT"
+              },
+              "ortho": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/P22_009716_1773_XI_02S223W__J09_048273_1747_XN_05S222W/P22_009716_1773_XI_02S223W__J09_048273_1747_XN_05S222W-DRG.tif",
+                "etag": "752564528eb6c8305930b08afce9ee0c-1",
+                "lastModified": "Fri, 07 Feb 2025 04:30:46 GMT"
+              },
+              "license": "CC0-1.0",
+              "heightShiftM": -2.3,
+              "brightness": {
+                "ctxMean": 0.37,
+                "ctxSpread": 0.04,
+                "gain": 439.3744,
+                "correlation": 0.854
+              }
+            },
+            {
+              "item": "P22_009571_1756_XI_04S222W__J19_052031_1751_XN_04S222W",
+              "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms/items/P22_009571_1756_XI_04S222W__J19_052031_1751_XN_04S222W",
+              "dtm": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/P22_009571_1756_XI_04S222W__J19_052031_1751_XN_04S222W/P22_009571_1756_XI_04S222W__J19_052031_1751_XN_04S222W-DEM-geoid-adj.tif",
+                "etag": "8d4f70819cc91f8528b2abba76e0bd86-1",
+                "lastModified": "Fri, 07 Feb 2025 04:30:44 GMT"
+              },
+              "ortho": {
+                "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/controlled/usgs/P22_009571_1756_XI_04S222W__J19_052031_1751_XN_04S222W/P22_009571_1756_XI_04S222W__J19_052031_1751_XN_04S222W-DRG.tif",
+                "etag": "144d9eafdab0b2a0e751653146772588-1",
+                "lastModified": "Fri, 07 Feb 2025 04:30:46 GMT"
+              },
+              "license": "CC0-1.0",
+              "heightShiftM": 124.8,
+              "brightness": {
+                "ctxMean": 0.32,
+                "ctxSpread": 0.05,
+                "gain": 343.7896,
+                "correlation": 0.851
+              }
+            }
+          ],
+          "far": {
+            "name": "Mars MGS MOLA - MEX HRSC Blended DEM Global 200m v2",
+            "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif",
+            "page": "https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m",
+            "citation": "Fergason, R.L., Hare, T.M., Laura, J. (2018). HRSC and MOLA Blended Digital Elevation Model at 200m v2. Astrogeology PDS Annex, U.S. Geological Survey.",
+            "license": "MOLA data CC0-1.0; HRSC data CC BY-SA 3.0 IGO (attribution required)",
+            "pixelM": 200,
+            "etag": "94ec792407f5a3da2f8b87aba42613eb-1358",
+            "lastModified": "Wed, 09 Nov 2022 14:59:19 GMT"
+          },
+          "planetRadiusM": 3396190
+        }
+      },
       "holesFilled": 0,
       "tint": [
         0.84,
@@ -210,6 +483,12 @@
       "shadingCheck": {
         "photoSun": 0.59,
         "oppositeSun": -0.513
+      },
+      "deshading": {
+        "ambientRatio": 0.271,
+        "castShadowFraction": 0,
+        "photoVsRelief": 0.59,
+        "textureVsRelief": -0.016
       },
       "holesFilled": 0,
       "tint": [

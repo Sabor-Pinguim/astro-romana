@@ -35,7 +35,7 @@ index.html              o jogo (MVP web, three.js); index.models.js e index.terr
 assets/
   models/               GERADO: GLBs + manifest.json (não editar à mão)
   audio/                GERADO: WAVs + manifest.json (não editar à mão)
-  terrain/              GERADO: terrenos reais de Marte (GLB com textura + manifest.json)
+  terrain/              GERADO: terrenos reais de Marte (GLB com textura e horizonte + manifest.json)
   sites/                GERADO: foto real (HiRISE) de cada local de pouso para o lobby (tools/web/site-photos.mjs)
 tools/
   modeling/             gerador procedural dos modelos 3D (Node + three.js)

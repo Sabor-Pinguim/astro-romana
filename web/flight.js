@@ -186,6 +186,113 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
     const root = gltf.scene;
     scene.add(root);
 
+    // The centre display shares the GLB's screen dimensions and panel tilt.
+    const dockingTarget = new THREE.WebGLRenderTarget(512, 354);
+    dockingTarget.texture.colorSpace = THREE.SRGBColorSpace;
+    const centreScreen = new THREE.Mesh(new THREE.PlaneGeometry(.34, .235),
+      new THREE.MeshBasicMaterial({ map: dockingTarget.texture, toneMapped: false }));
+    const panelTilt = -35 * Math.PI / 180;
+    centreScreen.rotation.x = panelTilt;
+    centreScreen.position.set(0, .86, -.7).add(new THREE.Vector3(0, .065, .068).applyAxisAngle(new THREE.Vector3(1, 0, 0), panelTilt));
+    centreScreen.visible = false;
+    root.add(centreScreen);
+
+    // A separate 3D docking camera is rendered into the centre screen's texture.
+    const dockingScene = new THREE.Scene(); dockingScene.background = new THREE.Color('#050e1b');
+    dockingScene.add(new THREE.HemisphereLight(0xcdeaff, 0x263346, 2));
+    const dockLight = new THREE.DirectionalLight(0xffffff, 2.2); dockLight.position.set(3, 5, 5); dockingScene.add(dockLight);
+    dockingScene.add(createStarfield(180, 12, 36));
+    const dockingCamera = new THREE.PerspectiveCamera(48, 512 / 354, .05, 50);
+    dockingScene.add(dockingCamera);
+
+    const hatch = new THREE.Group(); dockingScene.add(hatch);
+    const metal = new THREE.MeshStandardMaterial({ color: 0xb6c4c9, roughness: .55, metalness: .55, flatShading: true });
+    const darkMetal = new THREE.MeshStandardMaterial({ color: 0x344b5e, roughness: .7, flatShading: true });
+    const moduleMat = new THREE.MeshStandardMaterial({ color: 0xdce6e9, roughness: .5, metalness: .35, flatShading: true });
+    const targetRingMat = new THREE.MeshBasicMaterial({ color: 0x7edac2 });
+    const bullseyeMat = new THREE.MeshBasicMaterial({ color: 0xfce8a6 });
+
+    // Endurance-style rotating ring station structure around the central docking hub
+    const stationRing = new THREE.Mesh(new THREE.TorusGeometry(2.35, .09, 6, 24), darkMetal);
+    stationRing.position.z = -.38;
+    hatch.add(stationRing);
+    for (let i = 0; i < 12; i++) {
+      const a = (i * Math.PI * 2) / 12;
+      const pod = new THREE.Mesh(new THREE.BoxGeometry(.44, .28, .32), i % 2 ? metal : moduleMat);
+      pod.position.set(Math.sin(a) * 2.35, Math.cos(a) * 2.35, -.38);
+      pod.rotation.z = -a;
+      hatch.add(pod);
+      if (i % 3 === 0) {
+        const strut = new THREE.Mesh(new THREE.BoxGeometry(.12, 1.35, .12), darkMetal);
+        strut.position.set(Math.sin(a) * 1.68, Math.cos(a) * 1.68, -.28);
+        strut.rotation.z = -a;
+        hatch.add(strut);
+      }
+    }
+
+    // Central pressurized docking adapter & concentric alignment targets (visible down to z = 0.35 m)
+    const outer = new THREE.Mesh(new THREE.TorusGeometry(1.05, .12, 6, 16), metal); hatch.add(outer);
+    const inner = new THREE.Mesh(new THREE.TorusGeometry(.72, .06, 6, 16), darkMetal); inner.position.z = .06; hatch.add(inner);
+    const midGuide = new THREE.Mesh(new THREE.TorusGeometry(.42, .022, 6, 16), metal); midGuide.position.z = .03; hatch.add(midGuide);
+    const captureRing = new THREE.Mesh(new THREE.TorusGeometry(.18, .012, 6, 24), targetRingMat); captureRing.position.z = .04; hatch.add(captureRing);
+    const bullseyeRing = new THREE.Mesh(new THREE.TorusGeometry(.055, .008, 6, 16), bullseyeMat); bullseyeRing.position.z = .045; hatch.add(bullseyeRing);
+    const door = new THREE.Mesh(new THREE.CircleGeometry(.68, 12), metal); door.position.z = -.02; hatch.add(door);
+    for (let i = 0; i < 8; i++) {
+      const spoke = new THREE.Mesh(new THREE.BoxGeometry(.045, .62, .03), darkMetal);
+      const a = i * Math.PI / 4; spoke.position.set(Math.sin(a) * .35, Math.cos(a) * .35, .01); spoke.rotation.z = -a; hatch.add(spoke);
+    }
+
+    // Foreground cabin hatch collar & crosshair attached to dockingCamera (moves with the ship in 3D)
+    const cabinCollar = new THREE.Group();
+    cabinCollar.position.z = -.28;
+    const cabinFrameMat = new THREE.MeshBasicMaterial({ color: 0x1e2d3d });
+    const cabinReticleMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+    cabinCollar.add(new THREE.Mesh(new THREE.RingGeometry(.115, .16, 16), cabinFrameMat));
+    cabinCollar.add(new THREE.Mesh(new THREE.RingGeometry(.038, .044, 16), cabinReticleMat));
+    for (let i = 0; i < 4; i++) {
+      const tick = new THREE.Mesh(new THREE.PlaneGeometry(.024, .004), cabinReticleMat);
+      const a = i * Math.PI / 2;
+      tick.position.set(Math.cos(a) * .062, Math.sin(a) * .062, .001);
+      tick.rotation.z = a;
+      cabinCollar.add(tick);
+    }
+    dockingCamera.add(cabinCollar);
+    dockingCamera.position.set(0.45, -0.3, 5);
+    dockingCamera.lookAt(0.45, -0.3, 0);
+    const centreMaterial = centreScreen.material;
+    centreMaterial.map = dockingTarget.texture;
+    renderer.setRenderTarget(dockingTarget);
+    renderer.render(dockingScene, dockingCamera);
+    renderer.setRenderTarget(null);
+
+    // Dedicated displays: cover the model's static graphics until their phase is active.
+    function panelScreen(x) {
+      const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 354;
+      const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(.34, .235), new THREE.MeshBasicMaterial({ map: texture, toneMapped: false }));
+      mesh.rotation.x = panelTilt;
+      mesh.position.set(0, .86, -.7).add(new THREE.Vector3(x, .065, .09).applyAxisAngle(new THREE.Vector3(1, 0, 0), panelTilt));
+      root.add(mesh);
+      return { canvas, texture, mesh, ctx: canvas.getContext('2d') };
+    }
+    const rightScreen = panelScreen(.5);
+
+    function drawMissionScreen(f) {
+      const { ctx, canvas, texture } = rightScreen, w = canvas.width, h = canvas.height;
+      ctx.fillStyle = '#071423'; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#8da9bd';
+      for (let i = 0; i < 32; i++) ctx.fillRect((i * 137 + 23) % w, (i * 83 + 17) % h, 2, 2);
+      ctx.fillStyle = '#b8d9e9'; ctx.font = 'bold 22px sans-serif';
+      ctx.fillText(f.docked ? 'HARD-DOCK' : 'DOCKING CAMERA', 18, 30);
+      const g = f.docking, x = 256 + (g?.value[1] || 0) * 100, y = 177 - (g?.value[0] || 0) * 70;
+      ctx.strokeStyle = '#8ac5d0'; ctx.lineWidth = 5; ctx.strokeRect(190, 105, 132, 144);
+      ctx.beginPath(); ctx.moveTo(30, 177); ctx.lineTo(190, 177); ctx.moveTo(322, 177); ctx.lineTo(482, 177); ctx.stroke();
+      ctx.fillStyle = '#dce6e5'; ctx.beginPath(); ctx.moveTo(x, y - 35); ctx.lineTo(x + 26, y + 25); ctx.lineTo(x - 26, y + 25); ctx.closePath(); ctx.fill();
+      texture.needsUpdate = true;
+    }
+    centreScreen.visible = true;
+    drawMissionScreen({ docked: false, docking: null });
+
     const camAnchor = root.getObjectByName('Camera_Pilot');
     const baseCamPos = camAnchor
       ? camAnchor.getWorldPosition(new THREE.Vector3())
@@ -224,7 +331,7 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
     tagPivot(stickRHC, () => window.ASTRO_SIM?.handleCockpitAction('stabilize'));
     tagPivot(stickTHC, () => {
       const f = window.ASTRO_SIM?.flight;
-      if (f?.step === 'radiation') window.ASTRO_SIM?.handleCockpitAction('shield_storm');
+      if (f?.step === 2 && !f.docked) window.ASTRO_SIM?.handleCockpitAction('stabilize');
       else window.ASTRO_SIM?.handleCockpitAction('pump_fuel');
     });
     tagPivot(breakerBank, () => {
@@ -233,7 +340,7 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
       window.ASTRO_SIM?.handleCockpitAction('breaker', tripped >= 0 ? tripped : 0);
     });
     tagPivot(stageSwitch, () => window.ASTRO_SIM?.handleCockpitAction('stage_sep'));
-    tagPivot(edlSwitch, () => window.ASTRO_SIM?.handleCockpitAction('edl_arm'));
+    tagPivot(edlSwitch, () => window.ASTRO_SIM?.handleCockpitAction('stabilize'));
 
     // Spark particles for FX_Sparks_Left & FX_Sparks_Right
     const sparkAnchors = ['FX_Sparks_Left', 'FX_Sparks_Right']
@@ -266,6 +373,11 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
     let hoverOffset = new THREE.Vector2(0, 0);
 
     renderer.domElement.addEventListener('pointermove', e => {
+      if (window.ASTRO_SIM?.flight?.step === 1) {
+        hoverOffset.set(0, 0);
+        renderer.domElement.style.cursor = 'default';
+        return;
+      }
       const r = renderer.domElement.getBoundingClientRect();
       pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
       pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
@@ -276,6 +388,7 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
     });
 
     renderer.domElement.addEventListener('click', e => {
+      if (window.ASTRO_SIM?.flight?.step === 1) return;
       const r = renderer.domElement.getBoundingClientRect();
       pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
       pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
@@ -298,17 +411,30 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
       const f = window.ASTRO_SIM?.flight;
 
       if (f) {
+        if (f.step === 0 || (f.step === 1 && f.portDock)) {
+          const d = f.step === 1 ? f.portDock : { x: 0.45, y: -0.3, z: 5 };
+          dockingCamera.position.set(d.x, d.y, d.z); dockingCamera.lookAt(d.x, d.y, 0);
+          cabinReticleMat.color.setHex(Math.hypot(d.x, d.y) < .18 ? 0x7edac2 : 0xf59e0b);
+          hatch.rotation.z += reducedMotion ? 0 : dt * .18;
+          cabinCollar.rotation.z = reducedMotion ? 0 : hatch.rotation.z * .35;
+          renderer.setRenderTarget(dockingTarget); renderer.render(dockingScene, dockingCamera); renderer.setRenderTarget(null);
+        }
+        centreMaterial.map = dockingTarget.texture;
+        if (f.step === 2) drawMissionScreen(f);
         // Animate cockpit controls from live flight state
         if (throttlePivot) {
           throttlePivot.rotation.x = THREE.MathUtils.lerp(throttlePivot.rotation.x, throttleBaseRot - (f.throttle || 0) * 0.65, 0.14);
         }
         if (navball) {
+          navball.visible = true;
           // [pitch, yaw] error / band × 20°: at the band edge the target on the ball reaches the green brackets.
-          const g = f.step === 0 ? f.liftoff : null, ep = g ? g.value[0] / g.band : 0, ey = g ? g.value[1] / g.band : 0;
+          const g = f.step === 0 ? f.liftoff : f.step === 3 ? f.marsBurn : null, ep = g ? g.value[0] / g.band : 0, ey = g ? g.value[1] / g.band : 0;
           const deg = e => THREE.MathUtils.clamp(e * 20, -70, 70) * Math.PI / 180;
           const roll = g ? Math.sin(now * 0.0011) * 0.04 * Math.min(3, Math.hypot(ep, ey)) : 0;
-          navQ.setFromEuler(navE.set(deg(ep), -deg(ey), roll)); // nose high → target drops; nose right → target moves left
-          navball.quaternion.slerp(navGoal.copy(navBase).multiply(navQ), 0.3);
+          if (g) {
+            navQ.setFromEuler(navE.set(deg(ep), -deg(ey), roll)); // nose high → target drops; nose right → target moves left
+            navball.quaternion.slerp(navGoal.copy(navBase).multiply(navQ), 0.3);
+          }
         }
         if (stickRHC) {
           stickRHC.rotation.z = THREE.MathUtils.lerp(stickRHC.rotation.z, rhcBaseRot.z - (f.pitchX || 0) * 0.014, 0.15);

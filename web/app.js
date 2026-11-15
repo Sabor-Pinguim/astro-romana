@@ -66,9 +66,8 @@
     $$('[data-site]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.site===state.site)));
     $('#crew-count').textContent=`${state.friends.size+1}/4 PLAYERS`;
     $('#crew-grid').innerHTML=crew.map((p,i)=>{const host=i===0,friend=state.friends.has(p.id),picked=state.detail.kind==='crew'&&state.detail.id===p.id;
-      return `<article class="crew-card ${picked?'selected':''}" style="--crew:${p.color}"><div class="crew-stage">${astronaut(p)}</div><div class="crew-info"><h4 class="crew-name">${p.name}</h4><span class="crew-role">${p.role}</span><span class="status ${host||friend?'player':''}"><span class="dot"></span>${host?'HOST (PLAYER)':friend?'FRIEND (PLAYER)':'AI (NPC)'}</span></div><div class="crew-actions"><button class="invite" type="button" data-invite="${p.id}" ${host?'disabled':''}>${host?'Host':friend?'Remove':'Invite player'}</button><button class="pick" type="button" data-pick="${p.id}" aria-pressed="${picked}">Select</button></div></article>`;}).join('');
+      return `<article class="crew-card ${picked?'selected':''}" style="--crew:${p.color}"><div class="crew-stage">${astronaut(p)}</div><div class="crew-info"><h4 class="crew-name">${p.name}</h4><span class="crew-role">${p.role}</span><span class="status ${host||friend?'player':''}"><span class="dot"></span>${host?'HOST (PLAYER)':friend?'FRIEND (PLAYER)':'AI (NPC)'}</span></div><div class="crew-actions"><button class="pick" type="button" data-pick="${p.id}" aria-label="Details: ${p.name}" aria-pressed="${picked}">Details</button></div></article>`;}).join('');
     $$('#crew-grid [data-pick]').forEach(b=>b.addEventListener('click',()=>{state.detail={kind:'crew',id:b.dataset.pick};renderLobby();}));
-    $$('#crew-grid [data-invite]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.invite;if(state.friends.has(id)){state.friends.delete(id);toast('The seat went back to the AI crew.');}else{state.friends.add(id);toast('A friend joined this local lobby preview.');}renderLobby();}));
     renderDetail();
   }
   function renderDetail(){
@@ -367,6 +366,16 @@
   // ===========================================================================
   const SIM = (() => {
     const TARGET_FUEL = 100;
+    // All four flight phases are timed game-balance challenges. The stepper uses these
+    // durations directly, so its fill and its remaining-time counter cannot diverge.
+    const FLIGHT_PHASES = [
+      { id: 'liftoff', duration: 15 },
+      { id: 'separation', duration: 60 },
+      { id: 'docking', duration: 32 },
+      { id: 'mars-burn', duration: 15 },
+    ];
+    const phaseDuration = step => FLIGHT_PHASES[step]?.duration ?? 0;
+    const clock = seconds => `${String(Math.floor(Math.max(0, seconds) / 60)).padStart(2, '0')}:${String(Math.ceil(Math.max(0, seconds) % 60)).padStart(2, '0')}`;
     const radAudio = {
       muted: false,
       bed: null,
@@ -439,12 +448,19 @@
       stability: 100,
       breakers: [false, false, false],
       stageSeparated: false,
+      separationAdvancing: false,
       refuelDone: 0,
       stormShielded: false,
       edlChuteDeployed: false,
       radRate: 232,
       score: 100,
       design: null,
+      phaseElapsed: 0,
+      phaseTimedOut: false,
+      completedPhases: new Set(),
+      docking: null,
+      docked: false,
+      marsBurn: null,
       keys: new Set(),
       raf: 0,
       lastTime: 0,
@@ -516,14 +532,20 @@
         false,
       ];
       flight.stageSeparated = false;
+      flight.separationAdvancing = false;
       flight.refuelDone = 0;
       flight.stormShielded = false;
       flight.edlChuteDeployed = false;
       flight.radRate = 232;
       flight.score = 100 - (flight.design.overBudget ? 12 : 0) - (flight.design.overweight ? 10 : 0);
       flight.sparksUntil = flight.design.powerDeficit || flight.design.overweight ? performance.now() + 2800 : 0;
+      flight.phaseElapsed = 0;
+      flight.phaseTimedOut = false;
+      flight.completedPhases = new Set();
+      flight.docking = null;
+      flight.docked = false;
+      flight.marsBurn = null;
 
-      $('#flight-log').innerHTML = '';
       logFlight('T-00:00 Flight Deck online. Camera_Pilot locked.');
       if (flight.design.overweight) logFlight('ALERT: Low liftoff TWR (<1.2) or incomplete booster — high aerodynamic buffet!');
       if (flight.design.powerDeficit) logFlight('ALERT: Electrical bus deficit — inspect Breaker_Bank.');
@@ -541,7 +563,7 @@
     // axes: 1 (a gauge) or 2 (a reticle: inside the band when the distance to the centre is ≤ band).
     // drift(t) and input return one number per axis.
     function createKeepInRange({ duration, band, limit, authority, damping = 1.5, drift, axes = 1 }) {
-      const g = { t: 0, value: Array(axes).fill(0), rate: Array(axes).fill(0), inBand: 0, duration, band, limit, axes, done: false };
+      const g = { t: 0, value: Array(axes).fill(0), rate: Array(axes).fill(0), inBand: 0, duration, band, limit, axes, error: 0, done: false };
       g.tick = (dt, input) => {
         if (g.done) return g;
         g.t = Math.min(duration, g.t + dt);
@@ -564,7 +586,7 @@
     // Liftoff (Helena, keep in range on the navball): hold the ascent program through Max-Q in pitch and yaw.
     // value = [pitch, yaw] error in degrees (pitch > 0 = nose high, yaw > 0 = nose right); the band is a circle.
     // Gusts grow at Max-Q and with a low TWR; fins damp them (design.finsDrift). All numbers are game-balance.
-    const LIFTOFF = { duration: 30, band: 3, limit: 12, authority: 8, maxQ: [12, 20], throttle: 0.7 };
+    const LIFTOFF = { duration: phaseDuration(0), band: 3, limit: 12, authority: 8, maxQ: [6, 10], throttle: 0.7 };
     function startLiftoff() {
       const d = flight.design, s1 = Math.random() * 100, s2 = Math.random() * 100;
       const gust = (d.overweight ? 1.6 : 1) * (d.finsDrift ?? 1); // low TWR: the stack wallows more
@@ -587,23 +609,99 @@
       setFlightStep(1);
     }
 
+    // Phase 03: relative motion to the station, seen from the centre console's external camera.
+    // The station is intentionally close to keep the MVP legible; values are game-balance.
+    const DOCKING = { duration: 18, band: 0.18, limit: 1, authority: 1.35 };
+    function startDocking() {
+      const s1 = Math.random() * 100, s2 = Math.random() * 100;
+      const consequence = flight.liftoffStars < 2 || !flight.stageSeparated ? 1.35 : 1;
+      return createKeepInRange({
+        axes: 2, ...DOCKING,
+        drift: t => [
+          consequence * (.36 * Math.sin(t * 1.35 + s1) + .18 * Math.sin(t * 2.8 + s1 * .7)),
+          consequence * (.32 * Math.sin(t * 1.1 + s2) + .16 * Math.sin(t * 2.4 + s2 * 1.2)),
+        ],
+      });
+    }
+    function finishDocking(g) {
+      const aligned = Math.round(g.share() * 100);
+      flight.docked = true;
+      flight.stability = aligned;
+      flight.score += g.stars() * 3;
+      logFlight(`Station hard-dock confirmed. Relative alignment held ${aligned}% of the approach.`);
+      toast(`Docking secure · ${aligned}% inside the approach corridor`);
+      renderFlightUI();
+    }
+
+    // Phase 04 reuses the pilot mechanic with the response mirrored: the burn is observed
+    // from behind the vehicle, so the player has to counter-steer in the opposite direction.
+    const MARS_BURN = { duration: phaseDuration(3), band: LIFTOFF.band, limit: LIFTOFF.limit, authority: LIFTOFF.authority };
+    function startMarsBurn() {
+      const s1 = Math.random() * 100, s2 = Math.random() * 100;
+      const transferPenalty = flight.docking?.stars() < 2 ? 1.25 : 1;
+      return createKeepInRange({
+        axes: 2, ...MARS_BURN,
+        drift: t => [
+          transferPenalty * (2.6 * Math.sin(t * .82 + s1) + 1.9 * Math.sin(t * 2.1 + s1 * 1.4)),
+          transferPenalty * (2.2 * Math.sin(t * 1.16 + s2) + 1.7 * Math.sin(t * 2.5 + s2 * .8)),
+        ],
+      });
+    }
+    function finishMarsBurn(g, timedOut = false) {
+      const share = Math.round(g.share() * 100), stars = g.stars();
+      flight.score += (stars - 1) * 5 - (timedOut ? 8 : 0);
+      logFlight(`${timedOut ? 'Burn window closed' : 'Trans-Mars injection complete'}. ${share}% inside the departure corridor.`);
+      toast(`Mars departure ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${share}% aligned`);
+      finishFlightAndLand();
+    }
+
+    function triggerPhaseTransition() {
+      for (const el of [$('#cockpit-viewport'), $('#cockpit-minigame')]) {
+        if (!el) continue;
+        el.classList.remove('is-transitioning');
+        void el.offsetWidth;
+        el.classList.add('is-transitioning');
+        window.setTimeout(() => el.classList.remove('is-transitioning'), 600);
+      }
+    }
+
     function setFlightStep(nextStep) {
+      flight.completedPhases.add(flight.step);
       flight.step = nextStep;
       flight.progress = 0;
+      flight.phaseElapsed = 0;
+      flight.phaseTimedOut = false;
+      if (nextStep !== 1) flight.separationAdvancing = false;
+      flight.input = null;
+      triggerPhaseTransition();
       if (nextStep === 1) {
-        flight.breakers = [true, flight.design.powerDeficit || flight.design.overweight, true];
-        flight.sparksUntil = performance.now() + 3000;
-        logFlight('MAX-Q SURGE: Power bus tripped! Reset Breaker_Bank then engage Stage_Sep_Switch.');
-        radAudio.tone(320, 0.14, 'sawtooth', 0.06);
+        const roughAscent = (flight.liftoffStars ?? 0) < 2;
+        flight.portDock = {
+          x: roughAscent ? 0.62 : 0.45,
+          y: roughAscent ? -0.42 : -0.3,
+          z: 5,
+          fuel: 100,
+          status: 'approach',
+        };
+        flight.breakers = [false, false, false];
+        flight.sparksUntil = 0;
+        logFlight(roughAscent
+          ? 'Rough ascent increased station approach offset. Align the cabin hatch on the centre monitor.'
+          : 'Booster separated. Align the cabin hatch with the rotating station port on the centre monitor.');
+        radAudio.tone(520, 0.14, 'triangle', 0.05);
       } else if (nextStep === 2) {
-        flight.radRate = 810;
-        logFlight(`ORBIT ACHIEVED. Target refueling reserve: ${TARGET_FUEL}%. MSL RAD warns of 810 µGy/h solar particle event!`);
+        flight.docking = startDocking();
+        flight.docked = false;
+        flight.refuelDone = 0;
+        flight.radRate = 232;
+        logFlight(`ORBIT ACHIEVED. Match velocity with the tanker, then transfer ${TARGET_FUEL}% propellant.`);
         radAudio.tone(660, 0.12, 'triangle', 0.05);
       } else if (nextStep === 3) {
-        flight.altKm = 125;
-        flight.velMs = 5400;
+        flight.marsBurn = startMarsBurn();
+        flight.altKm = 400;
+        flight.velMs = 7670;
         flight.radRate = 232;
-        logFlight(`MARS ENTRY INTERFACE: Prepare ${state.site === 'jezero' ? 'Jezero' : 'Gale'} EDL. Deploy chute in Mach window!`);
+      logFlight('Tanker released. Hold the landing corridor for Mars.');
         radAudio.tone(520, 0.15, 'triangle', 0.05);
       }
       renderFlightUI();
@@ -622,6 +720,16 @@
         flight.pitchY = Math.max(-1, Math.min(1, flight.pitchY + dy * gain));
         radAudio.tone(440, 0.04, 'sine', 0.03);
       } else if (actionId === 'stabilize') {
+        if (flight.step === 2 && flight.docking && !flight.docked) {
+          flight.docking.value = flight.docking.value.map(v => v * 0.68);
+          flight.docking.rate = flight.docking.rate.map(v => v * 0.2);
+          flight.docking.error = Math.hypot(...flight.docking.value);
+          flight.stability = Math.min(100, flight.stability + 8);
+          logFlight('Relative-velocity trim fired.');
+          radAudio.tone(540, 0.06, 'triangle', 0.04);
+          renderFlightUI();
+          return;
+        }
         flight.pitchX *= 0.25;
         flight.pitchY *= 0.25;
         flight.stability = Math.min(100, flight.stability + 12);
@@ -634,20 +742,26 @@
           radAudio.tone(780, 0.07, 'triangle', 0.05);
         }
       } else if (actionId === 'stage_sep') {
-        if (flight.step === 1 && !flight.breakers.some(Boolean)) {
+        if (flight.step === 1 && !flight.portDock && !flight.breakers.some(Boolean) && !flight.stageSeparated) {
           flight.stageSeparated = true;
+          flight.separationAdvancing = true;
           logFlight('Stage_Sep_Switch actuated! Main booster separated cleanly.');
           radAudio.tone(880, 0.14, 'triangle', 0.06);
-          setFlightStep(2);
+          renderFlightUI();
+          window.setTimeout(() => {
+            if (flight.active && flight.step === 1 && flight.separationAdvancing) setFlightStep(2);
+          }, 1800);
           return;
         }
         toast('Reset all tripped Breaker_Bank switches before stage separation.');
       } else if (actionId === 'pump_fuel') {
-        if (flight.step === 2) {
+        if (flight.step === 2 && flight.docked) {
           flight.refuelDone = Math.min(TARGET_FUEL, flight.refuelDone + 25);
           flight.progress = Math.min(100, (flight.refuelDone / TARGET_FUEL) * 100);
           logFlight(`Orbital propellant transfer: ${flight.refuelDone}% / ${TARGET_FUEL}%.`);
           radAudio.tone(500, 0.06, 'sine', 0.04);
+        } else if (flight.step === 2) {
+          toast('Hold the docking corridor until the hard-dock latches.');
         }
       } else if (actionId === 'shield_storm') {
         flight.stormShielded = true;
@@ -663,15 +777,8 @@
           radAudio.tone(820, 0.12, 'triangle', 0.06);
         }
       } else if (actionId === 'complete_step') {
-        if (flight.step === 2 && flight.refuelDone >= TARGET_FUEL) {
-          if (!flight.stormShielded && !flight.design.hasHera) {
-            flight.score -= 10;
-            logFlight('Radiation dose absorbed during unshielded solar storm (-10 pts).');
-          }
+        if (flight.step === 2 && flight.docked && flight.refuelDone >= TARGET_FUEL) {
           setFlightStep(3);
-          return;
-        } else if (flight.step === 3 && flight.progress >= 95) {
-          finishFlightAndLand();
           return;
         }
       }
@@ -681,14 +788,34 @@
     function finishFlightAndLand() {
       flight.active = false;
       cancelAnimationFrame(flight.raf);
-      const hasEdlHardware = flight.design.hasLoftid || flight.design.hasTrn;
-      if (!flight.edlChuteDeployed || !hasEdlHardware) {
-        flight.hull = Math.max(45, flight.hull - 20);
-        flight.score -= 12;
-      }
-      if (!flight.design.hasTrn) flight.score -= 4;
-      toast(`Touchdown at ${state.site === 'jezero' ? 'Jezero Crater' : 'Gale Crater'}! Release harnesses for EVA.`);
+      toast(`Mars transfer confirmed. Arrival and landing sequence complete at ${state.site === 'jezero' ? 'Jezero Crater' : 'Gale Crater'}!`);
       startSurface();
+    }
+
+    function pilotInput() {
+      const k = flight.keys, h = flight.hold || {};
+      return [
+        (k.has('KeyW') || k.has('ArrowUp') || h.up ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') || h.down ? 1 : 0),
+        (k.has('KeyD') || k.has('ArrowRight') || h.right ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') || h.left ? 1 : 0),
+      ];
+    }
+
+    function timeOutFlightPhase() {
+      if (flight.phaseTimedOut) return;
+      flight.phaseTimedOut = true;
+      if (flight.step === 1) {
+        flight.score -= 10;
+        flight.hull = Math.max(55, flight.hull - 12);
+        flight.stageSeparated = true;
+        logFlight('Separation window expired. Emergency separation fired with hull damage (-10 pts).');
+        setFlightStep(2);
+      } else if (flight.step === 2) {
+        flight.score -= flight.docked ? 4 : 12;
+        flight.docked = true;
+        flight.refuelDone = TARGET_FUEL;
+        logFlight('Docking window expired. Auto-capture and minimum transfer completed with a mission penalty.');
+        setFlightStep(3);
+      }
     }
 
     function flightTick(now) {
@@ -696,11 +823,13 @@
       const dt = Math.min(0.05, (now - flight.lastTime) / 1000);
       flight.lastTime = now;
 
-      // Keyboard steering
-      if (flight.keys.has('ArrowLeft') || flight.keys.has('KeyA')) flight.pitchX = Math.max(-1, flight.pitchX - dt * 1.4);
-      if (flight.keys.has('ArrowRight') || flight.keys.has('KeyD')) flight.pitchX = Math.min(1, flight.pitchX + dt * 1.4);
-      if (flight.keys.has('ArrowUp') || flight.keys.has('KeyW')) flight.pitchY = Math.max(-1, flight.pitchY - dt * 1.4);
-      if (flight.keys.has('ArrowDown') || flight.keys.has('KeyS')) flight.pitchY = Math.min(1, flight.pitchY + dt * 1.4);
+      // Keyboard steering (disabled during step 1 3D camera translation)
+      if (flight.step !== 1) {
+        if (flight.keys.has('ArrowLeft') || flight.keys.has('KeyA')) flight.pitchX = Math.max(-1, flight.pitchX - dt * 1.4);
+        if (flight.keys.has('ArrowRight') || flight.keys.has('KeyD')) flight.pitchX = Math.min(1, flight.pitchX + dt * 1.4);
+        if (flight.keys.has('ArrowUp') || flight.keys.has('KeyW')) flight.pitchY = Math.max(-1, flight.pitchY - dt * 1.4);
+        if (flight.keys.has('ArrowDown') || flight.keys.has('KeyS')) flight.pitchY = Math.min(1, flight.pitchY + dt * 1.4);
+      }
 
       if (flight.step === 0) {
         if (!flight.liftoff && flight.throttle >= LIFTOFF.throttle) {
@@ -710,11 +839,10 @@
         }
         const g = flight.liftoff;
         if (g) {
-          const k = flight.keys, h = flight.hold || {};
-          const pitch = (k.has('KeyW') || k.has('ArrowUp') || h.up ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') || h.down ? 1 : 0);
-          const yaw = (k.has('KeyD') || k.has('ArrowRight') || h.right ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') || h.left ? 1 : 0);
+          const [pitch, yaw] = pilotInput();
           flight.input = { up: pitch > 0, down: pitch < 0, right: yaw > 0, left: yaw < 0 };
           g.tick(dt, [pitch, yaw]);
+          flight.phaseElapsed = g.t;
           flight.progress = (g.t / g.duration) * 100;
           flight.altKm = flight.progress * 0.85;
           flight.velMs = Math.round(flight.progress * 26.5);
@@ -725,22 +853,81 @@
           if (g.done) { finishLiftoff(g); }
         }
       } else if (flight.step === 1) {
-        flight.altKm = Math.min(220, flight.altKm + dt * 6);
-        flight.velMs = Math.min(7800, flight.velMs + dt * 210);
-        flight.progress = flight.breakers.filter(b => !b).length * 33;
+        const d = flight.portDock, k = flight.keys;
+        if (d && d.status === 'approach') {
+          flight.phaseElapsed += dt;
+          flight.altKm = Math.min(240, 28 + flight.progress * 2.1);
+          flight.velMs = Math.min(7670, 2250 + Math.round(flight.progress * 54));
+          const hasAny = (...codes) => codes.some(c => k.has(c)) ? 1 : 0;
+          const x = hasAny('ArrowRight', 'KeyD') - hasAny('ArrowLeft', 'KeyA');
+          const y = hasAny('ArrowUp') - hasAny('ArrowDown');
+          const z = hasAny('KeyE', 'KeyW') - hasAny('KeyQ', 'KeyS');
+          d.input = { left: x < 0, right: x > 0, up: y > 0, down: y < 0, forward: z > 0, back: z < 0 };
+          const movement = Math.abs(x) + Math.abs(y) + Math.abs(z);
+          const speed = .55; // game-balance: metres per second of relative translation
+          d.x = Math.max(-2, Math.min(2, d.x + x * speed * dt));
+          d.y = Math.max(-2, Math.min(2, d.y + y * speed * dt));
+          d.z = Math.max(.35, Math.min(7, d.z - z * speed * dt));
+          d.fuel = Math.max(0, d.fuel - movement * 3 * dt); // game-balance: percent per axis-second
+          flight.pitchX = Math.max(-1, Math.min(1, d.x));
+          flight.pitchY = Math.max(-1, Math.min(1, -d.y));
+          flight.stability = Math.round(Math.max(0, 100 - Math.hypot(d.x, d.y) * 100));
+          flight.progress = Math.max(0, Math.min(100, (5 - d.z) / 4.65 * 100));
+          if (d.z <= .36 && Math.hypot(d.x, d.y) < .18) {
+            d.status = 'success'; flight.stageSeparated = true; flight.score += 10;
+            logFlight('Hard-dock achieved! Cabin hatch latched to station port.');
+            radAudio.tone(880, 0.14, 'triangle', 0.06);
+            toast('Docking complete'); renderFlightUI();
+            window.setTimeout(() => { if (flight.active && flight.step === 1 && d.status === 'success') setFlightStep(2); }, 1400);
+          } else if (d.fuel <= 0 || flight.phaseElapsed >= phaseDuration(1)) {
+            d.status = 'failed'; flight.score -= 5;
+            logFlight(d.fuel <= 0 ? 'RCS docking propellant depleted! Advancing to orbital transfer.' : 'Approach window expired! Advancing to orbital transfer.');
+            radAudio.tone(240, 0.16, 'sawtooth', 0.06);
+            toast('Docking failed — proceeding to next phase'); renderFlightUI();
+            window.setTimeout(() => { if (flight.active && flight.step === 1 && d.status === 'failed') setFlightStep(2); }, 1400);
+          }
+        }
       } else if (flight.step === 2) {
+        flight.phaseElapsed += dt;
         flight.altKm = 400;
         flight.velMs = 7670;
-        if (!flight.stormShielded) flight.radRate = 810;
+        const g = flight.docking;
+        if (g && !flight.docked) {
+          const [pitch, yaw] = pilotInput();
+          flight.input = { up: pitch > 0, down: pitch < 0, right: yaw > 0, left: yaw < 0 };
+          g.tick(dt, [pitch, yaw]);
+          flight.stability = Math.round(g.share() * 100);
+          flight.progress = Math.min(65, (g.t / g.duration) * 65);
+          flight.pitchX = g.value[1] / g.limit;
+          flight.pitchY = -g.value[0] / g.limit;
+          if (g.done) finishDocking(g);
+        } else if (flight.docked) {
+          flight.progress = 65 + (flight.refuelDone / TARGET_FUEL) * 35;
+        }
+        if (flight.phaseElapsed >= phaseDuration(2)) { timeOutFlightPhase(); }
       } else if (flight.step === 3) {
-        const descentRate = flight.edlChuteDeployed ? 18 : 11;
-        flight.progress = Math.min(100, flight.progress + dt * descentRate);
-        flight.altKm = Math.max(0, 125 * (1 - flight.progress / 100));
-        const brakeFactor = (flight.edlChuteDeployed ? 0.55 : 0.92) * (flight.design.hasLoftid ? 0.8 : 1);
-        flight.velMs = Math.max(2, Math.round(5400 * (1 - flight.progress / 100) * brakeFactor));
-        flight.pitchX += Math.sin(now * 0.0031) * (flight.design.hasTrn ? 0.14 : 0.35) * dt;
-        if (flight.progress >= 100) {
-          finishFlightAndLand();
+        const g = flight.marsBurn;
+        if (g) {
+          const [pitch, yaw] = pilotInput();
+          // Mirrored burn: the outside view reverses the correction axes.
+          // Keep the pressed-state tied to the mirrored labels; the physics input below is inverted.
+          flight.input = { up: pitch > 0, down: pitch < 0, right: yaw > 0, left: yaw < 0 };
+          g.tick(dt, [pitch, yaw]);
+          flight.phaseElapsed = g.t;
+          flight.progress = (g.t / g.duration) * 100;
+          flight.altKm = 400 + flight.progress * 5.5;
+          flight.velMs = Math.round(7670 + flight.progress * 9.8);
+          flight.stability = Math.round(g.share() * 100);
+          flight.pitchX = g.value[1] / g.limit;
+          flight.pitchY = -g.value[0] / g.limit;
+          if (g.error > g.limit * .75) flight.hull = Math.max(50, flight.hull - dt * 2);
+          if (g.done) {
+            finishMarsBurn(g);
+            return;
+          }
+        }
+        if (flight.phaseElapsed >= phaseDuration(3) && g) {
+          finishMarsBurn(g, true);
           return;
         }
       }
@@ -751,20 +938,55 @@
       flight.raf = requestAnimationFrame(flightTick);
     }
 
+    function updateFlightStepper() {
+      $$('#flight-stepper .flight-phase').forEach((el, idx) => {
+        const active = idx === flight.step, done = idx < flight.step;
+        const fill = done ? 100 : active ? Math.min(100, (flight.phaseElapsed / phaseDuration(idx)) * 100) : 0;
+        el.classList.toggle('active', active);
+        el.classList.toggle('done', done);
+        el.style.setProperty('--phase-fill', `${fill}%`);
+        el.setAttribute('aria-current', active ? 'step' : 'false');
+        const readout = el.querySelector('[data-phase-time]');
+        if (readout) readout.textContent = clock(done ? 0 : active ? phaseDuration(idx) - flight.phaseElapsed : phaseDuration(idx));
+      });
+    }
+
     function updateCockpitHUD() {
+      updateFlightStepper();
       $('#flight-progress-val').textContent = Math.round(flight.progress) + '%';
+      const dockFuel = $('#port-dock-fuel');
+      if (dockFuel && flight.portDock) {
+        const fuel = Math.max(0, flight.portDock.fuel);
+        dockFuel.style.width = `${fuel}%`;
+        dockFuel.classList.toggle('amber', fuel <= 45 && fuel > 20);
+        dockFuel.classList.toggle('danger', fuel <= 20);
+        $('#port-dock-fuel-value').textContent = `${Math.ceil(fuel)}%`;
+        $('#port-dock-distance').textContent = `${flight.portDock.z.toFixed(1)} m`;
+        const offsetEl = $('#port-dock-offset');
+        if (offsetEl) {
+          const err = Math.hypot(flight.portDock.x, flight.portDock.y);
+          offsetEl.textContent = err < 0.18 ? `LOCKED (${err.toFixed(2)} m)` : `OFFSET ${err.toFixed(2)} m`;
+        }
+      }
       $('#flight-alt-val').textContent = flight.altKm.toFixed(1) + ' km';
       $('#flight-vel-val').textContent = number(flight.velMs) + ' m/s';
       $('#flight-hull-val').textContent = `${Math.round(flight.propellant)}% / ${Math.round(flight.hull)}%`;
-      $('#flight-goal-val').textContent = Math.round(flight.stability) + '%';
-      setBar('#flight-goal-fill', flight.stability / 100, flight.stability < 55 ? 'danger' : '');
+      const goalLabels = ['Ascent Corridor Alignment', 'Cabin Docking Alignment', 'Docking Corridor Alignment', 'Landing Corridor Alignment'];
+      const goal = flight.step === 1
+        ? Math.round(Math.max(0, 100 - Math.hypot(flight.portDock?.x ?? 0, flight.portDock?.y ?? 0) * 100))
+        : flight.step === 2 && flight.docking && !flight.docked
+          ? Math.round(flight.docking.share() * 100)
+          : flight.docked ? 100 : Math.round(flight.stability);
+      $('#flight-goal-label').textContent = goalLabels[flight.step];
+      $('#flight-goal-val').textContent = goal + '%';
+      setBar('#flight-goal-fill', goal / 100, goal < 55 ? 'danger' : '');
 
-      const g = flight.step === 0 ? flight.liftoff : null, mark = $('#kir-mark');
+      const g = flight.step === 0 ? flight.liftoff : flight.step === 3 ? flight.marsBurn : null, mark = $('#kir-mark');
       if (g && mark) {
         mark.style.left = `${50 + (g.value[1] / g.limit) * 50}%`;
         mark.style.top = `${50 - (g.value[0] / g.limit) * 50}%`;
         mark.classList.toggle('out', g.error > g.band);
-        $('#kir-time').textContent = `${Math.ceil(g.duration - g.t)} s to MECO`;
+        $('#kir-time').textContent = `${Math.ceil(g.duration - g.t)} s to ${flight.step === 0 ? 'MECO' : 'touchdown'}`;
         $('#kir-share').textContent = `${Math.round(g.share() * 100)}% in band`;
         const st = g.stars(); $('#kir-stars').textContent = '★'.repeat(st) + '☆'.repeat(3 - st);
         $$('[data-hold]').forEach(b => b.classList.toggle('on', !!flight.input?.[b.dataset.hold]));
@@ -774,28 +996,49 @@
         pip.style.translate = `calc(-50% + ${Math.round(flight.pitchX * 48)}px) calc(-50% + ${Math.round(flight.pitchY * 48)}px)`;
         pip.classList.toggle('danger', Math.hypot(flight.pitchX, flight.pitchY) > 0.55);
       }
-      const hasAlert = flight.breakers.some(Boolean) || (flight.step === 2 && !flight.stormShielded) || (flight.step === 3 && flight.progress > 35 && !flight.edlChuteDeployed);
+      const hasAlert = flight.breakers.some(Boolean) || (flight.step === 2 && !flight.docked);
       $('#cockpit-badge').textContent = hasAlert ? 'ACTION REQUIRED' : 'NOMINAL';
       $('#cockpit-alert-tag').textContent = hasAlert ? 'C&W MATRIX ALERT ACTIVE' : 'ALL SYSTEMS NOMINAL';
       $('#cockpit-rad-tag').textContent = `MSL RAD: ${flight.radRate} µGy/h`;
       const actionBtn = $('#cockpit-minigame [data-act="complete_step"]');
-      if (actionBtn && flight.step === 2) actionBtn.disabled = flight.refuelDone < TARGET_FUEL;
+      if (actionBtn && flight.step === 2) actionBtn.disabled = !flight.docked || flight.refuelDone < TARGET_FUEL;
+      const dockReadout = $('#docking-monitor-readout'), docking = flight.docking;
+      if (dockReadout && flight.step === 2 && docking) {
+        const align = Math.round(Math.max(0, 100 - (docking.error / docking.limit) * 100));
+        dockReadout.textContent = flight.docked ? 'HARD-DOCK' : `ALIGN ${align}%`;
+        $('#docking-monitor').style.setProperty('--dock-x', `${docking.value[1] * 28}px`);
+        $('#docking-monitor').style.setProperty('--dock-y', `${-docking.value[0] * 18}px`);
+      }
     }
 
     function renderFlightUI() {
-      $$('#flight-stepper .flight-pill').forEach((el, idx) => {
-        el.classList.toggle('active', idx === flight.step);
-        el.classList.toggle('done', idx < flight.step);
-      });
+      updateFlightStepper();
       const titles = [
         ['Flight Operations / Phase 05', 'Liftoff & Max-Q Corridor'],
-        ['Flight Operations / Phase 05B', 'Electrical Bus & Stage Separation'],
-        ['Transit Operations / Phase 06A', 'Orbital Refueling & Solar Storm'],
-        ['Mars Arrival / Phase 06B', 'Entry, Descent & Landing (EDL)'],
+        ['Flight Operations / Phase 05B', 'Cabin Docking'],
+        ['Transit Operations / Phase 06A', 'Orbital Docking & Propellant Transfer'],
+        ['Mars Arrival / Phase 06B', 'Mars Landing'],
       ];
-      $('.cockpit-reticle')?.toggleAttribute('hidden', flight.step === 0);
+      $('.cockpit-reticle')?.toggleAttribute('hidden', true);
       $('#cockpit-eyebrow').textContent = titles[flight.step][0];
       $('#cockpit-title').textContent = titles[flight.step][1];
+      const exterior = $('#flight-exterior'), monitor = $('#docking-monitor');
+      exterior?.toggleAttribute('hidden', true);
+      exterior?.classList.toggle('is-separated', flight.stageSeparated);
+      monitor?.toggleAttribute('hidden', true);
+
+      const outcome = $('#port-dock-outcome');
+      if (outcome) {
+        const st = flight.step === 1 ? flight.portDock?.status : null;
+        const done = st === 'success' || st === 'failed';
+        outcome.hidden = !done;
+        outcome.className = `dock-outcome${st === 'success' ? ' is-success' : st === 'failed' ? ' is-failed' : ''}`;
+        outcome.innerHTML = st === 'success'
+          ? '<span class="dock-outcome-mark" aria-hidden="true"><svg viewBox="0 0 36 36"><polyline points="7,19 15,27 29,10"/></svg></span><strong>Docking Complete</strong>'
+          : st === 'failed'
+            ? '<span class="dock-outcome-mark" aria-hidden="true"><svg viewBox="0 0 36 36"><line x1="9" y1="9" x2="27" y2="27"/><line x1="27" y1="9" x2="9" y2="27"/></svg></span><strong>Docking Failed</strong>'
+            : '';
+      }
 
       const box = $('#cockpit-minigame');
       if (flight.step === 0) {
@@ -811,38 +1054,42 @@
               : `<button class="button primary" type="button" data-act="throttle_up">Throttle ${Math.round(flight.throttle * 100)}%<kbd>Space</kbd></button>`}</div>
           </div>
           <div class="kir-stats"><span id="kir-time">${LIFTOFF.duration} s to MECO</span><span id="kir-share">—</span><span id="kir-stars">☆☆☆</span></div>`;
-        $$('[data-hold]', box).forEach(btn => {
-          btn.addEventListener('pointerdown', () => { flight.hold = { [btn.dataset.hold]: true }; });
-          for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => { flight.hold = null; });
-        });
       } else if (flight.step === 1) {
         box.innerHTML = `
-          <span class="eyebrow">Lucas · Minigame L-S4</span>
-          <h4>Reset Breaker_Bank &amp; Separate</h4>
-          <p>Max-Q tripped flight deck buses. Click all flashing red breakers (or click the 3D left wing), then flip <b>Stage_Sep_Switch</b>.</p>
-          <div class="breaker-grid">${flight.breakers.map((t, i) => `<button class="breaker-btn ${t ? 'tripped' : ''}" type="button" data-act="breaker" data-idx="${i}">Bus ${i + 1}: ${t ? 'TRIP' : 'OK'}</button>`).join('')}</div>
-          <button class="button primary" type="button" data-act="stage_sep" ${flight.breakers.some(Boolean) ? 'disabled' : ''}>Engage Stage_Sep_Switch →</button>`;
+          <span class="eyebrow">Helena · Station docking</span>
+          <h4>Align the cabin hatch</h4>
+          <p>Align the cabin hatch with the rotating station port on the centre monitor (keyboard only). Use <b>← →</b> (or <b>A / D</b>) left/right, <b>↑ ↓</b> up/down, <b>E / Q</b> (or <b>W / S</b>) forward/back. Every movement uses fuel.</p>
+          <div class="meter"><div class="meter-head"><span class="meter-label">Docking fuel</span><strong id="port-dock-fuel-value">100%</strong></div><div class="meter-track"><div class="meter-fill" id="port-dock-fuel" style="width:100%"></div></div></div>
+          <div class="docking-readout"><span id="port-dock-offset">OFFSET 0.54 m</span><strong id="port-dock-distance">5.0 m</strong></div>
+          <p>${flight.portDock?.status === 'failed' ? '✕ Docking failed. Advancing to orbital transfer…' : flight.portDock?.status === 'success' ? '✓ Hatch secured! Advancing to orbital transfer…' : 'Centre the port inside the green ring before closing to 0.36 m.'}</p>`;
       } else if (flight.step === 2) {
+        const g = flight.docking, aligned = g ? Math.round(g.share() * 100) : 0;
         box.innerHTML = `
-          <span class="eyebrow">Oscar &amp; Maya · Phase 06A</span>
-          <h4>Refuel (${TARGET_FUEL}%) &amp; Shield Solar Storm</h4>
-          <p>Cryogenic tanker docked. Pump fuel to your planned reserve and shield the crew from the 810 µGy/h storm (2024-05-20 RAD dataset).</p>
+          <span class="eyebrow">Oscar &amp; Maya · Orbital docking</span>
+          <h4>Match velocity &amp; transfer propellant</h4>
+          <p>${flight.docked ? `Hard-dock secure. Press ↑ to transfer propellant, then → to continue to Mars landing.` : 'Keep the tanker centred in the external view on the right monitor. W/S or ↑/↓ translate vertical, A/D or ←/→ translate lateral; the rougher the ascent, the more the stack drifts.'}</p>
+          <div class="docking-readout"><span>${flight.docked ? 'LATCHED · READY TO TRANSFER' : `ALIGNMENT ${aligned}%`}</span><strong>${flight.docked ? `${flight.refuelDone}/${TARGET_FUEL}%` : `${Math.ceil((g?.duration ?? 0) - (g?.t ?? 0))} s APPROACH`}</strong></div>
           <div class="control-grid">
-            <button class="button secondary" type="button" data-act="pump_fuel">Pump Fuel (${flight.refuelDone}/${TARGET_FUEL}%)</button>
-            <button class="button secondary" type="button" data-act="shield_storm" ${flight.stormShielded ? 'disabled' : ''}>${flight.stormShielded ? 'Shelter Sealed ✓' : flight.design.hasShelter ? 'Seal Storm Shelter' : 'Deploy Water Wall'}</button>
+            <button class="button secondary" type="button" data-act="pump_fuel" ${flight.docked ? '' : 'disabled'}>Transfer Propellant (${flight.refuelDone}/${TARGET_FUEL}%)</button>
+            <button class="button secondary" type="button" data-act="stabilize" ${flight.docked ? 'disabled' : ''}>Trim Relative Velocity</button>
           </div>
-          <button class="button primary" type="button" data-act="complete_step" ${flight.refuelDone < TARGET_FUEL ? 'disabled' : ''}>Commit to Mars EDL →</button>`;
+          <button class="button primary" type="button" data-act="complete_step" ${!flight.docked || flight.refuelDone < TARGET_FUEL ? 'disabled' : ''}>Continue to Mars Landing →</button>`;
       } else {
+        const g = flight.marsBurn;
         box.innerHTML = `
-          <span class="eyebrow">Helena · Minigame H-S1/S2</span>
-          <h4>Mars Thin-Air EDL Approach</h4>
-          <p>Arm <b>EDL_Arm_Switch</b> to deploy parachute/heat-shield (${flight.design.hasLoftid ? 'LOFTID + ASPIRE armed' : 'No extra heat-shield!'}) and stabilize for touchdown.</p>
-          <div class="control-grid">
-            <button class="button primary" type="button" data-act="edl_arm" ${flight.edlChuteDeployed ? 'disabled' : ''}>${flight.edlChuteDeployed ? 'Chute Deployed ✓' : 'Flip EDL_Arm_Switch'}</button>
-            <button class="button secondary" type="button" data-act="stabilize">${flight.design.hasTrn ? 'TRN Hazard Avoid' : 'Manual THC Flare'}</button>
+          <span class="eyebrow">Helena · Mars landing · Keep in range</span>
+          <h4>Hold the landing program</h4>
+          <p>Keep the navball target centred, inside the green brackets, until touchdown. <b>W/S</b> or <b>↑/↓</b> pitch, <b>A/D</b> or <b>←/→</b> yaw; corrections take a moment to bite.</p>
+          <div class="kir-row">
+            <div class="kir kir-2d" style="--band:${(MARS_BURN.band / MARS_BURN.limit) * 100}%"><div class="kir-band"></div><div class="kir-mark" id="kir-mark"></div><span class="kir-label top">Burn high</span><span class="kir-label bottom">Burn low</span></div>
+            <div class="kir-ctrl kir-pad"><button class="button secondary up" type="button" data-hold="up">▲<kbd>W · ↑</kbd></button><button class="button secondary left" type="button" data-hold="left">◀<kbd>A · ←</kbd></button><button class="button secondary right" type="button" data-hold="right">▶<kbd>D · →</kbd></button><button class="button secondary down" type="button" data-hold="down">▼<kbd>S · ↓</kbd></button></div>
           </div>
-          <button class="button primary" type="button" data-act="complete_step">Final Touchdown →</button>`;
+          <div class="kir-stats"><span id="kir-time">${MARS_BURN.duration} s to touchdown</span><span id="kir-share">—</span><span id="kir-stars">☆☆☆</span></div>`;
       }
+      $$('[data-hold]', box).forEach(btn => {
+        btn.addEventListener('pointerdown', () => { flight.hold = { [btn.dataset.hold]: true }; });
+        for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => { flight.hold = null; });
+      });
       $$('[data-act]', box).forEach(btn => btn.addEventListener('click', () => {
         const idx = btn.dataset.idx !== undefined ? Number(btn.dataset.idx) : undefined;
         handleCockpitAction(btn.dataset.act, idx);
@@ -914,8 +1161,12 @@
       if (state.screen === 'cockpit') {
         flight.keys.add(e.code);
         if (e.code.startsWith('Arrow')) e.preventDefault(); // steer, do not scroll the page
+        if (!e.repeat && flight.step === 2 && flight.docked) {
+          if (e.code === 'ArrowUp') handleCockpitAction('pump_fuel');
+          if (e.code === 'ArrowRight') handleCockpitAction('complete_step');
+        }
         if (e.code === 'Space' && e.repeat) { e.preventDefault(); return; }
-        if (e.code === 'Space') { e.preventDefault(); handleCockpitAction(flight.step === 0 ? 'throttle_up' : flight.step === 1 ? 'stage_sep' : flight.step === 2 ? 'pump_fuel' : 'edl_arm'); }
+        if (e.code === 'Space') { e.preventDefault(); if (flight.step !== 1) handleCockpitAction(flight.step === 0 ? 'throttle_up' : flight.step === 2 ? 'pump_fuel' : 'stabilize'); }
       }
     });
     document.addEventListener('keyup', e => flight.keys.delete(e.code));

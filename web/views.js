@@ -430,6 +430,12 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   const STRIDE = 1.33; // m/s that matches walk_loop (1.1 s cycle, two ~0.73 m steps)
   // game: the photo is a grayscale stretch; this gain on the manifest tint makes it read as warm Mars ground under the game lights.
   const GROUND_GAIN = [3, 2, 1.25];
+  // game: haze. With a horizon ring (manifest `horizon`), exp² by distance from the eye: clear for the first ~10 km,
+  // HAZE_AT_EDGE at the ring's far edge so it melts into the sky; without one, a short fog hides the terrain edge.
+  const HAZE_AT_EDGE = .97, EDGE_FOG = [45, 230], NO_RING_FAR = 1200;
+  const radialFog = shader => { // fog by distance, not view depth: the ring edge stays hidden at the screen sides too
+    shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>', '#ifdef USE_FOG\n  vFogDepth = length(mvPosition.xyz);\n#endif');
+  };
   const tasks = () => sim()?.surf.tasks ?? [];
   const isDone = id => !!sim()?.surf.completed.has(id);
   const touch = matchMedia('(pointer: coarse)').matches, clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -441,11 +447,12 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   const flat = (color, roughness = .7, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness, flatShading: true });
   function initWorld() {
     let renderer;
-    try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch { return null; }
+    // Logarithmic depth: the horizon ring reaches 100 km while the suit is 5 cm from the eye.
+    try { renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true }); } catch { return null; }
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
     viewEl.prepend(renderer.domElement);
-    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(72, 1, .05, 1200);
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(72, 1, .05, NO_RING_FAR);
     camera.rotation.order = 'YXZ';
     // Daytime Mars sky (game colors): butterscotch at the horizon, darker overhead; faceted dome.
     const horizon = new THREE.Color(0xd8a07c), zenith = new THREE.Color(0x7a4c46);
@@ -454,7 +461,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     const sky = new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
     sky.renderOrder = -1; scene.add(sky);
-    scene.fog = new THREE.Fog(horizon, 45, 230);
+    scene.fog = new THREE.Fog(horizon, ...EDGE_FOG);
     scene.add(new THREE.HemisphereLight(0xf3c9a0, 0x4a2418, 1.25));
     const sun = new THREE.DirectionalLight(0xfff0dc, 2.1);
     sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.normalBias = .03;
@@ -525,15 +532,23 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       delete entry.glb;
       const gltf = await loader.parseAsync(bytes.buffer, '');
-      let mesh = null; gltf.scene.traverse(o => { if (o.isMesh && !mesh) mesh = o; });
+      // "Terrain": the walkable HiRISE crop. "Horizon" (optional): the land around it out to tens of km.
+      const mesh = gltf.scene.getObjectByName('Terrain'), ring = gltf.scene.getObjectByName('Horizon') ?? null;
       mesh.receiveShadow = true;
       const { color, map } = mesh.material;
       color.setRGB(color.r * GROUND_GAIN[0], color.g * GROUND_GAIN[1], color.b * GROUND_GAIN[2]);
       if (map) map.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); // keeps the photo sharp at grazing angles
       addGroundDetail(mesh.material, entry.site.sizeM);
+      if (ring) { // its texture already carries the relief shading (real sun, 200 m DEM): light it as level ground
+        const m = ring.material, n = ring.geometry.attributes.position.count;
+        ring.geometry.setAttribute('normal', new THREE.Float32BufferAttribute(new Float32Array(n * 3).map((_, i) => (i % 3 === 1 ? 1 : 0)), 3));
+        m.color.setRGB(m.color.r * GROUND_GAIN[0], m.color.g * GROUND_GAIN[1], m.color.b * GROUND_GAIN[2]);
+        if (m.map) m.map.anisotropy = world.renderer.capabilities.getMaxAnisotropy();
+        m.flatShading = false; m.onBeforeCompile = radialFog; m.needsUpdate = true;
+      }
       const hf = heightField(mesh);
       gltf.scene.add(scatterRocks(hf, entry.site.id));
-      return { info: entry.site, scene: gltf.scene, hf };
+      return { info: entry.site, scene: gltf.scene, hf, ring };
     })().catch(err => { terrains.delete(id); throw err; }));
     return terrains.get(id);
   }
@@ -558,6 +573,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       grain.generateMipmaps = true; grain.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); grain.needsUpdate = true;
     }
     material.onBeforeCompile = shader => {
+      radialFog(shader);
       shader.uniforms.grainMap = { value: grain }; shader.uniforms.grainRepeat = { value: sizeM / 3 };
       shader.fragmentShader = 'uniform sampler2D grainMap;\nuniform float grainRepeat;\n' + shader.fragmentShader.replace('#include <map_fragment>',
         '#include <map_fragment>\n  diffuseColor.rgb *= 0.55 + 0.9 * texture2D(grainMap, vMapUv * grainRepeat).r;');
@@ -639,6 +655,12 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     world.sunDir.set(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el));
     world.skirt.position.y = info.elevation.minM - info.elevation.centerM - .4;
     world.skirt.material.color.setRGB(info.tint[0] * .2, info.tint[1] * .2, info.tint[2] * .2);
+    // With a horizon ring the real land continues past the edge: no skirt, haze out to the ring's far edge.
+    const reach = t.ring ? info.horizon.radiusM : 0;
+    world.skirt.visible = !t.ring;
+    const haze = world.scene.fog.color;
+    world.scene.fog = t.ring ? new THREE.FogExp2(haze, Math.sqrt(-Math.log(1 - HAZE_AT_EDGE)) / reach) : new THREE.Fog(haze, ...EDGE_FOG);
+    world.camera.far = t.ring ? reach * 1.05 : NO_RING_FAR; world.camera.updateProjectionMatrix();
     const lat = info.center.lat, lon = info.center.lon;
     $s('surface-coords').textContent = `${Math.abs(lat).toFixed(2)}°${lat < 0 ? 'S' : 'N'} ${Math.abs(lon).toFixed(2)}°${lon < 0 ? 'W' : 'E'} · HiRISE terrain ${info.sizeM} m`;
   }

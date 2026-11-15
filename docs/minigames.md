@@ -70,6 +70,19 @@ Os 8 candidatos a MVP usam as 6 mecânicas. Trocando H-S1 por H-S2, a pilotagem 
 
 ---
 
+## Fluxo de voo do MVP
+
+As quatro etapas do cockpit têm um minigame cronometrado. Os tempos, os limites de alinhamento e as penalidades abaixo são `game-balance`; as peças usadas para montar a nave continuam vindo de `references/parts/`.
+
+| Etapa | Dono | Minigame | Consequência |
+|---|---|---|---|
+| 01 · Liftoff & Max-Q | Helena | manter o alvo do navball no centro em dois eixos | uma ascensão ruim cria um disjuntor extra na separação |
+| 02 · Cabin docking | Helena | alinhar a escotilha da cabine em 3D no monitor central com `← →` (`A/D`), `↑ ↓` e `E/Q` (`W/S`), sem gastar todo o combustível | falha exibe X vermelho, custa pontos e avança para a próxima etapa |
+| 03 · Orbital docking | Oscar e Maya | manter a nave alinhada com o tanque na câmera externa do monitor central; depois, transferir propelente | aproximação ruim dificulta a injeção transmarciana; a janela vencida usa captura automática com penalidade |
+| 04 · Mars landing | Helena | repetir o navball da decolagem durante o pouso em Marte | pouco tempo na faixa reduz a pontuação da missão |
+
+---
+
 ## 1. Helena: Comandante e Piloto
 
 **Recursos:** Massa, Órbita, Orçamento. Os experimentos dela são **manobras e voos**: tecnologias que foram testadas de verdade em Marte.
