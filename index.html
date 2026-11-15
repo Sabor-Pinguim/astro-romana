@@ -336,37 +336,8 @@
     .flight-log div+div{margin-top:4px;padding-top:4px;border-top:1px solid #ffffff10}
 
     /* Phase 7: Mars Surface Exploration */
-    .compass-bar.slab{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;width:min(1600px,calc(100% - clamp(32px,6vw,88px)));margin:14px auto 0;padding:10px 18px}
-    .compass-track{position:relative;height:34px;overflow:hidden;background:var(--f0);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
-    .compass-ticks{display:flex;justify-content:space-between;align-items:center;height:100%;padding:0 14px;font:700 .7rem var(--heading);letter-spacing:.14em;color:var(--muted)}
-    .compass-ticks b{color:var(--solar-amber)}
-    .compass-marker{position:absolute;top:2px;bottom:2px;width:4px;background:var(--mars-orange);translate:-50% 0;transition:left .12s linear}
     .timer-readout{padding:.45rem .9rem;font:700 1.25rem/1 var(--heading);font-variant-numeric:tabular-nums;color:var(--bg-void);background:var(--solar-amber);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
     .timer-readout.urgent{color:var(--text-white);background:var(--crimson-alert);animation:blink .7s steps(2,end) infinite}
-    .surface-grid{flex:1;display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:14px;width:min(1600px,100%);margin:0 auto;padding:14px clamp(16px,3vw,44px) 14px}
-    .mission-panel{display:flex;flex-direction:column;gap:10px;padding:18px}
-    .task-list{display:flex;flex-direction:column;gap:8px}
-    .task-item{display:flex;flex-direction:column;gap:4px;padding:.85rem .95rem;border:0;text-align:left;color:var(--text-white);background:var(--f1);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);box-shadow:inset 3px 0 0 var(--amethyst);transition:background .15s}
-    .task-item:hover{background:var(--f4)}
-    .task-item.active{background:linear-gradient(112deg,#35183e 0 42%,#21122e 42%);box-shadow:inset 3px 0 0 var(--solar-amber)}
-    .task-item.done{box-shadow:inset 3px 0 0 var(--safe);opacity:.85}
-    .task-item strong{font:700 .8rem var(--heading);letter-spacing:.06em;text-transform:uppercase;color:var(--starlight-cream)}
-    .task-item small{font-size:.76rem;color:var(--muted)}
-    .surface-viewport.slab{position:relative;min-height:470px;overflow:hidden;background:linear-gradient(180deg,#2a1026 0 45%,#6e261f 45% 100%)}
-    .surface-viewport canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
-    .surface-viewport.is-3d .surface-map-fallback{display:none}
-    .surface-map-fallback{position:absolute;inset:0;display:block}
-    .surface-controls{position:absolute;right:14px;bottom:14px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-    .dpad{display:grid;grid-template-columns:repeat(3,38px);gap:4px}
-    .dpad button{height:34px;border:0;font:700 .78rem var(--heading);color:var(--starlight-cream);background:#11071Fe6;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
-    .dpad button:hover{color:var(--bg-void);background:var(--solar-amber)}
-    .surface-dock{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;width:min(1600px,100%);margin:0 auto;padding:0 clamp(16px,3vw,44px) 18px}
-    .dock-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px 16px}
-    .crew-switch,.inventory-slots{display:flex;flex-wrap:wrap;gap:6px;flex:1}
-    .crew-pill{flex:1;min-width:110px;padding:.5rem .7rem;border:0;text-align:left;color:var(--text-white);background:var(--f1);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);box-shadow:inset 3px 0 0 var(--crew,var(--amethyst))}
-    .crew-pill.active{color:var(--bg-void);background:var(--crew,var(--solar-amber))}
-    .crew-pill strong{display:block;font:700 .72rem var(--heading);letter-spacing:.08em;text-transform:uppercase}
-    .crew-pill small{display:block;font-size:.66rem;opacity:.85}
     .inv-slot{flex:1;min-width:105px;padding:.5rem .65rem;font:600 .66rem var(--heading);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--f0);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
     .inv-slot.filled{color:var(--bg-void);background:var(--safe)}
 
@@ -408,6 +379,13 @@
     .surface-hud{position:absolute;z-index:2;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
     .surface-site{padding:14px 20px 12px}
     .surface-site h2{margin:.25rem 0 .1rem;font-size:clamp(1.05rem,2vw,1.5rem);color:var(--starlight-cream);text-transform:uppercase}
+    .surface-hud button{pointer-events:auto}
+    .surface-status{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+    .surface-status .button{min-height:30px;padding:.4rem .75rem;--a:var(--f1);--b:var(--f1);--fg:var(--starlight-cream)}
+    #surface-rad-badge{text-transform:none} /* keeps µGy (uppercase turns µ into a Greek M) */
+    .surface-inv-label{margin:10px 0 6px}
+    .surface-inventory{display:flex;flex-wrap:wrap;gap:3px}
+    .surface-inventory .inv-slot{flex:0 1 auto;min-width:0;padding:.3rem .5rem;font-size:.58rem}
     .surface-goals{width:min(330px,46vw);padding:14px 14px 12px}
     .surface-goals ol{display:grid;gap:3px;margin:0;padding:0;list-style:none}
     .surface-goals li{--crew:var(--muted);display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:.55rem;padding:.42rem .55rem;background:var(--f1);font-size:.74rem;line-height:1.25}
@@ -466,7 +444,7 @@
       .orbit-map.slab{min-height:470px}
       .orbit-system{width:min(86vw,460px)}
       .crew-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .cockpit-layout,.surface-grid,.surface-dock,.results-grid{grid-template-columns:1fr}
+      .cockpit-layout,.results-grid{grid-template-columns:1fr}
     }
     @media (max-width:640px){
       .menu-shell{align-items:flex-end;padding-bottom:96px}
@@ -481,8 +459,7 @@
       .assembly-grid{grid-template-columns:1fr}
       .blueprint.slab{min-height:500px}
       .flight-stepper{grid-template-columns:repeat(2,1fr)}
-      .cockpit-viewport.slab,.surface-viewport.slab,.podium-viewport.slab{min-height:360px}
-      .compass-bar.slab{grid-template-columns:1fr;gap:8px}
+      .cockpit-viewport.slab,.podium-viewport.slab{min-height:360px}
       .app-foot{flex-wrap:wrap}
       .app-foot .hint{order:2;width:100%}
       .orbit-map.slab{min-height:380px}
@@ -491,9 +468,7 @@
       .stage-node{max-width:46%}
       .rocket-stage{min-width:0;padding:.4rem .6rem .4rem .75rem}
       .rocket-stage small{display:none}
-<<<<<<< Updated upstream
       .remove-stage{width:28px;font-size:.95rem}
-=======
       .surface-hud{top:10px;left:10px;right:10px;flex-direction:column;gap:6px}
       .surface-site{padding:10px 14px 8px}
       .surface-goals{width:100%;padding:10px}
@@ -505,7 +480,6 @@
       .surface-actions .button{flex:1}
       .surface-prompt{bottom:118px}
       .surface-jump{bottom:62px;right:10px;width:60px;height:60px}
->>>>>>> Stashed changes
     }
     @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
   </style>
@@ -563,7 +537,6 @@
     <footer class="app-foot"><div class="hint">Build the booster (engine + tank), fill the bays and the cabin, then launch.</div><div class="foot-actions"><button class="button primary" id="launch-button" type="button">Launch mission <span aria-hidden="true">↗</span></button></div></footer>
   </section>
 
-<<<<<<< Updated upstream
   <section id="cockpit" class="screen" aria-labelledby="cockpit-title">
     <header class="app-header">
       <div class="header-title">
@@ -625,63 +598,18 @@
   </section>
 
   <section id="surface" class="screen" aria-labelledby="surface-title">
-    <header class="app-header">
-      <div class="header-title">
-        <button class="button quiet" id="surface-back" type="button">← Flight Log</button>
-        <div>
-          <div class="eyebrow" id="surface-eyebrow">Phase 07 / Mars Surface EVA</div>
-          <h2 id="surface-title">Jezero Crater Surface Ops</h2>
-        </div>
+    <div class="surface-view" id="surface-view">
+      <div class="surface-hud">
+        <div class="surface-site slab"><span class="eyebrow">Phase 07 / Mars surface EVA</span><h2 id="surface-title">Landing site</h2><span class="micro" id="surface-coords"></span><div class="surface-status"><div class="timer-readout" id="surface-timer" aria-live="polite">03:00</div><span class="tag" id="surface-rad-badge">RAD: 232 µGy/sol · CALM</span><button class="button quiet" id="audio-toggle-surface" type="button">Audio: On</button></div></div>
+        <div class="surface-goals slab"><div class="block-label"><span class="micro">Experiments</span><span class="tag" id="surface-count">0/4 DONE</span></div><ol id="surface-goals"></ol><div class="block-label surface-inv-label"><span class="micro">Inventory</span></div><div class="surface-inventory" id="surface-inventory"></div></div>
       </div>
-      <div class="header-side">
-        <button class="button quiet" id="audio-toggle-surface" type="button">Audio: On</button>
-        <span class="tag" id="surface-rad-badge">RAD: 232 µGy/sol · CALM</span>
-        <div class="timer-readout" id="surface-timer" aria-live="polite">03:00</div>
-      </div>
-    </header>
-    <div class="compass-bar slab" aria-label="Surface navigation compass">
-      <span class="tag" id="surface-coords">18.38°N · 77.58°E</span>
-      <div class="compass-track">
-        <div class="compass-ticks"><span>W 270°</span><span>NW</span><b>N 000°</b><span>NE</span><span>E 090°</span><span>SE</span><span>S 180°</span></div>
-        <div class="compass-marker" id="compass-marker" style="left:50%" title="Active waypoint bearing"></div>
-      </div>
-      <span class="tag" id="surface-bearing-label">HDG 000° · WP LANDER</span>
-    </div>
-    <div class="surface-grid">
-      <aside class="panel slab mission-panel" aria-label="Surface science missions">
-        <div class="panel-heading">
-          <h3>Surface Missions</h3>
-          <span class="tag" id="surface-progress-tag">0 / 3 DONE</span>
-        </div>
-        <p class="muted" style="font-size:.82rem">Select a task to lock waypoint on the compass and guide the assigned specialist. Return to the ascent vehicle before launch window closes.</p>
-        <div class="task-list" id="surface-task-list"></div>
-        <button class="button primary" id="surface-action-btn" type="button" style="margin-top:auto">Move to Active Beacon →</button>
-        <button class="button secondary" id="surface-board-btn" type="button">Board Ascent Vehicle &amp; Depart →</button>
-      </aside>
-      <div class="surface-viewport slab" id="surface-viewport">
-        <div class="cockpit-hud-top">
-          <span class="tag" id="surface-active-crew-tag">ACTIVE: MAYA · ASTROBIOLOGY</span>
-          <span class="tag" id="surface-dist-tag">DIST TO WAYPOINT: 0 m</span>
-        </div>
-        <svg class="surface-map-fallback" id="surface-svg-fallback" viewBox="0 0 600 420" role="img" aria-label="2D Mars surface tactical map"></svg>
-        <div class="surface-controls">
-          <div class="dpad" aria-label="Surface movement controls">
-            <span></span><button type="button" data-move="0,-1" aria-label="Move North">▲</button><span></span>
-            <button type="button" data-move="-1,0" aria-label="Move West">◀</button><button type="button" data-move="0,1" aria-label="Move South">▼</button><button type="button" data-move="1,0" aria-label="Move East">▶</button>
-          </div>
-          <span class="tag">WASD / Arrows or Click Terrain</span>
-        </div>
-      </div>
-    </div>
-    <div class="surface-dock">
-      <section class="panel slab dock-strip" aria-label="Crew specialists">
-        <span class="micro">Crew (1–4)</span>
-        <div class="crew-switch" id="surface-crew-switch"></div>
-      </section>
-      <section class="panel slab dock-strip" aria-label="Mission inventory">
-        <span class="micro">Inventory</span>
-        <div class="inventory-slots" id="surface-inventory"></div>
-      </section>
+      <div class="surface-tags" id="surface-tags" aria-hidden="true"></div>
+      <button class="surface-prompt" id="surface-prompt" type="button" hidden></button>
+      <div class="surface-crew" id="surface-crew" aria-label="Crew member you control"></div>
+      <div class="surface-actions"><button class="button quiet" id="surface-camera" type="button">Camera · V</button><button class="button quiet" id="surface-leave" type="button">← Planner</button><button class="button primary" id="surface-board" type="button">Board &amp; depart ↗</button></div>
+      <div class="surface-stick" id="surface-stick" aria-hidden="true"><span></span></div>
+      <button class="surface-jump" id="surface-jump" type="button">Jump</button>
+      <div class="surface-start" id="surface-start"><div class="slab"><span class="eyebrow" id="surface-start-kicker">Touchdown</span><h3 id="surface-start-title">Loading terrain…</h3><p class="surface-keys" id="surface-keys"></p></div></div>
     </div>
   </section>
 
@@ -727,25 +655,7 @@
     </div>
   </section>
 
-=======
-  <section id="surface" class="screen" aria-labelledby="surface-title">
-    <div class="surface-view" id="surface-view">
-      <div class="surface-hud">
-        <div class="surface-site slab"><span class="eyebrow">Surface / sol 1</span><h2 id="surface-title">Landing site</h2><span class="micro" id="surface-coords"></span></div>
-        <div class="surface-goals slab"><div class="block-label"><span class="micro">Experiments</span><span class="tag" id="surface-count">0/4 DONE</span></div><ol id="surface-goals"></ol></div>
-      </div>
-      <div class="surface-tags" id="surface-tags" aria-hidden="true"></div>
-      <button class="surface-prompt" id="surface-prompt" type="button" hidden></button>
-      <div class="surface-crew" id="surface-crew" aria-label="Crew member you control"></div>
-      <div class="surface-actions"><button class="button quiet" id="surface-camera" type="button">Camera · V</button><button class="button secondary" id="surface-leave" type="button">Leave surface</button></div>
-      <div class="surface-stick" id="surface-stick" aria-hidden="true"><span></span></div>
-      <button class="surface-jump" id="surface-jump" type="button">Jump</button>
-      <div class="surface-start" id="surface-start"><div class="slab"><span class="eyebrow" id="surface-start-kicker">Touchdown</span><h3 id="surface-start-title">Loading terrain…</h3><p class="surface-keys" id="surface-keys"></p></div></div>
-    </div>
-  </section>
-
   <dialog id="minigame-dialog" aria-labelledby="minigame-title"><div class="dialog-inner"><span class="eyebrow" id="minigame-kicker">Experiment</span><h3 id="minigame-title">Experiment</h3><p id="minigame-brief"></p><div class="summary-list" id="minigame-summary"></div><p class="minigame-note">The minigame is not built yet. Completing it here marks the experiment as done.</p><div class="dialog-actions"><button class="button quiet" id="minigame-close" type="button">Back</button><button class="button primary" id="minigame-done" type="button">Complete experiment</button></div></div></dialog>
->>>>>>> Stashed changes
   <dialog id="quit-dialog" aria-labelledby="quit-title"><div class="dialog-inner"><span class="eyebrow">Quit mission</span><h3 id="quit-title">Leave the mission?</h3><p>This is a local prototype. You can close the tab at any time.</p><div class="dialog-actions"><button class="button quiet" id="quit-cancel" type="button">Stay</button><button class="button secondary" id="quit-confirm" type="button">Close notice</button></div></div></dialog>
   <dialog id="launch-dialog" aria-labelledby="launch-title"><div class="dialog-inner"><span class="eyebrow">Launch review</span><h3 id="launch-title">Mission ready for review</h3><p id="launch-message"></p><div class="summary-list" id="launch-summary"></div><div class="dialog-actions"><button class="button quiet" id="launch-close" type="button">Keep editing</button><button class="button primary" id="launch-confirm" type="button">Launch mission →</button></div></div></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -974,14 +884,7 @@
   $$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));renderBadge();renderTelemetry();}));
   $('#launch-button').addEventListener('click',showLaunch);
   $('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());
-<<<<<<< Updated upstream
   $('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();window.ASTRO_SIM?.startFlight();});
-=======
-  // Launch → touchdown: the cruise and the landing are not simulated yet, so the crew lands straight on the chosen site.
-  const playerCrew = () => state.detail.kind==='crew'?state.detail.id:crew[0].id;
-  const land = () => {showScreen('surface');window.dispatchEvent(new CustomEvent('astro:land',{detail:{site:state.site,crew:playerCrew()}}));};
-  $('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();const m=metrics();const risky=!m.ready||m.twr<TWR_MIN()||m.cost>m.budget||m.gen<m.draw;land();toast(risky?'Risky launch: engineering risks are not simulated yet. Touchdown.':`Touchdown at ${SITES_INFO[state.site].name}.`);});
->>>>>>> Stashed changes
   // Low-poly art: planets and terrain are flat-shaded triangles, like the 3D models.
   const RAMPS = {
     mars:['#3a0f1c','#8F241E','#b8391f','#E04F26','#EE7B57','#f6a07f'],
@@ -1188,39 +1091,17 @@
       sparksUntil: 0,
     };
 
-    const SURFACE_TASKS = {
-      jezero: [
-        { id: 'maya_drill', crew: 'maya', title: 'Delta Core Assay', desc: 'Drill & analyze ancient lake sediments with Maya.', x: 11, z: -10, item: 'Delta Core Sample', toolNote: 'PIXL/Drill synergy' },
-        { id: 'lucas_isru', crew: 'lucas', title: 'MOXIE Power & O₂ Rig', desc: 'Stabilize surface power array and produce oxygen.', x: -12, z: -8, item: 'O₂ Telemetry Cell', toolNote: 'Power grid stabilized' },
-        { id: 'oscar_link', crew: 'oscar', title: 'High-Gain Relay Uplinks', desc: 'Align Electra/DSOC beacon on Jezero ridge.', x: 8, z: 11, item: 'Earth Downlink Log', toolNote: 'High-rate telemetry' },
-      ],
-      gale: [
-        { id: 'maya_drill', crew: 'maya', title: 'Aeolis Mons Strata Sample', desc: 'Extract layered clay mineral sample on Mount Sharp.', x: 10, z: -11, item: 'Sulfate Rock Core', toolNote: 'Spectrometer assay' },
-        { id: 'lucas_isru', crew: 'lucas', title: 'MMRTG & RAD Calibration', desc: 'Service power junction & Curiosity RAD station.', x: -13, z: -7, item: 'O₂ Telemetry Cell', toolNote: 'Thermal loop balanced' },
-        { id: 'oscar_link', crew: 'oscar', title: 'Crater Rim Optical Link', desc: 'Lock laser/UHF carrier over Gale basin wall.', x: 9, z: 10, item: 'Earth Downlink Log', toolNote: 'Orbit pass locked' },
-      ],
-    };
+    // Surface experiments: the MVP ground candidates of docs/minigames.md, one per crew member. The owner runs
+    // the minigame next to its block; the item goes to the inventory and the experiment counts in the results.
+    const SURFACE_TASKS = [
+      { id: 'H-S1', crew: 'helena', title: 'Helicopter flight', minigame: 'Scout', mechanic: 'Piloting', basis: 'Ingenuity (2021–24)', desc: 'Fly through the scouting points before the battery runs out. Smooth, featureless sand confuses the navigation camera.', item: 'Aerial Scout Map' },
+      { id: 'L-S1', crew: 'lucas', title: 'Oxygen oven', minigame: 'Make oxygen', mechanic: 'Keep in range', basis: 'MOXIE on Perseverance (2021–23)', desc: 'Heat the reactor to about 800 °C and hold it in the green zone. Too hot damages the cell; too cold makes nothing.', item: 'O₂ Telemetry Cell' },
+      { id: 'O-S1', crew: 'oscar', title: 'Orbiter pass', minigame: 'Contact window', mechanic: 'Choice under a limit', basis: 'UHF relay (Electra)', desc: 'The orbiter passes overhead for a few seconds. Pick which data packets to send before the window closes.', item: 'Earth Downlink Log' },
+      { id: 'M-S1', crew: 'maya', title: 'Biosignature hunter', minigame: 'Leopard spots', mechanic: 'Pattern search', basis: 'PIXL + SHERLOC on Perseverance', desc: 'The rock is a grid. Each scan costs time and power; find the hidden spots before time runs out.', item: 'Biosignature Scan' },
+    ];
 
-    const surf = {
-      active: false,
-      timerSec: 180,
-      lastTick: 0,
-      raf: 0,
-      activeCrew: 'maya',
-      selectedTask: 'maya_drill',
-      completed: new Set(),
-      inventory: ['RAD Log (MSL)'],
-      crewPos: {
-        helena: { x: -1.8, z: 2.2 },
-        lucas: { x: -0.6, z: 2.5 },
-        oscar: { x: 0.7, z: 2.5 },
-        maya: { x: 1.9, z: 2.1 },
-      },
-      moving: { x: 0, z: 0 },
-      keys: new Set(),
-      tasks: [],
-      stranded: [],
-    };
+    // Surface state (rules). The 3D module walks the crew on the real terrain and reports back.
+    const surf = { active: false, timerSec: 180, lastTick: 0, raf: 0, activeCrew: 'helena', tasks: SURFACE_TASKS, completed: new Set(), inventory: [], stranded: [] };
 
     function logFlight(msg) {
       const box = $('#flight-log');
@@ -1231,11 +1112,11 @@
       while (box.children.length > 7) box.lastElementChild.remove();
     }
 
-    function startFlight() {
+    function captureDesign() {
       const r = state.rocket;
       const installed = new Set([r.booster.engine, r.booster.tank, ...r.stages.map(s => s.item), ...r.cabin].filter(Boolean));
       const m = DATA ? metrics() : { cost: 0, mass: 0, draw: 0, gen: 0, dv: 0, budget: budgetOf(state.difficulty), leo: 9400, twr: 0, ready: false };
-      flight.design = {
+      return {
         ...m,
         overweight: !m.ready || m.twr < TWR_MIN(),
         overBudget: m.cost > m.budget,
@@ -1251,6 +1132,10 @@
         hasDna: installed.has('cabin-msg-minion'),
         hasDish: installed.has('comm-dsoc-laser') || installed.has('comm-electra-marco') || installed.has('comm-rise-xband') || installed.has('cabin-scan-console'),
       };
+    }
+
+    function startFlight() {
+      flight.design = captureDesign();
       flight.active = true;
       flight.step = 0;
       flight.progress = 0;
@@ -1529,90 +1414,30 @@
     // PHASE 7: MARS SURFACE EXPLORATION
     // -------------------------------------------------------------------------
     function startSurface() {
+      flight.design ||= captureDesign();
       surf.active = true;
       surf.timerSec = state.difficulty === 'easy' ? 210 : state.difficulty === 'hard' ? 140 : 180;
-      surf.activeCrew = 'maya';
-      surf.tasks = SURFACE_TASKS[state.site] || SURFACE_TASKS.jezero;
-      surf.selectedTask = surf.tasks[0].id;
+      surf.activeCrew = state.detail.kind === 'crew' ? state.detail.id : 'maya';
       surf.completed = new Set();
-      surf.inventory = [flight.design.hasHera ? 'HERA Spectrum' : 'MSL RAD Log'];
-      surf.crewPos = {
-        helena: { x: -1.8, z: 2.2 },
-        lucas: { x: -0.6, z: 2.5 },
-        oscar: { x: 0.7, z: 2.5 },
-        maya: { x: 1.9, z: 2.1 },
-      };
+      surf.inventory = [flight.design.hasHera ? 'HERA Spectrum' : 'RAD Log (MSL)'];
       surf.stranded = [];
-
-      const jezero = state.site === 'jezero';
-      $('#surface-title').textContent = (jezero ? 'Jezero Crater' : 'Gale Crater') + ' Surface Ops';
-      $('#surface-coords').textContent = jezero ? '18.38°N · 77.58°E' : '4.59°S · 137.44°E';
       $('#surface-rad-badge').textContent = flight.design.hasHera ? 'RAD: 232 µGy/sol · HERA MONITOR' : 'RAD: 232 µGy/sol · CALM';
       showScreen('surface');
       radAudio.startSurfaceBed();
-      renderSurfaceUI();
+      window.dispatchEvent(new CustomEvent('astro:land', { detail: { site: state.site, crew: surf.activeCrew } }));
+      updateSurfaceTimer();
       cancelAnimationFrame(surf.raf);
       surf.lastTick = performance.now();
       surf.raf = requestAnimationFrame(surfaceTick);
     }
 
-    function activeTarget() {
-      if (surf.completed.size >= 3 || surf.selectedTask === 'return_ship') {
-        return { id: 'return_ship', crew: surf.activeCrew, title: 'Ascent Vehicle', x: 0, z: 0 };
-      }
-      return surf.tasks.find(t => t.id === surf.selectedTask) || surf.tasks[0];
-    }
-
-    function distanceToTarget(crewId = surf.activeCrew, tgt = activeTarget()) {
-      const p = surf.crewPos[crewId];
-      return Math.hypot(tgt.x - p.x, tgt.z - p.z);
-    }
-
-    function selectSurfaceTask(taskId) {
-      surf.selectedTask = taskId;
-      const t = surf.tasks.find(item => item.id === taskId);
-      if (t) surf.activeCrew = t.crew;
-      renderSurfaceUI();
-      window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf }));
-    }
-
-    function switchSurfaceCrew(crewId) {
-      surf.activeCrew = crewId;
-      renderSurfaceUI();
-      window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf }));
-    }
-
-    function performSurfaceInteract() {
-      const tgt = activeTarget();
-      const pos = surf.crewPos[surf.activeCrew];
-      const dist = distanceToTarget(surf.activeCrew, tgt);
-      if (dist > 2.4) {
-        // Guide specialist directly toward target if clicked from HUD/accessibility button
-        const ang = Math.atan2(tgt.z - pos.z, tgt.x - pos.x);
-        const step = Math.min(dist - 1.2, 4.5);
-        pos.x += Math.cos(ang) * step;
-        pos.z += Math.sin(ang) * step;
-        radAudio.tone(380, 0.06, 'triangle', 0.04);
-      }
-      if (distanceToTarget(surf.activeCrew, tgt) <= 2.5) {
-        if (tgt.id === 'return_ship') {
-          boardShipAndFinish(false);
-          return;
-        }
-        if (!surf.completed.has(tgt.id)) {
-          surf.completed.add(tgt.id);
-          surf.inventory.push(tgt.item);
-          radAudio.tone(860, 0.14, 'triangle', 0.06);
-          toast(`${tgt.title} completed! ${tgt.item} stored in inventory.`);
-          const remaining = surf.tasks.find(item => !surf.completed.has(item.id));
-          if (remaining) selectSurfaceTask(remaining.id);
-          else {
-            surf.selectedTask = 'return_ship';
-            toast('All 3 surface missions complete! Return crew to the Ascent Vehicle.');
-          }
-        }
-      }
-      renderSurfaceUI();
+    function completeSurfaceTask(id) {
+      const t = surf.tasks.find(item => item.id === id);
+      if (!surf.active || !t || surf.completed.has(id)) return;
+      surf.completed.add(id);
+      surf.inventory.push(t.item);
+      radAudio.tone(860, 0.14, 'triangle', 0.06);
+      toast(surf.completed.size === surf.tasks.length ? 'All surface experiments done! Walk back to the lander and board the ascent vehicle.' : `${t.title} done · ${t.item} stored in inventory.`);
       window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf }));
     }
 
@@ -1620,160 +1445,52 @@
       surf.active = false;
       cancelAnimationFrame(surf.raf);
       radAudio.stopAll();
-      surf.stranded = [];
-      if (forcedTimeout) {
-        for (const p of crew) {
-          const dist = Math.hypot(surf.crewPos[p.id].x, surf.crewPos[p.id].z);
-          if (dist > 11.5) surf.stranded.push(p.name);
-        }
-      }
+      // game-balance: on timeout, crew members more than 35 m from the lander are left behind.
+      surf.stranded = forcedTimeout ? crew.filter(p => (window.ASTRO_SURFACE?.distanceToLander(p.id) ?? 0) > 35).map(p => p.name) : [];
       showResults(forcedTimeout);
     }
 
+    function abortSurface() {
+      surf.active = false;
+      cancelAnimationFrame(surf.raf);
+      radAudio.stopAll();
+      showScreen('planner');
+    }
+
+    // The launch window only counts down while the crew is walking (not paused, loading or in a minigame).
     function surfaceTick(now) {
       if (!surf.active || state.screen !== 'surface') return;
-      const dt = Math.min(0.05, (now - surf.lastTick) / 1000);
+      const dt = Math.min(0.1, (now - surf.lastTick) / 1000);
       surf.lastTick = now;
-
-      surf.timerSec = Math.max(0, surf.timerSec - dt);
+      if (window.ASTRO_SURFACE?.running?.() ?? true) surf.timerSec = Math.max(0, surf.timerSec - dt);
       if (surf.timerSec <= 0) {
         toast('Return launch window reached! Mandatory ascent initiating.');
         boardShipAndFinish(true);
         return;
       }
-
-      let vx = surf.moving.x;
-      let vz = surf.moving.z;
-      if (surf.keys.has('KeyA') || surf.keys.has('ArrowLeft')) vx -= 1;
-      if (surf.keys.has('KeyD') || surf.keys.has('ArrowRight')) vx += 1;
-      if (surf.keys.has('KeyW') || surf.keys.has('ArrowUp')) vz -= 1;
-      if (surf.keys.has('KeyS') || surf.keys.has('ArrowDown')) vz += 1;
-      const mag = Math.hypot(vx, vz);
-      if (mag > 0) {
-        const speed = 6.2;
-        const pos = surf.crewPos[surf.activeCrew];
-        pos.x = Math.max(-18, Math.min(18, pos.x + (vx / mag) * speed * dt));
-        pos.z = Math.max(-18, Math.min(18, pos.z + (vz / mag) * speed * dt));
-        // Auto-complete mission when specialist walks onto beacon
-        const tgt = activeTarget();
-        if (tgt.id !== 'return_ship' && tgt.crew === surf.activeCrew && distanceToTarget(surf.activeCrew, tgt) < 2.2 && !surf.completed.has(tgt.id)) {
-          performSurfaceInteract();
-        }
-      }
-
-      updateSurfaceHUD();
-      window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf, walking: mag > 0 }));
+      updateSurfaceTimer();
       surf.raf = requestAnimationFrame(surfaceTick);
     }
 
-    function updateSurfaceHUD() {
-      const m = Math.floor(surf.timerSec / 60);
-      const s = Math.floor(surf.timerSec % 60);
-      const timerEl = $('#surface-timer');
-      timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    function updateSurfaceTimer() {
+      const timerEl = $('#surface-timer'), m = Math.floor(surf.timerSec / 60), sec = Math.floor(surf.timerSec % 60);
+      timerEl.textContent = `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
       timerEl.classList.toggle('urgent', surf.timerSec <= 30);
-
-      const p = surf.crewPos[surf.activeCrew];
-      const tgt = activeTarget();
-      const dx = tgt.x - p.x;
-      const dz = tgt.z - p.z;
-      const dist = Math.hypot(dx, dz);
-      // 0 deg = North (-Z), 90 deg = East (+X)
-      const deg = ((Math.atan2(dx, -dz) * 180 / Math.PI) + 360) % 360;
-      const markerPct = Math.max(6, Math.min(94, 50 + (deg > 180 ? deg - 360 : deg) / 180 * 44));
-      $('#compass-marker').style.left = markerPct + '%';
-      $('#surface-bearing-label').textContent = `HDG ${String(Math.round(deg)).padStart(3, '0')}° · ${tgt.title.toUpperCase()}`;
-      const person = crew.find(c => c.id === surf.activeCrew);
-      $('#surface-active-crew-tag').textContent = `ACTIVE: ${person.name.toUpperCase()} · ${person.role.toUpperCase()}`;
-      $('#surface-dist-tag').textContent = `DIST TO WAYPOINT: ${Math.round(dist * 3)} m`;
-      const actionBtn = $('#surface-action-btn');
-      if (actionBtn) {
-        if (tgt.id === 'return_ship') actionBtn.textContent = dist <= 2.5 ? 'Board Ascent Vehicle ✓' : 'Guide Crew Back to Ship →';
-        else actionBtn.textContent = dist <= 2.5 ? `Execute ${tgt.title} ✓` : `Guide ${person.name} to ${tgt.title} →`;
-      }
-      renderSurfaceFallbackMap();
     }
 
-    function renderSurfaceFallbackMap() {
-      const svg = $('#surface-svg-fallback');
-      if (!svg || $('#surface-viewport').classList.contains('is-3d')) return;
-      const mapX = x => 300 + x * 13;
-      const mapY = z => 210 + z * 9.5;
-      const tasksSvg = surf.tasks.map(t => {
-        const done = surf.completed.has(t.id);
-        const col = done ? '#7EDAC2' : '#F59E0B';
-        return `<g transform="translate(${mapX(t.x)} ${mapY(t.z)})"><polygon points="0,-10 10,8 -10,8" fill="${col}"/><text y="20" text-anchor="middle" fill="#FCE8A6" font-size="10" font-family="Chakra Petch">${t.title}</text></g>`;
-      }).join('');
-      const crewSvg = crew.map(c => {
-        const p = surf.crewPos[c.id];
-        const act = c.id === surf.activeCrew;
-        return `<g transform="translate(${mapX(p.x)} ${mapY(p.z)})"><polygon points="0,-8 8,0 0,8 -8,0" fill="${c.color}" stroke="${act ? '#FFFFFF' : 'none'}" stroke-width="2"/><text y="-11" text-anchor="middle" fill="#FFFFFF" font-size="9">${c.name}</text></g>`;
-      }).join('');
-      svg.innerHTML = `<rect width="600" height="420" fill="#2d1424"/><polygon points="0,420 220,300 440,340 600,260 600,420" fill="#5e1d22"/><polygon points="290,190 310,190 318,225 282,225" fill="#FCE8A6"/><text x="300" y="242" text-anchor="middle" fill="#FCE8A6" font-size="10">ASCENT VEHICLE</text>${tasksSvg}${crewSvg}`;
-    }
-
-    function renderSurfaceUI() {
-      $('#surface-progress-tag').textContent = `${surf.completed.size} / 3 DONE`;
-      $('#surface-task-list').innerHTML = surf.tasks.map(t => {
-        const done = surf.completed.has(t.id);
-        const active = surf.selectedTask === t.id;
-        return `<button class="task-item ${active ? 'active' : ''} ${done ? 'done' : ''}" type="button" data-stask="${t.id}"><strong>${done ? '✓ ' : ''}${t.title} (${t.crew.toUpperCase()})</strong><small>${t.desc}</small></button>`;
-      }).join('');
-      $$('[data-stask]', $('#surface-task-list')).forEach(btn => btn.addEventListener('click', () => selectSurfaceTask(btn.dataset.stask)));
-
-      $('#surface-crew-switch').innerHTML = crew.map((c, idx) => {
-        const active = surf.activeCrew === c.id;
-        return `<button class="crew-pill ${active ? 'active' : ''}" style="--crew:${c.color}" type="button" data-screw="${c.id}"><strong>${idx + 1}. ${c.name}</strong><small>${c.role.split('&')[0].trim()}</small></button>`;
-      }).join('');
-      $$('[data-screw]', $('#surface-crew-switch')).forEach(btn => btn.addEventListener('click', () => switchSurfaceCrew(btn.dataset.screw)));
-
-      const slots = [0, 1, 2, 3].map(i => surf.inventory[i] || 'Empty Sample Slot');
-      $('#surface-inventory').innerHTML = slots.map((label, i) => `<div class="inv-slot ${surf.inventory[i] ? 'filled' : ''}">${label}</div>`).join('');
-      updateSurfaceHUD();
-    }
-
-    $('#surface-action-btn').addEventListener('click', performSurfaceInteract);
-    $('#surface-board-btn').addEventListener('click', () => boardShipAndFinish(false));
-    $('#surface-back').addEventListener('click', () => {
-      surf.active = false;
-      cancelAnimationFrame(surf.raf);
-      radAudio.stopAll();
-      showScreen('planner');
-    });
     $('#cockpit-abort').addEventListener('click', () => {
       flight.active = false;
       cancelAnimationFrame(flight.raf);
       showScreen('planner');
     });
 
-    $$('[data-move]').forEach(btn => {
-      const [mx, mz] = btn.dataset.move.split(',').map(Number);
-      const startMove = () => { surf.moving = { x: mx, z: mz }; };
-      const stopMove = () => { surf.moving = { x: 0, z: 0 }; };
-      btn.addEventListener('pointerdown', startMove);
-      btn.addEventListener('pointerup', stopMove);
-      btn.addEventListener('pointerleave', stopMove);
-      btn.addEventListener('click', () => {
-        if (!surf.active) return;
-        const p = surf.crewPos[surf.activeCrew];
-        p.x = Math.max(-18, Math.min(18, p.x + mx * 1.4));
-        p.z = Math.max(-18, Math.min(18, p.z + mz * 1.4));
-        updateSurfaceHUD();
-        window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf, walking: true }));
-      });
-    });
-
     document.addEventListener('keydown', e => {
       if (state.screen === 'cockpit') {
         flight.keys.add(e.code);
         if (e.code === 'Space') { e.preventDefault(); handleCockpitAction(flight.step === 0 ? 'throttle_up' : flight.step === 1 ? 'stage_sep' : flight.step === 2 ? 'pump_fuel' : 'edl_arm'); }
-      } else if (state.screen === 'surface') {
-        surf.keys.add(e.code);
-        if (e.key >= '1' && e.key <= '4') switchSurfaceCrew(crew[Number(e.key) - 1].id);
-        if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); performSurfaceInteract(); }
       }
     });
-    document.addEventListener('keyup', e => { flight.keys.delete(e.code); surf.keys.delete(e.code); });
+    document.addEventListener('keyup', e => flight.keys.delete(e.code));
 
     // -------------------------------------------------------------------------
     // FINAL RESULTS, RANKING & ANIMATED PODIUM
@@ -1789,15 +1506,15 @@
       const grade = total >= 1150 ? 'S+' : total >= 950 ? 'A' : total >= 740 ? 'B' : 'C';
 
       $('#results-rank-letter').textContent = grade;
-      $('#results-score-text').textContent = `Total Score: ${number(total)} pts · ${tasksDone}/3 Surface Missions`;
+      $('#results-score-text').textContent = `Total Score: ${number(total)} pts · ${tasksDone}/${surf.tasks.length} Surface Experiments`;
       $('#results-status-badge').textContent = surf.stranded.length ? `LEFT BEHIND: ${surf.stranded.join(', ').toUpperCase()}` : 'ALL 4 CREW RETURNED';
       $('#results-headline').textContent = surf.stranded.length ? 'Emergency Extraction Partial' : grade === 'S+' ? 'Historic Mars Triumph' : 'Mission Complete';
       $('#podium-site-tag').textContent = `${state.site === 'jezero' ? 'JEZERO' : 'GALE'} CRATER · RANK ${grade}`;
 
-      const helenaPts = Math.round(210 + flight.stability * 1.1 + edlBonus * 4);
-      const lucasPts = Math.round(200 + (d.powerDeficit ? 10 : 45) + (surf.completed.has('lucas_isru') ? 130 : 25));
-      const oscarPts = Math.round(195 + (d.hasDish ? 45 : 15) + (surf.completed.has('oscar_link') ? 130 : 25));
-      const mayaPts = Math.round(200 + scienceBonus * 4 + (surf.completed.has('maya_drill') ? 145 : 25));
+      const helenaPts = Math.round(210 + flight.stability * 1.1 + edlBonus * 4 + (surf.completed.has('H-S1') ? 60 : 0));
+      const lucasPts = Math.round(200 + (d.powerDeficit ? 10 : 45) + (surf.completed.has('L-S1') ? 130 : 25));
+      const oscarPts = Math.round(195 + (d.hasDish ? 45 : 15) + (surf.completed.has('O-S1') ? 130 : 25));
+      const mayaPts = Math.round(200 + scienceBonus * 4 + (surf.completed.has('M-S1') ? 145 : 25));
       const ranked = [
         { ...crew[0], pts: helenaPts },
         { ...crew[1], pts: lucasPts },
@@ -1842,25 +1559,13 @@
 
     $('#results-replay').addEventListener('click', () => showScreen('lobby'));
 
-    return { startFlight, handleCockpitAction, selectSurfaceTask, switchSurfaceCrew, moveActiveTo: (x, z) => {
-      if (!surf.active) return;
-      surf.crewPos[surf.activeCrew] = { x: Math.max(-18, Math.min(18, x)), z: Math.max(-18, Math.min(18, z)) };
-      const tgt = activeTarget();
-      if (tgt.id !== 'return_ship' && tgt.crew === surf.activeCrew && distanceToTarget(surf.activeCrew, tgt) < 2.4 && !surf.completed.has(tgt.id)) {
-        performSurfaceInteract();
-      }
-      updateSurfaceHUD();
-    }, flight, surf };
+    return { startFlight, handleCockpitAction, startSurface, completeSurfaceTask, board: () => boardShipAndFinish(false), abortSurface, flight, surf };
   })();
   window.ASTRO_SIM = SIM;
   // Shared with the 3D modules below.
   function renderBadge(){$('#modifier-badge').textContent=`${money(budgetOf(state.difficulty))} · ${difficulty[state.difficulty].risk}`;}
   window.ASTRO_ART={RAMPS,PLANETS};
-<<<<<<< Updated upstream
-  window.ASTRO={state,crew,data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL,showScreen,toast};
-=======
-  window.ASTRO={state,crew,sites:SITES_INFO,toast,show:showScreen,land,data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab)};
->>>>>>> Stashed changes
+  window.ASTRO={state,crew,sites:SITES_INFO,toast,show:showScreen,showScreen,land:()=>SIM.startSurface(),data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL};
   paintArt();renderLobby();renderBadge();renderPlanner();setupStars();
   if(!DATA)fetch('godot/assets/models/parts/manifest.json').then(r=>r.json()).then(m=>{useData(m);renderBadge();renderPlanner();}).catch(()=>toast('Could not load the part specs.'));
 })();
@@ -2300,7 +2005,6 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   requestAnimationFrame(frame);
 })().catch(err => console.warn('3D rocket not shown:', err));
 
-<<<<<<< Updated upstream
 // Planner catalog: render each part's 3D GLB once into an offscreen studio view (cached in window.ASTRO_THUMBS).
 (async () => {
   const thumbs = window.ASTRO_THUMBS;
@@ -2379,6 +2083,513 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   window.addEventListener('astro:catalog', syncCatalogThumbs);
   syncCatalogThumbs();
 })().catch(err => console.warn('Catalog 3D thumbnails disabled:', err));
+// Surface: the landing site in 3D. The ground is the real HiRISE terrain of the chosen site
+// (godot/assets/terrain, built by tools/terrain; index.terrain.<site>.js when opened from disk).
+// First-person walk with the crew member's own suit in view when looking down (V: chase camera).
+// One block per crew member marks a surface experiment (window.ASTRO_SIM.surf.tasks) at a random spot;
+// its owner walks there and runs the minigame (placeholder for now). The rules (launch window timer,
+// inventory, boarding, results) live in ASTRO_SIM; this module moves the crew and reports back.
+(() => {
+  const root = document.getElementById('surface'), ui = window.ASTRO, sim = () => window.ASTRO_SIM;
+  if (!root || !ui) return;
+  const $s = id => document.getElementById(id);
+  const viewEl = $s('surface-view'), startEl = $s('surface-start'), promptEl = $s('surface-prompt'), dlg = $s('minigame-dialog');
+  const MARS_G = 3.71; // m/s², Mars surface gravity (same value as tools/modeling/lib/fx-presets.mjs)
+  // game-balance: walk/run speed (m/s), jump speed, reach to a block or the lander, and where the blocks
+  // land (close enough to visit all four within the launch window).
+  const WALK = 2.2, RUN = 4.6, JUMP = 2.6, REACH = 3.2, BOARD_REACH = 5, SPOT_MIN = 20, SPOT_MAX = 75, SPOT_GAP = 28;
+  // Where each crew member stands after touchdown (m, south of the lander).
+  const CREW_START = { helena: [-5.4, 6.6], lucas: [-1.8, 7.5], oscar: [2.1, 7.5], maya: [5.7, 6.3] };
+  const STRIDE = 1.33; // m/s that matches walk_loop (1.1 s cycle, two ~0.73 m steps)
+  // game: the photo is a grayscale stretch; this gain on the manifest tint makes it read as warm Mars ground under the game lights.
+  const GROUND_GAIN = [3, 2, 1.25];
+  const tasks = () => sim()?.surf.tasks ?? [];
+  const isDone = id => !!sim()?.surf.completed.has(id);
+  const touch = matchMedia('(pointer: coarse)').matches, clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  const s = { site: null, crew: null, mode: 'first', yaw: 0, pitch: -.1, bodyYaw: 0, speed: 0, vy: 0, grounded: true, jump: false,
+    pos: new THREE.Vector3(), keys: new Set(), stick: null, look: null, drag: null, ready: false, prompt: '' };
+  const KEYS_HELP = touch ? 'Left thumb walks, right thumb looks. Look down to see your suit.'
+    : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · mouse looks<br><kbd>E</kbd> run experiment or board · <kbd>V</kbd> camera · <kbd>1</kbd>–<kbd>4</kbd> crew · <kbd>Esc</kbd> pause<br>Look down to see your suit.';
+  let world = null;
+
+  const hiddenMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // still casts a shadow
+  const flat = (color, roughness = .7, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness, flatShading: true });
+  function initWorld() {
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch { return null; }
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
+    viewEl.prepend(renderer.domElement);
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(72, 1, .05, 1200);
+    camera.rotation.order = 'YXZ';
+    // Daytime Mars sky (game colors): butterscotch at the horizon, darker overhead; faceted dome.
+    const horizon = new THREE.Color(0xd8a07c), zenith = new THREE.Color(0x7a4c46);
+    const skyGeo = new THREE.IcosahedronGeometry(900, 2), sp = skyGeo.attributes.position, colors = [];
+    for (let k = 0; k < sp.count; k++) { const c = horizon.clone().lerp(zenith, Math.pow(Math.max(0, sp.getY(k) / 900), .55)); colors.push(c.r, c.g, c.b); }
+    skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    const sky = new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
+    sky.renderOrder = -1; scene.add(sky);
+    scene.fog = new THREE.Fog(horizon, 45, 230);
+    scene.add(new THREE.HemisphereLight(0xf3c9a0, 0x4a2418, 1.25));
+    const sun = new THREE.DirectionalLight(0xfff0dc, 2.1);
+    sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.normalBias = .03;
+    Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 180 });
+    scene.add(sun, sun.target);
+    const skirt = new THREE.Mesh(new THREE.CircleGeometry(1500, 6).rotateX(-Math.PI / 2), flat(0x6b3b28, 1));
+    scene.add(skirt);
+    const lander = makeLander(); scene.add(lander);
+    const w = { renderer, scene, camera, sky, sun, skirt, lander, sunDir: new THREE.Vector3(0, 1, 0), terrain: null, hf: null,
+      blocks: [], colliders: [], avatars: new Map(), avatar: null, width: 0, height: 0 };
+    new ResizeObserver(() => {
+      w.width = viewEl.clientWidth; w.height = viewEl.clientHeight;
+      if (!w.width || !w.height) return;
+      renderer.setSize(w.width, w.height, false); camera.aspect = w.width / w.height; camera.updateProjectionMatrix();
+    }).observe(viewEl);
+    bindInput(renderer.domElement);
+    return w;
+  }
+
+  // The landed vehicle at the site center (game art from primitives, palette colors).
+  function makeLander() {
+    const g = new THREE.Group(), hull = flat(0xe9e4f0, .6), foil = flat(0xd8a23a, .45, .3), steel = flat(0x8c90a0, .5, .4), dark = flat(0x281147, .9);
+    const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
+    add(new THREE.CylinderGeometry(1.5, 1.7, 1.3, 6), foil, 0, 1.75, 0);
+    add(new THREE.CylinderGeometry(1, 1.5, .8, 6), hull, 0, 2.8, 0);
+    add(new THREE.ConeGeometry(.55, .7, 8), steel, 0, .95, 0).rotation.x = Math.PI;
+    add(new THREE.BoxGeometry(.8, .9, .1), dark, 0, 1.75, 1.47);
+    add(new THREE.CylinderGeometry(.05, .05, 1.2, 5), steel, .5, 3.7, 0);
+    add(new THREE.ConeGeometry(.5, .22, 8, 1, true), hull, .5, 4.35, 0).rotation.x = Math.PI;
+    const up = new THREE.Vector3(0, 1, 0);
+    for (let k = 0; k < 4; k++) {
+      const a = Math.PI / 4 + k * Math.PI / 2, top = new THREE.Vector3(Math.sin(a) * 1.35, 1.5, Math.cos(a) * 1.35), foot = new THREE.Vector3(Math.sin(a) * 2.4, .08, Math.cos(a) * 2.4);
+      const dir = foot.clone().sub(top), leg = add(new THREE.CylinderGeometry(.07, .07, dir.length(), 5), steel, 0, 0, 0);
+      leg.position.copy(top).add(foot).multiplyScalar(.5); leg.quaternion.setFromUnitVectors(up, dir.normalize());
+      add(new THREE.CylinderGeometry(.3, .36, .1, 6), steel, foot.x, .05, foot.z);
+    }
+    return g;
+  }
+
+  // Experiment marker: hex plinth, a block in the owner's color, a floating gem and a light beam seen from afar.
+  function makeBlock(exp, color) {
+    const g = new THREE.Group(), tone = new THREE.Color(color), dark = flat(0x281147, .9), mat = flat(tone, .75);
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.45, .4, 6), dark); plinth.position.y = .1;
+    const block = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), mat); block.position.y = .85; block.rotation.y = Math.PI / 4;
+    const band = new THREE.Mesh(new THREE.BoxGeometry(1.14, .16, 1.14), dark); band.position.y = 1.05; band.rotation.y = Math.PI / 4;
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(.32), new THREE.MeshBasicMaterial({ color: 0xfce8a6 })); gem.position.y = 2.2;
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, 60, 6, 1, true),
+      new THREE.MeshBasicMaterial({ color: tone, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide }));
+    beam.position.y = 31;
+    for (const m of [plinth, block, band]) m.castShadow = m.receiveShadow = true;
+    g.add(plinth, block, band, gem, beam);
+    g.userData = { exp, gem, beam, tag: null };
+    return g;
+  }
+
+  // Terrain: the GLB comes from index.terrain.<site>.js (a <script> works on file://).
+  const terrains = new Map();
+  function fetchTerrain(id) {
+    if (!terrains.has(id)) terrains.set(id, (async () => {
+      if (!window.ASTRO_TERRAIN?.[id]) await new Promise((ok, fail) => {
+        const tag = document.createElement('script');
+        tag.src = `index.terrain.${id}.js`; tag.onload = ok; tag.onerror = () => fail(new Error(`index.terrain.${id}.js missing (npm run web:models)`));
+        document.head.append(tag);
+      });
+      const entry = window.ASTRO_TERRAIN?.[id];
+      if (!entry?.glb) throw new Error(`no terrain for ${id}`);
+      const bin = atob(entry.glb), bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      delete entry.glb;
+      const gltf = await loader.parseAsync(bytes.buffer, '');
+      let mesh = null; gltf.scene.traverse(o => { if (o.isMesh && !mesh) mesh = o; });
+      mesh.receiveShadow = true;
+      const { color, map } = mesh.material;
+      color.setRGB(color.r * GROUND_GAIN[0], color.g * GROUND_GAIN[1], color.b * GROUND_GAIN[2]);
+      if (map) map.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); // keeps the photo sharp at grazing angles
+      addGroundDetail(mesh.material, entry.site.sizeM);
+      const hf = heightField(mesh);
+      gltf.scene.add(scatterRocks(hf, entry.site.id));
+      return { info: entry.site, scene: gltf.scene, hf };
+    })().catch(err => { terrains.delete(id); throw err; }));
+    return terrains.get(id);
+  }
+  // The photo has 0.5 m pixels, too coarse at walking distance: a tiled grain (3 m tiles) multiplies it
+  // up close and averages out with distance (mipmaps). Game art, not data.
+  let grain = null;
+  function addGroundDetail(material, sizeM) {
+    if (!grain) {
+      const N = 256, data = new Uint8Array(N * N * 4), rnd = (i, seed) => { const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453; return x - Math.floor(x); };
+      const octave = (cells, seed) => (x, y) => { // tileable value noise
+        const fx = x / N * cells, fy = y / N * cells, i = Math.floor(fx), j = Math.floor(fy), u = fx - i, v = fy - j;
+        const at = (a, b) => rnd(((b % cells) * cells) + (a % cells), seed);
+        return (at(i, j) * (1 - u) + at(i + 1, j) * u) * (1 - v) + (at(i, j + 1) * (1 - u) + at(i + 1, j + 1) * u) * v;
+      };
+      const layers = [[octave(6, 1), .4], [octave(24, 2), .35], [octave(96, 3), .25]];
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+        const g = Math.round(255 * layers.reduce((sum, [f, w]) => sum + f(x, y) * w, 0)), k = (y * N + x) * 4;
+        data[k] = data[k + 1] = data[k + 2] = g; data[k + 3] = 255;
+      }
+      grain = new THREE.DataTexture(data, N, N);
+      grain.wrapS = grain.wrapT = THREE.RepeatWrapping; grain.magFilter = THREE.LinearFilter; grain.minFilter = THREE.LinearMipmapLinearFilter;
+      grain.generateMipmaps = true; grain.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); grain.needsUpdate = true;
+    }
+    material.onBeforeCompile = shader => {
+      shader.uniforms.grainMap = { value: grain }; shader.uniforms.grainRepeat = { value: sizeM / 3 };
+      shader.fragmentShader = 'uniform sampler2D grainMap;\nuniform float grainRepeat;\n' + shader.fragmentShader.replace('#include <map_fragment>',
+        '#include <map_fragment>\n  diffuseColor.rgb *= 0.55 + 0.9 * texture2D(grainMap, vMapUv * grainRepeat).r;');
+    };
+  }
+  // Loose rocks (game art): same spots every time for a site, so the ground has scale when walking.
+  function scatterRocks(hf, seedText) {
+    let seed = [...seedText].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const COUNT = 900, rocks = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 0), flat(0xffffff, .95), COUNT);
+    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), p = new THREE.Vector3(), sc = new THREE.Vector3(), c = new THREE.Color(), lim = hf.half - 6;
+    for (let i = 0; i < COUNT; i++) {
+      const size = rand() < .06 ? .5 + rand() * .7 : .06 + Math.pow(rand(), 2) * .35;
+      p.set((rand() * 2 - 1) * lim, 0, (rand() * 2 - 1) * lim); p.y = hf.at(p.x, p.z) - size * .25;
+      sc.set(size * (.8 + rand() * .5), size * (.45 + rand() * .3), size * (.8 + rand() * .5));
+      rocks.setMatrixAt(i, m.compose(p, q.setFromEuler(e.set(rand() * .6, rand() * Math.PI * 2, rand() * .6)), sc));
+      rocks.setColorAt(i, c.setRGB(.2 + rand() * .1, .1 + rand() * .05, .06 + rand() * .03));
+    }
+    rocks.castShadow = rocks.receiveShadow = true;
+    return rocks;
+  }
+  // Ground height by bilinear lookup in the mesh grid: row-major from the north-west corner,
+  // same layout as tools/terrain/lib/terrain-mesh.mjs (cheaper than a raycast on 129k triangles).
+  function heightField(mesh) {
+    const p = mesh.geometry.attributes.position, n = Math.round(Math.sqrt(p.count));
+    const x0 = p.getX(0), z0 = p.getZ(0), step = p.getX(1) - x0, h = new Float32Array(n * n);
+    for (let k = 0; k < n * n; k++) h[k] = p.getY(k);
+    const at = (x, z) => {
+      const fx = clamp((x - x0) / step, 0, n - 1.0001), fz = clamp((z - z0) / step, 0, n - 1.0001);
+      const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j, k = j * n + i;
+      return (h[k] * (1 - u) + h[k + 1] * u) * (1 - v) + (h[k + n] * (1 - u) + h[k + n + 1] * u) * v;
+    };
+    const slope = (x, z) => Math.hypot(at(x + 1, z) - at(x - 1, z), at(x, z + 1) - at(x, z - 1)) / 2;
+    return { at, slope, half: (n - 1) * step / 2 };
+  }
+
+  async function loadCrew(id) {
+    if (world.avatars.has(id)) return world.avatars.get(id);
+    const gltf = await loadGLTF(`characters/${id}.glb`), body = gltf.scene.clone(true); // pivot rig, no skinning
+    const mixer = new THREE.AnimationMixer(body), clip = name => gltf.animations.find(a => a.name === name);
+    const idle = mixer.clipAction(clip('idle_loop')), walk = mixer.clipAction(clip('walk_loop'));
+    idle.play(); walk.play(); walk.setEffectiveWeight(0);
+    const head = body.getObjectByName('Head'), helmet = [];
+    body.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    head.traverse(o => { if (o.isMesh) { o.userData.mat = o.material; helmet.push(o); } });
+    body.updateMatrixWorld(true);
+    const a = { id, body, mixer, idle, walk, head, helmet, walkW: 0, eyeY: head.getWorldPosition(new THREE.Vector3()).y, pos: new THREE.Vector3(), bodyYaw: 0 };
+    world.avatars.set(id, a); world.scene.add(body);
+    return a;
+  }
+  // Every crew member stands on the surface; the player controls one (keys 1–4), the others wait where they were left.
+  async function useCrew(id) {
+    const prev = world.avatar;
+    s.crew = id; renderCrewBar();
+    const a = await loadCrew(id);
+    if (s.crew !== id) return;
+    if (prev && prev !== a) { prev.pos.copy(s.pos); prev.bodyYaw = s.bodyYaw; }
+    world.avatar = a;
+    s.pos.copy(a.pos); s.bodyYaw = a.bodyYaw; s.yaw = a.bodyYaw - Math.PI; s.vy = 0; s.grounded = true;
+    if (sim()) sim().surf.activeCrew = id;
+    applyMode(); s.prompt = '';
+  }
+  const clampPitch = () => { s.pitch = s.mode === 'first' ? clamp(s.pitch, -1.45, 1.2) : clamp(s.pitch, -1, .45); };
+  function applyMode() {
+    for (const a of world.avatars.values()) for (const m of a.helmet) m.material = a === world.avatar && s.mode === 'first' ? hiddenMat : m.userData.mat;
+    clampPitch();
+  }
+  function setMode(mode) { s.mode = mode; applyMode(); }
+
+  function setTerrain(t) {
+    const { info, hf } = t;
+    if (world.terrain) world.scene.remove(world.terrain);
+    world.terrain = t.scene; world.hf = hf; world.scene.add(t.scene);
+    const az = info.sun.azimuthDeg * Math.PI / 180, el = info.sun.elevationDeg * Math.PI / 180; // sun of the photo (HiRISE label)
+    world.sunDir.set(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el));
+    world.skirt.position.y = info.elevation.minM - info.elevation.centerM - .4;
+    world.skirt.material.color.setRGB(info.tint[0] * .2, info.tint[1] * .2, info.tint[2] * .2);
+    const lat = info.center.lat, lon = info.center.lon;
+    $s('surface-coords').textContent = `${Math.abs(lat).toFixed(2)}°${lat < 0 ? 'S' : 'N'} ${Math.abs(lon).toFixed(2)}°${lon < 0 ? 'W' : 'E'} · HiRISE terrain ${info.sizeM} m`;
+  }
+
+  function placeBlocks() {
+    const { hf, scene } = world, tags = $s('surface-tags'), spots = [], lim = hf.half - 24;
+    for (const b of world.blocks) scene.remove(b);
+    tags.innerHTML = ''; world.blocks = []; world.colliders = [{ x: 0, z: 0, r: 2.9 }];
+    for (const exp of tasks()) {
+      let spot = null;
+      for (let t = 0; t < 300 && !spot; t++) {
+        const r = SPOT_MIN + Math.random() * (SPOT_MAX - SPOT_MIN), a = Math.random() * Math.PI * 2, x = Math.sin(a) * r, z = Math.cos(a) * r;
+        const ok = Math.abs(x) < lim && Math.abs(z) < lim && hf.slope(x, z) < .2 && spots.every(p => Math.hypot(p.x - x, p.z - z) > SPOT_GAP);
+        if (ok || t === 299) spot = { x, z };
+      }
+      spots.push(spot);
+      const owner = ui.crew.find(c => c.id === exp.crew), block = makeBlock(exp, owner.color);
+      block.position.set(spot.x, hf.at(spot.x, spot.z), spot.z);
+      const tag = document.createElement('span');
+      tag.className = 'surface-tag'; tag.style.setProperty('--crew', owner.color);
+      tags.append(tag); block.userData.tag = tag;
+      scene.add(block); world.blocks.push(block); world.colliders.push({ x: spot.x, z: spot.z, r: 1.6 });
+    }
+    $s('surface-goals').innerHTML = tasks().map(e => { const o = ui.crew.find(c => c.id === e.crew);
+      return `<li data-goal="${e.id}" style="--crew:${o.color}"><span class="goal-chip"></span><span class="goal-name"><strong>${e.id} · ${e.title}</strong><small>${o.name}</small></span><span class="goal-dist"></span><span class="goal-arrow"></span></li>`; }).join('');
+  }
+
+  function renderCrewBar() {
+    $s('surface-crew').innerHTML = ui.crew.map((c, i) => `<button type="button" data-crew="${c.id}" style="--crew:${c.color}" aria-pressed="${c.id === s.crew}">${c.name}<small>${touch ? '' : `key ${i + 1}`}</small></button>`).join('');
+  }
+  $s('surface-crew').addEventListener('click', e => { const b = e.target.closest('[data-crew]'); if (b && world) switchCrew(b.dataset.crew); });
+  function switchCrew(id) { if (id === s.crew) return; useCrew(id).then(() => ui.toast(`You are now ${ui.crew.find(c => c.id === id).name}.`)); }
+
+  function showStart(kicker, title, keys) {
+    $s('surface-start-kicker').textContent = kicker; $s('surface-start-title').textContent = title;
+    $s('surface-keys').innerHTML = keys; startEl.hidden = false;
+  }
+  function fail(message) { root.classList.add('surface-fail'); showStart('Surface', message, 'Use “Leave surface” to go back to the mission.'); }
+
+  async function land({ site, crew }) {
+    root.classList.remove('surface-fail');
+    if (!world) world = initWorld();
+    const info = ui.sites[site];
+    $s('surface-title').textContent = info?.name ?? site;
+    if (!world) return fail('The 3D surface needs WebGL.');
+    s.ready = false; s.site = site;
+    showStart('Touchdown', `Loading ${info.name}…`, '');
+    try {
+      const t = await fetchTerrain(site);
+      if (s.site !== site) return;
+      setTerrain(t);
+      world.lander.position.set(0, t.hf.at(0, 0), 0);
+      placeBlocks();
+      await Promise.all(ui.crew.map(c => loadCrew(c.id)));
+      for (const [id, [x, z]] of Object.entries(CREW_START)) { const a = world.avatars.get(id); a.pos.set(x, t.hf.at(x, z), z); a.bodyYaw = 0; }
+      world.avatar = null; s.pitch = -.1;
+      await useCrew(crew);
+      const first = world.blocks.find(b => b.userData.exp.crew === crew)?.position ?? world.blocks[0].position;
+      s.yaw = Math.atan2(-(first.x - s.pos.x), -(first.z - s.pos.z)); s.bodyYaw = s.yaw + Math.PI;
+      s.ready = true;
+      showStart('Touchdown', touch ? 'Touch to walk' : 'Click to walk', KEYS_HELP);
+    } catch (err) {
+      console.warn('Surface not shown:', err);
+      fail(`Could not load the ${info?.name ?? site} terrain.`);
+    }
+  }
+  window.addEventListener('astro:land', e => land(e.detail));
+
+  // Input: keyboard + mouse (pointer lock, or drag when the lock is not available), touch stick + look.
+  function bindInput(canvas) {
+    const live = () => isActive('surface') && s.ready && !dlg.open;
+    addEventListener('keydown', e => {
+      if (!live()) return;
+      s.keys.add(e.code);
+      if (e.code === 'Space') { s.jump = true; e.preventDefault(); }
+      if (e.code.startsWith('Arrow')) e.preventDefault();
+      if (e.code === 'KeyE' || e.code === 'Enter') interact();
+      if (e.code === 'KeyV') setMode(s.mode === 'first' ? 'third' : 'first');
+      const n = /^Digit([1-4])$/.exec(e.code)?.[1];
+      if (n) switchCrew(ui.crew[n - 1].id);
+    });
+    addEventListener('keyup', e => s.keys.delete(e.code));
+    addEventListener('blur', () => s.keys.clear());
+    const turn = (dx, dy, k) => { s.yaw -= dx * k; s.pitch -= dy * k; clampPitch(); };
+    let settle = false; // the first move after locking can carry a large jump (Chrome)
+    document.addEventListener('pointerlockchange', () => {
+      settle = true;
+      if (document.pointerLockElement !== canvas && live() && !touch) showStart('Paused', 'Click to keep walking', KEYS_HELP);
+    });
+    addEventListener('mousemove', e => {
+      if (document.pointerLockElement === canvas) {
+        if (settle || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) { settle = false; return; }
+        turn(e.movementX, e.movementY, .0022);
+      }
+      else if (s.drag) { turn(e.clientX - s.drag.x, e.clientY - s.drag.y, .004); s.drag = { x: e.clientX, y: e.clientY }; }
+    });
+    canvas.addEventListener('mousedown', e => { if (document.pointerLockElement !== canvas) s.drag = { x: e.clientX, y: e.clientY }; });
+    addEventListener('mouseup', () => { s.drag = null; });
+    const stickEl = $s('surface-stick');
+    canvas.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'touch' || !live()) return;
+      const r = viewEl.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (x < r.width * .45 && !s.stick) {
+        s.stick = { id: e.pointerId, ox: x, oy: y, x: 0, y: 0 };
+        stickEl.style.left = x + 'px'; stickEl.style.top = y + 'px'; stickEl.classList.add('on');
+      } else if (!s.look) s.look = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      try { canvas.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (s.stick?.id === e.pointerId) {
+        const r = viewEl.getBoundingClientRect(), dx = e.clientX - r.left - s.stick.ox, dy = e.clientY - r.top - s.stick.oy, len = Math.hypot(dx, dy), k = Math.min(1, len / 50) / (len || 1);
+        s.stick.x = dx * k; s.stick.y = -dy * k;
+        stickEl.firstElementChild.style.translate = `${s.stick.x * 33}px ${-s.stick.y * 33}px`;
+      } else if (s.look?.id === e.pointerId) { turn(e.clientX - s.look.x, e.clientY - s.look.y, .006); s.look.x = e.clientX; s.look.y = e.clientY; }
+    });
+    const release = e => {
+      if (s.stick?.id === e.pointerId) { s.stick = null; stickEl.classList.remove('on'); stickEl.firstElementChild.style.translate = ''; }
+      if (s.look?.id === e.pointerId) s.look = null;
+    };
+    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+    startEl.addEventListener('click', () => {
+      if (!s.ready || root.classList.contains('surface-fail')) return;
+      startEl.hidden = true;
+      if (!touch) try { canvas.requestPointerLock()?.catch?.(() => {}); } catch { /* drag to look instead */ }
+    });
+    $s('surface-jump').addEventListener('pointerdown', () => { s.jump = true; });
+  }
+  $s('surface-camera').addEventListener('click', () => { if (world?.avatar) setMode(s.mode === 'first' ? 'third' : 'first'); });
+  const release = () => { if (document.pointerLockElement) document.exitPointerLock(); s.keys.clear(); };
+  $s('surface-leave').addEventListener('click', () => { release(); if (sim()) sim().abortSurface(); else ui.show('planner'); });
+  $s('surface-board').addEventListener('click', () => { release(); sim()?.board(); });
+  promptEl.addEventListener('click', interact);
+
+  // Experiments: the owner runs the minigame next to the block.
+  const nearBlock = () => world.blocks.find(b => Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z) <= REACH) ?? null;
+  const nearLander = () => Math.hypot(s.pos.x, s.pos.z) <= BOARD_REACH;
+  function interact() {
+    if (!world || !s.ready) return;
+    const b = nearBlock();
+    if (!b) { if (nearLander()) { release(); sim()?.board(); } return; }
+    const e = b.userData.exp;
+    if (isDone(e.id)) return;
+    if (e.crew !== s.crew) return switchCrew(e.crew);
+    const owner = ui.crew.find(c => c.id === e.crew);
+    if (document.pointerLockElement) document.exitPointerLock();
+    s.keys.clear();
+    $s('minigame-kicker').textContent = `Experiment ${e.id} · ${owner.name}`;
+    $s('minigame-title').textContent = e.title;
+    $s('minigame-brief').textContent = e.desc;
+    $s('minigame-summary').innerHTML = [['Minigame', e.minigame], ['Mechanic', e.mechanic], ['Based on', e.basis]].map(([k, v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
+    dlg.dataset.exp = e.id; dlg.showModal();
+  }
+  $s('minigame-close').addEventListener('click', () => dlg.close());
+  $s('minigame-done').addEventListener('click', () => {
+    const id = dlg.dataset.exp; dlg.close();
+    if (!id || isDone(id)) return;
+    sim()?.completeSurfaceTask(id); s.prompt = '';
+    const b = world.blocks.find(x => x.userData.exp.id === id);
+    if (isDone(id)) { b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done'); }
+  });
+  dlg.addEventListener('close', () => { if (isActive('surface') && s.ready && !touch && !document.pointerLockElement) showStart('Paused', 'Click to keep walking', KEYS_HELP); });
+
+  const fwd = new THREE.Vector3(), eye = new THREE.Vector3(), look = new THREE.Vector3(), tmp = new THREE.Vector3();
+  function step(dt) {
+    const k = s.keys, a = world.avatar, hf = world.hf;
+    let ix = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
+    let iy = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
+    if (s.stick) { ix += s.stick.x; iy += s.stick.y; }
+    const len = Math.min(1, Math.hypot(ix, iy)), run = k.has('ShiftLeft') || k.has('ShiftRight') || (s.stick && len > .92);
+    const speed = len > .08 ? len * (run ? RUN : WALK) : 0, sin = Math.sin(s.yaw), cos = Math.cos(s.yaw);
+    let mx = 0, mz = 0;
+    if (speed) { const n = Math.hypot(ix, iy); mx = (-sin * iy + cos * ix) / n * speed; mz = (-cos * iy - sin * ix) / n * speed; }
+    const lim = hf.half - 8;
+    s.pos.x = clamp(s.pos.x + mx * dt, -lim, lim); s.pos.z = clamp(s.pos.z + mz * dt, -lim, lim);
+    const mates = [...world.avatars.values()].filter(o => o !== a).map(o => ({ x: o.pos.x, z: o.pos.z, r: .7 }));
+    for (const c of [...world.colliders, ...mates]) {
+      const dx = s.pos.x - c.x, dz = s.pos.z - c.z, d = Math.hypot(dx, dz);
+      if (d < c.r && d > 1e-4) { s.pos.x = c.x + dx / d * c.r; s.pos.z = c.z + dz / d * c.r; }
+    }
+    s.speed = speed;
+    const ground = hf.at(s.pos.x, s.pos.z);
+    if (s.grounded && s.jump) { s.vy = JUMP; s.grounded = false; }
+    s.jump = false;
+    if (s.grounded) s.pos.y = ground;
+    else { s.vy -= MARS_G * dt; s.pos.y += s.vy * dt; if (s.pos.y <= ground) { s.pos.y = ground; s.vy = 0; s.grounded = true; } }
+    // First person: the body faces the view. Chase camera: it turns toward where it walks.
+    const target = s.mode === 'first' ? s.yaw + Math.PI : speed ? Math.atan2(mx, mz) : s.bodyYaw;
+    const d = Math.atan2(Math.sin(target - s.bodyYaw), Math.cos(target - s.bodyYaw));
+    s.bodyYaw += s.mode === 'first' ? d : d * Math.min(1, dt * 10);
+    a.body.position.copy(s.pos); a.body.rotation.y = s.bodyYaw;
+    const walking = s.grounded && speed > 0 ? 1 : 0;
+    a.walkW += (walking - a.walkW) * Math.min(1, dt * 8);
+    a.walk.setEffectiveWeight(a.walkW); a.idle.setEffectiveWeight(1 - a.walkW);
+    a.walk.timeScale = clamp(speed / STRIDE, .6, 2.6);
+    a.mixer.update(reduce && !speed ? 0 : dt);
+    for (const o of world.avatars.values()) { // teammates idle where they were left
+      if (o === a) continue;
+      o.body.position.copy(o.pos); o.body.rotation.y = o.bodyYaw;
+      o.walkW += (0 - o.walkW) * Math.min(1, dt * 8); o.walk.setEffectiveWeight(o.walkW); o.idle.setEffectiveWeight(1 - o.walkW);
+      o.mixer.update(reduce ? 0 : dt);
+    }
+  }
+  function placeCamera() {
+    const { camera, avatar: a } = world;
+    fwd.set(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
+    if (s.mode === 'first') {
+      a.body.updateMatrixWorld(true);
+      if (reduce) eye.set(s.pos.x, s.pos.y + a.eyeY, s.pos.z); else a.head.getWorldPosition(eye);
+      // Eyes in front of the suit; further forward when looking down, so the chest, legs and feet come into view.
+      camera.position.copy(eye).addScaledVector(fwd, .3 + .22 * Math.max(0, -Math.sin(s.pitch))); camera.position.y += .14;
+      camera.rotation.set(s.pitch, s.yaw, 0);
+    } else {
+      look.copy(s.pos); look.y += 1.45;
+      const cp = Math.cos(s.pitch);
+      camera.position.copy(look).add(tmp.set(Math.sin(s.yaw) * cp, -Math.sin(s.pitch), Math.cos(s.yaw) * cp).multiplyScalar(4.4));
+      camera.position.y = Math.max(camera.position.y, world.hf.at(camera.position.x, camera.position.z) + .4);
+      camera.lookAt(look);
+    }
+  }
+  function updateHud() {
+    for (const b of world.blocks) {
+      const e = b.userData.exp, li = document.querySelector(`[data-goal="${e.id}"]`), dx = b.position.x - s.pos.x, dz = b.position.z - s.pos.z, dist = Math.hypot(dx, dz);
+      li.classList.toggle('done', isDone(e.id)); li.classList.toggle('here', dist <= REACH);
+      li.querySelector('.goal-dist').textContent = isDone(e.id) ? 'DONE' : `${Math.round(dist)} m`;
+      li.querySelector('.goal-arrow').style.rotate = `${Math.atan2(dx, -dz) + s.yaw}rad`; // bearing from north, relative to the view
+    }
+    const surf = sim()?.surf, inv = surf?.inventory ?? [];
+    $s('surface-count').textContent = `${surf?.completed.size ?? 0}/${tasks().length} DONE`;
+    const invKey = inv.join('|');
+    if (s.inv !== invKey) { s.inv = invKey; $s('surface-inventory').innerHTML = inv.map(item => `<span class="inv-slot filled">${item}</span>`).join(''); }
+    const b = nearBlock(), e = b?.userData.exp, owner = e && ui.crew.find(c => c.id === e.crew);
+    const state = e ? (isDone(e.id) ? 'done' : e.crew === s.crew ? 'run' : 'locked') : nearLander() ? 'board' : '';
+    const key = state + (e?.id ?? '') + s.crew;
+    if (key === s.prompt) return;
+    s.prompt = key; promptEl.hidden = !state;
+    if (!state) return;
+    promptEl.className = 'surface-prompt' + (state === 'run' || state === 'board' ? '' : ' ' + state);
+    promptEl.textContent = state === 'board' ? `${touch ? 'Tap' : 'E'} · Board the ascent vehicle · ${surf?.completed.size ?? 0}/${tasks().length} done`
+      : state === 'done' ? `${e.id} · ${e.title} · done`
+      : state === 'run' ? `${touch ? 'Tap' : 'E'} · Run ${e.id} · ${e.title}`
+      : `${e.id} is ${owner.name}’s experiment · ${touch ? 'tap' : `press ${ui.crew.indexOf(owner) + 1}`} to switch`;
+  }
+  const v = new THREE.Vector3();
+  function placeTags(now) {
+    const { camera } = world;
+    for (const b of world.blocks) {
+      const { tag, gem, beam, exp } = b.userData, dist = Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z);
+      if (!reduce) { gem.rotation.y = now / 700; gem.position.y = 2.2 + Math.sin(now / 500 + b.position.x) * .12; beam.material.opacity = .22 + .1 * Math.sin(now / 400); }
+      v.copy(b.position); v.y += 2.8; v.project(camera);
+      const show = v.z < 1 && dist < 260;
+      tag.hidden = !show;
+      if (!show) continue;
+      tag.textContent = isDone(exp.id) ? `${exp.id} ✓` : `${exp.id} · ${Math.round(dist)} m`;
+      tag.style.transform = `translate(${(v.x + 1) / 2 * world.width}px, ${(1 - v.y) / 2 * world.height}px)`;
+    }
+  }
+
+  let last = performance.now(), hudClock = 0;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(.1, (now - last) / 1000); last = now;
+    if (!world || !s.ready || !world.avatar || !isActive('surface') || !world.width) return;
+    if (!dlg.open) step(dt);
+    placeCamera();
+    world.sky.position.copy(world.camera.position);
+    world.sun.target.position.copy(s.pos); world.sun.position.copy(s.pos).addScaledVector(world.sunDir, 90);
+    placeTags(now);
+    if ((hudClock += dt) > .12) { hudClock = 0; updateHud(); }
+    world.renderer.render(world.scene, world.camera);
+  }
+  requestAnimationFrame(frame);
+  // Test and debug hook (Playwright, console): state, and a teleport next to a block.
+  window.ASTRO_SURFACE = { state: s, world: () => world,
+    running: () => !!(s.ready && startEl.hidden && !dlg.open),
+    distanceToLander(id) { const a = world?.avatars.get(id); if (!a) return 0; const p = a === world.avatar ? s.pos : a.pos; return Math.hypot(p.x, p.z); },
+    goTo(id) { const b = world?.blocks.find(x => x.userData.exp.id === id); if (b) { s.pos.x = b.position.x + 2.2; s.pos.z = b.position.z + 1.2; s.yaw = Math.atan2(-(b.position.x - s.pos.x), -(b.position.z - s.pos.z)); s.grounded = false; } } };
+  // index.html#surface or #surface-gale opens the surface directly (quick testing).
+  const direct = /^#surface(?:-(\w+))?$/.exec(location.hash);
+  if (direct) { if (ui.sites[direct[1]]) ui.state.site = direct[1]; ui.land(); }
+})();
 </script>
 
 <script type="module">
@@ -2472,7 +2683,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   }
 
   function createFacetedMarsPlanet(radius = 8.5) {
-    const geo = new THREE.IcosahedronGeometry(radius, 2).toNonIndexed();
+    const geo = new THREE.IcosahedronGeometry(radius, 2); // already non-indexed
     const pos = geo.attributes.position;
     const colors = new Float32Array(pos.count * 3);
     const c = new THREE.Color();
@@ -2748,315 +2959,6 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   }
 
   // ---------------------------------------------------------------------------
-  // 2. WALKABLE MARS SURFACE (#surface-viewport)
-  // ---------------------------------------------------------------------------
-  function marsHeight(x, z) {
-    const rCenter = Math.hypot(x, z);
-    const padFlatten = THREE.MathUtils.smoothstep(rCenter, 2.5, 7.5);
-    const raw = Math.sin(x * 0.28) * Math.cos(z * 0.24) * 0.65
-      + Math.sin(x * 0.65 + 1.1) * Math.sin(z * 0.58) * 0.24;
-    return raw * padFlatten;
-  }
-
-  function buildMarsTerrain(siteKey) {
-    const group = new THREE.Group();
-    const ramp = window.ASTRO_ART?.RAMPS?.[siteKey] || DEFAULT_MARS_RAMP;
-    const plane = new THREE.PlaneGeometry(52, 52, 30, 30);
-    plane.rotateX(-Math.PI / 2);
-    const nonIdx = plane.toNonIndexed();
-    const pos = nonIdx.attributes.position;
-    const colors = new Float32Array(pos.count * 3);
-    const col = new THREE.Color();
-
-    for (let i = 0; i < pos.count; i++) {
-      pos.setY(i, marsHeight(pos.getX(i), pos.getZ(i)));
-    }
-    for (let i = 0; i < pos.count; i += 3) {
-      const avgY = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
-      const t = THREE.MathUtils.clamp((avgY + 0.85) / 1.7, 0, 0.999);
-      col.set(ramp[Math.floor(t * ramp.length)]);
-      for (let k = 0; k < 3; k++) {
-        colors[(i + k) * 3] = col.r;
-        colors[(i + k) * 3 + 1] = col.g;
-        colors[(i + k) * 3 + 2] = col.b;
-      }
-    }
-    nonIdx.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    nonIdx.computeVertexNormals();
-
-    const terrainMesh = new THREE.Mesh(nonIdx, new THREE.MeshStandardMaterial({
-      vertexColors: true, roughness: 0.94, metalness: 0.03, flatShading: true
-    }));
-    terrainMesh.name = 'Mars_Ground';
-    group.add(terrainMesh);
-
-    // Scattered low-poly rocks outside center pad
-    const rockGeo = new THREE.IcosahedronGeometry(0.42, 0).toNonIndexed();
-    rockGeo.computeVertexNormals();
-    const rockMat = new THREE.MeshStandardMaterial({ color: ramp[1] || '#7c3621', roughness: 0.92, flatShading: true });
-    let s = 42;
-    const rnd = () => { s = (s * 48271) % 2147483647; return (s - 1) / 2147483646; };
-    for (let i = 0; i < 36; i++) {
-      const ang = rnd() * Math.PI * 2;
-      const dist = 5.2 + rnd() * 17;
-      const rx = Math.cos(ang) * dist;
-      const rz = Math.sin(ang) * dist;
-      const rock = new THREE.Mesh(rockGeo, rockMat);
-      const sc = 0.45 + rnd() * 1.4;
-      rock.scale.set(sc * 1.25, sc * 0.65, sc);
-      rock.position.set(rx, marsHeight(rx, rz) + sc * 0.14, rz);
-      rock.rotation.set(rnd() * 3, rnd() * 6, rnd() * 3);
-      group.add(rock);
-    }
-
-    // Central Mars Ascent Vehicle lander at (0, 0, 0)
-    const mav = new THREE.Group();
-    const hullMat = new THREE.MeshStandardMaterial({ color: 0xe6edf6, roughness: 0.55, metalness: 0.25, flatShading: true });
-    const darkMat = new THREE.MeshStandardMaterial({ color: 0x263143, roughness: 0.6, metalness: 0.4, flatShading: true });
-    const goldMat = new THREE.MeshStandardMaterial({ color: 0xe8a832, roughness: 0.35, metalness: 0.65, flatShading: true });
-
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 1.15, 2.8, 8).toNonIndexed(), hullMat);
-    body.position.y = 2.0;
-    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.85, 1.25, 8).toNonIndexed(), hullMat);
-    nose.position.y = 4.02;
-    const foil = new THREE.Mesh(new THREE.CylinderGeometry(1.18, 1.22, 0.55, 8).toNonIndexed(), goldMat);
-    foil.position.y = 0.85;
-    mav.add(body, nose, foil);
-
-    for (let l = 0; l < 4; l++) {
-      const a = (l / 4) * Math.PI * 2 + Math.PI / 4;
-      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.1, 0.14), darkMat);
-      leg.position.set(Math.cos(a) * 1.15, 0.48, Math.sin(a) * 1.15);
-      leg.rotation.z = Math.cos(a) * 0.45;
-      leg.rotation.x = -Math.sin(a) * 0.45;
-      mav.add(leg);
-    }
-    group.add(mav);
-
-    return { group, terrainMesh };
-  }
-
-  async function initSurface() {
-    const section = document.getElementById('surface');
-    const container = document.getElementById('surface-viewport');
-    if (!section || !container) return;
-
-    const { renderer, scene, camera } = makeViewport(container, { fov: 50, clearColor: 0x2d1614 });
-    scene.fog = new THREE.FogExp2(0x3a1c17, 0.022);
-    scene.add(new THREE.HemisphereLight(0xf3b391, 0x3b1a14, 0.72));
-    const sun = new THREE.DirectionalLight(0xffe6cc, 2.1);
-    sun.position.set(14, 22, 10);
-    scene.add(sun);
-
-    let currentSite = window.ASTRO?.state?.site || 'jezero';
-    let { group: marsGroup, terrainMesh } = buildMarsTerrain(currentSite);
-    scene.add(marsGroup);
-
-    // Load 4 animated characters
-    const crewActors = {};
-    await Promise.all(CREW_IDS.map(async id => {
-      const rel = window.ASTRO?.CREW_MODELS?.[id] || `characters/${id}.glb`;
-      const gltf = await parseFreshGLB(rel);
-      const model = gltf.scene;
-      scene.add(model);
-      const mixer = new THREE.AnimationMixer(model);
-      const actions = {};
-      const idle = findClip(gltf.animations, ['idle_loop', 'idle']);
-      const walk = findClip(gltf.animations, ['walk_loop', 'walk']);
-      const action = findClip(gltf.animations, ['action_loop', 'action']);
-      const wave = findClip(gltf.animations, ['wave']);
-      if (idle) actions.idle = mixer.clipAction(idle);
-      if (walk) actions.walk = mixer.clipAction(walk);
-      if (action) actions.action = mixer.clipAction(action);
-      if (wave) {
-        actions.wave = mixer.clipAction(wave);
-        actions.wave.setLoop(THREE.LoopOnce, 1);
-        actions.wave.clampWhenFinished = true;
-      }
-      const actor = {
-        id,
-        model,
-        mixer,
-        actions,
-        current: null,
-        pos: new THREE.Vector3(),
-        heading: 0,
-        lastSimX: 0,
-        lastSimZ: 0,
-      };
-      playClip(actor, 'idle', 0);
-      crewActors[id] = actor;
-    }));
-
-    // Mission beacon diamonds
-    const beacons = new Map();
-    const diamondGeo = new THREE.OctahedronGeometry(0.45, 0).toNonIndexed();
-    diamondGeo.computeVertexNormals();
-
-    function syncBeacons() {
-      const tasks = window.ASTRO_SIM?.surf?.tasks || [];
-      for (const task of tasks) {
-        if (!beacons.has(task.id)) {
-          const mat = new THREE.MeshStandardMaterial({
-            color: CREW_COLORS[task.crew] || '#52d6ff',
-            emissive: CREW_COLORS[task.crew] || '#52d6ff',
-            emissiveIntensity: 0.75,
-            roughness: 0.35,
-            flatShading: true
-          });
-          const mesh = new THREE.Mesh(diamondGeo, mat);
-          mesh.userData.taskId = task.id;
-          scene.add(mesh);
-          beacons.set(task.id, mesh);
-        }
-        const mesh = beacons.get(task.id);
-        const done = window.ASTRO_SIM?.surf?.completed?.has(task.id);
-        mesh.visible = !done;
-        mesh.position.set(task.x, marsHeight(task.x, task.z) + 1.35, task.z);
-      }
-    }
-    syncBeacons();
-    window.addEventListener('astro:surface', syncBeacons);
-
-    // Click terrain to walk / click beacon to target task; drag horizontally to orbit camera
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    let camYaw = 0.35;
-    let camPitch = 0.42;
-    let isDragging = false;
-    let dragDist = 0;
-    let prevX = 0, prevY = 0;
-
-    renderer.domElement.addEventListener('pointerdown', e => {
-      isDragging = true;
-      dragDist = 0;
-      prevX = e.clientX;
-      prevY = e.clientY;
-    });
-    window.addEventListener('pointermove', e => {
-      if (!isDragging || !section.classList.contains('active')) return;
-      const dx = e.clientX - prevX;
-      const dy = e.clientY - prevY;
-      dragDist += Math.hypot(dx, dy);
-      camYaw -= dx * 0.007;
-      camPitch = THREE.MathUtils.clamp(camPitch + dy * 0.005, 0.18, 1.05);
-      prevX = e.clientX;
-      prevY = e.clientY;
-    });
-    window.addEventListener('pointerup', e => {
-      if (!isDragging) return;
-      isDragging = false;
-      if (dragDist > 7 || !section.classList.contains('active')) return;
-      const r = renderer.domElement.getBoundingClientRect();
-      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
-      pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-      pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera);
-
-      const activeBeacons = Array.from(beacons.values()).filter(b => b.visible);
-      const bHits = raycaster.intersectObjects(activeBeacons, false);
-      if (bHits.length && bHits[0].object.userData.taskId) {
-        const tid = bHits[0].object.userData.taskId;
-        window.ASTRO_SIM?.selectSurfaceTask?.(tid);
-        const task = window.ASTRO_SIM?.surf?.tasks?.find(t => t.id === tid);
-        if (task) window.ASTRO_SIM?.moveActiveTo?.(task.x, task.z);
-        return;
-      }
-
-      const gHits = raycaster.intersectObject(terrainMesh, false);
-      if (gHits.length) {
-        const pt = gHits[0].point;
-        window.ASTRO_SIM?.moveActiveTo?.(
-          THREE.MathUtils.clamp(pt.x, -21, 21),
-          THREE.MathUtils.clamp(pt.z, -21, 21)
-        );
-      }
-    });
-
-    let lastT = performance.now();
-    const camGoal = new THREE.Vector3();
-    const lookGoal = new THREE.Vector3();
-
-    function frame(now) {
-      requestAnimationFrame(frame);
-      if (!section.classList.contains('active')) {
-        lastT = now;
-        return;
-      }
-      const dt = Math.min((now - lastT) / 1000, 0.05);
-      lastT = now;
-
-      const wantedSite = window.ASTRO?.state?.site || 'jezero';
-      if (wantedSite !== currentSite) {
-        currentSite = wantedSite;
-        scene.remove(marsGroup);
-        ({ group: marsGroup, terrainMesh } = buildMarsTerrain(currentSite));
-        scene.add(marsGroup);
-        syncBeacons();
-      }
-
-      const surf = window.ASTRO_SIM?.surf;
-      if (surf) {
-        for (const id of CREW_IDS) {
-          const actor = crewActors[id];
-          const target = surf.crewPos?.[id];
-          if (!actor || !target) continue;
-
-          const dx = target.x - actor.pos.x;
-          const dz = target.z - actor.pos.z;
-          const dist = Math.hypot(dx, dz);
-
-          if (dist > 0.06) {
-            const step = Math.min(dist, 5.2 * dt);
-            actor.pos.x += (dx / dist) * step;
-            actor.pos.z += (dz / dist) * step;
-            const desiredYaw = Math.atan2(dx, dz); // +Z forward per AGENTS.md §5.2
-            let diff = desiredYaw - actor.heading;
-            while (diff > Math.PI) diff -= Math.PI * 2;
-            while (diff < -Math.PI) diff += Math.PI * 2;
-            actor.heading += diff * Math.min(1, dt * 10);
-            playClip(actor, 'walk');
-          } else {
-            const nearTask = surf.tasks?.find(
-              t => t.crew === id && surf.completed?.has(t.id) && Math.hypot(t.x - actor.pos.x, t.z - actor.pos.z) < 2.2
-            );
-            playClip(actor, nearTask ? 'action' : 'idle');
-          }
-
-          actor.pos.y = marsHeight(actor.pos.x, actor.pos.z);
-          actor.model.position.copy(actor.pos);
-          actor.model.rotation.y = actor.heading;
-          actor.mixer.update(dt);
-        }
-
-        // Bob visible beacons
-        beacons.forEach(mesh => {
-          if (!mesh.visible) return;
-          if (!reducedMotion) {
-            mesh.rotation.y += dt * 1.4;
-            mesh.position.y = marsHeight(mesh.position.x, mesh.position.z) + 1.35 + Math.sin(now * 0.004) * 0.16;
-          }
-        });
-
-        // Smooth chase camera around active crew member
-        const focus = crewActors[surf.activeCrew]?.pos || new THREE.Vector3();
-        const camDist = 6.2;
-        camGoal.set(
-          focus.x + Math.sin(camYaw) * Math.cos(camPitch) * camDist,
-          focus.y + 1.3 + Math.sin(camPitch) * camDist,
-          focus.z + Math.cos(camYaw) * Math.cos(camPitch) * camDist
-        );
-        camera.position.lerp(camGoal, Math.min(1, dt * 7));
-        lookGoal.set(focus.x, focus.y + 1.15, focus.z);
-        camera.lookAt(lookGoal);
-      }
-
-      renderer.render(scene, camera);
-    }
-    requestAnimationFrame(frame);
-  }
-
-  // ---------------------------------------------------------------------------
   // 3. ANIMATED 3D PODIUM (#podium-viewport)
   // ---------------------------------------------------------------------------
   async function initPodium() {
@@ -3145,489 +3047,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   }
 
   initCockpit().catch(err => console.warn('3D cockpit fallback active:', err));
-  initSurface().catch(err => console.warn('3D surface fallback active:', err));
   initPodium().catch(err => console.warn('3D podium fallback active:', err));
-=======
-// Surface: the landing site in 3D. The ground is the real HiRISE terrain of the chosen site
-// (godot/assets/terrain, built by tools/terrain; index.terrain.<site>.js when opened from disk).
-// First-person walk with the crew member's own suit in view when looking down (V: chase camera).
-// One block per crew member marks a surface experiment (docs/minigames.md, MVP candidates) at a
-// random spot; its owner walks there and runs the minigame (placeholder for now).
-(() => {
-  const root = document.getElementById('surface'), ui = window.ASTRO;
-  if (!root || !ui) return;
-  const $s = id => document.getElementById(id);
-  const viewEl = $s('surface-view'), startEl = $s('surface-start'), promptEl = $s('surface-prompt'), dlg = $s('minigame-dialog');
-  const MARS_G = 3.71; // m/s², Mars surface gravity (same value as tools/modeling/lib/fx-presets.mjs)
-  // game-balance: walk/run speed (m/s), jump speed, reach to a block, and where the blocks land.
-  const WALK = 2.2, RUN = 4.6, JUMP = 2.6, REACH = 3.2, SPOT_MIN = 28, SPOT_MAX = 130, SPOT_GAP = 40;
-  const STRIDE = 1.33; // m/s that matches walk_loop (1.1 s cycle, two ~0.73 m steps)
-  // game: the photo is a grayscale stretch; this gain on the manifest tint makes it read as warm Mars ground under the game lights.
-  const GROUND_GAIN = [3, 2, 1.25];
-  const EXPERIMENTS = [
-    { id: 'H-S1', owner: 'helena', name: 'Helicopter flight', minigame: 'Scout', mechanic: 'Piloting', basis: 'Ingenuity (2021–24)', brief: 'Fly through the scouting points before the battery runs out. Smooth, featureless sand confuses the navigation camera.' },
-    { id: 'L-S1', owner: 'lucas', name: 'Oxygen oven', minigame: 'Make oxygen', mechanic: 'Keep in range', basis: 'MOXIE on Perseverance (2021–23)', brief: 'Heat the reactor to about 800 °C and hold it in the green zone. Too hot damages the cell; too cold makes nothing.' },
-    { id: 'O-S1', owner: 'oscar', name: 'Orbiter pass', minigame: 'Contact window', mechanic: 'Choice under a limit', basis: 'UHF relay (Electra)', brief: 'The orbiter passes overhead for a few seconds. Pick which data packets to send before the window closes.' },
-    { id: 'M-S1', owner: 'maya', name: 'Biosignature hunter', minigame: 'Leopard spots', mechanic: 'Pattern search', basis: 'PIXL + SHERLOC on Perseverance', brief: 'The rock is a grid. Each scan costs time and power; find the hidden spots before time runs out.' },
-  ];
-  const touch = matchMedia('(pointer: coarse)').matches, clamp = (x, a, b) => Math.min(b, Math.max(a, x));
-  const s = { site: null, crew: null, mode: 'first', yaw: 0, pitch: -.1, bodyYaw: 0, speed: 0, vy: 0, grounded: true, jump: false,
-    pos: new THREE.Vector3(), keys: new Set(), done: new Set(), stick: null, look: null, drag: null, ready: false, prompt: '' };
-  const KEYS_HELP = touch ? 'Left thumb walks, right thumb looks. Look down to see your suit.'
-    : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · mouse looks<br><kbd>E</kbd> run experiment · <kbd>V</kbd> camera · <kbd>1</kbd>–<kbd>4</kbd> crew · <kbd>Esc</kbd> pause<br>Look down to see your suit.';
-  let world = null;
-
-  const hiddenMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // still casts a shadow
-  const flat = (color, roughness = .7, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness, flatShading: true });
-  function initWorld() {
-    let renderer;
-    try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch { return null; }
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
-    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
-    viewEl.prepend(renderer.domElement);
-    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(72, 1, .05, 1200);
-    camera.rotation.order = 'YXZ';
-    // Daytime Mars sky (game colors): butterscotch at the horizon, darker overhead; faceted dome.
-    const horizon = new THREE.Color(0xd8a07c), zenith = new THREE.Color(0x7a4c46);
-    const skyGeo = new THREE.IcosahedronGeometry(900, 2), sp = skyGeo.attributes.position, colors = [];
-    for (let k = 0; k < sp.count; k++) { const c = horizon.clone().lerp(zenith, Math.pow(Math.max(0, sp.getY(k) / 900), .55)); colors.push(c.r, c.g, c.b); }
-    skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    const sky = new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
-    sky.renderOrder = -1; scene.add(sky);
-    scene.fog = new THREE.Fog(horizon, 45, 230);
-    scene.add(new THREE.HemisphereLight(0xf3c9a0, 0x4a2418, 1.25));
-    const sun = new THREE.DirectionalLight(0xfff0dc, 2.1);
-    sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.normalBias = .03;
-    Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 180 });
-    scene.add(sun, sun.target);
-    const skirt = new THREE.Mesh(new THREE.CircleGeometry(1500, 6).rotateX(-Math.PI / 2), flat(0x6b3b28, 1));
-    scene.add(skirt);
-    const lander = makeLander(); scene.add(lander);
-    const w = { renderer, scene, camera, sky, sun, skirt, lander, sunDir: new THREE.Vector3(0, 1, 0), terrain: null, hf: null,
-      blocks: [], colliders: [], avatars: new Map(), avatar: null, width: 0, height: 0 };
-    new ResizeObserver(() => {
-      w.width = viewEl.clientWidth; w.height = viewEl.clientHeight;
-      if (!w.width || !w.height) return;
-      renderer.setSize(w.width, w.height, false); camera.aspect = w.width / w.height; camera.updateProjectionMatrix();
-    }).observe(viewEl);
-    bindInput(renderer.domElement);
-    return w;
-  }
-
-  // The landed vehicle at the site center (game art from primitives, palette colors).
-  function makeLander() {
-    const g = new THREE.Group(), hull = flat(0xe9e4f0, .6), foil = flat(0xd8a23a, .45, .3), steel = flat(0x8c90a0, .5, .4), dark = flat(0x281147, .9);
-    const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
-    add(new THREE.CylinderGeometry(1.5, 1.7, 1.3, 6), foil, 0, 1.75, 0);
-    add(new THREE.CylinderGeometry(1, 1.5, .8, 6), hull, 0, 2.8, 0);
-    add(new THREE.ConeGeometry(.55, .7, 8), steel, 0, .95, 0).rotation.x = Math.PI;
-    add(new THREE.BoxGeometry(.8, .9, .1), dark, 0, 1.75, 1.47);
-    add(new THREE.CylinderGeometry(.05, .05, 1.2, 5), steel, .5, 3.7, 0);
-    add(new THREE.ConeGeometry(.5, .22, 8, 1, true), hull, .5, 4.35, 0).rotation.x = Math.PI;
-    const up = new THREE.Vector3(0, 1, 0);
-    for (let k = 0; k < 4; k++) {
-      const a = Math.PI / 4 + k * Math.PI / 2, top = new THREE.Vector3(Math.sin(a) * 1.35, 1.5, Math.cos(a) * 1.35), foot = new THREE.Vector3(Math.sin(a) * 2.4, .08, Math.cos(a) * 2.4);
-      const dir = foot.clone().sub(top), leg = add(new THREE.CylinderGeometry(.07, .07, dir.length(), 5), steel, 0, 0, 0);
-      leg.position.copy(top).add(foot).multiplyScalar(.5); leg.quaternion.setFromUnitVectors(up, dir.normalize());
-      add(new THREE.CylinderGeometry(.3, .36, .1, 6), steel, foot.x, .05, foot.z);
-    }
-    return g;
-  }
-
-  // Experiment marker: hex plinth, a block in the owner's color, a floating gem and a light beam seen from afar.
-  function makeBlock(exp, color) {
-    const g = new THREE.Group(), tone = new THREE.Color(color), dark = flat(0x281147, .9), mat = flat(tone, .75);
-    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.45, .4, 6), dark); plinth.position.y = .1;
-    const block = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), mat); block.position.y = .85; block.rotation.y = Math.PI / 4;
-    const band = new THREE.Mesh(new THREE.BoxGeometry(1.14, .16, 1.14), dark); band.position.y = 1.05; band.rotation.y = Math.PI / 4;
-    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(.32), new THREE.MeshBasicMaterial({ color: 0xfce8a6 })); gem.position.y = 2.2;
-    const beam = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, 60, 6, 1, true),
-      new THREE.MeshBasicMaterial({ color: tone, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide }));
-    beam.position.y = 31;
-    for (const m of [plinth, block, band]) m.castShadow = m.receiveShadow = true;
-    g.add(plinth, block, band, gem, beam);
-    g.userData = { exp, gem, beam, tag: null };
-    return g;
-  }
-
-  // Terrain: the GLB comes from index.terrain.<site>.js (a <script> works on file://).
-  const terrains = new Map();
-  function fetchTerrain(id) {
-    if (!terrains.has(id)) terrains.set(id, (async () => {
-      if (!window.ASTRO_TERRAIN?.[id]) await new Promise((ok, fail) => {
-        const tag = document.createElement('script');
-        tag.src = `index.terrain.${id}.js`; tag.onload = ok; tag.onerror = () => fail(new Error(`index.terrain.${id}.js missing (npm run web:models)`));
-        document.head.append(tag);
-      });
-      const entry = window.ASTRO_TERRAIN?.[id];
-      if (!entry?.glb) throw new Error(`no terrain for ${id}`);
-      const bin = atob(entry.glb), bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      delete entry.glb;
-      const gltf = await loader.parseAsync(bytes.buffer, '');
-      let mesh = null; gltf.scene.traverse(o => { if (o.isMesh && !mesh) mesh = o; });
-      mesh.receiveShadow = true;
-      const { color, map } = mesh.material;
-      color.setRGB(color.r * GROUND_GAIN[0], color.g * GROUND_GAIN[1], color.b * GROUND_GAIN[2]);
-      if (map) map.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); // keeps the photo sharp at grazing angles
-      addGroundDetail(mesh.material, entry.site.sizeM);
-      const hf = heightField(mesh);
-      gltf.scene.add(scatterRocks(hf, entry.site.id));
-      return { info: entry.site, scene: gltf.scene, hf };
-    })().catch(err => { terrains.delete(id); throw err; }));
-    return terrains.get(id);
-  }
-  // The photo has 0.5 m pixels, too coarse at walking distance: a tiled grain (3 m tiles) multiplies it
-  // up close and averages out with distance (mipmaps). Game art, not data.
-  let grain = null;
-  function addGroundDetail(material, sizeM) {
-    if (!grain) {
-      const N = 256, data = new Uint8Array(N * N * 4), rnd = (i, seed) => { const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453; return x - Math.floor(x); };
-      const octave = (cells, seed) => (x, y) => { // tileable value noise
-        const fx = x / N * cells, fy = y / N * cells, i = Math.floor(fx), j = Math.floor(fy), u = fx - i, v = fy - j;
-        const at = (a, b) => rnd(((b % cells) * cells) + (a % cells), seed);
-        return (at(i, j) * (1 - u) + at(i + 1, j) * u) * (1 - v) + (at(i, j + 1) * (1 - u) + at(i + 1, j + 1) * u) * v;
-      };
-      const layers = [[octave(6, 1), .4], [octave(24, 2), .35], [octave(96, 3), .25]];
-      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-        const g = Math.round(255 * layers.reduce((sum, [f, w]) => sum + f(x, y) * w, 0)), k = (y * N + x) * 4;
-        data[k] = data[k + 1] = data[k + 2] = g; data[k + 3] = 255;
-      }
-      grain = new THREE.DataTexture(data, N, N);
-      grain.wrapS = grain.wrapT = THREE.RepeatWrapping; grain.magFilter = THREE.LinearFilter; grain.minFilter = THREE.LinearMipmapLinearFilter;
-      grain.generateMipmaps = true; grain.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); grain.needsUpdate = true;
-    }
-    material.onBeforeCompile = shader => {
-      shader.uniforms.grainMap = { value: grain }; shader.uniforms.grainRepeat = { value: sizeM / 3 };
-      shader.fragmentShader = 'uniform sampler2D grainMap;\nuniform float grainRepeat;\n' + shader.fragmentShader.replace('#include <map_fragment>',
-        '#include <map_fragment>\n  diffuseColor.rgb *= 0.55 + 0.9 * texture2D(grainMap, vMapUv * grainRepeat).r;');
-    };
-  }
-  // Loose rocks (game art): same spots every time for a site, so the ground has scale when walking.
-  function scatterRocks(hf, seedText) {
-    let seed = [...seedText].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-    const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-    const COUNT = 900, rocks = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 0), flat(0xffffff, .95), COUNT);
-    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), p = new THREE.Vector3(), sc = new THREE.Vector3(), c = new THREE.Color(), lim = hf.half - 6;
-    for (let i = 0; i < COUNT; i++) {
-      const size = rand() < .06 ? .5 + rand() * .7 : .06 + Math.pow(rand(), 2) * .35;
-      p.set((rand() * 2 - 1) * lim, 0, (rand() * 2 - 1) * lim); p.y = hf.at(p.x, p.z) - size * .25;
-      sc.set(size * (.8 + rand() * .5), size * (.45 + rand() * .3), size * (.8 + rand() * .5));
-      rocks.setMatrixAt(i, m.compose(p, q.setFromEuler(e.set(rand() * .6, rand() * Math.PI * 2, rand() * .6)), sc));
-      rocks.setColorAt(i, c.setRGB(.2 + rand() * .1, .1 + rand() * .05, .06 + rand() * .03));
-    }
-    rocks.castShadow = rocks.receiveShadow = true;
-    return rocks;
-  }
-  // Ground height by bilinear lookup in the mesh grid: row-major from the north-west corner,
-  // same layout as tools/terrain/lib/terrain-mesh.mjs (cheaper than a raycast on 129k triangles).
-  function heightField(mesh) {
-    const p = mesh.geometry.attributes.position, n = Math.round(Math.sqrt(p.count));
-    const x0 = p.getX(0), z0 = p.getZ(0), step = p.getX(1) - x0, h = new Float32Array(n * n);
-    for (let k = 0; k < n * n; k++) h[k] = p.getY(k);
-    const at = (x, z) => {
-      const fx = clamp((x - x0) / step, 0, n - 1.0001), fz = clamp((z - z0) / step, 0, n - 1.0001);
-      const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j, k = j * n + i;
-      return (h[k] * (1 - u) + h[k + 1] * u) * (1 - v) + (h[k + n] * (1 - u) + h[k + n + 1] * u) * v;
-    };
-    const slope = (x, z) => Math.hypot(at(x + 1, z) - at(x - 1, z), at(x, z + 1) - at(x, z - 1)) / 2;
-    return { at, slope, half: (n - 1) * step / 2 };
-  }
-
-  async function useCrew(id) {
-    s.crew = id; renderCrewBar();
-    if (!world.avatars.has(id)) {
-      const gltf = await loadGLTF(`characters/${id}.glb`), body = gltf.scene.clone(true); // pivot rig, no skinning
-      const mixer = new THREE.AnimationMixer(body), clip = name => gltf.animations.find(a => a.name === name);
-      const idle = mixer.clipAction(clip('idle_loop')), walk = mixer.clipAction(clip('walk_loop'));
-      idle.play(); walk.play(); walk.setEffectiveWeight(0);
-      const head = body.getObjectByName('Head'), helmet = [];
-      body.traverse(o => { if (o.isMesh) o.castShadow = true; });
-      head.traverse(o => { if (o.isMesh) { o.userData.mat = o.material; helmet.push(o); } });
-      body.updateMatrixWorld(true);
-      world.avatars.set(id, { body, mixer, idle, walk, head, helmet, walkW: 0, eyeY: head.getWorldPosition(new THREE.Vector3()).y });
-    }
-    if (s.crew !== id) return;
-    if (world.avatar) world.scene.remove(world.avatar.body);
-    world.avatar = world.avatars.get(id); world.scene.add(world.avatar.body);
-    applyMode(); s.prompt = '';
-  }
-  const clampPitch = () => { s.pitch = s.mode === 'first' ? clamp(s.pitch, -1.45, 1.2) : clamp(s.pitch, -1, .45); };
-  function applyMode() {
-    for (const m of world.avatar?.helmet ?? []) m.material = s.mode === 'first' ? hiddenMat : m.userData.mat;
-    clampPitch();
-  }
-  function setMode(mode) { s.mode = mode; applyMode(); }
-
-  function setTerrain(t) {
-    const { info, hf } = t;
-    if (world.terrain) world.scene.remove(world.terrain);
-    world.terrain = t.scene; world.hf = hf; world.scene.add(t.scene);
-    const az = info.sun.azimuthDeg * Math.PI / 180, el = info.sun.elevationDeg * Math.PI / 180; // sun of the photo (HiRISE label)
-    world.sunDir.set(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el));
-    world.skirt.position.y = info.elevation.minM - info.elevation.centerM - .4;
-    world.skirt.material.color.setRGB(info.tint[0] * .2, info.tint[1] * .2, info.tint[2] * .2);
-    const lat = info.center.lat, lon = info.center.lon;
-    $s('surface-coords').textContent = `${Math.abs(lat).toFixed(2)}°${lat < 0 ? 'S' : 'N'} ${Math.abs(lon).toFixed(2)}°${lon < 0 ? 'W' : 'E'} · HiRISE terrain ${info.sizeM} m`;
-  }
-
-  function placeBlocks() {
-    const { hf, scene } = world, tags = $s('surface-tags'), spots = [], lim = hf.half - 24;
-    for (const b of world.blocks) scene.remove(b);
-    tags.innerHTML = ''; world.blocks = []; world.colliders = [{ x: 0, z: 0, r: 2.9 }];
-    for (const exp of EXPERIMENTS) {
-      let spot = null;
-      for (let t = 0; t < 300 && !spot; t++) {
-        const r = SPOT_MIN + Math.random() * (SPOT_MAX - SPOT_MIN), a = Math.random() * Math.PI * 2, x = Math.sin(a) * r, z = Math.cos(a) * r;
-        const ok = Math.abs(x) < lim && Math.abs(z) < lim && hf.slope(x, z) < .2 && spots.every(p => Math.hypot(p.x - x, p.z - z) > SPOT_GAP);
-        if (ok || t === 299) spot = { x, z };
-      }
-      spots.push(spot);
-      const owner = ui.crew.find(c => c.id === exp.owner), block = makeBlock(exp, owner.color);
-      block.position.set(spot.x, hf.at(spot.x, spot.z), spot.z);
-      const tag = document.createElement('span');
-      tag.className = 'surface-tag'; tag.style.setProperty('--crew', owner.color);
-      tags.append(tag); block.userData.tag = tag;
-      scene.add(block); world.blocks.push(block); world.colliders.push({ x: spot.x, z: spot.z, r: 1.6 });
-    }
-    $s('surface-goals').innerHTML = EXPERIMENTS.map(e => { const o = ui.crew.find(c => c.id === e.owner);
-      return `<li data-goal="${e.id}" style="--crew:${o.color}"><span class="goal-chip"></span><span class="goal-name"><strong>${e.id} · ${e.name}</strong><small>${o.name}</small></span><span class="goal-dist"></span><span class="goal-arrow"></span></li>`; }).join('');
-  }
-
-  function renderCrewBar() {
-    $s('surface-crew').innerHTML = ui.crew.map((c, i) => `<button type="button" data-crew="${c.id}" style="--crew:${c.color}" aria-pressed="${c.id === s.crew}">${c.name}<small>${touch ? '' : `key ${i + 1}`}</small></button>`).join('');
-  }
-  $s('surface-crew').addEventListener('click', e => { const b = e.target.closest('[data-crew]'); if (b && world) switchCrew(b.dataset.crew); });
-  function switchCrew(id) { if (id === s.crew) return; useCrew(id).then(() => ui.toast(`You are now ${ui.crew.find(c => c.id === id).name}.`)); }
-
-  function showStart(kicker, title, keys) {
-    $s('surface-start-kicker').textContent = kicker; $s('surface-start-title').textContent = title;
-    $s('surface-keys').innerHTML = keys; startEl.hidden = false;
-  }
-  function fail(message) { root.classList.add('surface-fail'); showStart('Surface', message, 'Use “Leave surface” to go back to the mission.'); }
-
-  async function land({ site, crew }) {
-    root.classList.remove('surface-fail');
-    if (!world) world = initWorld();
-    const info = ui.sites[site];
-    $s('surface-title').textContent = info?.name ?? site;
-    if (!world) return fail('The 3D surface needs WebGL.');
-    s.ready = false; s.site = site;
-    showStart('Touchdown', `Loading ${info.name}…`, '');
-    try {
-      const t = await fetchTerrain(site);
-      if (s.site !== site) return;
-      setTerrain(t);
-      world.lander.position.set(0, t.hf.at(0, 0), 0);
-      placeBlocks();
-      s.done.clear(); s.pos.set(1.2, 0, 4.6); s.pos.y = t.hf.at(s.pos.x, s.pos.z); s.vy = 0; s.grounded = true;
-      const first = world.blocks[0].position; s.yaw = Math.atan2(-(first.x - s.pos.x), -(first.z - s.pos.z)); s.pitch = -.1;
-      s.bodyYaw = s.yaw + Math.PI;
-      await useCrew(crew);
-      s.ready = true;
-      showStart('Touchdown', touch ? 'Touch to walk' : 'Click to walk', KEYS_HELP);
-    } catch (err) {
-      console.warn('Surface not shown:', err);
-      fail(`Could not load the ${info?.name ?? site} terrain.`);
-    }
-  }
-  window.addEventListener('astro:land', e => land(e.detail));
-
-  // Input: keyboard + mouse (pointer lock, or drag when the lock is not available), touch stick + look.
-  function bindInput(canvas) {
-    const live = () => isActive('surface') && s.ready && !dlg.open;
-    addEventListener('keydown', e => {
-      if (!live()) return;
-      s.keys.add(e.code);
-      if (e.code === 'Space') { s.jump = true; e.preventDefault(); }
-      if (e.code.startsWith('Arrow')) e.preventDefault();
-      if (e.code === 'KeyE') interact();
-      if (e.code === 'KeyV') setMode(s.mode === 'first' ? 'third' : 'first');
-      const n = /^Digit([1-4])$/.exec(e.code)?.[1];
-      if (n) switchCrew(ui.crew[n - 1].id);
-    });
-    addEventListener('keyup', e => s.keys.delete(e.code));
-    addEventListener('blur', () => s.keys.clear());
-    const turn = (dx, dy, k) => { s.yaw -= dx * k; s.pitch -= dy * k; clampPitch(); };
-    let settle = false; // the first move after locking can carry a large jump (Chrome)
-    document.addEventListener('pointerlockchange', () => {
-      settle = true;
-      if (document.pointerLockElement !== canvas && live() && !touch) showStart('Paused', 'Click to keep walking', KEYS_HELP);
-    });
-    addEventListener('mousemove', e => {
-      if (document.pointerLockElement === canvas) {
-        if (settle || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) { settle = false; return; }
-        turn(e.movementX, e.movementY, .0022);
-      }
-      else if (s.drag) { turn(e.clientX - s.drag.x, e.clientY - s.drag.y, .004); s.drag = { x: e.clientX, y: e.clientY }; }
-    });
-    canvas.addEventListener('mousedown', e => { if (document.pointerLockElement !== canvas) s.drag = { x: e.clientX, y: e.clientY }; });
-    addEventListener('mouseup', () => { s.drag = null; });
-    const stickEl = $s('surface-stick');
-    canvas.addEventListener('pointerdown', e => {
-      if (e.pointerType !== 'touch' || !live()) return;
-      const r = viewEl.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-      if (x < r.width * .45 && !s.stick) {
-        s.stick = { id: e.pointerId, ox: x, oy: y, x: 0, y: 0 };
-        stickEl.style.left = x + 'px'; stickEl.style.top = y + 'px'; stickEl.classList.add('on');
-      } else if (!s.look) s.look = { id: e.pointerId, x: e.clientX, y: e.clientY };
-      try { canvas.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
-    });
-    canvas.addEventListener('pointermove', e => {
-      if (s.stick?.id === e.pointerId) {
-        const r = viewEl.getBoundingClientRect(), dx = e.clientX - r.left - s.stick.ox, dy = e.clientY - r.top - s.stick.oy, len = Math.hypot(dx, dy), k = Math.min(1, len / 50) / (len || 1);
-        s.stick.x = dx * k; s.stick.y = -dy * k;
-        stickEl.firstElementChild.style.translate = `${s.stick.x * 33}px ${-s.stick.y * 33}px`;
-      } else if (s.look?.id === e.pointerId) { turn(e.clientX - s.look.x, e.clientY - s.look.y, .006); s.look.x = e.clientX; s.look.y = e.clientY; }
-    });
-    const release = e => {
-      if (s.stick?.id === e.pointerId) { s.stick = null; stickEl.classList.remove('on'); stickEl.firstElementChild.style.translate = ''; }
-      if (s.look?.id === e.pointerId) s.look = null;
-    };
-    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
-    startEl.addEventListener('click', () => {
-      if (!s.ready || root.classList.contains('surface-fail')) return;
-      startEl.hidden = true;
-      if (!touch) try { canvas.requestPointerLock()?.catch?.(() => {}); } catch { /* drag to look instead */ }
-    });
-    $s('surface-jump').addEventListener('pointerdown', () => { s.jump = true; });
-  }
-  $s('surface-camera').addEventListener('click', () => { if (world?.avatar) setMode(s.mode === 'first' ? 'third' : 'first'); });
-  $s('surface-leave').addEventListener('click', () => { if (document.pointerLockElement) document.exitPointerLock(); s.keys.clear(); ui.show('planner'); });
-  promptEl.addEventListener('click', interact);
-
-  // Experiments: the owner runs the minigame next to the block.
-  const nearBlock = () => world.blocks.find(b => Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z) <= REACH) ?? null;
-  function interact() {
-    const b = world && nearBlock();
-    if (!b) return;
-    const e = b.userData.exp;
-    if (s.done.has(e.id)) return;
-    if (e.owner !== s.crew) return switchCrew(e.owner);
-    const owner = ui.crew.find(c => c.id === e.owner);
-    if (document.pointerLockElement) document.exitPointerLock();
-    s.keys.clear();
-    $s('minigame-kicker').textContent = `Experiment ${e.id} · ${owner.name}`;
-    $s('minigame-title').textContent = e.name;
-    $s('minigame-brief').textContent = e.brief;
-    $s('minigame-summary').innerHTML = [['Minigame', e.minigame], ['Mechanic', e.mechanic], ['Based on', e.basis]].map(([k, v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
-    dlg.dataset.exp = e.id; dlg.showModal();
-  }
-  $s('minigame-close').addEventListener('click', () => dlg.close());
-  $s('minigame-done').addEventListener('click', () => {
-    const id = dlg.dataset.exp; dlg.close();
-    if (!id || s.done.has(id)) return;
-    s.done.add(id); s.prompt = '';
-    const b = world.blocks.find(x => x.userData.exp.id === id);
-    b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done');
-    ui.toast(s.done.size === EXPERIMENTS.length ? 'All surface experiments done. The rest of the mission comes in the full game.' : `${id} done · ${s.done.size}/${EXPERIMENTS.length}`);
-  });
-  dlg.addEventListener('close', () => { if (isActive('surface') && s.ready && !touch && !document.pointerLockElement) showStart('Paused', 'Click to keep walking', KEYS_HELP); });
-
-  const fwd = new THREE.Vector3(), eye = new THREE.Vector3(), look = new THREE.Vector3(), tmp = new THREE.Vector3();
-  function step(dt) {
-    const k = s.keys, a = world.avatar, hf = world.hf;
-    let ix = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
-    let iy = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
-    if (s.stick) { ix += s.stick.x; iy += s.stick.y; }
-    const len = Math.min(1, Math.hypot(ix, iy)), run = k.has('ShiftLeft') || k.has('ShiftRight') || (s.stick && len > .92);
-    const speed = len > .08 ? len * (run ? RUN : WALK) : 0, sin = Math.sin(s.yaw), cos = Math.cos(s.yaw);
-    let mx = 0, mz = 0;
-    if (speed) { const n = Math.hypot(ix, iy); mx = (-sin * iy + cos * ix) / n * speed; mz = (-cos * iy - sin * ix) / n * speed; }
-    const lim = hf.half - 8;
-    s.pos.x = clamp(s.pos.x + mx * dt, -lim, lim); s.pos.z = clamp(s.pos.z + mz * dt, -lim, lim);
-    for (const c of world.colliders) {
-      const dx = s.pos.x - c.x, dz = s.pos.z - c.z, d = Math.hypot(dx, dz);
-      if (d < c.r && d > 1e-4) { s.pos.x = c.x + dx / d * c.r; s.pos.z = c.z + dz / d * c.r; }
-    }
-    s.speed = speed;
-    const ground = hf.at(s.pos.x, s.pos.z);
-    if (s.grounded && s.jump) { s.vy = JUMP; s.grounded = false; }
-    s.jump = false;
-    if (s.grounded) s.pos.y = ground;
-    else { s.vy -= MARS_G * dt; s.pos.y += s.vy * dt; if (s.pos.y <= ground) { s.pos.y = ground; s.vy = 0; s.grounded = true; } }
-    // First person: the body faces the view. Chase camera: it turns toward where it walks.
-    const target = s.mode === 'first' ? s.yaw + Math.PI : speed ? Math.atan2(mx, mz) : s.bodyYaw;
-    const d = Math.atan2(Math.sin(target - s.bodyYaw), Math.cos(target - s.bodyYaw));
-    s.bodyYaw += s.mode === 'first' ? d : d * Math.min(1, dt * 10);
-    a.body.position.copy(s.pos); a.body.rotation.y = s.bodyYaw;
-    const walking = s.grounded && speed > 0 ? 1 : 0;
-    a.walkW += (walking - a.walkW) * Math.min(1, dt * 8);
-    a.walk.setEffectiveWeight(a.walkW); a.idle.setEffectiveWeight(1 - a.walkW);
-    a.walk.timeScale = clamp(speed / STRIDE, .6, 2.6);
-    a.mixer.update(reduce && !speed ? 0 : dt);
-  }
-  function placeCamera() {
-    const { camera, avatar: a } = world;
-    fwd.set(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
-    if (s.mode === 'first') {
-      a.body.updateMatrixWorld(true);
-      if (reduce) eye.set(s.pos.x, s.pos.y + a.eyeY, s.pos.z); else a.head.getWorldPosition(eye);
-      // Eyes in front of the suit; further forward when looking down, so the chest, legs and feet come into view.
-      camera.position.copy(eye).addScaledVector(fwd, .3 + .22 * Math.max(0, -Math.sin(s.pitch))); camera.position.y += .14;
-      camera.rotation.set(s.pitch, s.yaw, 0);
-    } else {
-      look.copy(s.pos); look.y += 1.45;
-      const cp = Math.cos(s.pitch);
-      camera.position.copy(look).add(tmp.set(Math.sin(s.yaw) * cp, -Math.sin(s.pitch), Math.cos(s.yaw) * cp).multiplyScalar(4.4));
-      camera.position.y = Math.max(camera.position.y, world.hf.at(camera.position.x, camera.position.z) + .4);
-      camera.lookAt(look);
-    }
-  }
-  function updateHud() {
-    for (const b of world.blocks) {
-      const e = b.userData.exp, li = document.querySelector(`[data-goal="${e.id}"]`), dx = b.position.x - s.pos.x, dz = b.position.z - s.pos.z, dist = Math.hypot(dx, dz);
-      li.classList.toggle('done', s.done.has(e.id)); li.classList.toggle('here', dist <= REACH);
-      li.querySelector('.goal-dist').textContent = s.done.has(e.id) ? 'DONE' : `${Math.round(dist)} m`;
-      li.querySelector('.goal-arrow').style.rotate = `${Math.atan2(dx, -dz) + s.yaw}rad`; // bearing from north, relative to the view
-    }
-    $s('surface-count').textContent = `${s.done.size}/${EXPERIMENTS.length} DONE`;
-    const b = nearBlock(), e = b?.userData.exp, owner = e && ui.crew.find(c => c.id === e.owner);
-    const state = !e ? '' : s.done.has(e.id) ? 'done' : e.owner === s.crew ? 'run' : 'locked';
-    const key = state + (e?.id ?? '') + s.crew;
-    if (key === s.prompt) return;
-    s.prompt = key; promptEl.hidden = !e;
-    if (!e) return;
-    promptEl.className = 'surface-prompt' + (state === 'run' ? '' : ' ' + state);
-    promptEl.textContent = state === 'done' ? `${e.id} · ${e.name} · done`
-      : state === 'run' ? `${touch ? 'Tap' : 'E'} · Run ${e.id} · ${e.name}`
-      : `${e.id} is ${owner.name}’s experiment · ${touch ? 'tap' : `press ${ui.crew.indexOf(owner) + 1}`} to switch`;
-  }
-  const v = new THREE.Vector3();
-  function placeTags(now) {
-    const { camera } = world;
-    for (const b of world.blocks) {
-      const { tag, gem, beam, exp } = b.userData, dist = Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z);
-      if (!reduce) { gem.rotation.y = now / 700; gem.position.y = 2.2 + Math.sin(now / 500 + b.position.x) * .12; beam.material.opacity = .22 + .1 * Math.sin(now / 400); }
-      v.copy(b.position); v.y += 2.8; v.project(camera);
-      const show = v.z < 1 && dist < 260;
-      tag.hidden = !show;
-      if (!show) continue;
-      tag.textContent = s.done.has(exp.id) ? `${exp.id} ✓` : `${exp.id} · ${Math.round(dist)} m`;
-      tag.style.transform = `translate(${(v.x + 1) / 2 * world.width}px, ${(1 - v.y) / 2 * world.height}px)`;
-    }
-  }
-
-  let last = performance.now(), hudClock = 0;
-  function frame(now) {
-    requestAnimationFrame(frame);
-    const dt = Math.min(.1, (now - last) / 1000); last = now;
-    if (!world || !s.ready || !world.avatar || !isActive('surface') || !world.width) return;
-    if (!dlg.open) step(dt);
-    placeCamera();
-    world.sky.position.copy(world.camera.position);
-    world.sun.target.position.copy(s.pos); world.sun.position.copy(s.pos).addScaledVector(world.sunDir, 90);
-    placeTags(now);
-    if ((hudClock += dt) > .12) { hudClock = 0; updateHud(); }
-    world.renderer.render(world.scene, world.camera);
-  }
-  requestAnimationFrame(frame);
-  // Test and debug hook (Playwright, console): state, and a teleport next to a block.
-  window.ASTRO_SURFACE = { state: s, world: () => world, goTo(id) { const b = world?.blocks.find(x => x.userData.exp.id === id); if (b) { s.pos.x = b.position.x + 2.2; s.pos.z = b.position.z + 1.2; s.yaw = Math.atan2(-(b.position.x - s.pos.x), -(b.position.z - s.pos.z)); s.grounded = false; } } };
-  // index.html#surface or #surface-gale opens the surface directly (quick testing).
-  const direct = /^#surface(?:-(\w+))?$/.exec(location.hash);
-  if (direct) { if (ui.sites[direct[1]]) ui.state.site = direct[1]; ui.land(); }
->>>>>>> Stashed changes
 })();
 </script>
 </body>

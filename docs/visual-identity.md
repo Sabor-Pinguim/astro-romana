@@ -122,7 +122,8 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
   - Chão: foto em tons de cinza × tinta do manifesto × ganho de jogo (`GROUND_GAIN`), mais um grão repetido a cada 3 m e pedras low poly (dodecaedros chapados, mesmas posições por sítio). Luz do sol na direção do sol da foto.
   - Sonda pousada no centro: hexágono dourado e branco com 4 pernas, feita de primitivas.
   - Experimento: plinto hexagonal escuro, cubo na cor do dono, gema creme girando e um feixe aditivo de 60 m visível de longe. Concluído: o feixe some e a gema fica verde `--safe`.
-  - HUD: painéis chanfrados nos cantos (local, lista de experimentos com distância e seta), barra da tripulação, aviso de interação em laranja (bloqueado em roxo, concluído em verde). No toque: joystick hexagonal e botão de pulo hexagonal.
+  - HUD: painéis chanfrados nos cantos (local com cronômetro da janela de retorno, RAD e áudio; lista de experimentos com distância e seta, e inventário), barra da tripulação, aviso de interação em laranja (bloqueado em roxo, concluído em verde), "Board & depart" em laranja. No toque: joystick hexagonal e botão de pulo hexagonal.
+  - Os 4 astronautas ficam em cena; o jogador controla um (teclas 1–4) e os outros esperam onde foram deixados.
 - **Terreno** (`facetTerrain`):
   - Linhas de vértices desde um perfil de silhueta (lista de pontos x, y) até a base, mais densas perto do horizonte.
   - Quads divididos em diagonais alternadas.
