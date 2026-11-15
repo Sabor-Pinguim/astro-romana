@@ -68,7 +68,7 @@
 
   <section id="launchpad" class="screen" aria-labelledby="launchpad-title">
     <div class="launchpad-view" id="launchpad-view">
-      <div class="launchpad-card slab"><span class="eyebrow">Launch pad · Earth</span><h2 id="launchpad-title">Mission</h2><span class="micro" id="launchpad-status">Final checks</span></div>
+      <div class="launchpad-card slab"><span class="eyebrow" id="launchpad-eyebrow">Launch pad · Earth</span><h2 id="launchpad-title">Mission</h2><span class="micro" id="launchpad-status">Final checks</span></div>
       <div class="launchpad-count" id="launchpad-count" aria-live="polite">T−10</div>
       <button class="button quiet launchpad-skip" id="launchpad-skip" type="button">Skip ▸▸ <kbd>Esc</kbd></button>
       <div class="launchpad-fade" id="launchpad-fade"></div>
@@ -147,7 +147,7 @@
   <section id="surface" class="screen" aria-labelledby="surface-title">
     <div class="surface-view" id="surface-view">
       <div class="surface-hud">
-        <div class="surface-site slab"><span class="eyebrow">Phase 07 / Mars surface EVA</span><h2 id="surface-title">Landing site</h2><span class="micro" id="surface-coords"></span><div class="surface-status"><div class="timer-readout" id="surface-timer" aria-live="polite">03:00</div><span class="tag" id="surface-rad-badge">RAD: 232 µGy/sol · CALM</span><button class="button quiet" id="audio-toggle-surface" type="button">Audio: On</button></div></div>
+        <div class="surface-site slab"><h2 class="eyebrow" id="surface-title">Mars surface EVA</h2><div class="timer-readout" id="surface-timer" aria-live="polite">03:00</div></div>
         <div class="surface-compass" aria-hidden="true"><div class="compass-strip" id="surface-compass-strip"></div><span class="compass-needle"></span><span class="compass-readout" id="surface-compass-readout">HDG 000°</span></div>
         <div class="surface-goals slab"><div class="block-label"><span class="micro">Experiments</span><span class="tag" id="surface-count">0/4 DONE</span></div><ol id="surface-goals"></ol><div class="block-label surface-inv-label"><span class="micro">Inventory</span></div><div class="surface-inventory" id="surface-inventory"></div></div>
       </div>

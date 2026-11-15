@@ -15,10 +15,11 @@ export const MISSION_RULES = {
   marsTransferDeltaVMs: 4300,
   minSafeLiftoffTwr: 1.2,
   minBareLiftoffTwr: 1.0,
+  minUpperStageTwr: 0.3,
   maxInternalStages: 7,
   cabinModuleSlots: 4,
   mandatoryOrbitalRefuelingForMars: true,
-  note: 'g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5.',
+  note: 'g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5. minUpperStageTwr: vacuum thrust-to-weight an upper stage needs at ignition to keep climbing (game-balance, est. from Centaur-class upper stages at ~0.3–0.4).',
 };
 
 export const PART_SPECS = {

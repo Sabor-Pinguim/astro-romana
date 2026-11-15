@@ -155,8 +155,12 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   const HULL = { booster: 'parts/structures/booster-thrust-section.glb', stage: 'parts/structures/stage-module.glb', cabin: 'parts/structures/crew-cabin.glb' };
   // Two versions of each hull: open here (the front half, node `Closed`, hidden so the bay shows) and closed
   // for outside views (launch pad), where the equipment is stowed inside and not loaded.
-  const hullOf = async (file, closed) => { const h = await loadGLB(file), cover = h.getObjectByName('Closed'); if (cover) cover.visible = closed; return h; };
-  const CABIN_SLOTS = [[-.2, .03], [.2, .03], [-.2, .5], [.2, .5]]; // x, y on the cabin deck; modules at half scale
+  const hullOf = async (file, closed) => {
+    const h = await loadGLB(file);
+    for (const n of ['Closed', 'Stowed_Front']) { const o = h.getObjectByName(n); if (o) o.visible = closed; }
+    return h;
+  };
+  const CABIN_SLOTS = [[-.28, .24], [.28, .24], [-.28, .80], [.28, .80]]; // x, y on the enlarged cabin decks
   const GAP = .36, TANK_CAP = 3.2;
   const stack = new THREE.Group(); scene.add(stack);
   const padMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: .8, depthWrite: false });
@@ -219,8 +223,8 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     g.userData.module = 'cabin'; g.add(await hullOf(HULL.cabin, closed));
     for (let k = 0; k < (closed ? 0 : CABIN_SLOTS.length); k++) {
       const [x, y] = CABIN_SLOTS[k], id = r.cabin[k];
-      if (id) { const e = await loadGLB(parts[id].file); e.scale.setScalar(.5); e.position.set(x, y, 0); g.add(e); }
-      else { const m = mountPoint(.08, { module: 'cabin' }); m.position.set(x, y + .01, 0); g.add(m); }
+      if (id) { const e = await loadGLB(parts[id].file); e.scale.setScalar(.58); e.position.set(x, y, 0); g.add(e); }
+      else { const m = mountPoint(.09, { module: 'cabin' }); m.position.set(x, y + .01, 0); g.add(m); }
     }
     g.userData.top = new THREE.Box3().setFromObject(g).max.y;
     return g;
@@ -268,7 +272,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       g.position.y = y; stack.add(g);
       const top = g.userData.top;
       layout.push({ key: g.userData.module, mid: y + top / 2, height: top });
-      if (g.userData.module === selected) [0, top].forEach(h => { const p = polygon(.66, 12, selMat); p.position.y = y + h; stack.add(p); });
+      if (g.userData.module === selected) { const ringR = g.userData.module === 'cabin' ? .86 : .66; [0, top].forEach(h => { const p = polygon(ringR, 12, selMat); p.position.y = y + h; stack.add(p); }); }
       y += top;
     });
     const box = new THREE.Box3().setFromObject(stack), size = box.getSize(new THREE.Vector3());
@@ -504,22 +508,47 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     return w;
   }
 
-  // The landed vehicle at the site center (game art from primitives, palette colors).
+  // The landed vehicle at the site center: the enlarged Crew Cabin / Mars Lander capsule with deployed legs and ladder.
   function makeLander() {
-    const g = new THREE.Group(), hull = flat(0xe9e4f0, .6), foil = flat(0xd8a23a, .45, .3), steel = flat(0x8c90a0, .5, .4), dark = flat(0x281147, .9);
+    const g = new THREE.Group(), steel = flat(0x9ea4ad, .45, .75), titanium = flat(0x8f9196, .4, .8),
+      foil = flat(0xd4a72c, .3, .9), dark = flat(0x1e2024, .55), nozzleMat = flat(0x3a3633, .6, .6);
     const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
-    add(new THREE.CylinderGeometry(1.5, 1.7, 1.3, 6), foil, 0, 1.75, 0);
-    add(new THREE.CylinderGeometry(1, 1.5, .8, 6), hull, 0, 2.8, 0);
-    add(new THREE.ConeGeometry(.55, .7, 8), steel, 0, .95, 0).rotation.x = Math.PI;
-    add(new THREE.BoxGeometry(.8, .9, .1), dark, 0, 1.75, 1.47);
-    add(new THREE.CylinderGeometry(.05, .05, 1.2, 5), steel, .5, 3.7, 0);
-    add(new THREE.ConeGeometry(.5, .22, 8, 1, true), hull, .5, 4.35, 0).rotation.x = Math.PI;
-    const up = new THREE.Vector3(0, 1, 0);
+    const strut = (geo, mat, a, b) => {
+      const dir = b.clone().sub(a), m = add(geo(dir.length()), mat, 0, 0, 0);
+      m.position.copy(a).add(b).multiplyScalar(.5);
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+      return m;
+    };
+    g.userData.ready = loadGLB('parts/structures/crew-cabin.glb').then(hull => {
+      for (const n of ['Stowed_Back', 'Stowed_Front']) { const o = hull.getObjectByName(n); if (o) o.visible = false; }
+      const closed = hull.getObjectByName('Closed'); if (closed) closed.visible = true;
+      hull.traverse(o => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
+      hull.scale.setScalar(2.05);
+      hull.position.y = .65;
+      g.add(hull);
+    });
+    // Under-hull heatshield base, thermal collar & descent engine nozzle.
+    add(new THREE.CylinderGeometry(1.48, 1.32, .16, 12), dark, 0, 1.05, 0);
+    add(new THREE.CylinderGeometry(.36, .42, .18, 10), foil, 0, .98, 0);
+    add(new THREE.ConeGeometry(.58, .72, 10), nozzleMat, 0, .68, 0).rotation.x = Math.PI;
+    // Four deployed landing legs with primary telescopic struts, A-frame braces & hexagonal footpads.
     for (let k = 0; k < 4; k++) {
-      const a = Math.PI / 4 + k * Math.PI / 2, top = new THREE.Vector3(Math.sin(a) * 1.35, 1.5, Math.cos(a) * 1.35), foot = new THREE.Vector3(Math.sin(a) * 2.4, .08, Math.cos(a) * 2.4);
-      const dir = foot.clone().sub(top), leg = add(new THREE.CylinderGeometry(.07, .07, dir.length(), 5), steel, 0, 0, 0);
-      leg.position.copy(top).add(foot).multiplyScalar(.5); leg.quaternion.setFromUnitVectors(up, dir.normalize());
-      add(new THREE.CylinderGeometry(.3, .36, .1, 6), steel, foot.x, .05, foot.z);
+      const a = Math.PI / 4 + k * Math.PI / 2, sin = Math.sin(a), cos = Math.cos(a);
+      const top = new THREE.Vector3(sin * 1.50, 1.24, cos * 1.50);
+      const low = new THREE.Vector3(sin * 1.38, 1.02, cos * 1.38);
+      const foot = new THREE.Vector3(sin * 2.48, .08, cos * 2.48);
+      const mid = top.clone().add(foot).multiplyScalar(.5);
+      strut(len => new THREE.CylinderGeometry(.06, .07, len, 6), steel, top, foot);
+      strut(len => new THREE.CylinderGeometry(.045, .045, len, 5), titanium, low, mid);
+      add(new THREE.CylinderGeometry(.28, .34, .09, 6), steel, foot.x, .045, foot.z);
+    }
+    // Boarding ladder on +Z leading up to the crew hatch threshold.
+    add(new THREE.BoxGeometry(.56, .04, .22), titanium, 0, 2.06, 1.56);
+    for (const sx of [-.24, .24]) strut(len => new THREE.CylinderGeometry(.024, .024, len, 6), steel, new THREE.Vector3(sx, 2.06, 1.50), new THREE.Vector3(sx, .04, 2.18));
+    for (let i = 0; i < 7; i++) {
+      const t = (i + .6) / 7.2, y = 2.06 * (1 - t) + .04 * t, z = 1.50 * (1 - t) + 2.18 * t;
+      const rung = add(new THREE.CylinderGeometry(.016, .016, .48, 5), steel, 0, y, z);
+      rung.rotation.z = Math.PI / 2;
     }
     return g;
   }
@@ -709,8 +738,6 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     const haze = world.scene.fog.color;
     world.scene.fog = t.ring ? new THREE.FogExp2(haze, Math.sqrt(-Math.log(1 - HAZE_AT_EDGE)) / reach) : new THREE.Fog(haze, ...EDGE_FOG);
     world.camera.far = t.ring ? reach * 1.05 : NO_RING_FAR; world.camera.updateProjectionMatrix();
-    const lat = info.center.lat, lon = info.center.lon;
-    $s('surface-coords').textContent = `${Math.abs(lat).toFixed(2)}°${lat < 0 ? 'S' : 'N'} ${Math.abs(lon).toFixed(2)}°${lon < 0 ? 'W' : 'E'} · HiRISE terrain ${info.sizeM} m`;
   }
 
   function placeBlocks() {
@@ -752,12 +779,11 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     root.classList.remove('surface-fail');
     if (!world) world = initWorld();
     const info = ui.sites[site];
-    $s('surface-title').textContent = info?.name ?? site;
     if (!world) return fail('The 3D surface needs WebGL.');
     s.ready = false; s.site = site;
     showStart('Touchdown', `Loading ${info.name}…`, '');
     try {
-      const t = await fetchTerrain(site);
+      const [t] = await Promise.all([fetchTerrain(site), world.lander.userData.ready]);
       if (s.site !== site) return;
       setTerrain(t);
       world.lander.position.set(0, t.hf.at(0, 0), 0);
@@ -777,7 +803,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       s.yaw = Math.atan2(-(first.x - s.pos.x), -(first.z - s.pos.z)); s.bodyYaw = s.yaw + Math.PI;
       s.ready = true;
       startEl.hidden = true;
-      ui.toast(touch ? 'Left side to walk · right side to look.' : 'WASD to walk · drag to look · E to interact.');
+      ui.toast(touch ? 'Left side to walk · right side to look.' : 'Click to look · WASD to walk · E to interact.');
     } catch (err) {
       console.warn('Surface not shown:', err);
       fail(`Could not load the ${info?.name ?? site} terrain.`);
@@ -862,7 +888,8 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     $s('surface-compass-readout').textContent = `HDG ${String(Math.round(heading) % 360).padStart(3, '0')}°`;
   }
 
-  // Input: keyboard + mouse (pointer lock, or drag when the lock is not available), touch stick + look.
+  // Input: keyboard + mouse look (a click on the view captures the mouse, Esc frees it; drag only when the
+  // browser refuses the lock), touch stick + look.
   function bindInput(canvas) {
     const live = () => isActive('surface') && s.ready && !dlg.open;
     addEventListener('keydown', e => {
@@ -883,6 +910,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     let settle = false; // the first move after locking can carry a large jump (Chrome)
     document.addEventListener('pointerlockchange', () => {
       settle = true;
+      if (document.pointerLockElement === canvas) s.drag = null;
     });
     addEventListener('mousemove', e => {
       if (document.pointerLockElement === canvas) {
@@ -892,7 +920,11 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       }
       else if (s.drag) { turn(e.clientX - s.drag.x, e.clientY - s.drag.y, .004); s.drag = { x: e.clientX, y: e.clientY }; }
     });
-    canvas.addEventListener('mousedown', e => { if (document.pointerLockElement !== canvas) s.drag = { x: e.clientX, y: e.clientY }; });
+    canvas.addEventListener('mousedown', e => {
+      if (e.button !== 0 || document.pointerLockElement === canvas) return;
+      s.drag = { x: e.clientX, y: e.clientY };
+      if (!touch && live()) try { canvas.requestPointerLock()?.catch?.(() => {}); } catch { /* drag to look instead */ }
+    });
     addEventListener('mouseup', () => { s.drag = null; });
     const stickEl = $s('surface-stick');
     canvas.addEventListener('pointerdown', e => {
@@ -1184,6 +1216,8 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   function frame(now) {
     requestAnimationFrame(frame);
     const dt = Math.min(.1, (now - last) / 1000); last = now;
+    // Leaving the surface (timer, results) must give the mouse back.
+    if (world && document.pointerLockElement === world.renderer.domElement && !isActive('surface')) document.exitPointerLock();
     if (!world || !s.ready || !world.avatar || !isActive('surface') || !world.width) return;
     if (!dlg.open) step(dt);
     placeCamera();

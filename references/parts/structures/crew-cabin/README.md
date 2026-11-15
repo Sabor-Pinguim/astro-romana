@@ -12,9 +12,9 @@ status: game module (checked 2026-11)
 
 # Crew cabin
 
-The required top module: the pressurized cabin with **4 module slots** on two decks (`web/views.js` `CABIN_SLOTS`; modules from [cabin-equipment.md](../../cabin-equipment.md) at half scale), under a capsule cone, a docking ring and a launch abort tower. Real data on crew capsules (size, volume, crew) is in [crew-cabins.md](../../crew-cabins.md).
+The required top module: an enlarged hammerhead pressurized cabin + stowed Mars lander base with **4 module slots** on two decks (`web/views.js` `CABIN_SLOTS`; modules from [cabin-equipment.md](../../cabin-equipment.md) at 0.58× scale) above a flared Ø 1.00 m → Ø 1.44 m Spacecraft-LM Adapter (SLA) skirt, under a capsule cone, a docking ring and a launch abort tower. Real data on crew capsules (size, volume, crew) is in [crew-cabins.md](../../crew-cabins.md).
 
-**Two versions in one model:** the front half of the hull sits on the `Closed` node. The builder hides it (open cutaway: the crew sees the installed modules); the launch pad and other outside views show it (closed cabin, with the hatch and the windows). The middle stage module (`stage-module`) follows the same rule.
+**Three configurations in one model:** the front half of the cabin sits on the `Closed` node, while the rocket-stack-only SLA adapter skirt and folded landing legs sit on `Stowed_Back` and `Stowed_Front`. The builder hides `Closed` and `Stowed_Front` (open cutaway showing installed modules); the launch pad shows all nodes (closed rocket stack); and on the Mars surface (`makeLander()` in `web/views.js`), `Closed` stays visible while `Stowed_Back` and `Stowed_Front` are hidden and replaced by deployed landing legs, an under-hull heatshield and descent engine bell, and a boarding ladder leading up to the crew hatch. The middle stage module (`stage-module`) follows the same `Closed` rule.
 
 **Why tier 1:** there is one cabin; what changes is the equipment inside.
 
@@ -22,13 +22,13 @@ The required top module: the pressurized cabin with **4 module slots** on two de
 
 | Key | Value | Unit | Source | Note |
 |---|---|---|---|---|
-| `mass_dry` | 3000 | kg | game-balance | normalized cabin and abort tower, without modules |
+| `mass_dry` | 3000 | kg | game-balance | normalized enlarged cabin, stowed lander base and abort tower, without modules |
 | `cost_unit` | 12 | USD M (game) | game-balance | same scale as `tools/modeling/parts/specs.mjs` |
 | `power_electric` | 300 | W | game-balance | base life support |
-| `diameter` | 1.00 | m (normalized) | game-balance | same as the whole stack; real capsules: Orion 5.0 m, Crew Dragon 4.0 m ([crew-cabins.md](../../crew-cabins.md) §1) |
-| `height` | 2.15 | m (normalized) | game-balance | cabin 0.95 + cone 0.50 + docking ring 0.08 + tower 0.62 |
-| `cabin_cavity` | Ø 0.97 × 0.95 | m | model | modules ≤ 0.68 × 0.72 × 0.56 m at full scale ([cabin-equipment.md](../../cabin-equipment.md) §3.1) |
-| `attach_points` | `Attach_Bottom` (0, 0, 0), `Attach_Top` (0, 2.15, 0), `View_Window` (0, 1.15, 0.40) | m | model | `View_Window`: between the two front windows, where the launch camera flies in |
+| `diameter` | 1.44 | m (normalized) | game-balance | flared from Ø 1.00 m stage interface (`Ø 1.47 m` across folded lander footpads); real capsules: Orion 5.0 m, Crew Dragon 4.0 m ([crew-cabins.md](../../crew-cabins.md) §1) |
+| `height` | 2.82 | m (normalized) | game-balance | interface 0.04 + SLA adapter 0.20 + lander/cabin cylinder 1.14 + cone 0.70 + docking ring 0.10 + tower 0.64 |
+| `cabin_cavity` | Ø 1.40 × 1.14 | m | model | modules ≤ 0.70 × 0.74 × 0.60 m at 0.58× scale ([cabin-equipment.md](../../cabin-equipment.md) §3.1) |
+| `attach_points` | `Attach_Bottom` (0, 0, 0), `Attach_Top` (0, 2.82, 0), `View_Window` (0, 1.68, 0.54) | m | model | `View_Window`: between the two front windows, where the launch camera flies in |
 
 ## 2. Vehicle and stage data
 
@@ -38,11 +38,12 @@ Not applicable.
 
 | Dimension | Value (m) | Source | Note |
 |---|---|---|---|
-| Cabin cylinder | Ø 1.00 × 0.95 | game-balance | floor deck top at y = 0.03, upper deck top at y = 0.5 (the two slot rows) |
-| Capsule cone | Ø 1.00 → Ø 0.48 over 0.50 | game-balance | half angle ≈ 27.5° |
-| Docking ring | Ø 0.48 → Ø 0.32 × 0.08 | game-balance | |
-| Abort tower | 4 struts 0.30, motor Ø 0.14 × 0.20, 4 canted nozzles, nose cone 0.12 | game-balance | |
-| Windows | 2 × 0.08 × 0.07 on the cone, hatch 0.16 × 0.28 with a round window | game-balance | front (+Z), on the `Closed` node |
+| Lower interface & SLA adapter | Ø 1.00 × 0.04 ring + Ø 1.00 → Ø 1.44 over 0.20 | game-balance | flared adapter matching Ø 1.00 m stage stack below |
+| Stowed lander & cabin cylinder | Ø 1.44 × 1.14 | game-balance | black heatshield collar, gold thermal foil band, 4 folded landing legs + footpads on diagonals; lower deck top at y = 0.24 (with hex lander core plate), upper deck top at y = 0.80 |
+| Capsule cone | Ø 1.44 → Ø 0.60 over 0.70 | game-balance | half angle ≈ 31° |
+| Docking ring | Ø 0.60 → Ø 0.40 × 0.10 | game-balance | with gold-foil docking hatch cap |
+| Abort tower | 4 struts 0.30, motor Ø 0.17 × 0.24, 4 canted nozzles, nose cone 0.12 | game-balance | y = 2.18 .. 2.82 |
+| Windows & hatch | 2 × 0.11 × 0.095 (framed 0.14 × 0.12) on the cone at y = 1.68; hatch 0.22 × 0.36 at y = 0.88 with a round window | game-balance | front (+Z), on the `Closed` node |
 
 ## 4. Low-poly model
 
@@ -50,24 +51,26 @@ Generated by `tools/modeling/parts/structures.mjs` (`npm run models:build:parts 
 
 ### 4.1 Shape in words
 
-A white cylinder with a capsule cone on top. Open version: only the back half (toward −Z) with a dark inner wall, a gold-foil lining in the cone, aluminum floor and upper decks, steel frames on the cut edges and two black RCS blocks. Above: an aluminum docking ring and the abort tower (four steel struts, white motor, four black nozzles, black nose cone). Closed version adds the front half: shell, black base band, two RCS blocks, an aluminum hatch with a round window and a handle, and two framed windows on the cone, each on one facet.
+A Ø 1.00 m aluminum base ring flares via a conical white SLA adapter skirt out to an enlarged Ø 1.44 m cylinder carrying a stowed Mars lander lower bay (black heatshield collar, gold thermal foil band, four folded steel landing legs with hinged hexagonal footpads on the diagonals) beneath the crew cabin and capsule cone. Open version: back half (toward −Z) with dark inner walls, gold-foil lining in the cone, aluminum lower and upper decks with a hexagonal gold lander core plate, steel cutaway and stanchion frames, and the two aft folded legs and RCS thruster blocks. Above: an aluminum/gold docking ring and the abort tower (four steel struts, white motor, four black nozzles, black nose cone). Closed version adds the front half: SLA adapter, heatshield collar, gold foil band, cabin cylinder and cone, two forward folded legs and RCS blocks, an aluminum hatch with a round window and handle, and two framed forward windows on the cone.
 
 ### 4.2 Node hierarchy
 
 ```text
-CrewCabin                   origin: center of the cabin floor
-├─ Attach_Top               (0, 2.15, 0)
+CrewCabin                   origin: center of the Ø 1.00 m lower stage interface (y = 0)
+├─ Attach_Top               (0, 2.82, 0)
 ├─ Attach_Bottom            (0, 0, 0)
-├─ View_Window              (0, 1.15, 0.40)   facing out through the front windows
-└─ Closed                   front half: hidden in the builder, shown in outside views
+├─ View_Window              (0, 1.68, 0.54)   facing out through the front windows
+├─ Closed                   front half of capsule hull, hatch, windows and forward hinges/RCS: hidden in builder, shown on pad and Mars surface
+├─ Stowed_Back              back SLA adapter skirt & aft folded legs: shown in builder and on pad, hidden on Mars surface
+└─ Stowed_Front             front SLA adapter skirt & forward folded legs: hidden in builder and on Mars surface, shown on pad
 ```
 
 ### 4.6 Budget and checks
 
 | Check | Target |
 |---|---|
-| Triangles | ≤ 1400 (built: 792) |
-| Meshes | ≤ 12 (built: 9) |
+| Triangles | ≤ 1800 (built: 1280) |
+| Meshes | ≤ 20 (built: 19) |
 
 ## 5. Images
 

@@ -599,12 +599,9 @@
     .surface-view{position:relative;flex:1;overflow:hidden;background:#2a1220;touch-action:none;user-select:none;-webkit-user-select:none}
     .surface-view canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
     .surface-hud{position:absolute;z-index:2;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
-    .surface-site{padding:14px 20px 12px}
-    .surface-site h2{margin:.25rem 0 .1rem;font-size:clamp(1.05rem,2vw,1.5rem);color:var(--starlight-cream);text-transform:uppercase}
+    .surface-site{display:flex;align-items:center;gap:14px;padding:10px 12px 10px 18px}
+    .surface-site h2{margin:0}
     .surface-hud button{pointer-events:auto}
-    .surface-status{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
-    .surface-status .button{min-height:30px;padding:.4rem .75rem;--a:var(--f1);--b:var(--f1);--fg:var(--starlight-cream)}
-    #surface-rad-badge{text-transform:none} /* keeps µGy (uppercase turns µ into a Greek M) */
     .surface-inv-label{margin:10px 0 6px}
     .surface-inventory{display:flex;flex-wrap:wrap;gap:3px}
     .surface-inventory .inv-slot{flex:0 1 auto;min-width:0;padding:.3rem .5rem;font-size:.58rem}
@@ -711,7 +708,7 @@
       .rocket-stage small{display:none}
       .remove-stage{width:28px;font-size:.95rem}
       .surface-hud{top:10px;left:10px;right:10px;flex-direction:column;gap:6px}
-      .surface-site{padding:10px 14px 8px}
+      .surface-site{padding:8px 10px 8px 14px}
       .surface-goals{width:100%;padding:10px}
       .surface-compass{width:100%;max-width:none;flex:none}
       .surface-actions .label{display:none}

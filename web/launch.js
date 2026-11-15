@@ -6,6 +6,7 @@
 // off (lift.ok false) stays on the pad: nothing lights without a working engine; with thrust below its weight the
 // engines burn, the stack strains and the engines shut down. The screen then fades to the debrief.
 // window.ASTRO_LAUNCHPAD(lift) shows this screen and resolves when the cockpit (or the debrief) should start.
+// The same screen also shows a Δv abort ending in a splashdown (window.ASTRO_SPLASHDOWN, below).
 const THREE = await import('three');
 const screen = document.getElementById('launchpad'), host = document.getElementById('launchpad-view');
 const $id = id => document.getElementById(id);
@@ -165,6 +166,7 @@ window.ASTRO_LAUNCHPAD = (lift = { ok: true, accel: 1 }) => new Promise(async re
   const site = ui.sites?.[ui.state.site];
   $id('launchpad-title').textContent = `Mission: ${site?.mission ?? 'Mars'}`;
   $id('launchpad-fade').classList.remove('on'); $id('launchpad-count').style.opacity = ''; $id('launchpad-count').classList.remove('fail');
+  $id('launchpad-eyebrow').textContent = 'Launch pad · Earth';
   let done = false;
   const finish = () => { if (done) return; done = true; $id('launchpad-fade').classList.add('on'); setTimeout(resolve, reduce ? 0 : 350); };
   $id('launchpad-skip').onclick = finish;
@@ -237,6 +239,169 @@ window.ASTRO_LAUNCHPAD = (lift = { ok: true, accel: 1 }) => new Promise(async re
       if (k >= .9) $id('launchpad-fade').classList.add('on');
       if (k >= 1) finish();
     }
+    renderer.render(v.scene, camera);
+  }
+  requestAnimationFrame(frame);
+});
+// ---------------------------------------------------------------------------------------------------------------
+// Splashdown: a flight short of Δv aborts (abortOf in web/app.js). The crew cabin the players built, closed and without
+// its abort tower (jettisoned before the parachutes open), comes down under three main parachutes and splashes into the
+// sea; the screen then fades to the debrief. window.ASTRO_SPLASHDOWN(info) shows it and resolves when the debrief opens.
+// game: start height (model metres), seconds of steady descent to the water, seconds on screen after it, sway in degrees.
+const SPLASH = { from: 15, fall: 7, hold: 4, sway: 6 };
+// The abort tower is the thin part on top of the cabin: it starts above the highest vertex wider than TOWER_R
+// (the docking ring), found on the loaded model so a redesigned cabin keeps working.
+const TOWER_R = .15;
+function towerBaseOf(cab) {
+  cab.updateMatrixWorld(true);
+  const inv = cab.matrixWorld.clone().invert(), m = new THREE.Matrix4(), p = new THREE.Vector3();
+  let top = 0;
+  cab.traverse(o => {
+    if (!o.isMesh || !o.visible) return;
+    m.multiplyMatrices(inv, o.matrixWorld);
+    const a = o.geometry.attributes.position;
+    for (let i = 0; i < a.count; i++) { p.fromBufferAttribute(a, i).applyMatrix4(m); if (Math.hypot(p.x, p.z) > TOWER_R) top = Math.max(top, p.y); }
+  });
+  return top + .01;
+}
+const OCEAN = [0x123a6b, 0x1d5f9a, 0x2c86ba]; // ocean ramp of the 2D art (RAMPS.ocean in web/app.js)
+const GORES = [0xe04f26, 0xfce8a6]; // parachute gores: Mars orange and starlight cream
+const CANOPY = { r: 1.25, cap: Math.PI * .4, lines: 3.4, spread: 1.1, tilt: .32 };
+let seaView = null;
+const wave = (x, z, t) => .16 * Math.sin(x * .32 + t * 1.2) + .11 * Math.sin(z * .45 - t * .9) + .06 * Math.sin((x + z) * .8 + t * 2);
+// One flat colour per triangle (non-indexed geometry), picked by pick(face index, centroid).
+function faceColors(geo, pick) {
+  const p = geo.attributes.position, c = [], v = new THREE.Vector3();
+  for (let f = 0; f < p.count / 3; f++) {
+    v.set(0, 0, 0); for (let k = 0; k < 3; k++) v.add(new THREE.Vector3().fromBufferAttribute(p, f * 3 + k));
+    const col = new THREE.Color(pick(f, v.divideScalar(3))); for (let k = 0; k < 3; k++) c.push(col.r, col.g, col.b);
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
+  return geo;
+}
+
+function initSea() {
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(45, 1, .1, 2000);
+  // The same faceted daytime sky as the launch pad, over open water.
+  const sky = new THREE.IcosahedronGeometry(900, 2), sp = sky.attributes.position, c = [];
+  const low = new THREE.Color(0xc2d8e2), high = new THREE.Color(0x3976b6);
+  for (let k = 0; k < sp.count; k++) { const col = low.clone().lerp(high, Math.pow(Math.max(0, sp.getY(k) / 900), .45)); c.push(col.r, col.g, col.b); }
+  sky.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
+  scene.add(new THREE.Mesh(sky, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false })));
+  scene.fog = new THREE.Fog(0xb9d0d8, 40, 260);
+  scene.add(new THREE.HemisphereLight(0xe8f5ff, 0x6f9fc0, 1.3));
+  const sun = new THREE.DirectionalLight(0xfff4df, 2.2); sun.position.set(-40, 48, 30); scene.add(sun);
+  // Sunlight bounced off the water lights the undersides of the canopies, so the gores keep their colours.
+  const bounce = new THREE.DirectionalLight(0xfff0dd, 1.1); bounce.position.set(20, -30, 15); scene.add(bounce);
+  // Ocean: a faceted grid, one flat colour per face; the waves move its vertices every frame.
+  const oceanGeo = faceColors(new THREE.PlaneGeometry(240, 240, 40, 40).rotateX(-Math.PI / 2).toNonIndexed(), f => OCEAN[(f * 7 + (f >> 4)) % 3]);
+  const ocean = new THREE.Mesh(oceanGeo, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .5, metalness: .1 }));
+  const base = Float32Array.from(oceanGeo.attributes.position.array);
+  scene.add(ocean);
+  // The craft: the capsule (added on each splashdown) and, above its docking ring, three canopies on their risers.
+  const craft = new THREE.Group(), chutes = new THREE.Group(), canopies = [];
+  craft.add(chutes); scene.add(craft);
+  for (let i = 0; i < 3; i++) {
+    const geo = new THREE.SphereGeometry(CANOPY.r, 10, 3, 0, Math.PI * 2, 0, CANOPY.cap).toNonIndexed();
+    geo.translate(0, -CANOPY.r * Math.cos(CANOPY.cap), 0); // rim at y = 0
+    faceColors(geo, (f, mid) => GORES[Math.floor((Math.atan2(mid.z, mid.x) + Math.PI) / (Math.PI / 5)) % 2]);
+    const canopy = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .8, side: THREE.DoubleSide }));
+    const a = i * Math.PI * 2 / 3 + .4;
+    canopy.userData.at = new THREE.Vector3(Math.sin(a) * CANOPY.spread, CANOPY.lines, Math.cos(a) * CANOPY.spread);
+    canopy.rotation.set(Math.cos(a) * CANOPY.tilt, 0, -Math.sin(a) * CANOPY.tilt);
+    chutes.add(canopy); canopies.push(canopy);
+  }
+  // Risers: four per canopy, from the docking ring to the canopy rim (rebuilt every frame as the canopies open).
+  const lineGeo = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(3 * 4 * 2 * 3), 3));
+  const lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0xfce8a6, transparent: true, opacity: .85 }));
+  chutes.add(lines);
+  // Splash: faceted foam puffs thrown out around the capsule.
+  const foam = Array.from({ length: 16 }, (_, i) => {
+    const m = new THREE.Mesh(new THREE.IcosahedronGeometry(.3, 0), new THREE.MeshStandardMaterial({ color: 0xfff6dc, roughness: 1, flatShading: true, transparent: true, opacity: 0 }));
+    m.userData.a = i * 2.4; m.userData.k = .6 + (i % 4) * .25; scene.add(m); return m;
+  });
+  const clip = new THREE.Plane();
+  return { scene, camera, ocean, base, craft, chutes, canopies, lines, foam, clip, cabin: null, towerY: 1 };
+}
+
+window.ASTRO_SPLASHDOWN = (info = {}) => new Promise(async resolve => {
+  ui.show('launchpad');
+  const site = ui.sites?.[ui.state.site], count = $id('launchpad-count');
+  $id('launchpad-title').textContent = `Mission: ${site?.mission ?? 'Mars'}`;
+  $id('launchpad-eyebrow').textContent = 'Abort · ocean recovery';
+  $id('launchpad-status').textContent = info.status ?? 'Abort';
+  $id('launchpad-fade').classList.remove('on'); count.style.opacity = ''; count.classList.add('fail'); count.textContent = 'ABORT';
+  let done = false;
+  const finish = () => { if (done) return; done = true; $id('launchpad-fade').classList.add('on'); setTimeout(resolve, reduce ? 0 : 350); };
+  $id('launchpad-skip').onclick = finish;
+  const onKey = e => { if (e.code === 'Escape') finish(); };
+  addEventListener('keydown', onKey, { once: true });
+  const end = SPLASH.fall + SPLASH.hold;
+  if (!renderer || !window.ASTRO_BUILD_ROCKET) { // no 3D: the texts alone
+    const t0 = performance.now();
+    const tick = () => { if (done) return; const t = (performance.now() - t0) / 1000; if (t >= SPLASH.fall) count.textContent = 'SPLASHDOWN'; if (t >= end) finish(); else requestAnimationFrame(tick); };
+    tick(); return;
+  }
+  seaView ||= initSea();
+  const v = seaView, { camera } = v;
+  if (!renderer.domElement.parentNode) { renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); host.prepend(renderer.domElement); }
+  renderer.localClippingEnabled = true;
+  // The configured cabin: the top module of the stack the crew built (views.js), closed. Its materials are cloned so the
+  // clipping plane that removes the abort tower only touches this copy.
+  const stackGroup = await window.ASTRO_BUILD_ROCKET(), cab = stackGroup.children[stackGroup.children.length - 1];
+  if (v.cabin) v.craft.remove(v.cabin);
+  cab.position.set(0, 0, 0); v.craft.position.set(0, 0, 0); v.craft.rotation.set(0, 0, 0); v.craft.add(cab); v.cabin = cab; v.towerY = towerBaseOf(cab);
+  cab.traverse(o => { if (o.isMesh) { o.material = Array.isArray(o.material) ? o.material.map(m => m.clone()) : o.material.clone(); [].concat(o.material).forEach(m => { m.clippingPlanes = [v.clip]; }); } });
+  v.chutes.position.set(0, v.towerY, 0); v.chutes.rotation.set(0, 0, 0); v.lines.visible = true;
+  const up = new THREE.Vector3(), top = new THREE.Vector3(), rim = new THREE.Vector3(), look = new THREE.Vector3();
+  const pos = v.ocean.geometry.attributes.position, linePos = v.lines.geometry.attributes.position;
+  let t = reduce ? SPLASH.fall - 1 : 0, last = performance.now(), size = '';
+  function frame(now) {
+    if (done || !screen.classList.contains('active')) return;
+    requestAnimationFrame(frame);
+    const dt = Math.min(.1, Math.max(0, (now - last) / 1000)); last = now; t += dt;
+    if (window.ASTRO_LAUNCH_JUMP != null) { t = window.ASTRO_LAUNCH_JUMP; window.ASTRO_LAUNCH_JUMP = null; } // tests: jump in time
+    const w = host.clientWidth, h = host.clientHeight;
+    if (w && h && size !== `${w}x${h}`) { size = `${w}x${h}`; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+    const wt = reduce ? 0 : t, fall = Math.min(1, t / SPLASH.fall), after = Math.max(0, t - SPLASH.fall), splashed = t >= SPLASH.fall;
+    for (let i = 0; i < pos.count; i++) pos.setY(i, wave(v.base[i * 3], v.base[i * 3 + 2], wt));
+    pos.needsUpdate = true; v.ocean.geometry.computeVertexNormals();
+    // Steady descent under the canopies, swinging a little; afloat after the splash, riding the waves.
+    const water = wave(0, 0, wt) - .22, sway = reduce ? 0 : SPLASH.sway * Math.PI / 180;
+    v.craft.position.y = splashed ? water : SPLASH.from + (water - SPLASH.from) * fall;
+    v.craft.rotation.z = Math.sin(t * 1.25) * sway * (splashed ? .4 : 1);
+    v.craft.rotation.x = Math.sin(t * .9 + 1) * sway * .5 * (splashed ? .4 : 1);
+    // Canopies inflate in the first second; after the splash they come off, fall to the side and settle on the water.
+    const k = Math.min(1, t / .9), open = k < 1 ? .2 + .8 * (1 - (1 - k) * (1 - k)) : 1;
+    v.canopies.forEach(c => { c.position.copy(c.userData.at); c.scale.set(open, splashed ? Math.max(.12, 1 - after * .8) : .6 + .4 * k, open); });
+    v.chutes.position.y = splashed ? v.towerY - Math.min(v.towerY + 1.6, after * 2.4) : v.towerY;
+    v.chutes.rotation.z = splashed ? Math.min(1.25, after * 1.1) : 0;
+    v.lines.visible = !splashed;
+    if (!splashed) {
+      let n = 0;
+      v.canopies.forEach(c => { c.updateMatrix(); for (let q = 0; q < 4; q++) {
+        const a = q * Math.PI / 2 + .3; rim.set(Math.cos(a) * CANOPY.r * Math.sin(CANOPY.cap), 0, Math.sin(a) * CANOPY.r * Math.sin(CANOPY.cap)).applyMatrix4(c.matrix);
+        linePos.setXYZ(n++, 0, 0, 0); linePos.setXYZ(n++, rim.x, rim.y, rim.z);
+      } });
+      linePos.needsUpdate = true;
+    }
+    v.foam.forEach(m => {
+      const r = .5 + after * 1.7 * m.userData.k;
+      m.position.set(Math.cos(m.userData.a) * r, water + .3 + Math.sin(Math.min(Math.PI, after * 2.2)) * .6 * m.userData.k, Math.sin(m.userData.a) * r);
+      const size = .4 + after * .3; m.scale.set(size, size * .55, size); m.material.opacity = splashed ? Math.max(0, .9 - after * .3) : 0;
+    });
+    // Abort tower clipped: keep what lies below the docking ring, along the capsule's own axis.
+    v.craft.updateMatrixWorld(true);
+    up.set(0, 1, 0).applyQuaternion(cab.getWorldQuaternion(new THREE.Quaternion()));
+    cab.localToWorld(top.set(0, v.towerY, 0));
+    v.clip.setFromNormalAndCoplanarPoint(up.negate(), top);
+    count.textContent = splashed ? 'SPLASHDOWN' : 'ABORT';
+    // Camera: follows the capsule down with the canopies in frame, then settles low over the water.
+    const a = .7 + t * .05, dist = (splashed ? 7 : 9) / Math.min(1, camera.aspect * 1.4); // narrow screens: step back
+    look.set(0, splashed ? .4 : v.craft.position.y + 2.4, 0);
+    camera.position.set(Math.sin(a) * dist, splashed ? 1.3 : Math.max(1.3, v.craft.position.y + .6), Math.cos(a) * dist);
+    camera.lookAt(look);
+    if (t >= end) finish();
     renderer.render(v.scene, camera);
   }
   requestAnimationFrame(frame);

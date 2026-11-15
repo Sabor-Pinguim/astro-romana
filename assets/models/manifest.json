@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T18:09:38.798Z",
+  "generatedAt": "2026-11-15T22:32:57.287Z",
   "generator": "tools/modeling/build-avatars.mjs",
   "conventions": {
     "units": "meters",
@@ -596,10 +596,11 @@
     "marsTransferDeltaVMs": 4300,
     "minSafeLiftoffTwr": 1.2,
     "minBareLiftoffTwr": 1,
+    "minUpperStageTwr": 0.3,
     "maxInternalStages": 7,
     "cabinModuleSlots": 4,
     "mandatoryOrbitalRefuelingForMars": true,
-    "note": "g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5."
+    "note": "g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5. minUpperStageTwr: vacuum thrust-to-weight an upper stage needs at ignition to keep climbing (game-balance, est. from Centaur-class upper stages at ~0.3–0.4)."
   },
   "parts": [
     {
@@ -3761,22 +3762,22 @@
       "nodeName": "CrewCabin",
       "category": "structures",
       "tier": 1,
-      "vehicle": "Crew cabin (required top)",
-      "role": "Pressurized cabin with 4 module slots under a launch abort tower; the front half (node Closed) closes it",
+      "vehicle": "Crew cabin & stowed Mars lander (required top)",
+      "role": "Enlarged pressurized cabin (4 module slots) and stowed Mars lander base over a flared SLA adapter; the front half (node Closed) closes it",
       "file": "parts/structures/crew-cabin.glb",
-      "summary": "White cylinder and capsule cone cut open to the front, dark inner wall, two aluminum decks, a gold-foil upper bulkhead, a docking ring and a launch abort tower; the Closed node adds the front half with the hatch and two windows.",
-      "originNote": "Center of the cabin floor (y = 0); the cutaway opening faces +Z",
+      "summary": "Flared Ø 1.00 m to Ø 1.44 m SLA adapter carrying a wider white-and-gold Mars lander & crew capsule with four folded landing legs, dark inner walls, two aluminum decks, a gold-foil upper bulkhead, docking ring and launch abort tower; the Closed node adds the front half with hatch and forward windows.",
+      "originNote": "Center of the Ø 1.00 m lower stage interface (y = 0); the cutaway opening faces +Z",
       "requiredNodes": [
         "Attach_Top",
         "Attach_Bottom"
       ],
       "fx": [],
       "dimensions": {
-        "width": 1.01,
-        "height": 2.15,
-        "depth": 1.018,
+        "width": 1.47,
+        "height": 2.82,
+        "depth": 1.47,
         "minY": 0,
-        "maxY": 2.15
+        "maxY": 2.82
       },
       "specs": {
         "massDryKg": 3000,
@@ -3791,13 +3792,13 @@
         }
       },
       "budget": {
-        "triangles": 1400,
-        "meshes": 12
+        "triangles": 1800,
+        "meshes": 20
       },
       "stats": {
-        "triangles": 792,
-        "meshes": 9,
-        "bytes": 64008
+        "triangles": 1280,
+        "meshes": 19,
+        "bytes": 106052
       },
       "references": [
         "references/parts/structures/crew-cabin/README.md"

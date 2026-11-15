@@ -113,14 +113,15 @@ const stageModule = {
   },
 };
 
-// Crew cabin: pressurized bay (4 module slots on two decks, see web/views.js CABIN_SLOTS) under a capsule
-// cone, a docking ring and a launch abort tower. Shape after the Apollo CM + LES and Orion + LAS
-// (references/parts/structures/crew-cabin/README.md); sizes normalized to the Ø 1.00 m stack.
-const CONE = { y0: 0.95, y1: 1.45, r0: 0.5, r1: 0.24 }; // capsule cone (half angle ≈ 27.5°)
+// Crew cabin: enlarged hammerhead upper capsule with stowed Mars lander base & folded landing legs
+// above a flared Ø 1.00 m -> Ø 1.44 m SLA adapter skirt (references/parts/structures/crew-cabin/README.md).
+const R_BASE = 0.50;
+const R_CAB = 0.72;
+const CONE = { y0: 1.38, y1: 2.08, r0: R_CAB, r1: 0.30 }; // capsule cone (half angle ≈ 31°)
 const coneR = (y) => CONE.r0 + (CONE.r1 - CONE.r0) * (y - CONE.y0) / (CONE.y1 - CONE.y0);
 const CONE_TILT = Math.atan((CONE.r0 - CONE.r1) / (CONE.y1 - CONE.y0)) / DEG;
-const WINDOW_Y = 1.15;
-const TOP = 2.15;
+const WINDOW_Y = 1.68;
+const TOP = 2.82;
 
 const crewCabin = {
   id: 'crew-cabin',
@@ -128,10 +129,10 @@ const crewCabin = {
   tier: 1,
   name: 'CrewCabin',
   displayName: 'Crew Cabin',
-  vehicle: 'Crew cabin (required top)',
-  role: 'Pressurized cabin with 4 module slots under a launch abort tower; the front half (node Closed) closes it',
-  summary: 'White cylinder and capsule cone cut open to the front, dark inner wall, two aluminum decks, a gold-foil upper bulkhead, a docking ring and a launch abort tower; the Closed node adds the front half with the hatch and two windows.',
-  originNote: 'Center of the cabin floor (y = 0); the cutaway opening faces +Z',
+  vehicle: 'Crew cabin & stowed Mars lander (required top)',
+  role: 'Enlarged pressurized cabin (4 module slots) and stowed Mars lander base over a flared SLA adapter; the front half (node Closed) closes it',
+  summary: 'Flared Ø 1.00 m to Ø 1.44 m SLA adapter carrying a wider white-and-gold Mars lander & crew capsule with four folded landing legs, dark inner walls, two aluminum decks, a gold-foil upper bulkhead, docking ring and launch abort tower; the Closed node adds the front half with hatch and forward windows.',
+  originNote: 'Center of the Ø 1.00 m lower stage interface (y = 0); the cutaway opening faces +Z',
   references: ['references/parts/structures/crew-cabin/README.md'],
   build() {
     const p = createPartBuilder({
@@ -149,52 +150,71 @@ const crewCabin = {
       attachBottom: [0, 0, 0],
       // Between the two forward windows, facing out: where the launch camera flies in.
       extraAnchors: [{ name: 'View_Window', pos: [0, WINDOW_Y, coneR(WINDOW_Y)], rot: [-CONE_TILT, 0, 0] }],
-      pivots: [{ name: 'Closed' }],
-      budget: { triangles: 1400, meshes: 12 },
+      pivots: [{ name: 'Closed' }, { name: 'Stowed_Back' }, { name: 'Stowed_Front' }],
+      budget: { triangles: 1800, meshes: 20 },
     });
-    // Open version (always shown): back half of the shell, inner walls, decks and the tower.
-    p.add('Root', 'Hull', cylArc(0.5, 0.5, 0.95, 12, ...BACK_HALF), { p: [0, 0.475, 0] })
-      .add('Root', 'HullBlack', inward(cylArc(0.485, 0.485, 0.95, 12, ...BACK_HALF)), { p: [0, 0.475, 0] })
-      .add('Root', 'Hull', cylArc(CONE.r1, CONE.r0, CONE.y1 - CONE.y0, 12, ...BACK_HALF), { p: [0, 1.2, 0] })
-      .add('Root', 'FoilGold', inward(cylArc(CONE.r1 - 0.015, CONE.r0 - 0.015, CONE.y1 - CONE.y0, 12, ...BACK_HALF)), { p: [0, 1.2, 0] })
-      .add('Root', 'HullBlack', cylArc(0.505, 0.505, 0.06, 12, ...BACK_HALF), { p: [0, 0.03, 0] })
-      .add('Root', 'Aluminum', cyl(0.5, 0.5, 0.03, 12), { p: [0, 0.015, 0] }) // floor deck, top at y = 0.03
-      .add('Root', 'Aluminum', cyl(0.46, 0.46, 0.03, 12), { p: [0, 0.485, 0] }) // upper deck, top at y = 0.5
-      .add('Root', 'Aluminum', flatRing(0.48, 0.42, 0.03, 12), { p: [0, CONE.y0, 0] }) // stays inside the cone
-      .add('Root', 'Steel', box(0.03, 0.95, 0.03), { p: [0.488, 0.475, 0] })
-      .add('Root', 'Steel', box(0.03, 0.95, 0.03), { p: [-0.488, 0.475, 0] })
-      .add('Root', 'Aluminum', cyl(0.16, CONE.r1, 0.08, 10), { p: [0, CONE.y1 + 0.04, 0] }); // docking ring
+    // Flared SLA adapter skirt (Ø 1.00 m -> Ø 1.44 m) & lower interface ring (rocket stack only; shed before landing).
+    p.add('Stowed_Back', 'Aluminum', cyl(R_BASE, R_BASE, 0.04, 12), { p: [0, 0.02, 0] })
+      .add('Stowed_Back', 'Hull', cylArc(R_CAB, R_BASE, 0.20, 12, ...BACK_HALF), { p: [0, 0.14, 0] })
+      .add('Stowed_Back', 'HullBlack', inward(cylArc(R_CAB - 0.015, R_BASE - 0.015, 0.20, 12, ...BACK_HALF)), { p: [0, 0.14, 0] })
+      .add('Stowed_Back', 'HullBlack', cylArc(0.54, 0.506, 0.04, 12, ...BACK_HALF), { p: [0, 0.05, 0] });
+    // Stowed Mars lander base collar & gold thermal foil lower bay band.
+    p.add('Root', 'HullBlack', cylArc(R_CAB + 0.015, R_CAB + 0.015, 0.07, 12, ...BACK_HALF), { p: [0, 0.26, 0] })
+      .add('Root', 'FoilGold', cylArc(R_CAB + 0.006, R_CAB + 0.006, 0.28, 12, ...BACK_HALF), { p: [0, 0.44, 0] });
+    // Open version: enlarged cylinder, dark inner wall, capsule cone, decks and cutaway frames.
+    p.add('Root', 'Hull', cylArc(R_CAB, R_CAB, 1.14, 12, ...BACK_HALF), { p: [0, 0.81, 0] })
+      .add('Root', 'HullBlack', inward(cylArc(R_CAB - 0.018, R_CAB - 0.018, 1.14, 12, ...BACK_HALF)), { p: [0, 0.81, 0] })
+      .add('Root', 'Hull', cylArc(CONE.r1, CONE.r0, CONE.y1 - CONE.y0, 12, ...BACK_HALF), { p: [0, 1.73, 0] })
+      .add('Root', 'FoilGold', inward(cylArc(CONE.r1 - 0.018, CONE.r0 - 0.018, CONE.y1 - CONE.y0, 12, ...BACK_HALF)), { p: [0, 1.73, 0] })
+      .add('Root', 'Aluminum', cyl(R_CAB - 0.01, R_CAB - 0.04, 0.035, 12), { p: [0, 0.2225, 0] }) // lower deck, top at y = 0.24
+      .add('Root', 'FoilGold', cyl(0.32, 0.36, 0.02, 6), { p: [0, 0.245, 0] }) // hexagonal lander core plate
+      .add('Root', 'Aluminum', cyl(R_CAB - 0.03, R_CAB - 0.03, 0.035, 12), { p: [0, 0.7825, 0] }) // upper deck, top at y = 0.80
+      .add('Root', 'Aluminum', flatRing(R_CAB - 0.02, R_CAB - 0.10, 0.035, 12), { p: [0, CONE.y0, 0] }) // upper cone ring
+      .add('Root', 'Steel', box(0.035, 1.14, 0.035), { p: [R_CAB - 0.015, 0.81, 0] })
+      .add('Root', 'Steel', box(0.035, 1.14, 0.035), { p: [-(R_CAB - 0.015), 0.81, 0] })
+      .add('Root', 'Steel', box(0.03, 1.12, 0.03), { p: [0.26, 0.80, -0.58] })
+      .add('Root', 'Steel', box(0.03, 1.12, 0.03), { p: [-0.26, 0.80, -0.58] })
+      .add('Root', 'Aluminum', cyl(0.20, CONE.r1, 0.10, 10), { p: [0, CONE.y1 + 0.05, 0] }) // docking ring
+      .add('Root', 'FoilGold', cyl(0.16, 0.16, 0.02, 8), { p: [0, CONE.y1 + 0.105, 0] }); // docking hatch cap
     // Launch abort tower: four leaning struts, the abort motor with four canted nozzles, the nose cone.
-    const strutY = [CONE.y1 + 0.08, 1.83];
-    const lean = Math.atan(0.05 / (strutY[1] - strutY[0])) / DEG;
+    const strutY = [CONE.y1 + 0.10, 2.46];
+    const lean = Math.atan(0.075 / (strutY[1] - strutY[0])) / DEG;
     for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-      p.add('Root', 'Steel', box(0.02, strutY[1] - strutY[0] + 0.02, 0.02), {
-        p: [sx * 0.067, (strutY[0] + strutY[1]) / 2, sz * 0.067], r: [-sz * lean, 0, sx * lean],
+      p.add('Root', 'Steel', box(0.024, strutY[1] - strutY[0] + 0.02, 0.024), {
+        p: [sx * 0.085, (strutY[0] + strutY[1]) / 2, sz * 0.085], r: [-sz * lean, 0, sx * lean],
       });
     }
-    p.add('Root', 'Hull', cyl(0.07, 0.07, 0.2, 8), { p: [0, 1.93, 0] })
-      .add('Root', 'HullBlack', cyl(0, 0.07, TOP - 2.03, 8), { p: [0, (TOP + 2.03) / 2, 0] });
-    for (const [x, z, r] of [[0.075, 0, [0, 0, 35]], [-0.075, 0, [0, 0, -35]], [0, 0.075, [-35, 0, 0]], [0, -0.075, [35, 0, 0]]]) {
-      p.add('Root', 'HullBlack', cyl(0.02, 0.032, 0.05, 6), { p: [x, 1.85, z], r });
+    p.add('Root', 'Hull', cyl(0.085, 0.085, 0.24, 8), { p: [0, 2.58, 0] })
+      .add('Root', 'HullBlack', cyl(0, 0.085, TOP - 2.70, 8), { p: [0, (TOP + 2.70) / 2, 0] });
+    for (const [x, z, r] of [[0.09, 0, [0, 0, 35]], [-0.09, 0, [0, 0, -35]], [0, 0.09, [-35, 0, 0]], [0, -0.09, [35, 0, 0]]]) {
+      p.add('Root', 'HullBlack', cyl(0.024, 0.038, 0.06, 6), { p: [x, 2.48, z], r });
     }
-    // RCS thruster quads on the diagonals: the two at the back stay, the two at the front close with the hull.
+    // Folded Mars lander landing legs (stowed nodes hidden once landed on Mars) & upper RCS thruster quads.
     for (const deg of [45, 135, 225, 315]) {
-      const a = deg * DEG, front = Math.cos(a) > 0;
-      p.add(front ? 'Closed' : 'Root', 'HullBlack', box(0.07, 0.09, 0.04), { p: [Math.sin(a) * 0.51, 0.8, Math.cos(a) * 0.51], r: [0, deg, 0] });
+      const a = deg * DEG, front = Math.cos(a) > 0, target = front ? 'Closed' : 'Root', stowedTarget = front ? 'Stowed_Front' : 'Stowed_Back';
+      const sin = Math.sin(a), cos = Math.cos(a);
+      p.add(stowedTarget, 'Steel', box(0.045, 0.56, 0.055), { p: [sin * (R_CAB + 0.035), 0.54, cos * (R_CAB + 0.035)], r: [0, deg, 0] })
+        .add(target, 'Titanium', box(0.08, 0.07, 0.07), { p: [sin * (R_CAB + 0.03), 0.28, cos * (R_CAB + 0.03)], r: [0, deg, 0] })
+        .add(stowedTarget, 'Steel', cyl(0.13, 0.11, 0.025, 6).rotateX(Math.PI / 2), { p: [sin * (R_CAB + 0.065), 0.83, cos * (R_CAB + 0.065)], r: [0, deg, 0] })
+        .add(target, 'HullBlack', box(0.085, 0.11, 0.05), { p: [sin * (R_CAB + 0.015), 1.22, cos * (R_CAB + 0.015)], r: [0, deg, 0] });
     }
-    // Closed version: the front half of the shell, the hatch with its window and two forward windows.
-    p.add('Closed', 'Hull', cylArc(0.5, 0.5, 0.95, 12, ...FRONT_HALF), { p: [0, 0.475, 0] })
-      .add('Closed', 'Hull', cylArc(CONE.r1, CONE.r0, CONE.y1 - CONE.y0, 12, ...FRONT_HALF), { p: [0, 1.2, 0] })
-      .add('Closed', 'HullBlack', cylArc(0.505, 0.505, 0.06, 12, ...FRONT_HALF), { p: [0, 0.03, 0] })
-      .add('Closed', 'Aluminum', box(0.16, 0.28, 0.012), { p: [0, 0.44, 0.497] })
-      .add('Closed', 'Visor', cyl(0.035, 0.035, 0.01, 8), { p: [0, 0.5, 0.505], r: [90, 0, 0] })
-      .add('Closed', 'HullBlack', box(0.07, 0.014, 0.012), { p: [0, 0.37, 0.507] });
+    // Front SLA adapter flare (only shown when Rocket Stack is Closed; hidden in Builder and on Mars).
+    p.add('Stowed_Front', 'Hull', cylArc(R_CAB, R_BASE, 0.20, 12, ...FRONT_HALF), { p: [0, 0.14, 0] })
+      .add('Stowed_Front', 'HullBlack', cylArc(0.54, 0.506, 0.04, 12, ...FRONT_HALF), { p: [0, 0.05, 0] });
+    // Closed version: front half of lander lower bay, cabin shell, hatch and two forward windows.
+    p.add('Closed', 'HullBlack', cylArc(R_CAB + 0.015, R_CAB + 0.015, 0.07, 12, ...FRONT_HALF), { p: [0, 0.26, 0] })
+      .add('Closed', 'FoilGold', cylArc(R_CAB + 0.006, R_CAB + 0.006, 0.28, 12, ...FRONT_HALF), { p: [0, 0.44, 0] })
+      .add('Closed', 'Hull', cylArc(R_CAB, R_CAB, 1.14, 12, ...FRONT_HALF), { p: [0, 0.81, 0] })
+      .add('Closed', 'Hull', cylArc(CONE.r1, CONE.r0, CONE.y1 - CONE.y0, 12, ...FRONT_HALF), { p: [0, 1.73, 0] })
+      .add('Closed', 'Aluminum', box(0.22, 0.36, 0.016), { p: [0, 0.88, R_CAB - 0.002] })
+      .add('Closed', 'Visor', cyl(0.048, 0.048, 0.012, 8), { p: [0, 0.95, R_CAB + 0.006], r: [90, 0, 0] })
+      .add('Closed', 'HullBlack', box(0.09, 0.018, 0.014), { p: [0, 0.78, R_CAB + 0.008] });
     // Each window sits on one cone facet (12 per half: 15° each), centred 7.5° off the front.
     for (const side of [-1, 1]) {
       const a = side * 7.5 * DEG, d = coneR(WINDOW_Y) * Math.cos(7.5 * DEG);
       const at = (out) => [Math.sin(a) * (d + out), WINDOW_Y, Math.cos(a) * (d + out)];
-      p.add('Closed', 'Aluminum', box(0.1, 0.09, 0.008), { p: at(0.002), r: [-CONE_TILT, side * 7.5, 0] })
-        .add('Closed', 'Visor', box(0.08, 0.07, 0.008), { p: at(0.005), r: [-CONE_TILT, side * 7.5, 0] });
+      p.add('Closed', 'Aluminum', box(0.14, 0.12, 0.01), { p: at(0.003), r: [-CONE_TILT, side * 7.5, 0] })
+        .add('Closed', 'Visor', box(0.11, 0.095, 0.01), { p: at(0.007), r: [-CONE_TILT, side * 7.5, 0] });
     }
     return p;
   },
