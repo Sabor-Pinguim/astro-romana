@@ -1,5 +1,5 @@
 // Renders the radiation soundscape from real Curiosity RAD dose-rate data
-// (references/datasets/msl-rad/) into godot/assets/audio/:
+// (references/datasets/msl-rad/) into assets/audio/:
 //
 //   rad_surface_bed.wav        seamless loop: 4 quiet sols on the surface of Gale crater
 //   rad_storm_2024_05_20.wav   one-shot: the 20 May 2024 solar particle event, 48 h in 32 s
@@ -19,7 +19,7 @@ import { SOL_SECONDS, gaussianSmooth, isoUtc, loadRadCsv, median, percentile, sa
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA_DIR = path.join(ROOT, 'references/datasets/msl-rad');
-const OUT_DIR = path.join(ROOT, 'godot/assets/audio');
+const OUT_DIR = path.join(ROOT, 'assets/audio');
 const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
 
 const ROOT_MIDI = 38; // D2: every stem shares the key so they layer cleanly

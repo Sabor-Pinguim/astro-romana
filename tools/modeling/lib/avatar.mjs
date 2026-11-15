@@ -69,7 +69,7 @@ export function createAvatar({ id, accent, visor = 'Visor' }) {
     restPositions: Object.fromEntries(RIG.map((j) => [j.name, new THREE.Vector3(...j.pos)])),
     fx: [],
     part: (pivot) => parts[pivot],
-    /** Empty node used as a particle emitter in the viewer and in Godot. Emits along its local +Y. */
+    /** Empty node used as a particle emitter in the viewer and in the game. Emits along its local +Y. */
     anchor(name, pivot, { p = [0, 0, 0], r = [0, 0, 0] } = {}, fx = null) {
       if (!name.startsWith('FX_')) throw new Error(`FX anchors must start with "FX_": ${name}`);
       const node = new THREE.Object3D();

@@ -1,11 +1,11 @@
 // Builds the low-poly celestial bodies (planets, moons) as GLB files from the real global
 // data in references/datasets/, and updates the `bodies` section of
-// godot/assets/models/manifest.json.
+// assets/models/manifest.json.
 //
 //   npm run models:build:bodies            # all bodies
 //   npm run models:build:bodies -- earth   # only selected bodies
 //
-// Output: godot/assets/models/bodies/<id>.glb
+// Output: assets/models/bodies/<id>.glb
 // The build reads only committed files (no network) and is deterministic.
 import './lib/node-polyfills.mjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -16,7 +16,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import allBodies from './bodies/index.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const MODELS_DIR = path.join(ROOT, 'godot/assets/models');
+const MODELS_DIR = path.join(ROOT, 'assets/models');
 const MANIFEST = path.join(MODELS_DIR, 'manifest.json');
 
 const BODY_CONVENTIONS = {

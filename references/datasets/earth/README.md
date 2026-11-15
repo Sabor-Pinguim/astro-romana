@@ -1,6 +1,6 @@
 # Earth global grids (land cover, relief, sea ice)
 
-Global 0.25° grids that drive the low-poly Earth (`tools/modeling/bodies/earth.mjs`, output in `godot/assets/models/bodies/earth.glb`). The generator reads only these files. `npm run models:fetch:bodies` downloads them again (dataset list in `tools/modeling/bodies/earth-datasets.mjs`).
+Global 0.25° grids that drive the low-poly Earth (`tools/modeling/bodies/earth.mjs`, output in `assets/models/bodies/earth.glb`). The generator reads only these files. `npm run models:fetch:bodies` downloads them again (dataset list in `tools/modeling/bodies/earth-datasets.mjs`).
 
 ## Sources
 

@@ -1,4 +1,4 @@
-// Validates the generated audio listed in godot/assets/audio/manifest.json:
+// Validates the generated audio listed in assets/audio/manifest.json:
 // WAV format, sizes, levels, seamless loops, clean one-shot edges and the
 // storm's dose envelope.
 //
@@ -10,7 +10,7 @@ import { gainToDb, peak, rms } from './lib/dsp.mjs';
 import { decodeWav } from './lib/wav.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const AUDIO_DIR = path.join(ROOT, 'godot/assets/audio');
+const AUDIO_DIR = path.join(ROOT, 'assets/audio');
 
 const MAX_BYTES = 5 * 1024 * 1024; // AGENTS.md, "Git": larger binaries need the team's OK
 const MAX_PEAK_DB = -0.5; // headroom against inter-sample clipping

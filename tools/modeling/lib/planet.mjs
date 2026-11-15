@@ -100,7 +100,7 @@ export function addSurfaceMeshes(root, prefix, materials, sphere, radii, faceMat
 
 /**
  * Adds an empty node on the displaced surface at a latitude/longitude.
- * Local axes: +Y = up (away from the center), +X = east, −Z = north (Godot's forward).
+ * Local axes: +Y = up (away from the center), +X = east, −Z = north (the camera's forward).
  * @returns {number} distance of the node from the center (body radii)
  */
 export function addSite(root, sphere, radii, { node, lat, lon }) {

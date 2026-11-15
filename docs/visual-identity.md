@@ -1,6 +1,6 @@
 # Identidade visual: low poly facetado
 
-Guia para reproduzir o visual do Astro Romana em qualquer tela: web (`index.html`), interface do Godot, cartazes e slides. A referência viva é o [index.html](../index.html). Quando este guia e o código divergirem, corrija os dois no mesmo commit.
+Guia para reproduzir o visual do Astro Romana em qualquer tela: web (`index.html`), cartazes e slides. A referência viva é o [index.html](../index.html). Quando este guia e o código divergirem, corrija os dois no mesmo commit.
 
 ## 1. A ideia em uma frase
 
@@ -60,12 +60,12 @@ Use só estes tokens. Os nomes são os das variáveis CSS de `:root`.
 
 - **Rótulo de seção ("eyebrow"):** Chakra Petch 600, 0,7 rem, CAIXA ALTA, espaçamento 0,14 em, âmbar, precedido de um triângulo ▲ laranja desenhado em CSS.
 - **Título do menu:** três linhas desalinhadas. A primeira em creme, a segunda em ametista recuada 0,5 em, a terceira em laranja dentro de um paralelogramo.
-- As duas fontes são OFL (Google Fonts) e podem ser embarcadas no Godot.
+- As duas fontes são OFL (Google Fonts) e podem ser embarcadas em qualquer build.
 - Não use Inter nem Space Grotesk: são a cara de interface genérica.
 
 ## 4. Formas
 
-Todas são `clip-path` no CSS; no Godot, veja a seção 8.
+Todas são `clip-path` no CSS.
 
 | Forma | Onde | Receita CSS |
 |---|---|---|
@@ -149,22 +149,7 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
 
 `prefers-reduced-motion: reduce` desliga todas as animações e para as órbitas. A tela continua completa e estática.
 
-## 8. Levar para o Godot
-
-O jogo não usa mais o Godot (AGENTS.md seção 3); esta tabela fica só como referência.
-
-| Web | Godot 4 |
-|---|---|
-| Painel chanfrado | `StyleBoxFlat` com `corner_radius_*` = 14 e `corner_detail = 1`: o canto vira um corte reto |
-| Botão paralelogramo | `StyleBoxFlat.skew = Vector2(0.25, 0)` |
-| Faceta clara em cima | Dois `StyleBoxFlat` empilhados, ou `border_width_top` com cor mais clara |
-| Malha triangular, listras | `TextureRect` com textura gerada em código ou shader simples, sem imagem pintada à mão |
-| Fontes | Embarcar os `.ttf` de Chakra Petch e Barlow (licença OFL) |
-| Paleta | Um `Theme` (`.tres`) com estas cores; nada de cor solta em cena |
-
-O renderizador Compatibility mantém o sombreamento chapado dos GLBs (AGENTS.md seção 5), e a interface deve acompanhar.
-
-## 9. Checklist para uma tela nova
+## 8. Checklist para uma tela nova
 
 - [ ] Só cores da tabela da seção 2 (ou tons de faceta derivados delas).
 - [ ] Nenhum `border-radius`, `blur`, `backdrop-filter`, `box-shadow` externo ou gradiente suave.

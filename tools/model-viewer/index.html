@@ -177,7 +177,7 @@
     <div class="connect" id="connect">
       <div class="card">
         <h3>Abrir os modelos</h3>
-        <p>Escolha a pasta <code>godot/assets/models</code> do repositório (a raiz do repositório também serve).
+        <p>Escolha a pasta <code>assets/models</code> do repositório (a raiz do repositório também serve).
           O navegador lembra a pasta e recarrega sozinho quando os modelos forem gerados de novo.</p>
         <div class="row">
           <button class="chip primary" id="pick-btn">Escolher pasta…</button>
@@ -199,12 +199,12 @@
     // ------------------------------------------------------------------------
     // Configuration: the viewer reads the manifest written by the model builder.
     // Opened from disk (file://) it asks for the models folder; served over HTTP it
-    // fetches ../../godot/assets/models/manifest.json (override with ?manifest=<url>).
+    // fetches ../../assets/models/manifest.json (override with ?manifest=<url>).
     // ------------------------------------------------------------------------
     const params = new URLSearchParams(location.search);
-    const MANIFEST_URL = new URL(params.get('manifest') ?? '../../godot/assets/models/manifest.json', location.href);
+    const MANIFEST_URL = new URL(params.get('manifest') ?? '../../assets/models/manifest.json', location.href);
     // Where manifest.json may sit inside the folder the user picks.
-    const MANIFEST_PATHS = ['', 'models/', 'assets/models/', 'godot/assets/models/'];
+    const MANIFEST_PATHS = ['', 'models/', 'assets/models/', 'assets/models/'];
     const POLL_MS = 2000;
     const TEAM_SPACING = 1.25;
 
@@ -600,7 +600,7 @@
           };
         } catch { /* try the next location */ }
       }
-      throw new Error(`Não achei manifest.json em "${root.name}". Escolha godot/assets/models ou a raiz do repositório.`);
+      throw new Error(`Não achei manifest.json em "${root.name}". Escolha assets/models ou a raiz do repositório.`);
     }
 
     /** Files from <input webkitdirectory> (browsers without showDirectoryPicker). A snapshot: pick again to reload. */
@@ -613,7 +613,7 @@
       const manifestKey = [...byPath.keys()]
         .filter((k) => k === 'manifest.json' || k.endsWith('/manifest.json'))
         .sort((a, b) => a.length - b.length)[0];
-      if (!manifestKey) throw new Error('Não achei manifest.json na pasta escolhida. Escolha godot/assets/models.');
+      if (!manifestKey) throw new Error('Não achei manifest.json na pasta escolhida. Escolha assets/models.');
       const base = manifestKey.slice(0, -'manifest.json'.length);
       const top = (fileList[0]?.webkitRelativePath ?? '').split('/')[0];
       return {
@@ -876,7 +876,7 @@
         const b = document.createElement('button');
         b.className = `chip${name === state.clip ? ' active' : ''}`;
         b.textContent = clipLabel(name);
-        b.title = name.endsWith('_loop') ? `${name} → no Godot vira "${clipLabel(name)}" em loop` : `${name} (uma vez no Godot; aqui repete para inspeção)`;
+        b.title = name.endsWith('_loop') ? `${name} (em loop)` : `${name} (toca uma vez no jogo; aqui repete para conferir)`;
         b.onclick = () => playClip(name);
         box.append(b);
       }
@@ -1104,7 +1104,7 @@
       }
       const file = files.find((f) => /\.glb$/i.test(f.name));
       if (!file) {
-        showBanner('Arraste a pasta <code>godot/assets/models</code> (Chrome/Edge) ou um arquivo <code>.glb</code>.');
+        showBanner('Arraste a pasta <code>assets/models</code> (Chrome/Edge) ou um arquivo <code>.glb</code>.');
         return;
       }
       try {

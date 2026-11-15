@@ -1,33 +1,6 @@
-# Godot 4.2+ specific ignores
-~*.dll
-
-~*.m4a
-~*.mp4
-~*.mp3
-
-# Godot 4+ specific ignores
-.godot/
-.nomedia
-
-# Godot-specific ignores
-.import/
-export.cfg
-export_credentials.cfg
-*.tmp
-
-# Imported translations (automatically generated from CSV files)
-*.translation
-
-# Mono-specific ignores
-.mono/
-data_*/
-mono_crash.*.json
-
-# Export outputs
-*.exe
-# Uncomment if your project does not version PCK files as runtime dependencies.
-# *.pck
-
 node_modules/
 # Terrain pipeline previews (npm run terrain:build -- --preview)
 tools/terrain/preview/
+# Editor and OS leftovers
+*.tmp
+~*

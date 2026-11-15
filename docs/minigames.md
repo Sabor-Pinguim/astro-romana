@@ -55,7 +55,7 @@ Maya tem mais opções porque é a cientista da missão. As de "tripulada" só e
 
 ## Mecânicas reutilizáveis
 
-Os 21 minigames usam só **6 mecânicas base**. Implementando as mecânicas como cenas genéricas no Godot, cada minigame vira basicamente arte + parâmetros.
+Os 21 minigames usam só **6 mecânicas base**. Implementando as mecânicas como componentes genéricos no jogo (three.js), cada minigame vira basicamente arte + parâmetros.
 
 | Mecânica | Como funciona | Usada em |
 |---|---|---|
@@ -364,5 +364,5 @@ Oscar  O-O2 (compressão) ──► reduz o peso das fotos de Maya
 
 1. Decidir se o cenário principal é **robótico** ou **tripulado**. Isso define se M-S5 e M-S6 entram.
 2. Validar os candidatos a MVP com a equipe.
-3. Prototipar as mecânicas base no Godot (começando por **manter na faixa** e **escolha sob limite**, que cobrem 9 minigames).
+3. Prototipar as mecânicas base no jogo (começando por **manter na faixa** e **escolha sob limite**, que cobrem 9 minigames).
 4. Escrever os textos finais dos cards "Fato real". Valores marcados como incertos no catálogo precisam ser conferidos antes.

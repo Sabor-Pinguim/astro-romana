@@ -223,7 +223,7 @@ Same format as the avatar animations (AGENTS.md §5.5): each clip is a function 
 | `overheat_loop` | moxie | 0.8 | yes | Body shakes, glow swells, red lamp blinks | Above 830 °C |
 | `cooldown` | moxie | 6 | no | Glow shrinks to cold; lamps off | Run ended |
 
-In Godot the `_loop` suffix is removed: `compressor`, `produce`, `overheat`.
+
 
 Keyframes for each clip (linear between keys unless the Note says ease):
 

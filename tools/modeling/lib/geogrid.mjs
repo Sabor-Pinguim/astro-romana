@@ -2,7 +2,7 @@
 // PNG files in references/datasets/, plus the body-frame convention shared by all bodies.
 //
 // Body frame: +Y = north pole (rotation axis), +Z = latitude 0° / longitude 0°,
-// +X = longitude 90° E. Godot's MODEL_FRONT (+Z) therefore faces the prime meridian.
+// +X = longitude 90° E. The model front (+Z) therefore faces the prime meridian.
 import { readFile } from 'node:fs/promises';
 import { decodePng } from './png.mjs';
 

@@ -1,6 +1,6 @@
 # Cabin Equipment: Real References for the Crew Cabin (`cabin-equipment.md`)
 
-Real spacecraft cabin systems, avionics consoles, docking/refueling hardware, closed-loop life support, radiation storm protection, exercise countermeasures, and onboard biomedical labs designed to be installed inside the mandatory **Crew Cabin** ([`godot/assets/models/rocket/cabin_cutaway.glb`](../../godot/assets/models/rocket/cabin_cutaway.glb)).
+Real spacecraft cabin systems, avionics consoles, docking/refueling hardware, closed-loop life support, radiation storm protection, exercise countermeasures, and onboard biomedical labs designed to be installed inside the mandatory **Crew Cabin** ([`assets/models/rocket/cabin_cutaway.glb`](../../assets/models/rocket/cabin_cutaway.glb)).
 
 While engines and tanks in [parts.md](parts.md) power the **Main Booster**, and payload bays in [stage-equipment.md](stage-equipment.md) fill the **1 to 7 Middle Stages**, these cabin modules govern **what the crew experiences inside the spacecraft** during first-person launch (Phase 5), mandatory Mars orbital refueling and 200+ day transit (Phase 6), and surface/return operations (Phase 7) — see [docs/resources/space-mission-game-transcricao-organizada.md](../../docs/resources/space-mission-game-transcricao-organizada.md) §6–§9.
 
@@ -45,7 +45,7 @@ Each crew member gets **3 cabin modules** spanning **Tier 1 (Baseline / Compact)
 ## 3. Cutaway Cabin Integration & 3D Model Conventions
 
 ### 3.1 Target Cabin Geometry (`cabin_cutaway.glb`)
-Inspected directly from [`godot/assets/models/rocket/cabin_cutaway.glb`](../../godot/assets/models/rocket/cabin_cutaway.glb):
+Inspected directly from [`assets/models/rocket/cabin_cutaway.glb`](../../assets/models/rocket/cabin_cutaway.glb):
 
 - **Outer shell radius:** `0.50 m` (`Ø 1.00 m`), overall height `2.05 m` (crew cabin + launch escape tower spire).
 - **Main lower pressurized bay (`InnerBayDark`):** `r_inner = 0.46 m` (`Ø 0.92 m`) from `y = 0.00 m` up to `y = 0.95 m`, tapering smoothly above `y = 0.95 m` (`r_inner = 0.28 m` up to `y = 1.45 m`).

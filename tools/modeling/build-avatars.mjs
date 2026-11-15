@@ -1,10 +1,10 @@
 // Builds the four low-poly astronaut avatars as GLB files plus a manifest.json that the
-// model viewer (tools/model-viewer) and the Godot project read.
+// model viewer (tools/model-viewer) and the game (index.html) read.
 //
 //   npm run models:build          # all characters
 //   npm run models:build -- maya  # only some characters
 //
-// Output: godot/assets/models/characters/<id>.glb and godot/assets/models/manifest.json
+// Output: assets/models/characters/<id>.glb and assets/models/manifest.json
 import './lib/node-polyfills.mjs';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -16,7 +16,7 @@ import { FX_PRESETS } from './lib/fx-presets.mjs';
 import characters from './characters/index.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const OUT_DIR = path.join(ROOT, 'godot/assets/models');
+const OUT_DIR = path.join(ROOT, 'assets/models');
 const MANIFEST = path.join(OUT_DIR, 'manifest.json');
 
 export const TRIANGLE_BUDGET = 3000;

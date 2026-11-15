@@ -1,7 +1,7 @@
 // Turns a square height grid into mesh arrays and computes shading helpers.
 //
 // Grid layout: count x count samples, row-major, row 0 = north edge, column 0 = west
-// edge, `step` meters apart. Godot/glTF axes: +X = east, +Y = up, -Z = north.
+// edge, `step` meters apart. glTF axes: +X = east, +Y = up, -Z = north.
 
 const DEG = Math.PI / 180;
 

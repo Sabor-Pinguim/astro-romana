@@ -2,7 +2,7 @@
 
 Este documento organiza os datasets reais da NASA recomendados para o **Space Mission Game** e define como cada um deles altera **regras, falhas, equilíbrio de recursos e objetivos** ao longo das fases do jogo, evitando que os dados sejam apenas texto decorativo.
 
-> **Estratégia recomendada para o Hackathon (MVP):** Em vez de depender de APIs externas ao vivo durante a apresentação, baixe **2 ou 3 datasets em CSV/JSON** do portal [`data.nasa.gov`](https://data.nasa.gov/) (e/ou NASA PDS) e embarque versões enxutas diretamente na pasta `res://data/` da Godot.
+> **Estratégia recomendada para o Hackathon (MVP):** Em vez de depender de APIs externas ao vivo durante a apresentação, baixe **2 ou 3 datasets em CSV/JSON** do portal [`data.nasa.gov`](https://data.nasa.gov/) (e/ou NASA PDS) e embarque versões enxutas diretamente no repositório, junto do jogo web.
 
 ---
 
@@ -57,7 +57,7 @@ Este documento organiza os datasets reais da NASA recomendados para o **Space Mi
 
 ## 3. Combinação Mínima Viável (Para fechar o MVP hoje)
 
-Para codificar rápido sem comprometer a obrigação do hackathon, o **combo mínimo de ouro** é embarcar **2 arquivos JSON locais** na Godot:
+Para codificar rápido sem comprometer a obrigação do hackathon, o **combo mínimo de ouro** é embarcar **2 arquivos JSON locais** no jogo:
 
 1. `res://data/mars_targets.json` *(Extraído de Mars 2020 / MOLA)* — Coordenadas, altitude, tipo de rocha, massa da amostra e valor científico para a bússola e missões de superfície.
 2. `res://data/mars_weather_sols.json` *(Extraído de REMS / MEDA)* — 10 a 20 linhas reais de Sol marciano com temperatura, pressão, vento e índice de poeira para ditar energia e dificuldade na superfície.

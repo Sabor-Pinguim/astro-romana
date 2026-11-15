@@ -18,8 +18,7 @@ export const smooth = (edge0, edge1, x) => {
  * offsets in meters, both relative to the rest pose. Looping clips must return the
  * same pose at u = 0 and u = 1.
  *
- * Godot marks an imported animation as looping when its name ends with "loop",
- * so looping clips are named `*_loop`.
+ * Looping clips are named `*_loop`; the game plays those in a loop and the others once.
  */
 export function buildClip(avatar, name, { duration, samples, pose }) {
   const frames = [];

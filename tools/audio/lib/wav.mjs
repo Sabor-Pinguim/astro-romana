@@ -1,9 +1,7 @@
 // Minimal 16-bit PCM WAV writer/reader.
 //
-// Looping files get a "smpl" chunk with one forward loop. Godot's WAV importer
-// reads it when the import option "Loop Mode" is "Detect From WAV" (the
-// default), so loops need no manual import settings. Use closeLoop() for loops:
-// see its comment for why.
+// Looping files get a "smpl" chunk with one forward loop, so players that read it
+// loop at the exact frame. Use closeLoop() for loops: see its comment for why.
 
 const SMPL_BYTES = 36 + 24; // header + one loop
 
@@ -47,13 +45,11 @@ export function encodeWav(channels, sampleRate, { loop } = {}) {
 }
 
 /**
- * Prepares an N-frame seamless loop for Godot: appends a copy of frame 0 and
+ * Prepares an N-frame seamless loop: appends a copy of frame 0 and
  * returns the loop points { start: 0, end: N }.
  *
- * Godot 4.7's mixer repeats frames start+1 … end (period end − start), and the
- * web "Sample" player loops [start, end), so both play exactly N frames per
- * cycle. Players that follow the WAV spec (inclusive end) repeat one frame per
- * cycle, which is inaudible. Checked by tools/godot/check_audio.gd.
+ * Players that loop [start, end) play exactly N frames per cycle. Players that
+ * follow the WAV spec (inclusive end) repeat one frame per cycle, which is inaudible.
  */
 export function closeLoop(channels) {
   const frames = channels[0].length;

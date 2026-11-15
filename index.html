@@ -1058,7 +1058,7 @@
         if (this.muted) return;
         try {
           if (!this.bed) {
-            this.bed = new Audio('godot/assets/audio/rad_surface_bed.wav');
+            this.bed = new Audio('assets/audio/rad_surface_bed.wav');
             this.bed.loop = true;
             this.bed.volume = 0.35;
           }
@@ -1589,7 +1589,7 @@
   window.ASTRO_ART={RAMPS,PLANETS};
   window.ASTRO={state,crew,sites:SITES_INFO,toast,show:showScreen,showScreen,land:()=>SIM.startSurface(),data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL};
   paintArt();renderLobby();renderBadge();renderPlanner();setupStars();
-  if(!DATA)fetch('godot/assets/models/parts/manifest.json').then(r=>r.json()).then(m=>{useData(m);renderBadge();renderPlanner();}).catch(()=>toast('Could not load the part specs.'));
+  if(!DATA)fetch('assets/models/parts/manifest.json').then(r=>r.json()).then(m=>{useData(m);renderBadge();renderPlanner();}).catch(()=>toast('Could not load the part specs.'));
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
@@ -1732,7 +1732,7 @@ if (art && system && renderer) {
 }
 </script>
 <script type="module">
-// 3D views built from the generated GLBs (godot/assets/models): the Saturn V flying on the menu,
+// 3D views built from the generated GLBs (assets/models): the Saturn V flying on the menu,
 // the selected crew member in the lobby and the rocket the crew is building in the planner.
 // Models come from index.models.js (works from file://) or, when served, straight from the folder.
 import * as THREE from 'three';
@@ -1746,7 +1746,7 @@ function loadGLTF(path) {
     const b64 = window.ASTRO_GLB?.[path];
     let data;
     if (b64) { const bin = atob(b64); data = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) data[i] = bin.charCodeAt(i); data = data.buffer; }
-    else data = await (await fetch('godot/assets/models/' + path)).arrayBuffer();
+    else data = await (await fetch('assets/models/' + path)).arrayBuffer();
     return loader.parseAsync(data, '');
   })());
   return cache.get(path);
@@ -2106,7 +2106,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   syncCatalogThumbs();
 })().catch(err => console.warn('Catalog 3D thumbnails disabled:', err));
 // Surface: the landing site in 3D. The ground is the real HiRISE terrain of the chosen site
-// (godot/assets/terrain, built by tools/terrain; index.terrain.<site>.js when opened from disk).
+// (assets/terrain, built by tools/terrain; index.terrain.<site>.js when opened from disk).
 // First-person walk with the crew member's own suit in view when looking down (V: chase camera).
 // One block per crew member marks a surface experiment (window.ASTRO_SIM.surf.tasks) at a random spot;
 // its owner walks there and runs the minigame (placeholder for now). The rules (launch window timer,
@@ -2728,7 +2728,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
       for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
       buf = u8.buffer;
     } else {
-      const res = await fetch(`godot/assets/models/${relPath}`);
+      const res = await fetch(`assets/models/${relPath}`);
       if (!res.ok) throw new Error(`Failed to fetch ${relPath}: ${res.status}`);
       buf = await res.arrayBuffer();
     }

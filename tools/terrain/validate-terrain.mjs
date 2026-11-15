@@ -1,4 +1,4 @@
-// Validates every site listed in godot/assets/terrain/manifest.json:
+// Validates every site listed in assets/terrain/manifest.json:
 //   1. Khronos glTF Validator (spec errors fail the run)
 //   2. Project rules: size limit, collision node name, grid, bounds match the manifest,
 //      embedded texture, sun and source recorded.
@@ -11,7 +11,7 @@ import validator from 'gltf-validator';
 import { readGlbJson } from './lib/glb.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const TERRAIN_DIR = path.join(ROOT, 'godot/assets/terrain');
+const TERRAIN_DIR = path.join(ROOT, 'assets/terrain');
 const MAX_BYTES = 5 * 1024 * 1024; // AGENTS.md §9: larger binaries need team agreement
 const MAX_VERTICES = 65535; // 16-bit indices (65535 itself is the reserved restart value)
 const TOLERANCE_M = 0.01;
@@ -27,7 +27,7 @@ async function validateSite(site) {
 
   const gltf = readGlbJson(bytes);
   if (bytes.length > MAX_BYTES) problems.push(`${(bytes.length / 1048576).toFixed(2)} MB > 5 MB`);
-  if (gltf.nodes?.[0]?.name !== 'Terrain-col') problems.push('root node must be "Terrain-col" (Godot collision suffix)');
+  if (gltf.nodes?.[0]?.name !== 'Terrain') problems.push('root node must be "Terrain"');
 
   const position = gltf.accessors[gltf.meshes[0].primitives[0].attributes.POSITION];
   const expectedVertices = site.gridVertices ** 2;

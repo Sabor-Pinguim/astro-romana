@@ -70,7 +70,7 @@ Dentre os 4 personagens definidos em [characters.md](characters.md), **Maya** (*
 
 ## Resumo de Estrutura de Dados para Codar Hoje (GDScript / JSON)
 
-Para agilizar a programação na Godot ainda hoje, todas as 3 missões podem usar uma **única estrutura genérica de missão (`MissionPoint.gd`)** alimentada por JSON:
+Para agilizar a programação, todas as 3 missões podem usar uma **única estrutura genérica de missão** alimentada por JSON:
 
 ```json
 {

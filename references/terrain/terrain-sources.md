@@ -1,7 +1,7 @@
 # Mars terrain sites: data sources
 
 Real-data terrains built by `tools/terrain/` (see AGENTS.md §14). Measured values
-(elevations, relief, sun position) live in `godot/assets/terrain/manifest.json`, which
+(elevations, relief, sun position) live in `assets/terrain/manifest.json`, which
 the build writes from the source files listed there (URL + ETag of the exact version).
 
 ## Products

@@ -1,11 +1,11 @@
 // Builds the 52 low-poly rocket parts (13 engines + 8 tanks + 16 equipment + 12 cabin + 1 cockpit + 2 structures) as GLB files plus
-// godot/assets/models/parts/manifest.json and updates the `parts` section of
-// godot/assets/models/manifest.json.
+// assets/models/parts/manifest.json and updates the `parts` section of
+// assets/models/manifest.json.
 //
 //   npm run models:build:parts             # all 52 parts
 //   npm run models:build:parts -- raptor   # only selected parts
 //
-// Output: godot/assets/models/parts/<engines|tanks|equipment|cabin|cockpit|structures>/<id>.glb
+// Output: assets/models/parts/<engines|tanks|equipment|cabin|cockpit|structures>/<id>.glb
 import './lib/node-polyfills.mjs';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -17,7 +17,7 @@ import allParts from './parts/index.mjs';
 import { PART_SPECS, MISSION_RULES } from './parts/specs.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const MODELS_DIR = path.join(ROOT, 'godot/assets/models');
+const MODELS_DIR = path.join(ROOT, 'assets/models');
 const MANIFEST = path.join(MODELS_DIR, 'manifest.json');
 const PARTS_MANIFEST = path.join(MODELS_DIR, 'parts/manifest.json');
 

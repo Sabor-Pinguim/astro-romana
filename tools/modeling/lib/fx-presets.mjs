@@ -1,5 +1,5 @@
 // Particle presets referenced by FX_* anchors. They are written to manifest.json so the
-// web viewer and (later) Godot GPUParticles3D can share the same numbers.
+// web viewer and the game can share the same numbers.
 //
 // Units: rate = particles/s, life = s, speed = m/s, spread = half-angle in degrees
 // around the anchor's local +Y, size = [start, end] in m, gravity = m/s² pulling down

@@ -6,7 +6,7 @@
 //   npm run terrain:build -- jezero            # some sites
 //   npm run terrain:build -- jezero --preview  # also write tools/terrain/preview/*.png
 //
-// Output: godot/assets/terrain/<id>.glb and godot/assets/terrain/manifest.json
+// Output: assets/terrain/<id>.glb and assets/terrain/manifest.json
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,7 +20,7 @@ import { buildTerrainMesh, correlation, hillshade, imageAtVertices } from './lib
 
 const HIRISE_PDS = 'https://hirise-pds.lpl.arizona.edu/PDS/RDR';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const OUT_DIR = path.join(ROOT, 'godot/assets/terrain');
+const OUT_DIR = path.join(ROOT, 'assets/terrain');
 const MANIFEST = path.join(OUT_DIR, 'manifest.json');
 const PREVIEW_DIR = path.join(ROOT, 'tools/terrain/preview');
 
@@ -186,8 +186,7 @@ async function buildSite(site, { preview }) {
   }
 
   const glb = writeGlb({
-    // "-col": Godot's importer adds a StaticBody3D with a trimesh collision shape.
-    nodeName: 'Terrain-col',
+    nodeName: 'Terrain',
     meshName: `Terrain_${site.id}`,
     positions: mesh.positions,
     normals: mesh.normals,
@@ -196,7 +195,6 @@ async function buildSite(site, { preview }) {
     material: {
       name: `Ground_${site.id}`,
       baseColorFactor: cfg.tint,
-      // Godot extracts it on import as <id>_albedo.png next to the GLB.
       image: { name: 'albedo', mimeType: 'image/png', bytes: encodePng(cfg.textureSize, cfg.textureSize, 1, texture) },
     },
     extras: { site: site.id, centerLat: cfg.center.lat, centerLon: cfg.center.lon, referenceElevationM: round(reference, 2) },
@@ -279,7 +277,7 @@ async function main() {
       axes: '+X east, +Y up, -Z north (true north at the site center)',
       origin: 'site center; y = 0 is the DTM elevation at the center (elevation.centerM)',
       sunAzimuth: 'degrees clockwise from north, as seen from the ground',
-      collision: 'node "Terrain-col" makes Godot add a StaticBody3D with a trimesh shape',
+      ground: 'the game reads heights from the mesh grid (row 0 = north edge, column 0 = west edge)',
     },
     sites,
   };

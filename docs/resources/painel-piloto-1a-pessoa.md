@@ -56,11 +56,11 @@ A foto mostra o **Convés de Voo Traseiro (*Aft Flight Deck* — painéis A6, A7
 
 ## 3. Estrutura Planejada para o Modelo 3D (`cockpit_pilot.glb`)
 
-Para que o Godot consiga animar ponteiros, trocar cores de alerta (`LedGreen` → `Lamp` → `LedRed`), clicar em disjuntores/alavancas via *raycast* em 1ª pessoa e soltar partículas, o modelo terá pivôs separados:
+Para que o jogo consiga animar ponteiros, trocar cores de alerta (`LedGreen` → `Lamp` → `LedRed`), clicar em disjuntores/alavancas via *raycast* em 1ª pessoa e soltar partículas, o modelo terá pivôs separados:
 
 1. **`Camera_Pilot` `(0, 1.18, 0.38)`:** posição exata da câmera em 1ª pessoa olhando para `−Z` (enquadrando o painel de 3 alas, as 3 telas, o monitor CCTV superior esquerdo, as janelas frontais/superiores e o topo dos 2 assentos laterais).
 2. **`Monitor_CCTV`:** monitor inclinado no canto superior esquerdo (como na foto real do *Space Shuttle*).
-3. **3 Telas Principais (`Screen_Left_Attitude`, `Screen_Center_Telemetry`, `Screen_Right_Trajectory`):** molduras chanfradas com elementos 3D low-poly de telemetria (mira circular, barras de nível, curva de subida e anel de motores) que também aceitam `SubViewport` / UI 2D do Godot por cima.
+3. **3 Telas Principais (`Screen_Left_Attitude`, `Screen_Center_Telemetry`, `Screen_Right_Trajectory`):** molduras chanfradas com elementos 3D low-poly de telemetria (mira circular, barras de nível, curva de subida e anel de motores) que também aceitam uma UI 2D (HTML) por cima.
 4. **Matriz `CW_Matrix` + `Alarm_Master_Red` / `Alarm_Caution_Amber`:** grade central de 12 blocos de alerta + botões mestre de alarme no topo do *glareshield*.
 5. **Controles Móveis com Pivô Próprio:**
    - `Joystick_RHC` (inclina em X/Z);

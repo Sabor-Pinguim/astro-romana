@@ -1,6 +1,6 @@
 # First-Person Pilot Control Panel (`pilot-cockpit.md`)
 
-Real spacecraft cockpit references, human-factors layout analysis, and low-poly 3D model specification for the **First-Person Pilot Control Panel** (`godot/assets/models/rocket/cockpit_pilot.glb`) used in **Phase 5 (Launch & Orbit Insertion)** and **Phase 6 (Orbital Refueling, Transit Emergencies & Mars Landing)** — see [docs/resources/space-mission-game-transcricao-organizada.md](../../docs/resources/space-mission-game-transcricao-organizada.md) §7–§8.
+Real spacecraft cockpit references, human-factors layout analysis, and low-poly 3D model specification for the **First-Person Pilot Control Panel** (`assets/models/rocket/cockpit_pilot.glb`) used in **Phase 5 (Launch & Orbit Insertion)** and **Phase 6 (Orbital Refueling, Transit Emergencies & Mars Landing)** — see [docs/resources/space-mission-game-transcricao-organizada.md](../../docs/resources/space-mission-game-transcricao-organizada.md) §7–§8.
 
 ---
 

@@ -1,4 +1,4 @@
-// Validates every model listed in godot/assets/models/manifest.json:
+// Validates every model listed in assets/models/manifest.json:
 //   1. Khronos glTF Validator (spec errors fail the run)
 //   2. Project rules: rig pivots, required clips, FX anchors, triangle budget,
 //      no textures, size and ground placement (avatars, parts); radius, relief,
@@ -15,7 +15,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { BODY_MATERIALS } from './lib/palette.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const MODELS_DIR = path.join(ROOT, 'godot/assets/models');
+const MODELS_DIR = path.join(ROOT, 'assets/models');
 
 const HELMET_TOP_RANGE = [1.75, 1.95]; // meters: body height = top of the helmet in the rest pose
 const MAX_TOTAL_HEIGHT = 2.4; // meters, including accessories such as antennas

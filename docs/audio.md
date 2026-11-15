@@ -4,7 +4,7 @@ O som de fundo do jogo é gerado a partir de **medições reais de radiação** 
 
 - **Dados e fontes:** [references/datasets/msl-rad/](../references/datasets/msl-rad/README.md)
 - **Gerador:** `tools/audio/` (regras em [AGENTS.md](../AGENTS.md), seção 7)
-- **Arquivos gerados:** `godot/assets/audio/`, com o `manifest.json`
+- **Arquivos gerados:** `assets/audio/`, com o `manifest.json`
 
 O áudio é gerado **antes**, fora do jogo. No jogo só tocamos os arquivos e ajustamos volume. Assim tudo funciona igual na versão web.
 
@@ -52,7 +52,7 @@ Os cliques são disparados pelo jogo:
   - se quiser, baixe o fundo ~6 dB enquanto ela toca;
   - para sincronizar o medidor de dose e os cliques com o som, use `stems[1].envelope`: a dose (µGy/dia) a cada `stepS` segundos do arquivo.
 - **Multiplayer:** a dose é estado do jogo e quem decide é o servidor. O som é local: cada cliente toca o seu a partir do estado recebido.
-- **Web:** teste no export web. Lá o modo "Sample" não aplica efeitos de áudio (reverb, filtros) nos barramentos.
+- **Web:** o jogo só toca os WAV prontos e ajusta o volume; nada de síntese ou efeitos em tempo real.
 
 ---
 
@@ -68,6 +68,6 @@ Os números de imprensa ("8.100 microgray") não batem com os dados. Veja os ⚠
 
 ## O que falta
 
-- **Integração no Godot:** um autoload de áudio que toque o fundo, a tempestade e os cliques, quando houver a cena da superfície.
+- **Integração no jogo:** o `index.html` toca o fundo e os cliques na superfície (`radAudio`); a tempestade ainda não entra.
 - **Viagem até Marte:** o CDAWeb não tem os dados do RAD do cruzeiro (2011–2012). Se o jogo quiser um som de viagem, os dados vêm do arquivo PDS.
 - **Ouvir e ajustar:** a validação confere formato, volume e emenda do loop, não se o som ficou bom. Os volumes e o tom são `game-balance` e podem mudar à vontade.

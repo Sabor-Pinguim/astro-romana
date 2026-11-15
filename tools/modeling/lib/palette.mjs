@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 // Shared low-poly palette. Every avatar uses these material names so the look stays
-// consistent in Godot and in the viewer. Colors follow real suits: white soft goods,
+// consistent in the game and in the viewer. Colors follow real suits: white soft goods,
 // navy life-support backpack (xEMU), grey glove tips (AxEMU), gold visor (Apollo/EMU).
 const BASE = {
   Suit: { color: '#E2DED6', roughness: 0.85 },

@@ -1,6 +1,6 @@
 # Curiosity RAD dose rate (MSL RAD Level 2)
 
-Radiation dose rate measured on the surface of Mars by the **Radiation Assessment Detector (RAD)** on NASA's Curiosity rover (Gale crater). These CSVs drive the game's radiation soundscape (`tools/audio/`, output in `godot/assets/audio/`).
+Radiation dose rate measured on the surface of Mars by the **Radiation Assessment Detector (RAD)** on NASA's Curiosity rover (Gale crater). These CSVs drive the game's radiation soundscape (`tools/audio/`, output in `assets/audio/`).
 
 ## Source
 

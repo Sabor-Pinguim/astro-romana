@@ -21,7 +21,7 @@ references/parts/
   stage-equipment.md       middle-stage equipment modules
 ```
 
-The numbers the game and the simulation use (mass, cost, power, thrust, Isp, propellant, each with its source) live in `tools/modeling/parts/specs.mjs` and are written to `godot/assets/models/parts/manifest.json` (`specs` of each part, plus `missionRules`).
+The numbers the game and the simulation use (mass, cost, power, thrust, Isp, propellant, each with its source) live in `tools/modeling/parts/specs.mjs` and are written to `assets/models/parts/manifest.json` (`specs` of each part, plus `missionRules`).
 
 To add a part: copy `_template.md` to `<engines|tanks>/<id>/README.md`, fill every row (unknown = `n/f`), save the photos next to it, and add a row to the catalogue below.
 
@@ -157,7 +157,7 @@ To be added to `tools/modeling/lib/palette.mjs` when the parts generator is buil
 
 ### Exhaust presets (proposal)
 
-For `lib/fx-presets.mjs` and the Godot `GPUParticles3D`. Visual guidance only, not data shown to the player.
+For `lib/fx-presets.mjs` and the game's particles. Visual guidance only, not data shown to the player.
 
 | Preset | Propellants | Look |
 |---|---|---|

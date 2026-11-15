@@ -25,7 +25,7 @@ function minMax(array, components) {
 
 /**
  * @param {object} mesh
- * @param {string} mesh.nodeName      node name (Godot reads suffixes such as "-col")
+ * @param {string} mesh.nodeName      node name
  * @param {string} mesh.meshName
  * @param {Float32Array} mesh.positions  xyz per vertex
  * @param {Float32Array} mesh.normals    xyz per vertex
