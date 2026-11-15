@@ -1,0 +1,17 @@
+{
+  "name": "astro-romana-rooms",
+  "private": true,
+  "description": "Room server for Astro Romana multiplayer: rooms, seats, phase and a host-authoritative message relay (WebSocket).",
+  "type": "module",
+  "main": "server.mjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "ws": "8.22.1"
+  }
+}
