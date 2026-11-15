@@ -12,6 +12,7 @@ const PART_CATEGORIES := {
 	"tanks": {"dir": "res://assets/models/parts/tanks", "max_meshes": 8},
 	"equipment": {"dir": "res://assets/models/parts/equipment", "max_meshes": 12},
 	"cabin": {"dir": "res://assets/models/parts/cabin", "max_meshes": 12},
+	"cockpit": {"dir": "res://assets/models/parts/cockpit", "max_meshes": 35},
 }
 const BODIES_DIR := "res://assets/models/bodies"
 const BODY_MAX_MESHES := 12
@@ -121,10 +122,12 @@ func _check_part(path: String, category: String, max_meshes: int) -> int:
 
 	if root.find_child("Attach_Top", true, false) == null:
 		problems.append("missing Attach_Top")
-	if category in ["tanks", "equipment", "cabin"] and root.find_child("Attach_Bottom", true, false) == null:
+	if category in ["tanks", "equipment", "cabin", "cockpit"] and root.find_child("Attach_Bottom", true, false) == null:
 		problems.append("missing Attach_Bottom")
 	if category == "engines" and root.find_child("FX_Exhaust", true, false) == null:
 		problems.append("missing FX_Exhaust")
+	if category == "cockpit" and root.find_child("Camera_Pilot", true, false) == null:
+		problems.append("missing Camera_Pilot")
 
 	var anchors: Array[String] = []
 	for node in root.find_children("FX_*", "", true, false):

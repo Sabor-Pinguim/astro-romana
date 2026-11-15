@@ -127,11 +127,29 @@ async function validatePart(entry, manifest) {
   });
 
   if (!names.has('Attach_Top')) problems.push('missing Attach_Top anchor');
-  if (['tanks', 'equipment', 'cabin'].includes(entry.category) && !names.has('Attach_Bottom')) {
+  if (['tanks', 'equipment', 'cabin', 'cockpit'].includes(entry.category) && !names.has('Attach_Bottom')) {
     problems.push('missing Attach_Bottom anchor');
   }
   if (entry.category === 'engines' && !names.has('FX_Exhaust')) {
     problems.push('missing FX_Exhaust anchor');
+  }
+  if (entry.category === 'cockpit') {
+    for (const reqNode of [
+      'Camera_Pilot',
+      'Joystick_RHC',
+      'Controller_THC',
+      'Throttle_Lever',
+      'Breaker_Bank',
+      'Stage_Sep_Switch',
+      'EDL_Arm_Switch',
+      'Abort_Button',
+      'Alarm_Master_Red',
+      'Alarm_Caution_Amber',
+      'FX_Sparks_Left',
+      'FX_Sparks_Right',
+    ]) {
+      if (!names.has(reqNode)) problems.push(`missing cockpit node "${reqNode}"`);
+    }
   }
 
   for (const fx of entry.fx ?? []) {
@@ -184,13 +202,37 @@ async function validatePart(entry, manifest) {
     if (Math.abs(bounds.min.y) > GROUND_TOLERANCE) {
       problems.push(`base at y = ${bounds.min.y.toFixed(3)} m, expected 0`);
     }
+  } else if (entry.category === 'cockpit') {
+    if (size.x > 2.20 + 1e-4) problems.push(`width ${size.x.toFixed(3)} m > 2.20 m`);
+    if (size.y > 1.70 + 1e-4) problems.push(`height ${size.y.toFixed(3)} m > 1.70 m`);
+    if (size.z > 1.50 + 1e-4) problems.push(`depth ${size.z.toFixed(3)} m > 1.50 m`);
+    if (Math.abs(bounds.min.y) > GROUND_TOLERANCE) {
+      problems.push(`base at y = ${bounds.min.y.toFixed(3)} m, expected 0`);
+    }
+  }
+
+  // 3. Game specs validation (AGENTS.md §4 & §8).
+  const s = entry.specs;
+  if (!s) {
+    problems.push('missing specs block');
+  } else {
+    if (!(typeof s.massDryKg === 'number' && s.massDryKg >= 0)) problems.push('specs.massDryKg must be >= 0');
+    if (!(typeof s.costM === 'number' && s.costM > 0)) problems.push('specs.costM must be > 0');
+    if (typeof s.powerW !== 'number') problems.push('specs.powerW must be a number');
+    if (!s.sources || Object.keys(s.sources).length === 0) problems.push('specs.sources must document value origins');
+    if (entry.category === 'engines') {
+      if (!(s.thrustVacKn > 0)) problems.push('engine specs.thrustVacKn must be > 0');
+      if (!(s.ispVacS > 0)) problems.push('engine specs.ispVacS must be > 0');
+    } else if (entry.category === 'tanks') {
+      if (!(s.propellantMassKg > 0)) problems.push('tank specs.propellantMassKg must be > 0');
+    }
   }
 
   return {
     problems,
     summary: `${triangles} tris, ${meshes} meshes, ` +
       `${size.x.toFixed(2)}×${size.y.toFixed(2)}×${size.z.toFixed(2)} m, ` +
-      `${report.issues.numWarnings} warnings`,
+      `${s ? `${s.massDryKg} kg, $${s.costM}M, ` : ''}${report.issues.numWarnings} warnings`,
   };
 }
 

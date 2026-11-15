@@ -23,6 +23,7 @@ export function createPartBuilder({
   attachBottom = null,
   extraAnchors = [],
   gimbal = null,
+  pivots = [],
   fxExhaust = null,
   fxAnchors = [],
   budget,
@@ -34,6 +35,7 @@ export function createPartBuilder({
 
   const nodes = { [name]: root, Root: root };
   const parts = { [name]: new PartSet(materials) };
+  const pivotOrigins = {};
 
   const addEmptyNode = (nodeName, pos, rotDeg = [0, 0, 0], userData = null) => {
     const node = new THREE.Object3D();
@@ -48,7 +50,7 @@ export function createPartBuilder({
 
   addEmptyNode('Attach_Top', attachTop);
   if (attachBottom) addEmptyNode('Attach_Bottom', attachBottom);
-  for (const extra of extraAnchors) addEmptyNode(extra.name, extra.pos, extra.rot ?? [0, 0, 0]);
+  for (const extra of extraAnchors) addEmptyNode(extra.name, extra.pos, extra.rot ?? [0, 0, 0], extra.userData ?? null);
 
   let gimbalNode = null;
   const gimbalPos = gimbal ?? [0, 0, 0];
@@ -59,6 +61,22 @@ export function createPartBuilder({
     root.add(gimbalNode);
     nodes.Gimbal = gimbalNode;
     parts.Gimbal = new PartSet(materials);
+    pivotOrigins.Gimbal = gimbalPos;
+  }
+
+  const pivotGroups = [];
+  for (const piv of pivots) {
+    const pGroup = new THREE.Group();
+    pGroup.name = piv.name;
+    const pos = piv.pos ?? [0, 0, 0];
+    const rot = piv.rot ?? [0, 0, 0];
+    pGroup.position.set(...pos);
+    pGroup.rotation.set(rot[0] * DEG, rot[1] * DEG, rot[2] * DEG);
+    root.add(pGroup);
+    nodes[piv.name] = pGroup;
+    parts[piv.name] = new PartSet(materials);
+    pivotOrigins[piv.name] = pos;
+    pivotGroups.push({ name: piv.name, node: pGroup });
   }
 
   const fx = [];
@@ -91,9 +109,10 @@ export function createPartBuilder({
       const set = parts[key];
       if (!set) throw new Error(`${id}: unknown target node "${target}"`);
       const t = { ...transform };
-      if (target === 'Gimbal' && gimbalNode) {
+      const origin = pivotOrigins[target];
+      if (origin) {
         const p = t.p ?? [0, 0, 0];
-        t.p = [p[0] - gimbalPos[0], p[1] - gimbalPos[1], p[2] - gimbalPos[2]];
+        t.p = [p[0] - origin[0], p[1] - origin[1], p[2] - origin[2]];
       }
       set.add(materialKey, geometry, t);
       return builder;
@@ -101,6 +120,9 @@ export function createPartBuilder({
     finish() {
       parts[name].attachTo(root, name);
       if (gimbalNode) parts.Gimbal.attachTo(gimbalNode, 'Gimbal');
+      for (const piv of pivotGroups) {
+        parts[piv.name].attachTo(piv.node, piv.name);
+      }
       return root;
     },
   };

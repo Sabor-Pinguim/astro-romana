@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FX_PRESETS } from './lib/fx-presets.mjs';
 import allParts from './parts/index.mjs';
+import { PART_SPECS, MISSION_RULES } from './parts/specs.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const MODELS_DIR = path.join(ROOT, 'godot/assets/models');
@@ -33,10 +34,29 @@ function countStats(root) {
   return { triangles, meshes };
 }
 
+const COCKPIT_PIVOT_NAMES = new Set([
+  'Camera_Pilot',
+  'Joystick_RHC',
+  'Controller_THC',
+  'Throttle_Lever',
+  'Breaker_Bank',
+  'Stage_Sep_Switch',
+  'EDL_Arm_Switch',
+  'Abort_Button',
+  'Alarm_Master_Red',
+  'Alarm_Caution_Amber',
+]);
+
 function collectNodeNames(root) {
   const names = [];
   root.traverse((o) => {
-    if (o.name && (o.name.startsWith('Attach_') || o.name === 'Gimbal' || o.name.startsWith('FX_'))) {
+    if (
+      o.name &&
+      (o.name.startsWith('Attach_') ||
+        o.name === 'Gimbal' ||
+        o.name.startsWith('FX_') ||
+        COCKPIT_PIVOT_NAMES.has(o.name))
+    ) {
       names.push(o.name);
     }
   });
@@ -56,6 +76,11 @@ async function buildPart(def, exporter) {
   const outPath = path.join(MODELS_DIR, file);
   await mkdir(path.dirname(outPath), { recursive: true });
   await writeFile(outPath, Buffer.from(glb));
+  if (def.id === 'cockpit-pilot') {
+    const rocketCopy = path.join(MODELS_DIR, 'rocket/cockpit_pilot.glb');
+    await mkdir(path.dirname(rocketCopy), { recursive: true });
+    await writeFile(rocketCopy, Buffer.from(glb));
+  }
 
   const stats = countStats(root);
   if (stats.triangles > built.budget.triangles) {
@@ -63,6 +88,10 @@ async function buildPart(def, exporter) {
   }
   if (stats.meshes > built.budget.meshes) {
     throw new Error(`${def.id}: ${stats.meshes} meshes exceeds budget ${built.budget.meshes}`);
+  }
+  const specs = PART_SPECS[def.id];
+  if (!specs) {
+    throw new Error(`${def.id}: missing game specs in tools/modeling/parts/specs.mjs`);
   }
 
   return {
@@ -85,6 +114,7 @@ async function buildPart(def, exporter) {
       minY: Number(bounds.min.y.toFixed(3)),
       maxY: Number(bounds.max.y.toFixed(3)),
     },
+    specs,
     budget: built.budget,
     stats: { ...stats, bytes: glb.byteLength },
     references: def.references,
@@ -138,9 +168,11 @@ async function main() {
           tankOrigin: 'bottom interface (stands above y = 0)',
           equipmentOrigin: 'bottom mounting plate (stands on y = 0 inside cutaway stage bay)',
           cabinOrigin: 'bottom mounting deck (stands on y = 0 inside cutaway cabin bay)',
+          cockpitOrigin: 'cabin floor center (minY = 0, forward windshield toward -Z, Camera_Pilot at (0, 1.18, 0.38))',
           fxAnchorPrefix: 'FX_',
         },
         fxPresets: FX_PRESETS,
+        missionRules: MISSION_RULES,
         parts,
       },
       null,
@@ -152,6 +184,7 @@ async function main() {
     ...existingManifest,
     generatedAt,
     fxPresets: FX_PRESETS,
+    missionRules: MISSION_RULES,
     parts,
   };
   await writeFile(MANIFEST, `${JSON.stringify(mergedManifest, null, 2)}\n`);

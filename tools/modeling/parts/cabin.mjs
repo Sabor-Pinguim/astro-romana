@@ -321,7 +321,7 @@ const cabinEvaAirlock = {
       .add('Root', 'Aluminum', box(0.6, 0.03, 0.12), { p: [0, 0.615, -0.08] })
       // Lower Martian dust sump & filter vent
       .add('Root', 'Titanium', box(0.24, 0.08, 0.14), { p: [0, 0.07, 0.02] })
-      .add('Root', 'Strap', box(0.18, 0.05, 0.02), { p: [0, 0.07, 0.095] });
+      .add('Root', 'HullBlack', box(0.18, 0.05, 0.02), { p: [0, 0.07, 0.095] });
 
     // Central airlock hatch door, seal, porthole, handwheel & status LEDs
     p.add('Root', 'HullBlack', cyl(0.155, 0.155, 0.025, 10), { p: [0, 0.33, -0.035], r: [90, 0, 0] })

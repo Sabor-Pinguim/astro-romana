@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T04:23:03.890Z",
+  "generatedAt": "2026-11-15T05:01:13.262Z",
   "generator": "tools/modeling/build-avatars.mjs",
   "conventions": {
     "units": "meters",
@@ -580,120 +580,6 @@
         "meshes": 46,
         "bytes": 242252
       }
-    }
-  ],
-  "bodyConventions": {
-    "units": "body radii: the mean radius is 1.0; scale by radiusMeters (or any map scale) in the scene",
-    "up": "+Y = north pole (rotation axis)",
-    "forward": "+Z = latitude 0°, longitude 0°; +X = longitude 90° E",
-    "origin": "center of the body",
-    "relief": "vertices sit at 1 + reliefExaggeration × height / radiusMeters; water is flat at its level",
-    "siteAnchors": "Site_* empties on the surface: +Y up, +X east, −Z north"
-  },
-  "bodies": [
-    {
-      "id": "earth",
-      "name": "Earth",
-      "nodeName": "Earth",
-      "file": "bodies/earth.glb",
-      "radiusMeters": 6371000,
-      "radiusSource": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
-      "detail": 5,
-      "refine": [
-        {
-          "lat": 28.6082,
-          "lon": -80.6041,
-          "detail": 7,
-          "radiusKm": 1000
-        },
-        {
-          "lat": 28.6082,
-          "lon": -80.6041,
-          "detail": 6,
-          "radiusKm": 2000
-        }
-      ],
-      "reliefExaggeration": 25,
-      "sites": [
-        {
-          "id": "lc39a",
-          "node": "Site_LC39A",
-          "name": "Kennedy Space Center Launch Complex 39A",
-          "lat": 28.6082,
-          "lon": -80.6041,
-          "radius": 1,
-          "source": "https://en.wikipedia.org/wiki/Kennedy_Space_Center_Launch_Complex_39A"
-        }
-      ],
-      "materials": {
-        "OceanDeep": "water faces where most samples are deeper than 200 m (ETOPO1)",
-        "OceanShelf": "water faces where most samples are shallower than 200 m (ETOPO1)",
-        "SeaIce": "water faces where most samples have ≥ 15% sea ice at the yearly minimum (AMSR2)",
-        "Ice": "IGBP 15 permanent snow and ice; Antarctic ice shelves (MODIS water above 0 m in ETOPO1)",
-        "Jungle": "IGBP 2 evergreen broadleaf forests",
-        "Forest": "IGBP 1, 3, 4, 5 needleleaf, deciduous and mixed forests",
-        "Savanna": "IGBP 8, 9 woody savannas and savannas",
-        "Grass": "IGBP 10, 11 grasslands and permanent wetlands",
-        "Crop": "IGBP 12, 13, 14 croplands, urban, cropland mosaics",
-        "Shrub": "IGBP 6, 7 closed and open shrublands",
-        "Desert": "IGBP 16 barren"
-      },
-      "faceCounts": {
-        "SeaIce": 283,
-        "Ice": 690,
-        "OceanDeep": 15224,
-        "OceanShelf": 1351,
-        "Desert": 848,
-        "Grass": 1430,
-        "Forest": 650,
-        "Savanna": 1702,
-        "Crop": 780,
-        "Shrub": 633,
-        "Jungle": 531
-      },
-      "maxHeightMeters": 5058,
-      "data": [
-        "references/datasets/earth/etopo1_ice_0p25deg.png",
-        "references/datasets/earth/modis_igbp_2024_0p25deg.png",
-        "references/datasets/earth/amsr2_sea_ice_2024-09-15_0p25deg.png",
-        "references/datasets/earth/amsr2_sea_ice_2025-02-20_0p25deg.png"
-      ],
-      "bounds": {
-        "min": [
-          -1,
-          -1.0112,
-          -1
-        ],
-        "max": [
-          1,
-          1,
-          1
-        ]
-      },
-      "budget": {
-        "triangles": 26000,
-        "meshes": 12,
-        "bytes": 2097152
-      },
-      "stats": {
-        "triangles": 24122,
-        "meshes": 11,
-        "bytes": 1746504
-      },
-      "references": [
-        {
-          "label": "MODIS land cover (MCD12Q1) via NASA GIBS",
-          "url": "https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api"
-        },
-        {
-          "label": "ETOPO1 Global Relief Model (NOAA NCEI)",
-          "url": "https://www.ncei.noaa.gov/products/etopo-global-relief-model"
-        },
-        {
-          "label": "AMSR2 sea-ice concentration via NASA GIBS",
-          "url": "https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api"
-        }
-      ]
     }
   ]
 }

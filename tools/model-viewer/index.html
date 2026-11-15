@@ -124,6 +124,9 @@
       <button class="chip" id="team-btn" title="Mostrar os 4 lado a lado (tecla 0)">Equipe lado a lado</button>
     </div>
 
+    <h2>Peças e Módulos</h2>
+    <div class="models" id="parts"></div>
+
     <h2>Animação</h2>
     <div class="row" id="clips"></div>
     <div class="clip-desc" id="clip-desc"></div>
@@ -151,6 +154,7 @@
     <label class="toggle"><input type="checkbox" id="rotate"> Girar automaticamente</label>
     <label class="toggle"><input type="checkbox" id="autoreload" checked> Recarregar quando os modelos mudarem</label>
     <div class="row">
+      <button class="chip" id="fpv-btn" title="Alternar câmera 1ª pessoa do piloto (Tecla C)" hidden>👁 Visão 1ª Pessoa (Piloto)</button>
       <button class="chip" id="reload-btn" title="Tecla R">↻ Recarregar agora</button>
       <button class="chip" id="change-folder-btn">Trocar pasta…</button>
     </div>
@@ -480,6 +484,7 @@
 
     function prepareModel(gltf, entry) {
       const root = gltf.scene;
+      const isPart = Boolean(entry?.category);
       root.traverse((o) => {
         if (o.isMesh) {
           o.castShadow = o.receiveShadow = true;
@@ -509,14 +514,29 @@
         const g = o.geometry;
         triangles += (g.index ? g.index.count : g.attributes.position.count) / 3;
       });
+      root.updateMatrixWorld(true);
+      const size = new THREE.Vector3();
+      new THREE.Box3().setFromObject(root).getSize(size);
 
-      // Debug helpers: axes on rig pivots, magenta arrows on FX anchors (emission axis = +Y).
+      // Debug helpers: axes on rig pivots/attach points, magenta arrows on FX anchors (emission axis = +Y).
       // Collect targets first so the traversal does not walk into the helpers it creates.
-      const pivotNames = new Set(state.manifest?.conventions?.pivots ?? []);
+      const pivotNames = new Set([
+        ...(state.manifest?.conventions?.pivots ?? []),
+        'Camera_Pilot',
+        'Joystick_RHC',
+        'Controller_THC',
+        'Throttle_Lever',
+        'Breaker_Bank',
+        'Stage_Sep_Switch',
+        'EDL_Arm_Switch',
+        'Abort_Button',
+        'Alarm_Master_Red',
+        'Alarm_Caution_Amber',
+      ]);
       const fxNodes = [], pivotNodes = [];
       root.traverse((o) => {
         if (o.name.startsWith('FX_')) fxNodes.push(o);
-        else if (pivotNames.has(o.name)) pivotNodes.push(o);
+        else if (pivotNames.has(o.name) || o.name.startsWith('Attach_') || o.name === 'Gimbal') pivotNodes.push(o);
       });
       const helpers = [];
       for (const o of fxNodes) {
@@ -525,7 +545,7 @@
         helpers.push(arrow);
       }
       for (const o of pivotNodes) {
-        const axes = new THREE.AxesHelper(0.08);
+        const axes = new THREE.AxesHelper(isPart ? 0.06 : 0.08);
         axes.material.depthTest = false;
         axes.renderOrder = 20;
         o.add(axes);
@@ -533,7 +553,7 @@
       }
       helpers.forEach((h) => (h.visible = $('helpers').checked));
 
-      return { entry, gltf, root, mixer, actions, emitters, helpers, current: null, stats: { triangles, meshes } };
+      return { entry, isPart, gltf, root, mixer, actions, emitters, helpers, current: null, stats: { triangles, meshes, size } };
     }
 
     // ------------------------------------------------------------------------
@@ -697,20 +717,36 @@
       }
     }
 
+    const PART_KIND_LABELS = {
+      engines: 'Motor',
+      tanks: 'Tanque',
+      equipment: 'Equipamento',
+      cabin: 'Cabine',
+      cockpit: 'Cockpit 1ª Pessoa',
+    };
+    const PART_KIND_COLORS = {
+      engines: '#FF6A00',
+      tanks: '#C4C8CC',
+      equipment: '#38E07B',
+      cabin: '#5AA9FF',
+      cockpit: '#FF3B30',
+    };
+
     async function loadFromSource(source) {
       const manifest = await source.readManifest();
       const previous = state.models;
       state.manifest = manifest; // presets are needed while preparing
-      const gltfs = await Promise.all(manifest.models.map(async (entry) =>
+      const allEntries = [...(manifest.models ?? []), ...(manifest.parts ?? [])];
+      const gltfs = await Promise.all(allEntries.map(async (entry) =>
         loader.parseAsync(await source.readModel(entry.file, manifest.generatedAt), '')));
-      // Keep manifest order (= docs/characters.md order) regardless of which file loaded first.
-      const loaded = new Map(manifest.models.map((entry, i) => [entry.id, prepareModel(gltfs[i], entry)]));
+      // Keep manifest order (= docs/characters.md & parts order) regardless of which file loaded first.
+      const loaded = new Map(allEntries.map((entry, i) => [entry.id, prepareModel(gltfs[i], entry)]));
       for (const m of previous.values()) disposeModel(m);
       state.models = loaded;
       $('source').textContent = `Gerado em ${new Date(manifest.generatedAt).toLocaleString('pt-BR')} · ${source.label}`;
       buildModelList();
       if (state.view.mode !== 'file') {
-        if (!state.view.id || !loaded.has(state.view.id)) state.view.id = manifest.models[0]?.id;
+        if (!state.view.id || !loaded.has(state.view.id)) state.view.id = allEntries[0]?.id;
         showView(state.view.mode, state.view.id, { keepCamera: true });
       }
       hideBanner();
@@ -729,7 +765,7 @@
     // Views
     // ------------------------------------------------------------------------
     function visibleModels() {
-      if (state.view.mode === 'team') return [...state.models.values()];
+      if (state.view.mode === 'team') return [...state.models.values()].filter((m) => !m.isPart);
       if (state.view.mode === 'file') return state.fileModel ? [state.fileModel] : [];
       const m = state.models.get(state.view.id);
       return m ? [m] : [];
@@ -746,8 +782,19 @@
       const list = [...shown];
       list.forEach((m, i) => {
         m.root.position.set((i - (list.length - 1) / 2) * TEAM_SPACING, 0, 0);
+        if (list.length === 1 && m.isPart) {
+          m.root.updateMatrixWorld(true);
+          const box = new THREE.Box3().setFromObject(m.root);
+          if (box.min.y < -0.005) m.root.position.set(0, -box.min.y + 0.15, 0);
+        }
       });
-      if (!keepCamera) frameCamera(list.length);
+      if (!keepCamera) {
+        state.fpv = false;
+        frameCamera(list.length);
+      }
+      const singleCamNode = list.length === 1 ? list[0].root.getObjectByName('Camera_Pilot') : null;
+      $('fpv-btn').hidden = !singleCamNode;
+      $('fpv-btn').classList.toggle('active', Boolean(state.fpv && singleCamNode));
       document.querySelectorAll('.model-btn').forEach((b) => b.classList.toggle('active', mode === 'single' && b.dataset.id === id));
       $('team-btn').classList.toggle('active', mode === 'team');
       buildClipButtons();
@@ -757,6 +804,24 @@
     }
 
     function frameCamera(count) {
+      camera.fov = 40;
+      camera.updateProjectionMatrix();
+      const list = visibleModels();
+      if (count === 1 && list[0]?.isPart) {
+        const m = list[0];
+        m.root.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(m.root);
+        const center = new THREE.Vector3();
+        const size = new THREE.Vector3();
+        box.getCenter(center);
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z, 0.4);
+        const dist = maxDim * 1.9;
+        controls.target.copy(center);
+        camera.position.set(center.x + dist * 0.45, center.y + maxDim * 0.35, center.z + dist);
+        controls.update();
+        return;
+      }
       const width = Math.max(1, count) * TEAM_SPACING;
       const dist = count > 1 ? 2.2 + width * 1.1 : 3.4;
       controls.target.set(0, 0.95, 0);
@@ -770,7 +835,7 @@
     function buildModelList() {
       const box = $('models');
       box.innerHTML = '';
-      state.manifest.models.forEach((entry, i) => {
+      (state.manifest.models ?? []).forEach((entry, i) => {
         const b = document.createElement('button');
         b.className = 'model-btn';
         b.dataset.id = entry.id;
@@ -779,6 +844,20 @@
         b.onclick = () => showView('single', entry.id);
         box.append(b);
       });
+
+      const partsBox = $('parts');
+      partsBox.innerHTML = '';
+      for (const entry of state.manifest.parts ?? []) {
+        const b = document.createElement('button');
+        b.className = 'model-btn';
+        b.dataset.id = entry.id;
+        const kind = PART_KIND_LABELS[entry.category] ?? entry.category;
+        const color = PART_KIND_COLORS[entry.category] ?? '#C4C8CC';
+        b.innerHTML = `<span class="dot" style="background:${color}"></span>
+          <span><b>${entry.displayName ?? entry.name}</b><span class="role">${kind} · T${entry.tier} · ${entry.vehicle ?? entry.role}</span></span>`;
+        b.onclick = () => showView('single', entry.id);
+        partsBox.append(b);
+      }
     }
 
     function clipLabel(name) {
@@ -821,12 +900,32 @@
 
     function checksFor(m) {
       const conv = state.manifest?.conventions;
-      if (!conv) return [];
       const names = new Set();
       m.root.traverse((o) => names.add(o.name));
       const checks = [];
       const budget = m.entry?.budget?.triangles;
       if (budget) checks.push([m.stats.triangles <= budget, `${m.stats.triangles} / ${budget} triângulos`]);
+
+      if (m.isPart) {
+        const meshBudget = m.entry?.budget?.meshes ?? 12;
+        checks.push([m.stats.meshes <= meshBudget, `${m.stats.meshes} / ${meshBudget} meshes`]);
+        checks.push([names.has('Attach_Top'), 'âncora Attach_Top']);
+        if (['tanks', 'equipment', 'cabin', 'cockpit'].includes(m.entry.category)) {
+          checks.push([names.has('Attach_Bottom'), 'âncora Attach_Bottom']);
+        }
+        if (m.entry.category === 'cockpit') {
+          checks.push([names.has('Camera_Pilot'), 'câmera Camera_Pilot (1ª pessoa)']);
+          checks.push([names.has('Joystick_RHC') && names.has('Throttle_Lever'), 'comandos articulados (RHC/Manete/Chaves)']);
+        }
+        if (m.entry.category === 'engines') {
+          checks.push([names.has('FX_Exhaust'), 'âncora FX_Exhaust']);
+        }
+        const missingFx = (m.entry?.fx ?? []).filter((f) => !names.has(f.anchor)).map((f) => f.anchor);
+        checks.push([missingFx.length === 0, missingFx.length ? `faltam âncoras: ${missingFx.join(', ')}` : `${m.emitters.length} âncoras FX`]);
+        return checks;
+      }
+
+      if (!conv) return checks;
       const missingPivots = conv.pivots.filter((p) => !names.has(p));
       checks.push([missingPivots.length === 0, missingPivots.length ? `faltam pivôs: ${missingPivots.join(', ')}` : `${conv.pivots.length} pivôs do rig`]);
       const missingClips = conv.requiredClips.filter((c) => !m.actions[c]);
@@ -850,6 +949,42 @@
       const m = list[0];
       const e = m.entry ?? { name: 'Arquivo local', role: m.fileName ?? '' };
       const kb = e.stats?.bytes ? `${(e.stats.bytes / 1024).toFixed(0)} KB` : '—';
+      const dim = `${m.stats.size.x.toFixed(2)}×${m.stats.size.y.toFixed(2)}×${m.stats.size.z.toFixed(2)} m`;
+      if (m.isPart) {
+        const kind = PART_KIND_LABELS[e.category] ?? e.category;
+        const accent = PART_KIND_COLORS[e.category] ?? '#C4C8CC';
+        const s = e.specs;
+        const pwrText = s ? (s.powerW > 0 ? `+${s.powerW} W (gera)` : s.powerW < 0 ? `${s.powerW} W` : '0 W') : '—';
+        const specRows = s ? [
+          ['Custo', `$${s.costM}M`],
+          ['Massa seca', `${s.massDryKg.toLocaleString('pt-BR')} kg`],
+          ...(s.propellantMassKg > 0 ? [['Propelente', `${s.propellantMassKg.toLocaleString('pt-BR')} kg`]] : []),
+          ...(s.thrustVacKn > 0 ? [['Empuxo (SL / Vac)', `${s.thrustSlKn || '—'} / ${s.thrustVacKn} kN`]] : []),
+          ...(s.ispVacS > 0 ? [['Isp (SL / Vac)', `${s.ispSlS || '—'} / ${s.ispVacS} s`]] : []),
+          ['Potência', pwrText],
+          ...(s.dataRateKbps > 0 ? [['Taxa de dados', s.dataRateKbps >= 1000 ? `${(s.dataRateKbps / 1000).toFixed(1)} Mbps` : `${s.dataRateKbps} kbps`]] : []),
+          ...(s.unlocksMinigames?.length ? [['Minigames', s.unlocksMinigames.join(', ')]] : []),
+          ...(s.mitigatesEvents?.length ? [['Mitiga eventos', s.mitigatesEvents.join(', ')]] : []),
+        ] : [];
+        info.innerHTML = `
+          <div><b style="color:${accent}">${e.displayName ?? e.name}</b></div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">${kind} · Tier ${e.tier} · ${e.vehicle ?? ''}</div>
+          ${e.role ? `<p style="margin-top:6px">${e.role}</p>` : ''}
+          ${e.summary ? `<p>${e.summary}</p>` : ''}
+          ${specRows.length ? `<h2>Dados de Jogo (Specs)</h2><div class="stats">${specRows.map(([k, v]) => `<span>${k}</span><span>${v}</span>`).join('')}</div>` : ''}
+          <h2>Geometria 3D</h2>
+          <div class="stats">
+            <span>Triângulos</span><span>${m.stats.triangles}</span>
+            <span>Meshes</span><span>${m.stats.meshes}</span>
+            <span>Dimensões</span><span>${dim}</span>
+            <span>Tamanho</span><span>${kb}</span>
+          </div>
+          ${state.manifest && m.entry ? `<h2>Validação</h2><ul class="checks">${checksFor(m).map(([ok, t]) =>
+            `<li class="${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✘'} ${t}</li>`).join('')}</ul>` : ''}
+          ${s?.sources ? `<h2>Fontes dos Valores</h2><ul>${Object.entries(s.sources).map(([k, v]) => `<li><b>${k}:</b> <small>${v}</small></li>`).join('')}</ul>` : ''}
+          ${e.references?.length ? `<h2>Referências</h2><ul>${e.references.map((r) => `<li><code>${r}</code></li>`).join('')}</ul>` : ''}`;
+        return;
+      }
       info.innerHTML = `
         <div><b style="color:${e.accent ?? 'inherit'}">${e.name}</b> · ${e.role}</div>
         ${e.summary ? `<p>${e.summary}</p>` : ''}
@@ -895,6 +1030,29 @@
       }
     };
     $('rotate').onchange = (ev) => (controls.autoRotate = ev.target.checked);
+    function toggleFpvCamera() {
+      const list = visibleModels();
+      const m = list.length === 1 ? list[0] : null;
+      const camNode = m?.root.getObjectByName('Camera_Pilot');
+      if (!camNode) return;
+      state.fpv = !state.fpv;
+      $('fpv-btn').classList.toggle('active', state.fpv);
+      if (state.fpv) {
+        m.root.updateMatrixWorld(true);
+        const worldPos = new THREE.Vector3();
+        camNode.getWorldPosition(worldPos);
+        const targetArr = camNode.userData?.target ?? [0, 0.86, -0.55];
+        camera.fov = camNode.userData?.fov ?? 62;
+        camera.updateProjectionMatrix();
+        camera.position.copy(worldPos);
+        controls.target.set(targetArr[0], targetArr[1], targetArr[2]);
+        controls.update();
+      } else {
+        frameCamera(1);
+      }
+    }
+
+    $('fpv-btn').onclick = () => toggleFpvCamera();
     $('reload-btn').onclick = () => reload();
     // Give keyboard focus back to the page so shortcuts keep working after using a control.
     document.querySelector('aside').addEventListener('change', (ev) => ev.target.blur());
@@ -916,6 +1074,7 @@
       else if (ev.key === '0') showView('team');
       else if (ev.key === ' ') { ev.preventDefault(); togglePlay(); }
       else if (ev.key.toLowerCase() === 'w') { $('wire').checked = !$('wire').checked; applyWireframe(); }
+      else if (ev.key.toLowerCase() === 'c') toggleFpvCamera();
       else if (ev.key.toLowerCase() === 'r') reload();
       else if (ev.key.toLowerCase() === 'p') {
         const order = ['auto', 'always', 'off'];

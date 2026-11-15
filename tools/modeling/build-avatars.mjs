@@ -136,6 +136,7 @@ async function main() {
     fxPresets: FX_PRESETS,
     references: REFERENCES,
     models,
+    ...(previousManifest.missionRules ? { missionRules: previousManifest.missionRules } : {}),
     ...(previousManifest.parts ? { parts: previousManifest.parts } : {}),
     ...(previousManifest.bodies ? { bodyConventions: previousManifest.bodyConventions, bodies: previousManifest.bodies } : {}),
   };
