@@ -2,7 +2,7 @@
 
 Regras para **qualquer pessoa ou agente de IA** (Claude Code, OpenAI Codex, Google Antigravity, Cursor etc.) que mexer neste repositório.
 
-- Este é o **único** arquivo de instruções para agentes: as ferramentas acima o leem sozinhas (veja a seção 13). Não crie cópias por ferramenta.
+- Este é o **único** arquivo de instruções para agentes: as ferramentas acima o leem sozinhas (veja a seção 14). Não crie cópias por ferramenta.
 - Se uma regra daqui conflitar com o pedido de alguém do time, pergunte antes de seguir.
 - Se o time mudar uma regra, atualize este arquivo no mesmo commit.
 
@@ -19,6 +19,8 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 | [docs/minigames.md](docs/minigames.md) | Experimentos e minigames por personagem |
 | [references/experiments/](references/experiments/) | Dados reais de missões, com fontes |
 | [references/parts/parts.md](references/parts/parts.md) | Peças reais de foguete (motores, tanques): tiers, dados, fotos e instruções low poly |
+| [references/datasets/msl-rad/](references/datasets/msl-rad/) | Radiação medida pelo detector RAD do Curiosity, com fonte |
+| [docs/audio.md](docs/audio.md) | Paisagem sonora gerada a partir desses dados de radiação |
 
 ---
 
@@ -26,16 +28,18 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 
 ```text
 docs/                   design do jogo (PT-BR) e material do desafio
-references/             dados reais com fontes (EN): experimentos, peças
+references/             dados reais com fontes (EN): experimentos, peças, datasets
 godot/                  projeto Godot 4.7 (o jogo)
   assets/models/        GERADO: GLBs + manifest.json (não editar à mão)
+  assets/audio/         GERADO: WAVs + manifest.json (não editar à mão)
 tools/
   modeling/             gerador procedural dos modelos 3D (Node + three.js)
     characters/<id>.mjs um arquivo por personagem: equipamento + animação de ação
     lib/                rig, formas, paleta, animações, presets de partículas
+  audio/                gerador da paisagem sonora a partir de dados reais (Node, sem dependências)
   model-viewer/         visualizador HTML para validar modelos
   godot/                scripts de verificação headless do Godot
-package.json            dependências e scripts do gerador (npm run models)
+package.json            dependências e scripts dos geradores (npm run models, npm run audio)
 ```
 
 ---
@@ -74,7 +78,7 @@ package.json            dependências e scripts do gerador (npm run models)
 - **Compatível com web:**
   - Nada de threads nem APIs exclusivas de um sistema operacional.
   - ENet só fora da web: esconda essas opções com `OS.has_feature("web")`.
-- **Verificação:** rode headless antes de concluir (veja a seção 10).
+- **Verificação:** rode headless antes de concluir (veja a seção 11).
 
 ### JavaScript (ferramentas)
 - Módulos ES puros (`.mjs`), sem etapa de build.
@@ -184,7 +188,31 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ---
 
-## 7. Dados científicos e textos do jogo
+## 7. Pipeline de áudio (paisagem sonora da radiação)
+
+- **O código é a fonte da verdade:** `tools/audio/` gera o som offline a partir dos dados reais do RAD (`references/datasets/msl-rad/`). Os WAVs em `godot/assets/audio/` são **gerados**: não edite à mão. Para mudar, edite o código e rode `npm run audio`.
+- **Nada de síntese em tempo real no jogo:** a exportação web sem threads usa o modo de reprodução "Sample", que não tem efeitos de áudio e pode picotar com `AudioStreamGenerator`. O jogo só toca arquivos prontos e ajusta volume.
+- **Sem dependências:** JavaScript puro. O gerador é determinístico: os mesmos dados e o mesmo código geram os mesmos bytes.
+- **Arquivos gerados:**
+
+  | Arquivo | Tipo | Uso no jogo |
+  |---|---|---|
+  | `rad_surface_bed.wav` | loop, 40 s | Fundo na superfície de Marte |
+  | `rad_storm_2024_05_20.wav` | único, 32 s | Tempestade solar real, por cima do fundo |
+  | `geiger_click_<n>.wav` | únicos, 50 ms | Contador Geiger; a taxa segue a dose (parâmetros no `manifest.json`) |
+
+- **Loops:** o WAV leva um chunk `smpl`, que o Godot lê sozinho (importação "Detect From WAV"). Gere loops com `closeLoop()` (`lib/wav.mjs`): o Godot repete os quadros `início+1 … fim`, e o quadro extra deixa a emenda exata.
+- **Formato:** PCM 16 bits. Ambientes em 24 kHz estéreo (cada arquivo abaixo de 5 MB); efeitos em 44,1 kHz mono. O Godot importa com compressão QOA.
+- **Escolhas musicais** (tom de Ré, escala pentatônica menor, volumes, compressão de tempo) são `game-balance`. Os eventos e as curvas que as controlam vêm dos dados. O mapeamento está em [docs/audio.md](docs/audio.md) e no `manifest.json`.
+- **Fluxo ao mudar o áudio:**
+  1. `npm run audio`: gera e valida. Precisa passar sem ✘.
+  2. `godot --headless --path godot --import`, depois `godot --headless --path godot --script "$PWD/tools/godot/check_audio.gd"`. Precisa terminar com `RESULT: OK`.
+  3. Ouça os arquivos: a validação não julga se o som ficou bom.
+  4. Faça commit **junto** do código, dos WAVs, do `manifest.json` e dos arquivos `.import`.
+
+---
+
+## 8. Dados científicos e textos do jogo
 
 - **Números "reais":** tudo que for apresentado ao jogador como real vem de `references/`, com a fonte.
 - **Marcas nas referências:**
@@ -198,7 +226,7 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ---
 
-## 8. Idioma
+## 9. Idioma
 
 | O quê | Idioma |
 |---|---|
@@ -208,7 +236,7 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ---
 
-## 9. Git
+## 10. Git
 
 - **Commits:** no padrão já usado pelo time (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`), em inglês.
 - **Fazer commit de:** arquivos `.import` do Godot e assets gerados (assim quem não tem Node consegue abrir o projeto).
@@ -221,10 +249,11 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ---
 
-## 10. Checklist antes de concluir uma tarefa
+## 11. Checklist antes de concluir uma tarefa
 
 - [ ] `npm run models` passa (se tocou em modelos).
 - [ ] `check_models.gd` retorna `RESULT: OK` (se tocou em modelos ou na importação).
+- [ ] `npm run audio` passa e `check_audio.gd` retorna `RESULT: OK` (se tocou em áudio ou na importação).
 - [ ] Os scripts GDScript carregam sem erro no modo headless.
 - [ ] O visualizador abre sem erros no console.
 - [ ] Nenhum número apresentado como real ficou sem fonte.
@@ -232,7 +261,7 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ---
 
-## 11. Comandos
+## 12. Comandos
 
 ```bash
 npm install                    # uma vez: three + validador glTF
@@ -240,14 +269,17 @@ npm run models                 # gera os 4 avatares e valida
 npm run models:build -- maya   # gera só um personagem
 npm run models:validate        # só valida
 # visualizador: abrir tools/model-viewer/index.html no navegador e escolher godot/assets/models
+npm run audio                  # gera a paisagem sonora e valida
+npm run audio:fetch            # baixa de novo os dados do RAD (só para mudar as janelas de dados)
 
 godot --headless --path godot --import
 godot --headless --path godot --script "$PWD/tools/godot/check_models.gd"
+godot --headless --path godot --script "$PWD/tools/godot/check_audio.gd"
 ```
 
 ---
 
-## 12. Referências para quem for mexer no pipeline
+## 13. Referências para quem for mexer no pipeline
 
 - **Skills de three.js:** [CloudAI-X/threejs-skills](https://github.com/CloudAI-X/threejs-skills) (MIT). Ler `threejs-geometry`, `threejs-animation` e `threejs-asset-pipeline` antes de alterar o gerador ou o visualizador.
 - **Godot:**
@@ -257,7 +289,7 @@ godot --headless --path godot --script "$PWD/tools/godot/check_models.gd"
 
 ---
 
-## 13. Ferramentas de IA que leem este arquivo
+## 14. Ferramentas de IA que leem este arquivo
 
 | Ferramenta | Como encontra este arquivo | Limite |
 |---|---|---|
