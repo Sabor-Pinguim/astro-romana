@@ -1,0 +1,240 @@
+{
+  "generator": "tools/terrain/build-terrain.mjs",
+  "conventions": {
+    "units": "meters",
+    "axes": "+X east, +Y up, -Z north (true north at the site center)",
+    "origin": "site center; y = 0 is the DTM elevation at the center (elevation.centerM)",
+    "sunAzimuth": "degrees clockwise from north, as seen from the ground",
+    "collision": "node \"Terrain-col\" makes Godot add a StaticBody3D with a trimesh shape"
+  },
+  "sites": [
+    {
+      "id": "jezero",
+      "name": "Jezero Crater",
+      "file": "jezero.glb",
+      "center": {
+        "lat": 18.4447,
+        "lon": 77.4508
+      },
+      "corners": [
+        {
+          "lat": 18.449019,
+          "lon": 77.446247
+        },
+        {
+          "lat": 18.449019,
+          "lon": 77.455353
+        },
+        {
+          "lat": 18.440381,
+          "lon": 77.455353
+        },
+        {
+          "lat": 18.440381,
+          "lon": 77.446247
+        }
+      ],
+      "sizeM": 512,
+      "gridVertices": 255,
+      "gridSpacingM": 2.0157,
+      "textureSize": 1024,
+      "texelM": 0.5,
+      "triangles": 129032,
+      "elevation": {
+        "centerM": -2568.69,
+        "minM": -2573.58,
+        "maxM": -2564.25,
+        "reliefM": 9.33
+      },
+      "sun": {
+        "azimuthDeg": 267.37,
+        "elevationDeg": 42.42,
+        "localTimeH": 15.24,
+        "solarLongitudeDeg": 154.92,
+        "startTime": "2016-05-19T08:25:36.182",
+        "observation": "ESP_045994_1985",
+        "label": "https://hirise-pds.lpl.arizona.edu/PDS/RDR/ESP/ORB_045900_045999/ESP_045994_1985/ESP_045994_1985_RED.LBL"
+      },
+      "shadingCheck": {
+        "photoSun": 0.227,
+        "oppositeSun": -0.206
+      },
+      "holesFilled": 0,
+      "tint": [
+        0.86,
+        0.62,
+        0.44,
+        1
+      ],
+      "source": {
+        "license": "CC0-1.0",
+        "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_045994_1985_046060_1985_U01",
+        "description": "This product is a Mars Reconnaissance Orbiter (MRO) High Resolution Imaging Experiment (HiRISE) Digital Terrain Model (DTM). This product was created and edited using BAE Systems Set or BAE Systems GXP. This product's rationale for creation was: Candidate landing site for 2020 mission in Jezero Crater. This DTM was created by University Of Arizona.",
+        "dtm": {
+          "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/DTEEC_045994_1985_046060_1985_U01.tif",
+          "gsdM": 1.0166,
+          "etag": "9921ecbc8fe910627983c82a5282db31-19",
+          "lastModified": "Sat, 08 Jul 2023 05:04:17 GMT"
+        },
+        "ortho": {
+          "name": "ESP_045994_1985_RED_A_01_ORTHO",
+          "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_045994_1985_ESP_046060_1985/ESP_045994_1985_RED_A_01_ORTHO.tif",
+          "etag": "368080df20d6a92003fbaad60c1656bd-121",
+          "lastModified": "Sat, 08 Jul 2023 05:04:18 GMT"
+        }
+      }
+    },
+    {
+      "id": "gale",
+      "name": "Gale Crater",
+      "file": "gale.glb",
+      "center": {
+        "lat": -4.5895,
+        "lon": 137.4417
+      },
+      "corners": [
+        {
+          "lat": -4.585181,
+          "lon": 137.437367
+        },
+        {
+          "lat": -4.585181,
+          "lon": 137.446033
+        },
+        {
+          "lat": -4.593819,
+          "lon": 137.446033
+        },
+        {
+          "lat": -4.593819,
+          "lon": 137.437367
+        }
+      ],
+      "sizeM": 512,
+      "gridVertices": 255,
+      "gridSpacingM": 2.0157,
+      "textureSize": 1024,
+      "texelM": 0.5,
+      "triangles": 129032,
+      "elevation": {
+        "centerM": -4502.54,
+        "minM": -4506.41,
+        "maxM": -4497.15,
+        "reliefM": 9.27
+      },
+      "sun": {
+        "azimuthDeg": 288.62,
+        "elevationDeg": 33.91,
+        "localTimeH": 15.58,
+        "solarLongitudeDeg": 148.68,
+        "startTime": "2008-10-28T08:30:34.934",
+        "observation": "PSP_010573_1755",
+        "label": "https://hirise-pds.lpl.arizona.edu/PDS/RDR/PSP/ORB_010500_010599/PSP_010573_1755/PSP_010573_1755_RED.LBL"
+      },
+      "shadingCheck": {
+        "photoSun": 0.663,
+        "oppositeSun": -0.662
+      },
+      "holesFilled": 0,
+      "tint": [
+        0.84,
+        0.6,
+        0.45,
+        1
+      ],
+      "source": {
+        "license": "CC0-1.0",
+        "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_010573_1755_010639_1755_U01",
+        "description": "This product is a Mars Reconnaissance Orbiter (MRO) High Resolution Imaging Experiment (HiRISE) Digital Terrain Model (DTM). This product was created and edited using BAE Systems Set or BAE Systems GXP. This product's rationale for creation was: Possible MSL landing site in Gale Crater. This DTM was created by University Of Arizona.",
+        "dtm": {
+          "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/PSP_010573_1755_PSP_010639_1755/DTEEC_010573_1755_010639_1755_U01.tif",
+          "gsdM": 1.0118,
+          "etag": "358071ac8871f5b69f3ea7ce169a1865-21",
+          "lastModified": "Sat, 08 Jul 2023 10:54:57 GMT"
+        },
+        "ortho": {
+          "name": "PSP_010573_1755_RED_A_01_ORTHO",
+          "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/PSP_010573_1755_PSP_010639_1755/PSP_010573_1755_RED_A_01_ORTHO.tif",
+          "etag": "f33c2a7561f94e92c977207c8cb864b5-127",
+          "lastModified": "Sat, 08 Jul 2023 10:54:57 GMT"
+        }
+      }
+    },
+    {
+      "id": "north_polar_scarp",
+      "name": "North polar cap scarp",
+      "file": "north_polar_scarp.glb",
+      "center": {
+        "lat": 83.87,
+        "lon": -124.871
+      },
+      "corners": [
+        {
+          "lat": 83.887251,
+          "lon": -125.033234
+        },
+        {
+          "lat": 83.887251,
+          "lon": -124.708766
+        },
+        {
+          "lat": 83.8527,
+          "lon": -124.709675
+        },
+        {
+          "lat": 83.8527,
+          "lon": -125.032325
+        }
+      ],
+      "sizeM": 2048,
+      "gridVertices": 255,
+      "gridSpacingM": 8.063,
+      "textureSize": 1024,
+      "texelM": 2,
+      "triangles": 129032,
+      "elevation": {
+        "centerM": -4004.98,
+        "minM": -4455,
+        "maxM": -3769.56,
+        "reliefM": 685.44
+      },
+      "sun": {
+        "azimuthDeg": 217.84,
+        "elevationDeg": 24.25,
+        "localTimeH": 14.42,
+        "solarLongitudeDeg": 128.83,
+        "startTime": "2014-05-11T02:31:58.206",
+        "observation": "ESP_036506_2640",
+        "label": "https://hirise-pds.lpl.arizona.edu/PDS/RDR/ESP/ORB_036500_036599/ESP_036506_2640/ESP_036506_2640_RED.LBL"
+      },
+      "shadingCheck": {
+        "photoSun": 0.59,
+        "oppositeSun": -0.513
+      },
+      "holesFilled": 0,
+      "tint": [
+        0.93,
+        0.88,
+        0.84,
+        1
+      ],
+      "source": {
+        "license": "CC0-1.0",
+        "catalog": "https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEPC_036506_2640_036546_2640_A01",
+        "description": "This product is a Mars Reconnaissance Orbiter (MRO) High Resolution Imaging Experiment (HiRISE) Digital Terrain Model (DTM). This product was created and edited using BAE Systems Set or BAE Systems GXP. This product's rationale for creation was: Steepest north polar scarp. This DTM was created by University Of Arizona.",
+        "dtm": {
+          "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_036506_2640_ESP_036546_2640/DTEPC_036506_2640_036546_2640_A01.tif",
+          "gsdM": 1.0059,
+          "etag": "64918adfbcd38474c9355e559990c7d5-33",
+          "lastModified": "Sat, 08 Jul 2023 07:33:31 GMT"
+        },
+        "ortho": {
+          "name": "ESP_036506_2640_RED_C_01_ORTHO",
+          "url": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_036506_2640_ESP_036546_2640/ESP_036506_2640_RED_C_01_ORTHO.tif",
+          "etag": "82ff94543d78a5e0573df3a635cc8331-13",
+          "lastModified": "Sat, 08 Jul 2023 07:33:38 GMT"
+        }
+      }
+    }
+  ]
+}

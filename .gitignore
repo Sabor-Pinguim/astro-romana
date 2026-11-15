@@ -29,3 +29,5 @@ mono_crash.*.json
 # *.pck
 
 node_modules/
+# Terrain pipeline previews (npm run terrain:build -- --preview)
+tools/terrain/preview/

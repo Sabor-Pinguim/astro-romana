@@ -116,6 +116,13 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
   - A pilha balança ±43° sem esconder o lado aberto, e cada rótulo acompanha seu módulo.
   - Catálogo lateral (`.catalog` / `#parts-list`): cada peça exibe uma miniatura 3D chanfrada (`.part-thumb`) do seu modelo GLB sob a mesma iluminação de estúdio (com fallback SVG low poly quando WebGL estiver indisponível).
   - Lobby: o tripulante escolhido aparece em 3D (GLB do avatar, animação `idle_loop`; `wave` ao selecionar de novo) sobre um pedestal hexagonal na cor dele.
+- **Superfície** (pouso, terreno real do HiRISE em `index.terrain.<sítio>.js`):
+  - Primeira pessoa com o corpo à vista: o capacete some para a câmera, mas continua fazendo sombra; olhando para baixo aparecem peito, mãos, pernas e pés. `V` troca para a câmera atrás do personagem.
+  - Céu: domo de icosaedro facetado, caramelo `#d8a07c` no horizonte e `#7a4c46` no alto; a névoa usa a cor do horizonte (45 a 230 m).
+  - Chão: foto em tons de cinza × tinta do manifesto × ganho de jogo (`GROUND_GAIN`), mais um grão repetido a cada 3 m e pedras low poly (dodecaedros chapados, mesmas posições por sítio). Luz do sol na direção do sol da foto.
+  - Sonda pousada no centro: hexágono dourado e branco com 4 pernas, feita de primitivas.
+  - Experimento: plinto hexagonal escuro, cubo na cor do dono, gema creme girando e um feixe aditivo de 60 m visível de longe. Concluído: o feixe some e a gema fica verde `--safe`.
+  - HUD: painéis chanfrados nos cantos (local, lista de experimentos com distância e seta), barra da tripulação, aviso de interação em laranja (bloqueado em roxo, concluído em verde). No toque: joystick hexagonal e botão de pulo hexagonal.
 - **Terreno** (`facetTerrain`):
   - Linhas de vértices desde um perfil de silhueta (lista de pontos x, y) até a base, mais densas perto do horizonte.
   - Quads divididos em diagonais alternadas.
@@ -140,6 +147,8 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
 `prefers-reduced-motion: reduce` desliga todas as animações e para as órbitas. A tela continua completa e estática.
 
 ## 8. Levar para o Godot
+
+O jogo não usa mais o Godot (AGENTS.md seção 3); esta tabela fica só como referência.
 
 | Web | Godot 4 |
 |---|---|

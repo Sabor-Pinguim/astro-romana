@@ -31,9 +31,10 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 ```text
 docs/                   design do jogo (PT-BR) e material do desafio
 references/             dados reais com fontes (EN): experimentos, peças, datasets
-godot/                  projeto Godot 4.7 (o jogo)
+godot/                  só os assets gerados (o jogo não usa mais o Godot; veja a seção 3)
   assets/models/        GERADO: GLBs + manifest.json (não editar à mão)
   assets/audio/         GERADO: WAVs + manifest.json (não editar à mão)
+  assets/terrain/       GERADO: terrenos reais de Marte (GLB + textura + manifest.json)
 tools/
   modeling/             gerador procedural dos modelos 3D (Node + three.js)
     characters/<id>.mjs um arquivo por personagem: equipamento + animação de ação
@@ -41,7 +42,8 @@ tools/
     lib/                rig, formas, paleta, animações, presets de partículas
   audio/                gerador da paisagem sonora a partir de dados reais (Node, sem dependências)
   model-viewer/         visualizador HTML para validar modelos
-  godot/                scripts de verificação headless do Godot
+  terrain/              terrenos a partir de DTMs do HiRISE; regras em tools/terrain/AGENTS.md
+  godot/                checagens headless do Godot (legado, opcionais)
   web/                  empacota modelos e specs usados pelo index.html (index.models.js)
 package.json            dependências e scripts dos geradores (npm run models, npm run audio)
 ```
@@ -52,18 +54,26 @@ package.json            dependências e scripts dos geradores (npm run models, n
 
 | Tema | Decisão | Por quê |
 |---|---|---|
+<<<<<<< Updated upstream
 | Entrega executável (MVP Hackathon) | **Web / JavaScript + Three.js (`0.186.1`)** em `index.html` + `index.models.js` | Reaproveita 100% das telas 3D/2D já prontas, os GLBs e os WAVs gerados; roda direto no navegador (`file://` ou hospedado) sem fricção de export |
 | Assets compartilhados | `godot/assets/models/` e `godot/assets/audio/` + Godot 4.7.2 | Mantêm-se como diretórios canônicos de saída dos geradores offline e base futura caso o projeto retome build nativa |
 | Linguagem (código do jogo MVP) | **HTML / CSS / JS (ES modules CDN)** sem etapa de build | Edição imediata, zero dependências de runtime além do Three.js 0.186.1 |
 | GDScript (opcional / legado futuro) | **GDScript** (sem C#) / **GL Compatibility** / Thread Support desligado | Mantido caso o time decida portar o MVP web para executável/servidor Godot dedicado pós-hackathon |
 | Física (referência Godot) | Jolt (configurado em `project.godot`) | Padrão do projeto Godot |
 | Multiplayer, protótipo web / futuro | Simulação cooperativa local com tripulação IA em `index.html` (multiplayer P2P/WebSocket opcional pós-hackathon) | Garante entrega jogável das 7 fases no prazo do desafio |
+=======
+| Engine | **three.js** no navegador: o jogo (MVP) é o `index.html` | Decisão de 2026-11: o Godot foi deixado de lado |
+| Assets | GLB/WAV gerados continuam em `godot/assets/` | As ferramentas e os pacotes da página já usam esse caminho |
+| Multiplayer | Ainda não feito. Plano: servidor dedicado + WebSocket atrás de Caddy (`wss://`) numa VM da GCP | Navegadores só falam WebSocket/WebRTC |
+| Autoridade | **O servidor manda no estado**; clientes só pedem ações | Funciona igual em P2P e dedicado |
+>>>>>>> Stashed changes
 | Ferramentas | Node ≥ 20; `three` fixado em **0.186.1** (mesma versão nos import maps do visualizador e do `index.html`) | Builds reprodutíveis |
 
 ---
 
 ## 4. Regras de código
 
+<<<<<<< Updated upstream
 ### GDScript (jogo)
 - **Estilo:** siga o [guia oficial](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html).
   - `snake_case` para arquivos, funções e variáveis.
@@ -82,9 +92,14 @@ package.json            dependências e scripts dos geradores (npm run models, n
 - **Verificação:** rode headless antes de concluir (veja a seção 11).
 
 ### HTML (jogo web executável, `index.html`)
+=======
+### HTML e three.js (o jogo, `index.html`)
+>>>>>>> Stashed changes
 - **Identidade visual:** siga [docs/visual-identity.md](docs/visual-identity.md) (low poly facetado, paleta, fontes, formas, arte gerada). Se mudar o visual, atualize esse arquivo no mesmo commit.
 - **Arquivo único, sem build.** O three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D e a planta 2D são o fallback).
-- **3D e dados na página:** vêm de `index.models.js`, gerado por `npm run web:models` (o `file://` bloqueia `fetch`); `npm run models` já o roda.
+- **3D e dados na página:** vêm de `index.models.js` e de `index.terrain.<sítio>.js` (terreno de cada local de pouso, carregado no pouso), gerados por `npm run web:models` (o `file://` bloqueia `fetch`); `npm run models` já o roda.
+- **Números de balanceamento** (massa, potência, custo, velocidades) ficam em dados ou constantes nomeadas, nunca soltos no código. Cada valor diz se é real (com a fonte em `references/`) ou de jogo (`game-balance`).
+- **Superfície:** `index.html#surface-<sítio>` abre direto o pouso; `window.ASTRO_SURFACE` expõe estado e `goTo(id)` para testes.
 - **Teste** em 1440 px e 390 px de largura e com movimento reduzido.
 
 ### JavaScript (ferramentas)
@@ -179,7 +194,7 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ### 5.7 Fluxo obrigatório ao mudar um modelo
 1. `npm run models`: gera e valida. Precisa passar sem ✘; o validador oficial da Khronos não pode reportar erros.
-2. `godot --headless --path godot --import`, depois `godot --headless --path godot --script "$PWD/tools/godot/check_models.gd"`. Precisa terminar com `RESULT: OK`.
+2. *(Legado, opcional)* `godot --headless --path godot --import`, depois `godot --headless --path godot --script "$PWD/tools/godot/check_models.gd"`. Precisa terminar com `RESULT: OK`.
 3. Abra o visualizador (seção 6) e confira visualmente cada animação, as partículas e os pivôs (opção "Pivôs do rig e âncoras FX").
 4. Faça commit **junto** do código-fonte, dos GLBs, do `manifest.json` e dos arquivos `.import`.
 
@@ -219,7 +234,7 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 - **Escolhas musicais** (tom de Ré, escala pentatônica menor, volumes, compressão de tempo) são `game-balance`. Os eventos e as curvas que as controlam vêm dos dados. O mapeamento está em [docs/audio.md](docs/audio.md) e no `manifest.json`.
 - **Fluxo ao mudar o áudio:**
   1. `npm run audio`: gera e valida. Precisa passar sem ✘.
-  2. `godot --headless --path godot --import`, depois `godot --headless --path godot --script "$PWD/tools/godot/check_audio.gd"`. Precisa terminar com `RESULT: OK`.
+  2. *(Legado, opcional)* `godot --headless --path godot --import`, depois `godot --headless --path godot --script "$PWD/tools/godot/check_audio.gd"`. Precisa terminar com `RESULT: OK`.
   3. Ouça os arquivos: a validação não julga se o som ficou bom.
   4. Faça commit **junto** do código, dos WAVs, do `manifest.json` e dos arquivos `.import`.
 
@@ -266,9 +281,8 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 ## 11. Checklist antes de concluir uma tarefa
 
 - [ ] `npm run models` passa (se tocou em modelos).
-- [ ] `check_models.gd` retorna `RESULT: OK` (se tocou em modelos ou na importação).
-- [ ] `npm run audio` passa e `check_audio.gd` retorna `RESULT: OK` (se tocou em áudio ou na importação).
-- [ ] Os scripts GDScript carregam sem erro no modo headless.
+- [ ] `npm run audio` passa (se tocou em áudio); `npm run terrain` passa (se tocou em terreno).
+- [ ] O `index.html` abre sem erros no console em 1440 e 390 px (se tocou na página).
 - [ ] O visualizador abre sem erros no console.
 - [ ] Nenhum número apresentado como real ficou sem fonte.
 - [ ] Docs e este arquivo atualizados, se alguma convenção mudou.
@@ -287,10 +301,7 @@ npm run models:build:bodies    # gera os planetas (ex.: -- earth)
 # visualizador: abrir tools/model-viewer/index.html no navegador e escolher godot/assets/models
 npm run audio                  # gera a paisagem sonora e valida
 npm run audio:fetch            # baixa de novo os dados do RAD (só para mudar as janelas de dados)
-
-godot --headless --path godot --import
-godot --headless --path godot --script "$PWD/tools/godot/check_models.gd"
-godot --headless --path godot --script "$PWD/tools/godot/check_audio.gd"
+npm run terrain                # terrenos reais de Marte (regras em tools/terrain/AGENTS.md)
 ```
 
 ---
@@ -315,7 +326,7 @@ godot --headless --path godot --script "$PWD/tools/godot/check_audio.gd"
 
 - **Tamanho:** mantenha este arquivo abaixo de ~20 KB para caber com folga nos limites acima.
 - **Sem cópias:** não crie `GEMINI.md`, `.agents/rules/` nem `AGENTS.override.md` com cópias destas regras. O Antigravity soma todos os arquivos de regras que encontra, e as cópias divergem com o tempo.
-- **Regras de uma parte só do projeto:** coloque na seção correspondente daqui. Só divida em arquivos por pasta se este passar do limite.
+- **Regras de uma parte só do projeto:** coloque na seção correspondente daqui. Só divida em arquivos por pasta se este passar do limite. Já divididas: `tools/terrain/AGENTS.md` (com um `CLAUDE.md` ao lado que o importa).
 - **Para conferir o que o agente carregou:**
   - Codex: `codex --ask-for-approval never "Summarize the current instructions."`
   - Antigravity: Customizations → Rules, onde o `AGENTS.md` aparece na lista.

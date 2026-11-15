@@ -401,6 +401,54 @@
     .toast{position:fixed;left:50%;bottom:26px;z-index:40;max-width:min(520px,calc(100vw - 32px));padding:.85rem 1.5rem;font:600 .8rem/1.35 var(--heading);letter-spacing:.04em;color:var(--bg-void);background:linear-gradient(165deg,color-mix(in srgb,var(--solar-amber) 72%,var(--starlight-cream)) 0 50%,var(--solar-amber) 50%);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);translate:-50% calc(100% + 40px);visibility:hidden;transition:translate .3s cubic-bezier(.7,0,.2,1),visibility .3s}
     .toast.show{translate:-50% 0;visibility:visible}
 
+    /* Surface: the landing site in 3D, with a HUD over the canvas */
+    #surface{height:100vh;height:100dvh;min-height:0}
+    .surface-view{position:relative;flex:1;overflow:hidden;background:#2a1220;touch-action:none;user-select:none;-webkit-user-select:none}
+    .surface-view canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+    .surface-hud{position:absolute;z-index:2;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
+    .surface-site{padding:14px 20px 12px}
+    .surface-site h2{margin:.25rem 0 .1rem;font-size:clamp(1.05rem,2vw,1.5rem);color:var(--starlight-cream);text-transform:uppercase}
+    .surface-goals{width:min(330px,46vw);padding:14px 14px 12px}
+    .surface-goals ol{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+    .surface-goals li{--crew:var(--muted);display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:.55rem;padding:.42rem .55rem;background:var(--f1);font-size:.74rem;line-height:1.25}
+    .surface-goals li.here{background:var(--f4)}
+    .goal-chip{width:.8rem;height:.8rem;background:var(--crew);clip-path:var(--hex)}
+    .goal-name strong{display:block;font:600 .7rem var(--heading);letter-spacing:.08em;color:var(--starlight-cream);text-transform:uppercase}
+    .goal-name small{color:var(--muted)}
+    .goal-dist{font:600 .72rem var(--heading);color:var(--starlight-cream)}
+    .goal-arrow{width:14px;height:14px;background:var(--solar-amber);clip-path:polygon(50% 0,100% 100%,50% 72%,0 100%)}
+    .surface-goals li.done{opacity:.62}
+    .surface-goals li.done .goal-arrow{background:var(--safe);clip-path:var(--diamond)}
+    .surface-tag{--crew:var(--solar-amber);position:absolute;left:0;top:0;z-index:1;padding:.28rem .55rem .28rem .65rem;font:700 .6rem/1 var(--heading);letter-spacing:.1em;white-space:nowrap;color:var(--bg-void);background:var(--crew);clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);pointer-events:none;translate:-50% -100%}
+    .surface-tag.done{background:var(--safe)}
+    .surface-prompt{position:absolute;z-index:3;left:50%;bottom:96px;translate:-50% 0;max-width:calc(100vw - 32px);padding:.85rem 1.4rem;border:0;font:700 .78rem/1.3 var(--heading);letter-spacing:.08em;text-transform:uppercase;color:var(--bg-void);background:linear-gradient(112deg,var(--coral-hover) 0 40%,var(--mars-orange) 40%);clip-path:var(--chamfer);cursor:pointer}
+    .surface-prompt.locked{color:var(--starlight-cream);background:linear-gradient(112deg,var(--f4) 0 40%,var(--f3) 40%);cursor:default}
+    .surface-prompt.done{color:var(--bg-void);background:var(--safe);cursor:default}
+    .surface-crew{position:absolute;z-index:5;left:16px;bottom:16px;display:flex;gap:4px}
+    .surface-crew button{--crew:var(--muted);min-width:76px;padding:.55rem .7rem .5rem;border:0;border-bottom:3px solid var(--crew);font:600 .66rem/1.2 var(--heading);letter-spacing:.1em;text-transform:uppercase;text-align:left;color:var(--muted);background:var(--f1);cursor:pointer}
+    .surface-crew button small{display:block;color:var(--crew);font-size:.58rem}
+    .surface-crew button[aria-pressed="true"]{color:var(--bg-void);background:var(--crew)}
+    .surface-crew button[aria-pressed="true"] small{color:var(--bg-void)}
+    .surface-actions{position:absolute;z-index:5;right:16px;bottom:16px;display:flex;gap:6px}
+    .surface-actions .button{min-height:40px;padding:.6rem 1rem}
+    .surface-actions .button.quiet{--a:var(--f1);--b:var(--f1);--fg:var(--starlight-cream)}
+    .surface-start{position:absolute;z-index:4;inset:0;display:grid;place-items:center;padding:16px;background:#11071fa8;cursor:pointer}
+    .surface-start[hidden]{display:none}
+    .surface-start .slab{max-width:560px;padding:24px 28px;text-align:center}
+    .surface-start h3{margin:.4rem 0;font-size:1.5rem;color:var(--starlight-cream);text-transform:uppercase}
+    .surface-keys{margin:0;font-size:.84rem;color:var(--muted)}
+    .surface-keys kbd{display:inline-block;min-width:1.6em;margin:0 .15em;padding:.05em .4em;font:600 .7rem/1.5 var(--heading);color:var(--starlight-cream);background:var(--f4)}
+    .surface-fail .surface-start{cursor:default}
+    .surface-stick{position:absolute;z-index:3;left:0;top:0;width:110px;height:110px;margin:-55px 0 0 -55px;border:2px solid #fce8a666;clip-path:var(--hex);background:#11071f55;pointer-events:none;visibility:hidden}
+    .surface-stick span{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;background:var(--solar-amber);clip-path:var(--hex)}
+    .surface-stick.on{visibility:visible}
+    .surface-jump{display:none}
+    .minigame-note{padding:.6rem .8rem;font-size:.8rem;background:repeating-linear-gradient(-45deg,var(--f1) 0 10px,var(--f2) 10px 20px)}
+    @media (pointer:coarse){
+      .surface-jump{position:absolute;z-index:3;right:16px;bottom:70px;display:block;width:72px;height:72px;border:0;font:700 .7rem var(--heading);letter-spacing:.1em;text-transform:uppercase;color:var(--bg-void);background:var(--solar-amber);clip-path:var(--hex)}
+      .surface-actions .button:first-child{display:none}
+    }
+
     @keyframes wipe{from{clip-path:polygon(0 0,0 0,-20% 100%,0 100%)}to{clip-path:polygon(0 0,120% 0,100% 100%,0 100%)}}
     @keyframes spin{to{rotate:360deg}}
     @keyframes drift{to{translate:0 -14px}}
@@ -443,7 +491,21 @@
       .stage-node{max-width:46%}
       .rocket-stage{min-width:0;padding:.4rem .6rem .4rem .75rem}
       .rocket-stage small{display:none}
+<<<<<<< Updated upstream
       .remove-stage{width:28px;font-size:.95rem}
+=======
+      .surface-hud{top:10px;left:10px;right:10px;flex-direction:column;gap:6px}
+      .surface-site{padding:10px 14px 8px}
+      .surface-goals{width:100%;padding:10px}
+      .surface-goals li{padding:.3rem .5rem}
+      .goal-name small{display:none}
+      .surface-crew{left:10px;bottom:62px}
+      .surface-crew button{min-width:0;padding:.5rem .55rem .45rem}
+      .surface-actions{left:10px;right:10px;bottom:10px}
+      .surface-actions .button{flex:1}
+      .surface-prompt{bottom:118px}
+      .surface-jump{bottom:62px;right:10px;width:60px;height:60px}
+>>>>>>> Stashed changes
     }
     @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
   </style>
@@ -501,6 +563,7 @@
     <footer class="app-foot"><div class="hint">Build the booster (engine + tank), fill the bays and the cabin, then launch.</div><div class="foot-actions"><button class="button primary" id="launch-button" type="button">Launch mission <span aria-hidden="true">↗</span></button></div></footer>
   </section>
 
+<<<<<<< Updated upstream
   <section id="cockpit" class="screen" aria-labelledby="cockpit-title">
     <header class="app-header">
       <div class="header-title">
@@ -664,6 +727,25 @@
     </div>
   </section>
 
+=======
+  <section id="surface" class="screen" aria-labelledby="surface-title">
+    <div class="surface-view" id="surface-view">
+      <div class="surface-hud">
+        <div class="surface-site slab"><span class="eyebrow">Surface / sol 1</span><h2 id="surface-title">Landing site</h2><span class="micro" id="surface-coords"></span></div>
+        <div class="surface-goals slab"><div class="block-label"><span class="micro">Experiments</span><span class="tag" id="surface-count">0/4 DONE</span></div><ol id="surface-goals"></ol></div>
+      </div>
+      <div class="surface-tags" id="surface-tags" aria-hidden="true"></div>
+      <button class="surface-prompt" id="surface-prompt" type="button" hidden></button>
+      <div class="surface-crew" id="surface-crew" aria-label="Crew member you control"></div>
+      <div class="surface-actions"><button class="button quiet" id="surface-camera" type="button">Camera · V</button><button class="button secondary" id="surface-leave" type="button">Leave surface</button></div>
+      <div class="surface-stick" id="surface-stick" aria-hidden="true"><span></span></div>
+      <button class="surface-jump" id="surface-jump" type="button">Jump</button>
+      <div class="surface-start" id="surface-start"><div class="slab"><span class="eyebrow" id="surface-start-kicker">Touchdown</span><h3 id="surface-start-title">Loading terrain…</h3><p class="surface-keys" id="surface-keys"></p></div></div>
+    </div>
+  </section>
+
+  <dialog id="minigame-dialog" aria-labelledby="minigame-title"><div class="dialog-inner"><span class="eyebrow" id="minigame-kicker">Experiment</span><h3 id="minigame-title">Experiment</h3><p id="minigame-brief"></p><div class="summary-list" id="minigame-summary"></div><p class="minigame-note">The minigame is not built yet. Completing it here marks the experiment as done.</p><div class="dialog-actions"><button class="button quiet" id="minigame-close" type="button">Back</button><button class="button primary" id="minigame-done" type="button">Complete experiment</button></div></div></dialog>
+>>>>>>> Stashed changes
   <dialog id="quit-dialog" aria-labelledby="quit-title"><div class="dialog-inner"><span class="eyebrow">Quit mission</span><h3 id="quit-title">Leave the mission?</h3><p>This is a local prototype. You can close the tab at any time.</p><div class="dialog-actions"><button class="button quiet" id="quit-cancel" type="button">Stay</button><button class="button secondary" id="quit-confirm" type="button">Close notice</button></div></div></dialog>
   <dialog id="launch-dialog" aria-labelledby="launch-title"><div class="dialog-inner"><span class="eyebrow">Launch review</span><h3 id="launch-title">Mission ready for review</h3><p id="launch-message"></p><div class="summary-list" id="launch-summary"></div><div class="dialog-actions"><button class="button quiet" id="launch-close" type="button">Keep editing</button><button class="button primary" id="launch-confirm" type="button">Launch mission →</button></div></div></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -892,7 +974,14 @@
   $$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));renderBadge();renderTelemetry();}));
   $('#launch-button').addEventListener('click',showLaunch);
   $('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());
+<<<<<<< Updated upstream
   $('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();window.ASTRO_SIM?.startFlight();});
+=======
+  // Launch → touchdown: the cruise and the landing are not simulated yet, so the crew lands straight on the chosen site.
+  const playerCrew = () => state.detail.kind==='crew'?state.detail.id:crew[0].id;
+  const land = () => {showScreen('surface');window.dispatchEvent(new CustomEvent('astro:land',{detail:{site:state.site,crew:playerCrew()}}));};
+  $('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();const m=metrics();const risky=!m.ready||m.twr<TWR_MIN()||m.cost>m.budget||m.gen<m.draw;land();toast(risky?'Risky launch: engineering risks are not simulated yet. Touchdown.':`Touchdown at ${SITES_INFO[state.site].name}.`);});
+>>>>>>> Stashed changes
   // Low-poly art: planets and terrain are flat-shaded triangles, like the 3D models.
   const RAMPS = {
     mars:['#3a0f1c','#8F241E','#b8391f','#E04F26','#EE7B57','#f6a07f'],
@@ -1767,7 +1856,11 @@
   // Shared with the 3D modules below.
   function renderBadge(){$('#modifier-badge').textContent=`${money(budgetOf(state.difficulty))} · ${difficulty[state.difficulty].risk}`;}
   window.ASTRO_ART={RAMPS,PLANETS};
+<<<<<<< Updated upstream
   window.ASTRO={state,crew,data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL,showScreen,toast};
+=======
+  window.ASTRO={state,crew,sites:SITES_INFO,toast,show:showScreen,land,data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab)};
+>>>>>>> Stashed changes
   paintArt();renderLobby();renderBadge();renderPlanner();setupStars();
   if(!DATA)fetch('godot/assets/models/parts/manifest.json').then(r=>r.json()).then(m=>{useData(m);renderBadge();renderPlanner();}).catch(()=>toast('Could not load the part specs.'));
 })();
@@ -2207,6 +2300,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   requestAnimationFrame(frame);
 })().catch(err => console.warn('3D rocket not shown:', err));
 
+<<<<<<< Updated upstream
 // Planner catalog: render each part's 3D GLB once into an offscreen studio view (cached in window.ASTRO_THUMBS).
 (async () => {
   const thumbs = window.ASTRO_THUMBS;
@@ -3053,6 +3147,487 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
   initCockpit().catch(err => console.warn('3D cockpit fallback active:', err));
   initSurface().catch(err => console.warn('3D surface fallback active:', err));
   initPodium().catch(err => console.warn('3D podium fallback active:', err));
+=======
+// Surface: the landing site in 3D. The ground is the real HiRISE terrain of the chosen site
+// (godot/assets/terrain, built by tools/terrain; index.terrain.<site>.js when opened from disk).
+// First-person walk with the crew member's own suit in view when looking down (V: chase camera).
+// One block per crew member marks a surface experiment (docs/minigames.md, MVP candidates) at a
+// random spot; its owner walks there and runs the minigame (placeholder for now).
+(() => {
+  const root = document.getElementById('surface'), ui = window.ASTRO;
+  if (!root || !ui) return;
+  const $s = id => document.getElementById(id);
+  const viewEl = $s('surface-view'), startEl = $s('surface-start'), promptEl = $s('surface-prompt'), dlg = $s('minigame-dialog');
+  const MARS_G = 3.71; // m/s², Mars surface gravity (same value as tools/modeling/lib/fx-presets.mjs)
+  // game-balance: walk/run speed (m/s), jump speed, reach to a block, and where the blocks land.
+  const WALK = 2.2, RUN = 4.6, JUMP = 2.6, REACH = 3.2, SPOT_MIN = 28, SPOT_MAX = 130, SPOT_GAP = 40;
+  const STRIDE = 1.33; // m/s that matches walk_loop (1.1 s cycle, two ~0.73 m steps)
+  // game: the photo is a grayscale stretch; this gain on the manifest tint makes it read as warm Mars ground under the game lights.
+  const GROUND_GAIN = [3, 2, 1.25];
+  const EXPERIMENTS = [
+    { id: 'H-S1', owner: 'helena', name: 'Helicopter flight', minigame: 'Scout', mechanic: 'Piloting', basis: 'Ingenuity (2021–24)', brief: 'Fly through the scouting points before the battery runs out. Smooth, featureless sand confuses the navigation camera.' },
+    { id: 'L-S1', owner: 'lucas', name: 'Oxygen oven', minigame: 'Make oxygen', mechanic: 'Keep in range', basis: 'MOXIE on Perseverance (2021–23)', brief: 'Heat the reactor to about 800 °C and hold it in the green zone. Too hot damages the cell; too cold makes nothing.' },
+    { id: 'O-S1', owner: 'oscar', name: 'Orbiter pass', minigame: 'Contact window', mechanic: 'Choice under a limit', basis: 'UHF relay (Electra)', brief: 'The orbiter passes overhead for a few seconds. Pick which data packets to send before the window closes.' },
+    { id: 'M-S1', owner: 'maya', name: 'Biosignature hunter', minigame: 'Leopard spots', mechanic: 'Pattern search', basis: 'PIXL + SHERLOC on Perseverance', brief: 'The rock is a grid. Each scan costs time and power; find the hidden spots before time runs out.' },
+  ];
+  const touch = matchMedia('(pointer: coarse)').matches, clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  const s = { site: null, crew: null, mode: 'first', yaw: 0, pitch: -.1, bodyYaw: 0, speed: 0, vy: 0, grounded: true, jump: false,
+    pos: new THREE.Vector3(), keys: new Set(), done: new Set(), stick: null, look: null, drag: null, ready: false, prompt: '' };
+  const KEYS_HELP = touch ? 'Left thumb walks, right thumb looks. Look down to see your suit.'
+    : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · mouse looks<br><kbd>E</kbd> run experiment · <kbd>V</kbd> camera · <kbd>1</kbd>–<kbd>4</kbd> crew · <kbd>Esc</kbd> pause<br>Look down to see your suit.';
+  let world = null;
+
+  const hiddenMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // still casts a shadow
+  const flat = (color, roughness = .7, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness, flatShading: true });
+  function initWorld() {
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch { return null; }
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
+    viewEl.prepend(renderer.domElement);
+    const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(72, 1, .05, 1200);
+    camera.rotation.order = 'YXZ';
+    // Daytime Mars sky (game colors): butterscotch at the horizon, darker overhead; faceted dome.
+    const horizon = new THREE.Color(0xd8a07c), zenith = new THREE.Color(0x7a4c46);
+    const skyGeo = new THREE.IcosahedronGeometry(900, 2), sp = skyGeo.attributes.position, colors = [];
+    for (let k = 0; k < sp.count; k++) { const c = horizon.clone().lerp(zenith, Math.pow(Math.max(0, sp.getY(k) / 900), .55)); colors.push(c.r, c.g, c.b); }
+    skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    const sky = new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
+    sky.renderOrder = -1; scene.add(sky);
+    scene.fog = new THREE.Fog(horizon, 45, 230);
+    scene.add(new THREE.HemisphereLight(0xf3c9a0, 0x4a2418, 1.25));
+    const sun = new THREE.DirectionalLight(0xfff0dc, 2.1);
+    sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.normalBias = .03;
+    Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 180 });
+    scene.add(sun, sun.target);
+    const skirt = new THREE.Mesh(new THREE.CircleGeometry(1500, 6).rotateX(-Math.PI / 2), flat(0x6b3b28, 1));
+    scene.add(skirt);
+    const lander = makeLander(); scene.add(lander);
+    const w = { renderer, scene, camera, sky, sun, skirt, lander, sunDir: new THREE.Vector3(0, 1, 0), terrain: null, hf: null,
+      blocks: [], colliders: [], avatars: new Map(), avatar: null, width: 0, height: 0 };
+    new ResizeObserver(() => {
+      w.width = viewEl.clientWidth; w.height = viewEl.clientHeight;
+      if (!w.width || !w.height) return;
+      renderer.setSize(w.width, w.height, false); camera.aspect = w.width / w.height; camera.updateProjectionMatrix();
+    }).observe(viewEl);
+    bindInput(renderer.domElement);
+    return w;
+  }
+
+  // The landed vehicle at the site center (game art from primitives, palette colors).
+  function makeLander() {
+    const g = new THREE.Group(), hull = flat(0xe9e4f0, .6), foil = flat(0xd8a23a, .45, .3), steel = flat(0x8c90a0, .5, .4), dark = flat(0x281147, .9);
+    const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
+    add(new THREE.CylinderGeometry(1.5, 1.7, 1.3, 6), foil, 0, 1.75, 0);
+    add(new THREE.CylinderGeometry(1, 1.5, .8, 6), hull, 0, 2.8, 0);
+    add(new THREE.ConeGeometry(.55, .7, 8), steel, 0, .95, 0).rotation.x = Math.PI;
+    add(new THREE.BoxGeometry(.8, .9, .1), dark, 0, 1.75, 1.47);
+    add(new THREE.CylinderGeometry(.05, .05, 1.2, 5), steel, .5, 3.7, 0);
+    add(new THREE.ConeGeometry(.5, .22, 8, 1, true), hull, .5, 4.35, 0).rotation.x = Math.PI;
+    const up = new THREE.Vector3(0, 1, 0);
+    for (let k = 0; k < 4; k++) {
+      const a = Math.PI / 4 + k * Math.PI / 2, top = new THREE.Vector3(Math.sin(a) * 1.35, 1.5, Math.cos(a) * 1.35), foot = new THREE.Vector3(Math.sin(a) * 2.4, .08, Math.cos(a) * 2.4);
+      const dir = foot.clone().sub(top), leg = add(new THREE.CylinderGeometry(.07, .07, dir.length(), 5), steel, 0, 0, 0);
+      leg.position.copy(top).add(foot).multiplyScalar(.5); leg.quaternion.setFromUnitVectors(up, dir.normalize());
+      add(new THREE.CylinderGeometry(.3, .36, .1, 6), steel, foot.x, .05, foot.z);
+    }
+    return g;
+  }
+
+  // Experiment marker: hex plinth, a block in the owner's color, a floating gem and a light beam seen from afar.
+  function makeBlock(exp, color) {
+    const g = new THREE.Group(), tone = new THREE.Color(color), dark = flat(0x281147, .9), mat = flat(tone, .75);
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.45, .4, 6), dark); plinth.position.y = .1;
+    const block = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), mat); block.position.y = .85; block.rotation.y = Math.PI / 4;
+    const band = new THREE.Mesh(new THREE.BoxGeometry(1.14, .16, 1.14), dark); band.position.y = 1.05; band.rotation.y = Math.PI / 4;
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(.32), new THREE.MeshBasicMaterial({ color: 0xfce8a6 })); gem.position.y = 2.2;
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, 60, 6, 1, true),
+      new THREE.MeshBasicMaterial({ color: tone, transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide }));
+    beam.position.y = 31;
+    for (const m of [plinth, block, band]) m.castShadow = m.receiveShadow = true;
+    g.add(plinth, block, band, gem, beam);
+    g.userData = { exp, gem, beam, tag: null };
+    return g;
+  }
+
+  // Terrain: the GLB comes from index.terrain.<site>.js (a <script> works on file://).
+  const terrains = new Map();
+  function fetchTerrain(id) {
+    if (!terrains.has(id)) terrains.set(id, (async () => {
+      if (!window.ASTRO_TERRAIN?.[id]) await new Promise((ok, fail) => {
+        const tag = document.createElement('script');
+        tag.src = `index.terrain.${id}.js`; tag.onload = ok; tag.onerror = () => fail(new Error(`index.terrain.${id}.js missing (npm run web:models)`));
+        document.head.append(tag);
+      });
+      const entry = window.ASTRO_TERRAIN?.[id];
+      if (!entry?.glb) throw new Error(`no terrain for ${id}`);
+      const bin = atob(entry.glb), bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      delete entry.glb;
+      const gltf = await loader.parseAsync(bytes.buffer, '');
+      let mesh = null; gltf.scene.traverse(o => { if (o.isMesh && !mesh) mesh = o; });
+      mesh.receiveShadow = true;
+      const { color, map } = mesh.material;
+      color.setRGB(color.r * GROUND_GAIN[0], color.g * GROUND_GAIN[1], color.b * GROUND_GAIN[2]);
+      if (map) map.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); // keeps the photo sharp at grazing angles
+      addGroundDetail(mesh.material, entry.site.sizeM);
+      const hf = heightField(mesh);
+      gltf.scene.add(scatterRocks(hf, entry.site.id));
+      return { info: entry.site, scene: gltf.scene, hf };
+    })().catch(err => { terrains.delete(id); throw err; }));
+    return terrains.get(id);
+  }
+  // The photo has 0.5 m pixels, too coarse at walking distance: a tiled grain (3 m tiles) multiplies it
+  // up close and averages out with distance (mipmaps). Game art, not data.
+  let grain = null;
+  function addGroundDetail(material, sizeM) {
+    if (!grain) {
+      const N = 256, data = new Uint8Array(N * N * 4), rnd = (i, seed) => { const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453; return x - Math.floor(x); };
+      const octave = (cells, seed) => (x, y) => { // tileable value noise
+        const fx = x / N * cells, fy = y / N * cells, i = Math.floor(fx), j = Math.floor(fy), u = fx - i, v = fy - j;
+        const at = (a, b) => rnd(((b % cells) * cells) + (a % cells), seed);
+        return (at(i, j) * (1 - u) + at(i + 1, j) * u) * (1 - v) + (at(i, j + 1) * (1 - u) + at(i + 1, j + 1) * u) * v;
+      };
+      const layers = [[octave(6, 1), .4], [octave(24, 2), .35], [octave(96, 3), .25]];
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+        const g = Math.round(255 * layers.reduce((sum, [f, w]) => sum + f(x, y) * w, 0)), k = (y * N + x) * 4;
+        data[k] = data[k + 1] = data[k + 2] = g; data[k + 3] = 255;
+      }
+      grain = new THREE.DataTexture(data, N, N);
+      grain.wrapS = grain.wrapT = THREE.RepeatWrapping; grain.magFilter = THREE.LinearFilter; grain.minFilter = THREE.LinearMipmapLinearFilter;
+      grain.generateMipmaps = true; grain.anisotropy = world.renderer.capabilities.getMaxAnisotropy(); grain.needsUpdate = true;
+    }
+    material.onBeforeCompile = shader => {
+      shader.uniforms.grainMap = { value: grain }; shader.uniforms.grainRepeat = { value: sizeM / 3 };
+      shader.fragmentShader = 'uniform sampler2D grainMap;\nuniform float grainRepeat;\n' + shader.fragmentShader.replace('#include <map_fragment>',
+        '#include <map_fragment>\n  diffuseColor.rgb *= 0.55 + 0.9 * texture2D(grainMap, vMapUv * grainRepeat).r;');
+    };
+  }
+  // Loose rocks (game art): same spots every time for a site, so the ground has scale when walking.
+  function scatterRocks(hf, seedText) {
+    let seed = [...seedText].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const COUNT = 900, rocks = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 0), flat(0xffffff, .95), COUNT);
+    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), p = new THREE.Vector3(), sc = new THREE.Vector3(), c = new THREE.Color(), lim = hf.half - 6;
+    for (let i = 0; i < COUNT; i++) {
+      const size = rand() < .06 ? .5 + rand() * .7 : .06 + Math.pow(rand(), 2) * .35;
+      p.set((rand() * 2 - 1) * lim, 0, (rand() * 2 - 1) * lim); p.y = hf.at(p.x, p.z) - size * .25;
+      sc.set(size * (.8 + rand() * .5), size * (.45 + rand() * .3), size * (.8 + rand() * .5));
+      rocks.setMatrixAt(i, m.compose(p, q.setFromEuler(e.set(rand() * .6, rand() * Math.PI * 2, rand() * .6)), sc));
+      rocks.setColorAt(i, c.setRGB(.2 + rand() * .1, .1 + rand() * .05, .06 + rand() * .03));
+    }
+    rocks.castShadow = rocks.receiveShadow = true;
+    return rocks;
+  }
+  // Ground height by bilinear lookup in the mesh grid: row-major from the north-west corner,
+  // same layout as tools/terrain/lib/terrain-mesh.mjs (cheaper than a raycast on 129k triangles).
+  function heightField(mesh) {
+    const p = mesh.geometry.attributes.position, n = Math.round(Math.sqrt(p.count));
+    const x0 = p.getX(0), z0 = p.getZ(0), step = p.getX(1) - x0, h = new Float32Array(n * n);
+    for (let k = 0; k < n * n; k++) h[k] = p.getY(k);
+    const at = (x, z) => {
+      const fx = clamp((x - x0) / step, 0, n - 1.0001), fz = clamp((z - z0) / step, 0, n - 1.0001);
+      const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j, k = j * n + i;
+      return (h[k] * (1 - u) + h[k + 1] * u) * (1 - v) + (h[k + n] * (1 - u) + h[k + n + 1] * u) * v;
+    };
+    const slope = (x, z) => Math.hypot(at(x + 1, z) - at(x - 1, z), at(x, z + 1) - at(x, z - 1)) / 2;
+    return { at, slope, half: (n - 1) * step / 2 };
+  }
+
+  async function useCrew(id) {
+    s.crew = id; renderCrewBar();
+    if (!world.avatars.has(id)) {
+      const gltf = await loadGLTF(`characters/${id}.glb`), body = gltf.scene.clone(true); // pivot rig, no skinning
+      const mixer = new THREE.AnimationMixer(body), clip = name => gltf.animations.find(a => a.name === name);
+      const idle = mixer.clipAction(clip('idle_loop')), walk = mixer.clipAction(clip('walk_loop'));
+      idle.play(); walk.play(); walk.setEffectiveWeight(0);
+      const head = body.getObjectByName('Head'), helmet = [];
+      body.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      head.traverse(o => { if (o.isMesh) { o.userData.mat = o.material; helmet.push(o); } });
+      body.updateMatrixWorld(true);
+      world.avatars.set(id, { body, mixer, idle, walk, head, helmet, walkW: 0, eyeY: head.getWorldPosition(new THREE.Vector3()).y });
+    }
+    if (s.crew !== id) return;
+    if (world.avatar) world.scene.remove(world.avatar.body);
+    world.avatar = world.avatars.get(id); world.scene.add(world.avatar.body);
+    applyMode(); s.prompt = '';
+  }
+  const clampPitch = () => { s.pitch = s.mode === 'first' ? clamp(s.pitch, -1.45, 1.2) : clamp(s.pitch, -1, .45); };
+  function applyMode() {
+    for (const m of world.avatar?.helmet ?? []) m.material = s.mode === 'first' ? hiddenMat : m.userData.mat;
+    clampPitch();
+  }
+  function setMode(mode) { s.mode = mode; applyMode(); }
+
+  function setTerrain(t) {
+    const { info, hf } = t;
+    if (world.terrain) world.scene.remove(world.terrain);
+    world.terrain = t.scene; world.hf = hf; world.scene.add(t.scene);
+    const az = info.sun.azimuthDeg * Math.PI / 180, el = info.sun.elevationDeg * Math.PI / 180; // sun of the photo (HiRISE label)
+    world.sunDir.set(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el));
+    world.skirt.position.y = info.elevation.minM - info.elevation.centerM - .4;
+    world.skirt.material.color.setRGB(info.tint[0] * .2, info.tint[1] * .2, info.tint[2] * .2);
+    const lat = info.center.lat, lon = info.center.lon;
+    $s('surface-coords').textContent = `${Math.abs(lat).toFixed(2)}°${lat < 0 ? 'S' : 'N'} ${Math.abs(lon).toFixed(2)}°${lon < 0 ? 'W' : 'E'} · HiRISE terrain ${info.sizeM} m`;
+  }
+
+  function placeBlocks() {
+    const { hf, scene } = world, tags = $s('surface-tags'), spots = [], lim = hf.half - 24;
+    for (const b of world.blocks) scene.remove(b);
+    tags.innerHTML = ''; world.blocks = []; world.colliders = [{ x: 0, z: 0, r: 2.9 }];
+    for (const exp of EXPERIMENTS) {
+      let spot = null;
+      for (let t = 0; t < 300 && !spot; t++) {
+        const r = SPOT_MIN + Math.random() * (SPOT_MAX - SPOT_MIN), a = Math.random() * Math.PI * 2, x = Math.sin(a) * r, z = Math.cos(a) * r;
+        const ok = Math.abs(x) < lim && Math.abs(z) < lim && hf.slope(x, z) < .2 && spots.every(p => Math.hypot(p.x - x, p.z - z) > SPOT_GAP);
+        if (ok || t === 299) spot = { x, z };
+      }
+      spots.push(spot);
+      const owner = ui.crew.find(c => c.id === exp.owner), block = makeBlock(exp, owner.color);
+      block.position.set(spot.x, hf.at(spot.x, spot.z), spot.z);
+      const tag = document.createElement('span');
+      tag.className = 'surface-tag'; tag.style.setProperty('--crew', owner.color);
+      tags.append(tag); block.userData.tag = tag;
+      scene.add(block); world.blocks.push(block); world.colliders.push({ x: spot.x, z: spot.z, r: 1.6 });
+    }
+    $s('surface-goals').innerHTML = EXPERIMENTS.map(e => { const o = ui.crew.find(c => c.id === e.owner);
+      return `<li data-goal="${e.id}" style="--crew:${o.color}"><span class="goal-chip"></span><span class="goal-name"><strong>${e.id} · ${e.name}</strong><small>${o.name}</small></span><span class="goal-dist"></span><span class="goal-arrow"></span></li>`; }).join('');
+  }
+
+  function renderCrewBar() {
+    $s('surface-crew').innerHTML = ui.crew.map((c, i) => `<button type="button" data-crew="${c.id}" style="--crew:${c.color}" aria-pressed="${c.id === s.crew}">${c.name}<small>${touch ? '' : `key ${i + 1}`}</small></button>`).join('');
+  }
+  $s('surface-crew').addEventListener('click', e => { const b = e.target.closest('[data-crew]'); if (b && world) switchCrew(b.dataset.crew); });
+  function switchCrew(id) { if (id === s.crew) return; useCrew(id).then(() => ui.toast(`You are now ${ui.crew.find(c => c.id === id).name}.`)); }
+
+  function showStart(kicker, title, keys) {
+    $s('surface-start-kicker').textContent = kicker; $s('surface-start-title').textContent = title;
+    $s('surface-keys').innerHTML = keys; startEl.hidden = false;
+  }
+  function fail(message) { root.classList.add('surface-fail'); showStart('Surface', message, 'Use “Leave surface” to go back to the mission.'); }
+
+  async function land({ site, crew }) {
+    root.classList.remove('surface-fail');
+    if (!world) world = initWorld();
+    const info = ui.sites[site];
+    $s('surface-title').textContent = info?.name ?? site;
+    if (!world) return fail('The 3D surface needs WebGL.');
+    s.ready = false; s.site = site;
+    showStart('Touchdown', `Loading ${info.name}…`, '');
+    try {
+      const t = await fetchTerrain(site);
+      if (s.site !== site) return;
+      setTerrain(t);
+      world.lander.position.set(0, t.hf.at(0, 0), 0);
+      placeBlocks();
+      s.done.clear(); s.pos.set(1.2, 0, 4.6); s.pos.y = t.hf.at(s.pos.x, s.pos.z); s.vy = 0; s.grounded = true;
+      const first = world.blocks[0].position; s.yaw = Math.atan2(-(first.x - s.pos.x), -(first.z - s.pos.z)); s.pitch = -.1;
+      s.bodyYaw = s.yaw + Math.PI;
+      await useCrew(crew);
+      s.ready = true;
+      showStart('Touchdown', touch ? 'Touch to walk' : 'Click to walk', KEYS_HELP);
+    } catch (err) {
+      console.warn('Surface not shown:', err);
+      fail(`Could not load the ${info?.name ?? site} terrain.`);
+    }
+  }
+  window.addEventListener('astro:land', e => land(e.detail));
+
+  // Input: keyboard + mouse (pointer lock, or drag when the lock is not available), touch stick + look.
+  function bindInput(canvas) {
+    const live = () => isActive('surface') && s.ready && !dlg.open;
+    addEventListener('keydown', e => {
+      if (!live()) return;
+      s.keys.add(e.code);
+      if (e.code === 'Space') { s.jump = true; e.preventDefault(); }
+      if (e.code.startsWith('Arrow')) e.preventDefault();
+      if (e.code === 'KeyE') interact();
+      if (e.code === 'KeyV') setMode(s.mode === 'first' ? 'third' : 'first');
+      const n = /^Digit([1-4])$/.exec(e.code)?.[1];
+      if (n) switchCrew(ui.crew[n - 1].id);
+    });
+    addEventListener('keyup', e => s.keys.delete(e.code));
+    addEventListener('blur', () => s.keys.clear());
+    const turn = (dx, dy, k) => { s.yaw -= dx * k; s.pitch -= dy * k; clampPitch(); };
+    let settle = false; // the first move after locking can carry a large jump (Chrome)
+    document.addEventListener('pointerlockchange', () => {
+      settle = true;
+      if (document.pointerLockElement !== canvas && live() && !touch) showStart('Paused', 'Click to keep walking', KEYS_HELP);
+    });
+    addEventListener('mousemove', e => {
+      if (document.pointerLockElement === canvas) {
+        if (settle || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) { settle = false; return; }
+        turn(e.movementX, e.movementY, .0022);
+      }
+      else if (s.drag) { turn(e.clientX - s.drag.x, e.clientY - s.drag.y, .004); s.drag = { x: e.clientX, y: e.clientY }; }
+    });
+    canvas.addEventListener('mousedown', e => { if (document.pointerLockElement !== canvas) s.drag = { x: e.clientX, y: e.clientY }; });
+    addEventListener('mouseup', () => { s.drag = null; });
+    const stickEl = $s('surface-stick');
+    canvas.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'touch' || !live()) return;
+      const r = viewEl.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (x < r.width * .45 && !s.stick) {
+        s.stick = { id: e.pointerId, ox: x, oy: y, x: 0, y: 0 };
+        stickEl.style.left = x + 'px'; stickEl.style.top = y + 'px'; stickEl.classList.add('on');
+      } else if (!s.look) s.look = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      try { canvas.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (s.stick?.id === e.pointerId) {
+        const r = viewEl.getBoundingClientRect(), dx = e.clientX - r.left - s.stick.ox, dy = e.clientY - r.top - s.stick.oy, len = Math.hypot(dx, dy), k = Math.min(1, len / 50) / (len || 1);
+        s.stick.x = dx * k; s.stick.y = -dy * k;
+        stickEl.firstElementChild.style.translate = `${s.stick.x * 33}px ${-s.stick.y * 33}px`;
+      } else if (s.look?.id === e.pointerId) { turn(e.clientX - s.look.x, e.clientY - s.look.y, .006); s.look.x = e.clientX; s.look.y = e.clientY; }
+    });
+    const release = e => {
+      if (s.stick?.id === e.pointerId) { s.stick = null; stickEl.classList.remove('on'); stickEl.firstElementChild.style.translate = ''; }
+      if (s.look?.id === e.pointerId) s.look = null;
+    };
+    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+    startEl.addEventListener('click', () => {
+      if (!s.ready || root.classList.contains('surface-fail')) return;
+      startEl.hidden = true;
+      if (!touch) try { canvas.requestPointerLock()?.catch?.(() => {}); } catch { /* drag to look instead */ }
+    });
+    $s('surface-jump').addEventListener('pointerdown', () => { s.jump = true; });
+  }
+  $s('surface-camera').addEventListener('click', () => { if (world?.avatar) setMode(s.mode === 'first' ? 'third' : 'first'); });
+  $s('surface-leave').addEventListener('click', () => { if (document.pointerLockElement) document.exitPointerLock(); s.keys.clear(); ui.show('planner'); });
+  promptEl.addEventListener('click', interact);
+
+  // Experiments: the owner runs the minigame next to the block.
+  const nearBlock = () => world.blocks.find(b => Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z) <= REACH) ?? null;
+  function interact() {
+    const b = world && nearBlock();
+    if (!b) return;
+    const e = b.userData.exp;
+    if (s.done.has(e.id)) return;
+    if (e.owner !== s.crew) return switchCrew(e.owner);
+    const owner = ui.crew.find(c => c.id === e.owner);
+    if (document.pointerLockElement) document.exitPointerLock();
+    s.keys.clear();
+    $s('minigame-kicker').textContent = `Experiment ${e.id} · ${owner.name}`;
+    $s('minigame-title').textContent = e.name;
+    $s('minigame-brief').textContent = e.brief;
+    $s('minigame-summary').innerHTML = [['Minigame', e.minigame], ['Mechanic', e.mechanic], ['Based on', e.basis]].map(([k, v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
+    dlg.dataset.exp = e.id; dlg.showModal();
+  }
+  $s('minigame-close').addEventListener('click', () => dlg.close());
+  $s('minigame-done').addEventListener('click', () => {
+    const id = dlg.dataset.exp; dlg.close();
+    if (!id || s.done.has(id)) return;
+    s.done.add(id); s.prompt = '';
+    const b = world.blocks.find(x => x.userData.exp.id === id);
+    b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done');
+    ui.toast(s.done.size === EXPERIMENTS.length ? 'All surface experiments done. The rest of the mission comes in the full game.' : `${id} done · ${s.done.size}/${EXPERIMENTS.length}`);
+  });
+  dlg.addEventListener('close', () => { if (isActive('surface') && s.ready && !touch && !document.pointerLockElement) showStart('Paused', 'Click to keep walking', KEYS_HELP); });
+
+  const fwd = new THREE.Vector3(), eye = new THREE.Vector3(), look = new THREE.Vector3(), tmp = new THREE.Vector3();
+  function step(dt) {
+    const k = s.keys, a = world.avatar, hf = world.hf;
+    let ix = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
+    let iy = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
+    if (s.stick) { ix += s.stick.x; iy += s.stick.y; }
+    const len = Math.min(1, Math.hypot(ix, iy)), run = k.has('ShiftLeft') || k.has('ShiftRight') || (s.stick && len > .92);
+    const speed = len > .08 ? len * (run ? RUN : WALK) : 0, sin = Math.sin(s.yaw), cos = Math.cos(s.yaw);
+    let mx = 0, mz = 0;
+    if (speed) { const n = Math.hypot(ix, iy); mx = (-sin * iy + cos * ix) / n * speed; mz = (-cos * iy - sin * ix) / n * speed; }
+    const lim = hf.half - 8;
+    s.pos.x = clamp(s.pos.x + mx * dt, -lim, lim); s.pos.z = clamp(s.pos.z + mz * dt, -lim, lim);
+    for (const c of world.colliders) {
+      const dx = s.pos.x - c.x, dz = s.pos.z - c.z, d = Math.hypot(dx, dz);
+      if (d < c.r && d > 1e-4) { s.pos.x = c.x + dx / d * c.r; s.pos.z = c.z + dz / d * c.r; }
+    }
+    s.speed = speed;
+    const ground = hf.at(s.pos.x, s.pos.z);
+    if (s.grounded && s.jump) { s.vy = JUMP; s.grounded = false; }
+    s.jump = false;
+    if (s.grounded) s.pos.y = ground;
+    else { s.vy -= MARS_G * dt; s.pos.y += s.vy * dt; if (s.pos.y <= ground) { s.pos.y = ground; s.vy = 0; s.grounded = true; } }
+    // First person: the body faces the view. Chase camera: it turns toward where it walks.
+    const target = s.mode === 'first' ? s.yaw + Math.PI : speed ? Math.atan2(mx, mz) : s.bodyYaw;
+    const d = Math.atan2(Math.sin(target - s.bodyYaw), Math.cos(target - s.bodyYaw));
+    s.bodyYaw += s.mode === 'first' ? d : d * Math.min(1, dt * 10);
+    a.body.position.copy(s.pos); a.body.rotation.y = s.bodyYaw;
+    const walking = s.grounded && speed > 0 ? 1 : 0;
+    a.walkW += (walking - a.walkW) * Math.min(1, dt * 8);
+    a.walk.setEffectiveWeight(a.walkW); a.idle.setEffectiveWeight(1 - a.walkW);
+    a.walk.timeScale = clamp(speed / STRIDE, .6, 2.6);
+    a.mixer.update(reduce && !speed ? 0 : dt);
+  }
+  function placeCamera() {
+    const { camera, avatar: a } = world;
+    fwd.set(-Math.sin(s.yaw), 0, -Math.cos(s.yaw));
+    if (s.mode === 'first') {
+      a.body.updateMatrixWorld(true);
+      if (reduce) eye.set(s.pos.x, s.pos.y + a.eyeY, s.pos.z); else a.head.getWorldPosition(eye);
+      // Eyes in front of the suit; further forward when looking down, so the chest, legs and feet come into view.
+      camera.position.copy(eye).addScaledVector(fwd, .3 + .22 * Math.max(0, -Math.sin(s.pitch))); camera.position.y += .14;
+      camera.rotation.set(s.pitch, s.yaw, 0);
+    } else {
+      look.copy(s.pos); look.y += 1.45;
+      const cp = Math.cos(s.pitch);
+      camera.position.copy(look).add(tmp.set(Math.sin(s.yaw) * cp, -Math.sin(s.pitch), Math.cos(s.yaw) * cp).multiplyScalar(4.4));
+      camera.position.y = Math.max(camera.position.y, world.hf.at(camera.position.x, camera.position.z) + .4);
+      camera.lookAt(look);
+    }
+  }
+  function updateHud() {
+    for (const b of world.blocks) {
+      const e = b.userData.exp, li = document.querySelector(`[data-goal="${e.id}"]`), dx = b.position.x - s.pos.x, dz = b.position.z - s.pos.z, dist = Math.hypot(dx, dz);
+      li.classList.toggle('done', s.done.has(e.id)); li.classList.toggle('here', dist <= REACH);
+      li.querySelector('.goal-dist').textContent = s.done.has(e.id) ? 'DONE' : `${Math.round(dist)} m`;
+      li.querySelector('.goal-arrow').style.rotate = `${Math.atan2(dx, -dz) + s.yaw}rad`; // bearing from north, relative to the view
+    }
+    $s('surface-count').textContent = `${s.done.size}/${EXPERIMENTS.length} DONE`;
+    const b = nearBlock(), e = b?.userData.exp, owner = e && ui.crew.find(c => c.id === e.owner);
+    const state = !e ? '' : s.done.has(e.id) ? 'done' : e.owner === s.crew ? 'run' : 'locked';
+    const key = state + (e?.id ?? '') + s.crew;
+    if (key === s.prompt) return;
+    s.prompt = key; promptEl.hidden = !e;
+    if (!e) return;
+    promptEl.className = 'surface-prompt' + (state === 'run' ? '' : ' ' + state);
+    promptEl.textContent = state === 'done' ? `${e.id} · ${e.name} · done`
+      : state === 'run' ? `${touch ? 'Tap' : 'E'} · Run ${e.id} · ${e.name}`
+      : `${e.id} is ${owner.name}’s experiment · ${touch ? 'tap' : `press ${ui.crew.indexOf(owner) + 1}`} to switch`;
+  }
+  const v = new THREE.Vector3();
+  function placeTags(now) {
+    const { camera } = world;
+    for (const b of world.blocks) {
+      const { tag, gem, beam, exp } = b.userData, dist = Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z);
+      if (!reduce) { gem.rotation.y = now / 700; gem.position.y = 2.2 + Math.sin(now / 500 + b.position.x) * .12; beam.material.opacity = .22 + .1 * Math.sin(now / 400); }
+      v.copy(b.position); v.y += 2.8; v.project(camera);
+      const show = v.z < 1 && dist < 260;
+      tag.hidden = !show;
+      if (!show) continue;
+      tag.textContent = s.done.has(exp.id) ? `${exp.id} ✓` : `${exp.id} · ${Math.round(dist)} m`;
+      tag.style.transform = `translate(${(v.x + 1) / 2 * world.width}px, ${(1 - v.y) / 2 * world.height}px)`;
+    }
+  }
+
+  let last = performance.now(), hudClock = 0;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(.1, (now - last) / 1000); last = now;
+    if (!world || !s.ready || !world.avatar || !isActive('surface') || !world.width) return;
+    if (!dlg.open) step(dt);
+    placeCamera();
+    world.sky.position.copy(world.camera.position);
+    world.sun.target.position.copy(s.pos); world.sun.position.copy(s.pos).addScaledVector(world.sunDir, 90);
+    placeTags(now);
+    if ((hudClock += dt) > .12) { hudClock = 0; updateHud(); }
+    world.renderer.render(world.scene, world.camera);
+  }
+  requestAnimationFrame(frame);
+  // Test and debug hook (Playwright, console): state, and a teleport next to a block.
+  window.ASTRO_SURFACE = { state: s, world: () => world, goTo(id) { const b = world?.blocks.find(x => x.userData.exp.id === id); if (b) { s.pos.x = b.position.x + 2.2; s.pos.z = b.position.z + 1.2; s.yaw = Math.atan2(-(b.position.x - s.pos.x), -(b.position.z - s.pos.z)); s.grounded = false; } } };
+  // index.html#surface or #surface-gale opens the surface directly (quick testing).
+  const direct = /^#surface(?:-(\w+))?$/.exec(location.hash);
+  if (direct) { if (ui.sites[direct[1]]) ui.state.site = direct[1]; ui.land(); }
+>>>>>>> Stashed changes
 })();
 </script>
 </body>
