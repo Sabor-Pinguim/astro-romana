@@ -874,13 +874,6 @@
       showResults(forcedTimeout);
     }
 
-    function abortSurface() {
-      surf.active = false;
-      cancelAnimationFrame(surf.raf);
-      radAudio.stopAll();
-      showScreen('planner');
-    }
-
     // The launch window only counts down while the crew is walking (not paused, loading or in a minigame).
     function surfaceTick(now) {
       if (!surf.active || state.screen !== 'surface') return;
@@ -901,12 +894,6 @@
       timerEl.textContent = `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
       timerEl.classList.toggle('urgent', surf.timerSec <= 30);
     }
-
-    $('#cockpit-abort').addEventListener('click', () => {
-      flight.active = false;
-      cancelAnimationFrame(flight.raf);
-      showScreen('planner');
-    });
 
     document.addEventListener('keydown', e => {
       if (state.screen === 'cockpit') {
@@ -986,7 +973,7 @@
 
     $('#results-replay').addEventListener('click', () => showScreen('lobby'));
 
-    return { startFlight, handleCockpitAction, startSurface, completeSurfaceTask, board: () => boardShipAndFinish(false), abortSurface, flight, surf };
+    return { startFlight, handleCockpitAction, startSurface, completeSurfaceTask, board: () => boardShipAndFinish(false), flight, surf };
   })();
   window.ASTRO_SIM = SIM;
   // Shared with the 3D modules below.

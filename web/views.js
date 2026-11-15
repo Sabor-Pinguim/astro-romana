@@ -674,7 +674,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     $s('surface-start-kicker').textContent = kicker; $s('surface-start-title').textContent = title;
     $s('surface-keys').innerHTML = keys; startEl.hidden = false;
   }
-  function fail(message) { root.classList.add('surface-fail'); showStart('Surface', message, 'Use “Leave surface” to go back to the mission.'); }
+  function fail(message) { root.classList.add('surface-fail'); showStart('Surface', message, 'Use “Board & depart” to end the mission.'); }
 
   async function land({ site, crew }) {
     root.classList.remove('surface-fail');
@@ -839,7 +839,6 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   }
   $s('surface-camera').addEventListener('click', () => { if (world?.avatar) setMode(s.mode === 'first' ? 'third' : 'first'); });
   const release = () => { if (document.pointerLockElement) document.exitPointerLock(); s.keys.clear(); };
-  $s('surface-leave').addEventListener('click', () => { release(); if (sim()) sim().abortSurface(); else ui.show('planner'); });
   $s('surface-board').addEventListener('click', () => { release(); sim()?.board(); });
   promptEl.addEventListener('click', interact);
 
@@ -849,7 +848,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   const confirmation = document.createElement('div');
   confirmation.className = 'minigame-complete';
   confirmation.setAttribute('role', 'status');
-  confirmation.innerHTML = '<span class="minigame-check" aria-hidden="true">✓</span><strong>Experiment complete</strong><p>Results saved. Returning to the surface…</p>';
+  confirmation.innerHTML = '<span class="minigame-check" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 24 L19 34 L40 12"/></svg></span><strong>Experiment complete</strong>';
   dlg.querySelector('.dialog-inner').append(confirmation);
   const nearBlock = () => world.blocks.find(b => Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z) <= REACH) ?? null;
   const nearLander = () => Math.hypot(s.pos.x, s.pos.z) <= BOARD_REACH;
