@@ -6,6 +6,12 @@ extends SceneTree
 ##   godot --headless --path godot --script "$PWD/tools/godot/check_models.gd"
 
 const MODELS_DIR := "res://assets/models/characters"
+const PART_CATEGORIES := {
+	"engines": {"dir": "res://assets/models/parts/engines", "max_meshes": 10},
+	"tanks": {"dir": "res://assets/models/parts/tanks", "max_meshes": 8},
+	"equipment": {"dir": "res://assets/models/parts/equipment", "max_meshes": 12},
+	"cabin": {"dir": "res://assets/models/parts/cabin", "max_meshes": 12},
+}
 const PIVOTS: Array[String] = [
 	"Hips", "Torso", "Head",
 	"UpperArm_L", "LowerArm_L", "Hand_L", "UpperArm_R", "LowerArm_R", "Hand_R",
@@ -28,6 +34,21 @@ func _initialize() -> void:
 		if file.get_extension() != "glb":
 			continue
 		failures += _check_model(MODELS_DIR.path_join(file))
+
+	for category: String in PART_CATEGORIES:
+		var cfg: Dictionary = PART_CATEGORIES[category]
+		var part_dir: String = cfg["dir"]
+		var max_meshes: int = cfg["max_meshes"]
+		var part_files := DirAccess.get_files_at(part_dir)
+		if part_files.is_empty():
+			push_error("No files in %s (did you run --import?)" % part_dir)
+			failures += 1
+			continue
+		for file in part_files:
+			if file.get_extension() != "glb":
+				continue
+			failures += _check_part(part_dir.path_join(file), category, max_meshes)
+
 	print("RESULT: %s" % ("OK" if failures == 0 else "%d problem(s)" % failures))
 	quit(1 if failures > 0 else 0)
 
@@ -67,6 +88,43 @@ func _check_model(path: String) -> int:
 		path.get_file(), meshes,
 		player.get_animation_list() if player else [], anchors,
 	]
+	root.free()
+
+	if problems.is_empty():
+		print("✔ " + label)
+		return 0
+	print("✘ " + label)
+	for problem in problems:
+		print("    - " + problem)
+	return problems.size()
+
+
+func _check_part(path: String, category: String, max_meshes: int) -> int:
+	var problems: Array[String] = []
+	var packed := load(path) as PackedScene
+	if packed == null:
+		print("✘ %s: could not load (not imported?)" % path)
+		return 1
+	var root := packed.instantiate()
+
+	if root.find_child("Attach_Top", true, false) == null:
+		problems.append("missing Attach_Top")
+	if category in ["tanks", "equipment", "cabin"] and root.find_child("Attach_Bottom", true, false) == null:
+		problems.append("missing Attach_Bottom")
+	if category == "engines" and root.find_child("FX_Exhaust", true, false) == null:
+		problems.append("missing FX_Exhaust")
+
+	var anchors: Array[String] = []
+	for node in root.find_children("FX_*", "", true, false):
+		anchors.append(String(node.name))
+
+	var meshes := root.find_children("*", "MeshInstance3D", true, false).size()
+	if meshes == 0:
+		problems.append("no meshes")
+	elif meshes > max_meshes:
+		problems.append("%d meshes > %d" % [meshes, max_meshes])
+
+	var label := "%s/%s: %d meshes, fx %s" % [category, path.get_file(), meshes, anchors]
 	root.free()
 
 	if problems.is_empty():

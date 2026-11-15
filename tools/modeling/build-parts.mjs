@@ -1,11 +1,11 @@
-// Builds the 37 low-poly rocket parts (13 engines + 8 tanks + 16 equipment) as GLB files plus
+// Builds the 49 low-poly rocket parts (13 engines + 8 tanks + 16 equipment + 12 cabin) as GLB files plus
 // godot/assets/models/parts/manifest.json and updates the `parts` section of
 // godot/assets/models/manifest.json.
 //
-//   npm run models:build:parts             # all 37 parts
+//   npm run models:build:parts             # all 49 parts
 //   npm run models:build:parts -- raptor   # only selected parts
 //
-// Output: godot/assets/models/parts/<engines|tanks|equipment>/<id>.glb
+// Output: godot/assets/models/parts/<engines|tanks|equipment|cabin>/<id>.glb
 import './lib/node-polyfills.mjs';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -137,6 +137,7 @@ async function main() {
           engineOrigin: 'top mounting interface (hangs below y = 0)',
           tankOrigin: 'bottom interface (stands above y = 0)',
           equipmentOrigin: 'bottom mounting plate (stands on y = 0 inside cutaway stage bay)',
+          cabinOrigin: 'bottom mounting deck (stands on y = 0 inside cutaway cabin bay)',
           fxAnchorPrefix: 'FX_',
         },
         fxPresets: FX_PRESETS,

@@ -94,6 +94,104 @@ async function validateModel(entry, conventions) {
   };
 }
 
+const DEFAULT_PART_MESH_BUDGET = {
+  engines: 10,
+  tanks: 8,
+  equipment: 12,
+  cabin: 12,
+};
+
+async function validatePart(entry, manifest) {
+  const problems = [];
+  const file = path.join(MODELS_DIR, entry.file);
+  const bytes = await readFile(file);
+
+  // 1. Khronos validator.
+  const report = await validator.validateBytes(new Uint8Array(bytes), { uri: entry.file, maxIssues: 50 });
+  for (const message of report.issues.messages) {
+    if (message.severity === 0) problems.push(`glTF error ${message.code}: ${message.message} (${message.pointer ?? ''})`);
+  }
+
+  // 2. Project rules.
+  const gltf = await parseGlb(entry.file, bytes);
+  const scene = gltf.scene;
+  const names = new Set();
+  const fxNodes = new Map();
+  scene.traverse((o) => {
+    if (o.name) {
+      names.add(o.name);
+      if (o.name.startsWith('FX_')) fxNodes.set(o.name, o);
+    }
+  });
+
+  if (!names.has('Attach_Top')) problems.push('missing Attach_Top anchor');
+  if (['tanks', 'equipment', 'cabin'].includes(entry.category) && !names.has('Attach_Bottom')) {
+    problems.push('missing Attach_Bottom anchor');
+  }
+  if (entry.category === 'engines' && !names.has('FX_Exhaust')) {
+    problems.push('missing FX_Exhaust anchor');
+  }
+
+  for (const fx of entry.fx ?? []) {
+    if (!names.has(fx.anchor)) problems.push(`FX anchor "${fx.anchor}" listed in manifest but not in the model`);
+    if (fx.preset && !manifest.fxPresets?.[fx.preset]) {
+      problems.push(`FX "${fx.anchor}" references unknown preset "${fx.preset}"`);
+    }
+  }
+  for (const [anchorName, node] of fxNodes) {
+    const preset = node.userData?.fx;
+    if (preset && !manifest.fxPresets?.[preset]) {
+      problems.push(`FX node "${anchorName}" carries unknown preset "${preset}"`);
+    }
+  }
+
+  let triangles = 0;
+  let meshes = 0;
+  let textures = 0;
+  scene.traverse((o) => {
+    if (!o.isMesh) return;
+    meshes++;
+    const g = o.geometry;
+    triangles += (g.index ? g.index.count : g.attributes.position.count) / 3;
+    for (const value of Object.values(o.material)) if (value?.isTexture) textures++;
+  });
+
+  const triBudget = entry.budget?.triangles ?? 1500;
+  const meshBudget = entry.budget?.meshes ?? DEFAULT_PART_MESH_BUDGET[entry.category] ?? 12;
+  if (triangles > triBudget) problems.push(`${triangles} triangles > budget ${triBudget}`);
+  if (meshes > meshBudget) problems.push(`${meshes} meshes > budget ${meshBudget}`);
+  if (bytes.byteLength > MAX_BYTES) problems.push(`${(bytes.byteLength / 1024).toFixed(0)} KB > ${MAX_BYTES / 1024} KB`);
+  if (textures > 0) problems.push(`${textures} textures found; parts use flat palette colors only`);
+
+  scene.updateMatrixWorld(true);
+  const bounds = new THREE.Box3().setFromObject(scene);
+  const size = new THREE.Vector3();
+  bounds.getSize(size);
+
+  if (entry.category === 'equipment') {
+    if (size.x > 0.76 + 1e-4) problems.push(`width ${size.x.toFixed(3)} m > 0.76 m`);
+    if (size.y > 0.78 + 1e-4) problems.push(`height ${size.y.toFixed(3)} m > 0.78 m`);
+    if (size.z > 0.76 + 1e-4) problems.push(`depth ${size.z.toFixed(3)} m > 0.76 m`);
+    if (Math.abs(bounds.min.y) > GROUND_TOLERANCE) {
+      problems.push(`base at y = ${bounds.min.y.toFixed(3)} m, expected 0`);
+    }
+  } else if (entry.category === 'cabin') {
+    if (size.x > 0.70 + 1e-4) problems.push(`width ${size.x.toFixed(3)} m > 0.70 m`);
+    if (size.y > 0.74 + 1e-4) problems.push(`height ${size.y.toFixed(3)} m > 0.74 m`);
+    if (size.z > 0.60 + 1e-4) problems.push(`depth ${size.z.toFixed(3)} m > 0.60 m`);
+    if (Math.abs(bounds.min.y) > GROUND_TOLERANCE) {
+      problems.push(`base at y = ${bounds.min.y.toFixed(3)} m, expected 0`);
+    }
+  }
+
+  return {
+    problems,
+    summary: `${triangles} tris, ${meshes} meshes, ` +
+      `${size.x.toFixed(2)}×${size.y.toFixed(2)}×${size.z.toFixed(2)} m, ` +
+      `${report.issues.numWarnings} warnings`,
+  };
+}
+
 async function main() {
   const manifest = JSON.parse(await readFile(path.join(MODELS_DIR, 'manifest.json'), 'utf8'));
   let failed = 0;
@@ -105,6 +203,16 @@ async function main() {
       for (const p of problems) console.log(`    - ${p}`);
     } else {
       console.log(`✔ ${entry.id}: ${summary}`);
+    }
+  }
+  for (const entry of manifest.parts ?? []) {
+    const { problems, summary } = await validatePart(entry, manifest);
+    if (problems.length) {
+      failed++;
+      console.log(`✘ [${entry.category}] ${entry.id}: ${summary}`);
+      for (const p of problems) console.log(`    - ${p}`);
+    } else {
+      console.log(`✔ [${entry.category}] ${entry.id}: ${summary}`);
     }
   }
   if (failed) {

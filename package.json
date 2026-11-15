@@ -8,8 +8,9 @@
   },
   "scripts": {
     "models:build": "node tools/modeling/build-avatars.mjs",
+    "models:build:parts": "node tools/modeling/build-parts.mjs",
     "models:validate": "node tools/modeling/validate.mjs",
-    "models": "npm run models:build && npm run models:validate",
+    "models": "npm run models:build && npm run models:build:parts && npm run models:validate",
     "audio:fetch": "node tools/audio/fetch-rad.mjs",
     "audio:build": "node tools/audio/generate.mjs",
     "audio:validate": "node tools/audio/validate.mjs",

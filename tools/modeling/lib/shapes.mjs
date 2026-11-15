@@ -9,13 +9,43 @@ const DEG = THREE.MathUtils.DEG2RAD;
 export const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 export const cyl = (radiusTop, radiusBottom, height, segments = 8) =>
   new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segments, 1);
+export const cylOpen = (radiusTop, radiusBottom, height, segments = 8) =>
+  new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segments, 1, true);
+export const cylArc = (
+  radiusTop,
+  radiusBottom,
+  height,
+  segments = 8,
+  thetaStart = 0,
+  thetaLength = Math.PI * 2,
+) => new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segments, 1, true, thetaStart, thetaLength);
 export const ball = (radius, widthSegments = 8, heightSegments = 6) =>
   new THREE.SphereGeometry(radius, widthSegments, heightSegments);
 /** Ring lying flat in the XZ plane (around the Y axis). */
 export const ring = (radius, tube, tubularSegments = 10, radialSegments = 3) =>
   new THREE.TorusGeometry(radius, tube, radialSegments, tubularSegments).rotateX(Math.PI / 2);
-export const lathe = (profile, segments = 8) =>
-  new THREE.LatheGeometry(profile.map(([x, y]) => new THREE.Vector2(x, y)), segments);
+/** Partial torus arc in the XY plane. */
+export const torusArc = (radius, tube, tubularSegments = 10, radialSegments = 4, arc = Math.PI) =>
+  new THREE.TorusGeometry(radius, tube, radialSegments, tubularSegments, arc);
+/** Solid annular washer / flange ring in the XZ plane centered at y = 0. */
+export const flatRing = (outerR, innerR, height, segments = 12) => {
+  const h = height / 2;
+  const profile = [
+    [innerR, -h],
+    [outerR, -h],
+    [outerR, h],
+    [innerR, h],
+    [innerR, -h],
+  ];
+  return new THREE.LatheGeometry(profile.map(([x, y]) => new THREE.Vector2(x, y)), segments);
+};
+export const lathe = (profile, segments = 8) => {
+  const pts =
+    profile.length >= 2 && profile[0][1] > profile[profile.length - 1][1]
+      ? [...profile].reverse()
+      : profile;
+  return new THREE.LatheGeometry(pts.map(([x, y]) => new THREE.Vector2(x, y)), segments);
+};
 /** Partial sphere; phi is measured around +Y starting at -X (three.js convention). */
 export const shell = (radius, w, h, phiStart, phiLength, thetaStart, thetaLength) =>
   new THREE.SphereGeometry(radius, w, h, phiStart, phiLength, thetaStart, thetaLength);

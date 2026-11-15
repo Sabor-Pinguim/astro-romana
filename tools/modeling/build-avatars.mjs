@@ -93,13 +93,14 @@ async function main() {
     throw new Error(`Unknown character id. Known: ${characters.map((c) => c.id).join(', ')}`);
   }
 
-  // Keep entries of characters that were not rebuilt this run.
-  let previous = [];
+  // Keep entries of characters and parts that were not rebuilt this run.
+  let previousManifest = {};
   try {
-    previous = JSON.parse(await readFile(MANIFEST, 'utf8')).models ?? [];
+    previousManifest = JSON.parse(await readFile(MANIFEST, 'utf8'));
   } catch {
     // first build
   }
+  const previous = previousManifest.models ?? [];
 
   const exporter = new GLTFExporter();
   const built = [];
@@ -127,10 +128,15 @@ async function main() {
       pivots: PIVOT_NAMES,
       requiredClips: REQUIRED_CLIPS,
       fxAnchorPrefix: 'FX_',
+      ...(previousManifest.conventions?.engineOrigin ? { engineOrigin: previousManifest.conventions.engineOrigin } : {}),
+      ...(previousManifest.conventions?.tankOrigin ? { tankOrigin: previousManifest.conventions.tankOrigin } : {}),
+      ...(previousManifest.conventions?.equipmentOrigin ? { equipmentOrigin: previousManifest.conventions.equipmentOrigin } : {}),
+      ...(previousManifest.conventions?.cabinOrigin ? { cabinOrigin: previousManifest.conventions.cabinOrigin } : {}),
     },
     fxPresets: FX_PRESETS,
     references: REFERENCES,
     models,
+    ...(previousManifest.parts ? { parts: previousManifest.parts } : {}),
   };
   await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`✔ manifest → ${path.relative(ROOT, MANIFEST)}`);

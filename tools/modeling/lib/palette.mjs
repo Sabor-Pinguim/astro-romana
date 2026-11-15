@@ -20,6 +20,17 @@ const BASE = {
   Lamp: { color: '#FFF6DD', emissive: '#FFF6DD', emissiveIntensity: 2.5, roughness: 0.3 },
   LedGreen: { color: '#38E07B', emissive: '#38E07B', emissiveIntensity: 2.0, roughness: 0.3 },
   LedRed: { color: '#FF3B30', emissive: '#FF3B30', emissiveIntensity: 2.0, roughness: 0.3 },
+  // Rocket parts materials (references/parts/parts.md §3).
+  Hull: { color: '#E9E9E4', roughness: 0.6 },
+  HullBlack: { color: '#1E2024', roughness: 0.55 },
+  Foam: { color: '#C8742F', roughness: 0.95 },
+  Steel: { color: '#B9BEC4', metalness: 0.9, roughness: 0.3 },
+  Aluminum: { color: '#C4C8CC', metalness: 0.8, roughness: 0.45 },
+  Titanium: { color: '#8F9196', metalness: 0.85, roughness: 0.4 },
+  Copper: { color: '#A8683A', metalness: 0.9, roughness: 0.35 },
+  NozzleDark: { color: '#3A3633', metalness: 0.6, roughness: 0.6 },
+  FoilGold: { color: '#D4A72C', metalness: 1.0, roughness: 0.3 },
+  FoilSilver: { color: '#C9CDD1', metalness: 1.0, roughness: 0.3 },
 };
 
 function makeMaterial(name, def) {
@@ -50,5 +61,12 @@ export function createPalette(accentHex) {
     emissiveIntensity: 2.0,
     roughness: 0.3,
   });
+  return materials;
+}
+
+/** Builds the shared material set for rocket parts and cabin/stage equipment. */
+export function createPartsPalette() {
+  const materials = {};
+  for (const [name, def] of Object.entries(BASE)) materials[name] = makeMaterial(name, def);
   return materials;
 }
