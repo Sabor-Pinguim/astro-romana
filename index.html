@@ -317,6 +317,14 @@
     .cockpit-fallback{position:absolute;inset:14% 8% 12%;display:grid;place-items:center;padding:24px;text-align:center;background:linear-gradient(145deg,#1d1128 0 45%,#281147 45%);clip-path:var(--chamfer)}
     .cockpit-hud-top{position:absolute;top:14px;left:16px;right:16px;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
     .cockpit-hud-bottom{position:absolute;left:16px;right:16px;bottom:14px;z-index:3;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;pointer-events:none}
+    .cockpit-reticle[hidden]{display:none}
+    .kir{position:relative;height:120px;margin:.3rem 0;background:repeating-linear-gradient(0deg,var(--f1) 0 11px,var(--f2) 11px 12px);clip-path:var(--chamfer)}
+    .kir-band{position:absolute;left:0;right:0;top:calc(50% - var(--band));height:calc(2 * var(--band));background:#7edac22e;border-top:2px solid var(--safe);border-bottom:2px solid var(--safe)}
+    .kir-mark{position:absolute;left:12%;right:12%;top:50%;height:4px;margin-top:-2px;background:var(--starlight-cream);transition:background .2s}
+    .kir-mark.out{background:var(--mars-orange)}
+    .kir-label{position:absolute;right:8px;font:600 .58rem var(--heading);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .kir-label.top{top:6px}.kir-label.bottom{bottom:6px}
+    .kir-stats{display:flex;justify-content:space-between;gap:8px;font:600 .7rem var(--heading);letter-spacing:.06em;color:var(--starlight-cream)}
     .cockpit-reticle{position:absolute;left:50%;top:38%;z-index:2;width:128px;height:128px;translate:-50% -50%;pointer-events:none;border:2px solid #7edac255;clip-path:polygon(16% 0,84% 0,100% 16%,100% 84%,84% 100%,16% 100%,0 84%,0 16%)}
     .cockpit-pip{position:absolute;left:50%;top:50%;width:16px;height:16px;translate:-50% -50%;background:var(--solar-amber);clip-path:var(--diamond);transition:translate .06s linear}
     .cockpit-pip.danger{background:var(--coral-hover)}
@@ -1169,6 +1177,8 @@
       flight.pitchX = 0;
       flight.pitchY = 0;
       flight.stability = 100;
+      flight.liftoff = null;
+      flight.hold = 0;
       flight.breakers = [
         flight.design.powerDeficit,
         flight.design.powerDeficit || flight.design.overweight,
@@ -1192,6 +1202,49 @@
       cancelAnimationFrame(flight.raf);
       flight.lastTime = performance.now();
       flight.raf = requestAnimationFrame(flightTick);
+    }
+
+    // Reusable mechanic "keep in range" (docs/minigames.md): a value drifts on its own and the player pushes it
+    // back (input −1…1) to keep it inside the green band. The value has inertia, so corrections overshoot.
+    // Stars come from the share of time spent inside the band (0–3, docs/minigames.md rule 3).
+    function createKeepInRange({ duration, band, limit, authority, damping = 1.5, drift }) {
+      const g = { t: 0, value: 0, rate: 0, inBand: 0, duration, band, limit, done: false };
+      g.tick = (dt, input) => {
+        if (g.done) return g;
+        g.t = Math.min(duration, g.t + dt);
+        g.rate += (drift(g.t, g.value) + input * authority - g.rate * damping) * dt;
+        g.value = Math.max(-limit, Math.min(limit, g.value + g.rate * dt));
+        if (g.value === limit || g.value === -limit) g.rate = 0;
+        if (Math.abs(g.value) <= band) g.inBand += dt;
+        g.done = g.t >= duration;
+        return g;
+      };
+      g.share = () => (g.t ? g.inBand / g.t : 1);
+      g.stars = () => { const k = g.share(); return k >= 0.85 ? 3 : k >= 0.65 ? 2 : k >= 0.4 ? 1 : 0; };
+      return g;
+    }
+
+    // Liftoff (Helena, keep in range): hold the pitch program through Max-Q. value = pitch error in degrees,
+    // positive = nose above the program. All numbers are game-balance.
+    const LIFTOFF = { duration: 30, band: 2.5, limit: 12, authority: 8, maxQ: [12, 20], throttle: 0.7 };
+    function startLiftoff() {
+      const d = flight.design, wallow = d.overweight ? 1.6 : 1, seed = Math.random() * 100; // low TWR: the stack wallows more
+      return createKeepInRange({
+        duration: LIFTOFF.duration, band: LIFTOFF.band, limit: LIFTOFF.limit,
+        authority: LIFTOFF.authority * (d.hasCockpitUpgrade ? 1.25 : 1),
+        drift: t => {
+          const q = t > LIFTOFF.maxQ[0] && t < LIFTOFF.maxQ[1] ? 2.4 : 1; // gusts peak around Max-Q
+          return wallow * q * (3.2 * Math.sin(t * 0.9 + seed) + 2.6 * Math.sin(t * 2.3 + seed * 1.7) + 1);
+        },
+      });
+    }
+    function finishLiftoff(g) {
+      const stars = g.stars(), share = Math.round(g.share() * 100);
+      flight.liftoffStars = stars;
+      flight.score += (stars - 1) * 4;
+      logFlight(`MECO. Pitch program held ${share}% of the ascent (${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}).`);
+      toast(`Liftoff ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${share}% inside the band`);
+      setFlightStep(1);
     }
 
     function setFlightStep(nextStep) {
@@ -1309,22 +1362,26 @@
       if (flight.keys.has('ArrowUp') || flight.keys.has('KeyW')) flight.pitchY = Math.max(-1, flight.pitchY - dt * 1.4);
       if (flight.keys.has('ArrowDown') || flight.keys.has('KeyS')) flight.pitchY = Math.min(1, flight.pitchY + dt * 1.4);
 
-      const driftMag = flight.design.overweight ? 0.55 : 0.28;
       if (flight.step === 0) {
-        flight.pitchX += (Math.sin(now * 0.0023) * driftMag) * dt;
-        flight.pitchY += (Math.cos(now * 0.0019) * driftMag * 0.7) * dt;
-        const speedMul = flight.throttle > 0.65 ? 16 : 6;
-        flight.progress = Math.min(100, flight.progress + dt * speedMul);
-        flight.altKm = flight.progress * 0.85;
-        flight.velMs = Math.round(flight.progress * 26.5);
-        const err = Math.hypot(flight.pitchX, flight.pitchY);
-        if (err > 0.6) {
-          flight.hull = Math.max(50, flight.hull - dt * 4);
-          flight.stability = Math.max(20, flight.stability - dt * 12);
-        } else {
-          flight.stability = Math.min(100, flight.stability + dt * 8);
+        if (!flight.liftoff && flight.throttle >= LIFTOFF.throttle) {
+          flight.liftoff = startLiftoff();
+          logFlight('Liftoff! Keep the navball horizon between the green brackets.');
+          renderFlightUI();
         }
-        if (flight.progress >= 100) setFlightStep(1);
+        const g = flight.liftoff;
+        if (g) {
+          const up = flight.keys.has('KeyW') || flight.keys.has('ArrowUp') || flight.hold > 0;
+          const down = flight.keys.has('KeyS') || flight.keys.has('ArrowDown') || flight.hold < 0;
+          g.tick(dt, (up ? 1 : 0) - (down ? 1 : 0));
+          flight.progress = (g.t / g.duration) * 100;
+          flight.altKm = flight.progress * 0.85;
+          flight.velMs = Math.round(flight.progress * 26.5);
+          flight.stability = Math.round(g.share() * 100);
+          flight.pitchX = 0;
+          flight.pitchY = -g.value / g.limit; // the RHC leans with the error
+          if (Math.abs(g.value) > g.limit * 0.75) flight.hull = Math.max(50, flight.hull - dt * 3); // off-program loads
+          if (g.done) { finishLiftoff(g); }
+        }
       } else if (flight.step === 1) {
         flight.altKm = Math.min(220, flight.altKm + dt * 6);
         flight.velMs = Math.min(7800, flight.velMs + dt * 210);
@@ -1360,6 +1417,14 @@
       $('#flight-goal-val').textContent = Math.round(flight.stability) + '%';
       setBar('#flight-goal-fill', flight.stability / 100, flight.stability < 55 ? 'danger' : '');
 
+      const g = flight.step === 0 ? flight.liftoff : null, mark = $('#kir-mark');
+      if (g && mark) {
+        mark.style.top = `${50 - (g.value / g.limit) * 50}%`;
+        mark.classList.toggle('out', Math.abs(g.value) > g.band);
+        $('#kir-time').textContent = `${Math.ceil(g.duration - g.t)} s to MECO`;
+        $('#kir-share').textContent = `${Math.round(g.share() * 100)}% in band`;
+        const st = g.stars(); $('#kir-stars').textContent = '★'.repeat(st) + '☆'.repeat(3 - st);
+      }
       const pip = $('#cockpit-pip');
       if (pip) {
         pip.style.translate = `calc(-50% + ${Math.round(flight.pitchX * 48)}px) calc(-50% + ${Math.round(flight.pitchY * 48)}px)`;
@@ -1384,19 +1449,26 @@
         ['Transit Operations / Phase 06A', 'Orbital Refueling & Solar Storm'],
         ['Mars Arrival / Phase 06B', 'Entry, Descent & Landing (EDL)'],
       ];
+      $('.cockpit-reticle')?.toggleAttribute('hidden', flight.step === 0);
       $('#cockpit-eyebrow').textContent = titles[flight.step][0];
       $('#cockpit-title').textContent = titles[flight.step][1];
 
       const box = $('#cockpit-minigame');
       if (flight.step === 0) {
+        const g = flight.liftoff;
         box.innerHTML = `
-          <span class="eyebrow">Helena · Minigame H-O1</span>
-          <h4>Throttle &amp; Attitude Corridor</h4>
-          <p>Push <b>Throttle_Lever</b> above 70% and keep the amber diamond centered inside the reticle with <b>Joystick_RHC</b> or WASD.${flight.design.overweight ? ' <b>(Low TWR buffet active!)</b>' : ''}</p>
-          <div class="control-grid">
-            <button class="button primary" type="button" data-act="throttle_up">Push Throttle (${Math.round(flight.throttle * 100)}%)</button>
-            <button class="button secondary" type="button" data-act="stabilize">Center RHC Attitude</button>
-          </div>`;
+          <span class="eyebrow">Helena · Liftoff · Keep in range</span>
+          <h4>Hold the pitch program</h4>
+          <p>${g ? 'Keep the navball horizon between the green brackets until MECO. <b>W/↑</b> nose up, <b>S/↓</b> nose down; corrections take a moment to bite.' : `Push <b>Throttle_Lever</b> to ${LIFTOFF.throttle * 100}% (<b>Space</b>) to lift off.`}${flight.design.overweight ? ' <b>Low TWR: the stack wallows more.</b>' : ''}</p>
+          <div class="kir" style="--band:${(LIFTOFF.band / LIFTOFF.limit) * 50}%"><div class="kir-band"></div><div class="kir-mark" id="kir-mark"></div><span class="kir-label top">Nose high</span><span class="kir-label bottom">Nose low</span></div>
+          <div class="kir-stats"><span id="kir-time">${LIFTOFF.duration} s to MECO</span><span id="kir-share">—</span><span id="kir-stars">☆☆☆</span></div>
+          <div class="control-grid">${g
+            ? '<button class="button secondary" type="button" data-hold="1">▲ Nose up</button><button class="button secondary" type="button" data-hold="-1">▼ Nose down</button>'
+            : `<button class="button primary" type="button" data-act="throttle_up">Push Throttle (${Math.round(flight.throttle * 100)}%)</button>`}</div>`;
+        $$('[data-hold]', box).forEach(btn => {
+          btn.addEventListener('pointerdown', () => { flight.hold = Number(btn.dataset.hold); });
+          for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => { flight.hold = 0; });
+        });
       } else if (flight.step === 1) {
         box.innerHTML = `
           <span class="eyebrow">Lucas · Minigame L-S4</span>
@@ -2905,6 +2977,9 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     const alarmRedMats = cloneAlarmMaterials(root.getObjectByName('Alarm_Master_Red'));
     const alarmAmberMats = cloneAlarmMaterials(root.getObjectByName('Alarm_Caution_Amber'));
 
+    // Navball: the ball turns so its horizon line reaches the green brackets (20° on the ball) at the band edge.
+    const navball = root.getObjectByName('Navball');
+    const navBase = navball ? navball.quaternion.clone() : null, navQ = new THREE.Quaternion(), navGoal = new THREE.Quaternion(), navE = new THREE.Euler();
     const throttleBaseRot = throttlePivot ? throttlePivot.rotation.x : 0;
     const rhcBaseRot = stickRHC ? stickRHC.rotation.clone() : new THREE.Euler();
 
@@ -3000,6 +3075,13 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
         // Animate cockpit controls from live flight state
         if (throttlePivot) {
           throttlePivot.rotation.x = THREE.MathUtils.lerp(throttlePivot.rotation.x, throttleBaseRot - (f.throttle || 0) * 0.65, 0.14);
+        }
+        if (navball) {
+          const g = f.step === 0 ? f.liftoff : null, err = g ? g.value / g.band : 0;
+          const pitch = THREE.MathUtils.clamp(err * 20, -70, 70) * Math.PI / 180; // nose high → horizon drops
+          const roll = g ? Math.sin(now * 0.0011) * 0.05 * Math.min(3, Math.abs(err)) : 0;
+          navQ.setFromEuler(navE.set(pitch, 0, roll));
+          navball.quaternion.slerp(navGoal.copy(navBase).multiply(navQ), 0.3);
         }
         if (stickRHC) {
           stickRHC.rotation.z = THREE.MathUtils.lerp(stickRHC.rotation.z, rhcBaseRot.z - (f.pitchX || 0) * 0.014, 0.15);

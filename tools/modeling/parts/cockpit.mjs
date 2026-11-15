@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createPartBuilder } from '../lib/part-builder.mjs';
-import { ball, box, cyl, ring } from '../lib/shapes.mjs';
+import { ball, box, cyl, ring, shell } from '../lib/shapes.mjs';
 
 /**
  * First-person pilot panel (`cockpit-pilot`), laid out after NASA's Orion crew module cockpit:
@@ -39,6 +39,16 @@ const WING_L = surface([-0.72, 0.74, -0.36], 35, -30); // side panels turned tow
 const WING_R = surface([0.72, 0.74, -0.36], -35, -30);
 const BULKHEAD = surface([0, 1.3, -0.8], 0, 30); // forward wall of the cone, leaning over the panel
 const DU_U = [-0.5, 0, 0.5]; // the 3 display units
+// Navball (attitude ball) on the left display: radius, and the band edge in degrees of ball rotation.
+// index.html turns the ball so its horizon line stays between the fixed green brackets while the pilot is in range.
+const NAV_R = 0.095, NAV_BAND_DEG = 20;
+// The ball and its fixed marks face the pilot's eyes (Camera_Pilot), so the horizon reads level and centred.
+const CAMERA = [0, 1.18, 0.38];
+const NAV_C = PANEL.at(-0.5, 0.065, 0.008);
+const NAV = (() => {
+  const d = CAMERA.map((c, i) => c - NAV_C[i]);
+  return surface(NAV_C, Math.atan2(d[0], d[2]) / DEG, -Math.atan2(d[1], Math.hypot(d[0], d[2])) / DEG);
+})();
 
 // The two guarded switches and the throttle flip about their own X axis in index.html: no base rotation.
 const PIVOTS = [
@@ -48,6 +58,7 @@ const PIVOTS = [
   { name: 'Stage_Sep_Switch', pos: [0.09, 0.625, -0.15] },
   { name: 'EDL_Arm_Switch', pos: [0.21, 0.625, -0.15] },
   { name: 'Abort_Button', pos: [0, 0.625, -0.4] },
+  { name: 'Navball', pos: NAV_C, rot: NAV.r },
   { name: 'Breaker_Bank', pos: WING_L.at(0, -0.09, 0.022), rot: WING_L.r },
   { name: 'Alarm_Master_Red', pos: PANEL.at(-0.09, 0.255, 0.035), rot: PANEL.r },
   { name: 'Alarm_Caution_Amber', pos: PANEL.at(0.09, 0.255, 0.035), rot: PANEL.r },
@@ -80,7 +91,7 @@ const cockpitPilot = {
       attachTop: [0, 1.64, 0],
       attachBottom: [0, 0, 0],
       extraAnchors: [
-        { name: 'Camera_Pilot', pos: [0, 1.18, 0.38], rot: [-18, 0, 0], userData: { target: [0, 0.86, -0.55], fov: 62 } },
+        { name: 'Camera_Pilot', pos: CAMERA, rot: [-18, 0, 0], userData: { target: [0, 0.86, -0.55], fov: 62 } },
       ],
       pivots: PIVOTS,
       fxAnchors: [
@@ -120,10 +131,23 @@ const cockpitPilot = {
     }
     // Screen graphics (game art): attitude on the left, system levels in the centre, ascent path on the right.
     const S = 0.063;
-    on(PANEL, 'LedGreen', ring(0.075, 0.005, 16, 3), -0.5, 0.065, S);
-    on(PANEL, 'Lamp', box(0.2, 0.006, 0.002), -0.5, 0.065, S + 0.001);
-    for (const dv of [-0.06, -0.03, 0.03, 0.06]) on(PANEL, 'LedGreen', box(Math.abs(dv) > 0.05 ? 0.08 : 0.05, 0.004, 0.002), -0.5, 0.065 + dv, S);
-    on(PANEL, 'LedAmber', box(0.05, 0.008, 0.002), -0.5, 0.065, S + 0.002);
+    // Navball: sky and ground halves, a lit horizon line, pitch lines every 20°, sunk into the left screen so a
+    // cap bulges out like a flight director attitude indicator. The aircraft symbol and the band brackets are fixed.
+    const half = Math.PI / 2;
+    pin('Navball', 'Pack', shell(NAV_R, 16, 6, 0, Math.PI * 2, 0, half), [0, 0, 0]);
+    pin('Navball', 'Foam', shell(NAV_R, 16, 6, 0, Math.PI * 2, half, half), [0, 0, 0]);
+    pin('Navball', 'Lamp', ring(NAV_R * 1.02, 0.006, 24, 3), [0, 0, 0]); // ring() already lies flat (XZ)
+    for (const deg of [-40, -20, 20, 40]) {
+      const a = deg * DEG;
+      pin('Navball', 'Hull', ring(NAV_R * Math.cos(a) * 1.005, 0.0022, 20, 3), [0, NAV_R * Math.sin(a), 0]);
+    }
+    const front = NAV_R + 0.012, edge = NAV_R * Math.sin(NAV_BAND_DEG * DEG);
+    on(NAV, 'LedAmber', box(0.012, 0.012, 0.004), 0, 0, front);
+    for (const sx of [-1, 1]) on(NAV, 'LedAmber', box(0.04, 0.007, 0.004), sx * 0.036, 0, front);
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+      on(NAV, 'LedGreen', box(0.03, 0.005, 0.004), sx * 0.082, sy * edge, front - 0.01);
+      on(NAV, 'LedGreen', box(0.005, 0.016, 0.004), sx * 0.0945, sy * (edge - 0.0055), front - 0.01);
+    }
     [[0.15, 'LedGreen'], [0.11, 'LedGreen'], [0.17, 'Lamp'], [0.08, 'LedAmber'], [0.13, 'LedGreen']].forEach(([h, mat], i) => {
       on(PANEL, mat, box(0.035, h, 0.002), -0.12 + i * 0.06, -0.035 + h / 2, S);
     });
