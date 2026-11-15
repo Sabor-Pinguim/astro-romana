@@ -152,7 +152,10 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   if (!view) return;
   blueprint.classList.add('is-3d');
   const { scene, camera, renderer } = view, overlay = blueprint.querySelector('#stack-overlay');
-  const HULL = { booster: 'parts/structures/booster-thrust-section.glb', stage: 'parts/structures/stage-module.glb', cabin: 'rocket/cabin_cutaway.glb' };
+  const HULL = { booster: 'parts/structures/booster-thrust-section.glb', stage: 'parts/structures/stage-module.glb', cabin: 'parts/structures/crew-cabin.glb' };
+  // Two versions of each hull: open here (the front half, node `Closed`, hidden so the bay shows) and closed
+  // for outside views (launch pad), where the equipment is stowed inside and not loaded.
+  const hullOf = async (file, closed) => { const h = await loadGLB(file), cover = h.getObjectByName('Closed'); if (cover) cover.visible = closed; return h; };
   const CABIN_SLOTS = [[-.2, .03], [.2, .03], [-.2, .5], [.2, .5]]; // x, y on the cabin deck; modules at half scale
   const GAP = .36, TANK_CAP = 3.2;
   const stack = new THREE.Group(); scene.add(stack);
@@ -200,20 +203,21 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     g.userData.top = top;
     return g;
   }
-  async function stage(r, i, parts) {
+  async function stage(r, i, parts, closed = false) {
     if (r.stages[i].type === 'booster') return booster({ booster: r.stages[i] }, parts, `stage-${i}`);
-    const g = new THREE.Group(), hull = await loadGLB(HULL.stage), key = `stage-${i}`, item = r.stages[i].item;
+    const g = new THREE.Group(), hull = await hullOf(HULL.stage, closed), key = `stage-${i}`, item = r.stages[i].item;
     g.userData.module = key; g.add(hull);
     const bay = attach(hull, 'Attach_Bay', .1);
-    if (item) { const e = await loadGLB(parts[item].file); e.position.y = bay; g.add(e); }
+    if (closed) { /* equipment stowed inside the closed bay */ }
+    else if (item) { const e = await loadGLB(parts[item].file); e.position.y = bay; g.add(e); }
     else { const m = mountPoint(.16, { module: key }); m.position.y = bay + .01; g.add(m); }
     g.userData.top = attach(hull, 'Attach_Top', 1);
     return g;
   }
-  async function cabin(r, parts) {
+  async function cabin(r, parts, closed = false) {
     const g = new THREE.Group();
-    g.userData.module = 'cabin'; g.add(await loadGLB(HULL.cabin));
-    for (let k = 0; k < CABIN_SLOTS.length; k++) {
+    g.userData.module = 'cabin'; g.add(await hullOf(HULL.cabin, closed));
+    for (let k = 0; k < (closed ? 0 : CABIN_SLOTS.length); k++) {
       const [x, y] = CABIN_SLOTS[k], id = r.cabin[k];
       if (id) { const e = await loadGLB(parts[id].file); e.scale.setScalar(.5); e.position.set(x, y, 0); g.add(e); }
       else { const m = mountPoint(.08, { module: 'cabin' }); m.position.set(x, y + .01, 0); g.add(m); }
@@ -276,18 +280,19 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   }
   window.addEventListener('astro:rocket', rebuild);
   rebuild();
-  // Launch pad (web/launch.js): the same assembly, stacked without gaps, mounting points or selection rings.
+  // Launch pad (web/launch.js) and other outside views: the same assembly, closed, stacked without gaps,
+  // mounting points or selection rings.
   window.ASTRO_BUILD_ROCKET = async () => {
     const data = ui.data(), r = ui.state.rocket;
-    const groups = await Promise.all([booster(r, data.parts), ...r.stages.map((_, i) => stage(r, i, data.parts)), cabin(r, data.parts)]);
+    const groups = await Promise.all([booster(r, data.parts), ...r.stages.map((_, i) => stage(r, i, data.parts, true)), cabin(r, data.parts, true)]);
     const rocket = new THREE.Group();
     let y = 0;
     for (const g of groups) {
       g.traverse(o => { if (o.userData.pulse) o.visible = false; });
       g.position.y = y; rocket.add(g); y += g.userData.top;
     }
-    const cab = groups[groups.length - 1], mark = new THREE.Object3D();
-    mark.position.y = cab.userData.top / 2; cab.add(mark);
+    const cab = groups[groups.length - 1], mark = cab.getObjectByName('View_Window') ?? new THREE.Object3D(); // the pilot's windows
+    if (!mark.parent) { mark.position.y = cab.userData.top / 2; cab.add(mark); }
     rocket.updateMatrixWorld(true);
     const minY = new THREE.Box3().setFromObject(rocket).min.y;
     rocket.userData = { height: y, minY, cabin: mark, cabinMid: cab.position.y + cab.userData.top / 2 };

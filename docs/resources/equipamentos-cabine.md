@@ -1,6 +1,6 @@
 # Equipamentos da Cabine da Tripulação (Catálogo de Gameplay e Missões)
 
-Este documento descreve os **12 módulos reais de equipamento** pesquisados para equipar o interior da **Cabine (`cabin_cutaway.glb`)** na Fase 3 (construção do foguete), operando diretamente na visão em primeira pessoa do lançamento (Fase 5), no reabastecimento orbital e viagem de ida/volta (Fase 6) e nas missões de superfície em Marte (Fase 7).
+Este documento descreve os **12 módulos reais de equipamento** pesquisados para equipar o interior da **Cabine (`parts/structures/crew-cabin.glb`)** na Fase 3 (construção do foguete), operando diretamente na visão em primeira pessoa do lançamento (Fase 5), no reabastecimento orbital e viagem de ida/volta (Fase 6) e nas missões de superfície em Marte (Fase 7).
 
 Enquanto os 21 motores e tanques de [references/parts/parts.md](../../references/parts/parts.md) compõem o **Main Booster**, e os 16 equipamentos de [equipamentos-estagios.md](equipamentos-estagios.md) ocupam os **1 a 7 estágios do meio**, os módulos da cabine definem os **painéis internos, suporte à vida, acoplamento orbital e segurança da tripulação**.
 
@@ -12,7 +12,7 @@ Enquanto os 21 motores e tanques de [references/parts/parts.md](../../references
 
 ## 1. Papel da Cabine no fluxo do jogo
 
-A **Cabine (`cabin_cutaway.glb`)** é um dos dois módulos **obrigatórios** da nave (junto ao *Main Booster*). Sua cavidade principal pressurizada (`Ø 0,92 m × 0,95 m` na escala normalizada do modelo *cutaway*, antes do funil superior da torre de escape) recebe módulos padronizados de até **`0,68 × 0,72 × 0,56 m`** assentados no piso (`y = 0`).
+A **Cabine (`parts/structures/crew-cabin.glb`)** é um dos dois módulos **obrigatórios** da nave (junto ao *Main Booster*). Sua cavidade principal pressurizada (`Ø 0,92 m × 0,95 m` na escala normalizada do modelo *cutaway*, antes do funil superior da torre de escape) recebe módulos padronizados de até **`0,68 × 0,72 × 0,56 m`** assentados no piso (`y = 0`).
 
 ### O que a personalização da Cabine altera nas Fases 5, 6 e 7
 - **Fase 5 (Lançamento em 1ª pessoa):** os painéis exibidos a cada astronauta (`§7.1`) e a tolerância da tripulação à aceleração e vibração dependem do cockpit (`cabin-orion-cockpit`), dos assentos amortecedores (`cabin-launch-seats`) e do barramento elétrico (`cabin-pcdu-thermal`).

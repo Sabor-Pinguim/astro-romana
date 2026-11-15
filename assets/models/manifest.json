@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T16:08:37.458Z",
+  "generatedAt": "2026-11-15T18:09:38.798Z",
   "generator": "tools/modeling/build-avatars.mjs",
   "conventions": {
     "units": "meters",
@@ -598,16 +598,6 @@
     "minBareLiftoffTwr": 1,
     "maxInternalStages": 7,
     "cabinModuleSlots": 4,
-    "cabinHull": {
-      "massDryKg": 3000,
-      "powerW": -300,
-      "costM": 12,
-      "sources": {
-        "massDryKg": "game-balance",
-        "powerW": "game-balance (base life support)",
-        "costM": "game-balance"
-      }
-    },
     "mandatoryOrbitalRefuelingForMars": true,
     "note": "g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5."
   },
@@ -3723,9 +3713,9 @@
       "category": "structures",
       "tier": 1,
       "vehicle": "Middle stages (0 to 7, stackable)",
-      "role": "Open cutaway bay with a mounting point for 1 equipment item",
+      "role": "Cutaway bay with a mounting point for 1 equipment item; the front half (node Closed) closes it",
       "file": "parts/structures/stage-module.glb",
-      "summary": "White half shell open to the front, dark inner wall, aluminum decks and a gold hexagonal mounting plate at the bay center.",
+      "summary": "White half shell open to the front, dark inner wall, aluminum decks and a gold hexagonal mounting plate at the bay center; the Closed node adds the front half with its black band and an access panel.",
       "originNote": "Bottom interface (y = 0); next module fits at y = 1",
       "requiredNodes": [
         "Attach_Top",
@@ -3736,7 +3726,7 @@
       "dimensions": {
         "width": 1.01,
         "height": 1,
-        "depth": 1.005,
+        "depth": 1.01,
         "minY": 0,
         "maxY": 1
       },
@@ -3754,15 +3744,63 @@
       },
       "budget": {
         "triangles": 700,
-        "meshes": 8
+        "meshes": 10
       },
       "stats": {
-        "triangles": 264,
-        "meshes": 6,
-        "bytes": 24012
+        "triangles": 324,
+        "meshes": 9,
+        "bytes": 30156
       },
       "references": [
         "references/parts/structures/stage-module/README.md"
+      ]
+    },
+    {
+      "id": "crew-cabin",
+      "name": "Crew Cabin",
+      "nodeName": "CrewCabin",
+      "category": "structures",
+      "tier": 1,
+      "vehicle": "Crew cabin (required top)",
+      "role": "Pressurized cabin with 4 module slots under a launch abort tower; the front half (node Closed) closes it",
+      "file": "parts/structures/crew-cabin.glb",
+      "summary": "White cylinder and capsule cone cut open to the front, dark inner wall, two aluminum decks, a gold-foil upper bulkhead, a docking ring and a launch abort tower; the Closed node adds the front half with the hatch and two windows.",
+      "originNote": "Center of the cabin floor (y = 0); the cutaway opening faces +Z",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 1.01,
+        "height": 2.15,
+        "depth": 1.018,
+        "minY": 0,
+        "maxY": 2.15
+      },
+      "specs": {
+        "massDryKg": 3000,
+        "propellantMassKg": 0,
+        "powerW": -300,
+        "costM": 12,
+        "dataRateKbps": 0,
+        "sources": {
+          "massDryKg": "game-balance (references/parts/structures/crew-cabin/README.md: normalized pressurized cabin and abort tower)",
+          "powerW": "game-balance (base life support)",
+          "costM": "game-balance (mandatory crew cabin)"
+        }
+      },
+      "budget": {
+        "triangles": 1400,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 792,
+        "meshes": 9,
+        "bytes": 64008
+      },
+      "references": [
+        "references/parts/structures/crew-cabin/README.md"
       ]
     },
     {

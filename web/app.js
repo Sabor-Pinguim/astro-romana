@@ -129,7 +129,7 @@
     };
     const stack=[engineStage('booster',r.booster,true)];
     r.stages.forEach((s,i)=>{if(s.type==='booster')stack.push(engineStage(`stage-${i}`,s,false));else payload+=take(spec('stage-module'))+take(s.item?spec(s.item):null);});
-    payload+=take(rule('cabinHull'));r.cabin.forEach(id=>{payload+=take(spec(id));});
+    payload+=take(spec('crew-cabin'));r.cabin.forEach(id=>{payload+=take(spec(id));});
     stack.slice(1).forEach(s=>{if(!s.ready)payload+=s.hw+s.prop;});
     const ready=stack[0].ready,firing=ready?stack.filter(s=>s.ready):[];
     const mass=payload+stack.reduce((a,s)=>a+(s.ready||s===stack[0]?s.hw+s.prop:0),0);

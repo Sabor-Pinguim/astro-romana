@@ -1,7 +1,7 @@
 (async () => {
 // Launch pad: the rocket the crew designed stands on the pad while the camera circles it and the countdown
-// runs. At zero the engines light, the stack starts to climb and the camera flies into the cabin (the cutaway
-// faces +Z); then the cockpit, in the pilot's view, takes over.
+// runs. At zero the engines light, the stack starts to climb and the camera flies up to the pilot's windows
+// (the closed cabin faces +Z); the screen fades and the cockpit, in the pilot's view, takes over.
 // window.ASTRO_LAUNCHPAD() shows this screen and resolves when the cockpit should start.
 const THREE = await import('three');
 const screen = document.getElementById('launchpad'), host = document.getElementById('launchpad-view');
@@ -105,13 +105,14 @@ window.ASTRO_LAUNCHPAD = () => new Promise(async resolve => {
   buildTower(v);
   v.plume.scale.setScalar(0.001); v.rocket.add(v.plume); v.plume.position.y = stackGroup.userData.minY;
   v.smoke.forEach(m => { m.material.opacity = 0; m.scale.setScalar(.01); });
-  const mid = new THREE.Vector3(), cabin = new THREE.Vector3(), from = new THREE.Vector3(), look = new THREE.Vector3(), into = new THREE.Vector3();
+  const mid = new THREE.Vector3(), cabin = new THREE.Vector3(), look = new THREE.Vector3(), into = new THREE.Vector3();
   const R = v.height * 1.15 + 4;
-  let t = reduce ? COUNT : 0, last = performance.now(), flyFrom = null;
+  let t = reduce ? COUNT : 0, last = performance.now(), flyFrom = null, lookFrom = null;
   function frame(now) {
     if (done || !screen.classList.contains('active')) return;
     requestAnimationFrame(frame);
     const dt = Math.min(.1, Math.max(0, (now - last) / 1000)); last = now; t += dt; // rAF time can precede performance.now()
+    if (window.ASTRO_LAUNCH_PAUSE) t -= dt; // tests: hold the moment
     if (window.ASTRO_LAUNCH_JUMP != null) { t = window.ASTRO_LAUNCH_JUMP; window.ASTRO_LAUNCH_JUMP = null; } // tests: jump in time
     countdownText(t);
     const lit = Math.max(0, t - COUNT), climb = Math.max(0, lit - .8);
@@ -137,15 +138,18 @@ window.ASTRO_LAUNCHPAD = () => new Promise(async resolve => {
       camera.position.set(Math.sin(a) * R + (Math.random() - .5) * shake, look.y + Math.sin(t * .5) * 1.2 * (1 - low) + 1.5 * low + (Math.random() - .5) * shake, Math.cos(a) * R);
       camera.lookAt(look);
     } else {
-      // Fly into the cabin through the cutaway (+Z), following the climbing rocket.
-      if (!flyFrom) flyFrom = camera.position.clone();
+      // Fly up to the pilot's windows (+Z), following the climbing rocket; the fade covers the way in.
+      if (!flyFrom) { flyFrom = camera.position.clone(); lookFrom = look.clone(); }
       const k = Math.min(1, (t - COUNT - IGNITION_HOLD) / FLY_IN), e = k * k * (3 - 2 * k);
       $id('launchpad-count').style.opacity = String(1 - e);
-      into.copy(cabin).add({ x: 0, y: .15, z: .25 });
-      from.copy(flyFrom).lerp(into, e);
-      camera.position.copy(from);
-      look.lerp(cabin.clone().add({ x: 0, y: .05, z: -1 }), e * .35); // from where the camera was looking
+      into.copy(cabin).add({ x: 0, y: .02, z: .14 });
+      // Swing round the rocket to its front (+Z) and up to the windows by halfway, then close in.
+      const half = Math.min(1, k * 2), turn = half * half * (3 - 2 * half);
+      const a = Math.atan2(flyFrom.x, flyFrom.z) * (1 - turn), r0 = Math.hypot(flyFrom.x, flyFrom.z), rr = r0 + (into.z - r0) * e;
+      camera.position.set(Math.sin(a) * rr, flyFrom.y + (into.y - flyFrom.y) * turn, Math.cos(a) * rr); // level with the windows by halfway
+      look.copy(lookFrom).lerp(cabin.clone().add({ x: 0, y: 0, z: -1 }), turn); // the gaze is on the windows by then
       camera.lookAt(look);
+      if (k >= .9) $id('launchpad-fade').classList.add('on');
       if (k >= 1) finish();
     }
     renderer.render(v.scene, camera);

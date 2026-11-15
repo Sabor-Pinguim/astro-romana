@@ -17,13 +17,6 @@ export const MISSION_RULES = {
   minBareLiftoffTwr: 1.0,
   maxInternalStages: 7,
   cabinModuleSlots: 4,
-  // Crew cabin hull (rocket/cabin_cutaway.glb) for the builder totals; it is not a generated part.
-  cabinHull: {
-    massDryKg: 3000,
-    powerW: -300,
-    costM: 12.0,
-    sources: { massDryKg: 'game-balance', powerW: 'game-balance (base life support)', costM: 'game-balance' },
-  },
   mandatoryOrbitalRefuelingForMars: true,
   note: 'g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5.',
 };
@@ -929,6 +922,18 @@ export const PART_SPECS = {
       massDryKg: 'game-balance (references/parts/structures/booster-thrust-section/README.md: normalized aft skirt and thrust plate)',
       powerW: 'game-balance (passive structure)',
       costM: 'game-balance (mandatory Main Booster hull)',
+    },
+  },
+  'crew-cabin': {
+    massDryKg: 3000,
+    propellantMassKg: 0,
+    powerW: -300,
+    costM: 12.0,
+    dataRateKbps: 0,
+    sources: {
+      massDryKg: 'game-balance (references/parts/structures/crew-cabin/README.md: normalized pressurized cabin and abort tower)',
+      powerW: 'game-balance (base life support)',
+      costM: 'game-balance (mandatory crew cabin)',
     },
   },
   'stage-module': {
