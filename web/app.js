@@ -29,7 +29,7 @@
   const MAX_STAGES = () => rule('maxInternalStages',7), CABIN_SLOTS = () => rule('cabinModuleSlots',4), TWR_MIN = () => rule('minSafeLiftoffTwr',1.2), TWR_BARE = () => rule('minBareLiftoffTwr',1);
   const stageName = key => key==='booster'?'stage 1':`stage ${+key.slice(6)+2}`;
   const budgetOf = level => rule('defaultBudgetM',250)*difficulty[level].factor;
-  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:{booster:{engine:null,fins:null,tank:null},stages:[{item:null},{item:null}],cabin:[]},sel:{kind:'booster'},tab:'engine'};
+  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:{booster:{engine:'merlin-1d',fins:'fins-small',tank:'falcon-9-stage-1-tank'},stages:[{item:'power-rosa-solar'},{item:null}],cabin:[]},sel:{kind:'booster'},tab:'engine'};
   const money = n => (n<0?'−$':'$')+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<10?1:0})+'M';
   const number = n => n==null?'n/f':Math.round(n).toLocaleString('en-US');
   const tonnes = kg => kg==null?'n/f':(kg/1000).toLocaleString('en-US',{maximumFractionDigits:kg<10000?2:1})+' t';

@@ -786,7 +786,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   window.addEventListener('astro:land', e => land(e.detail));
 
   // Emote wheel: the animations every avatar has (AGENTS.md §5.5). Hold Q, aim with the mouse and release;
-  // or click/tap the 😀 button and pick. In first person the camera steps back while the emote plays.
+  // or click/tap the emotes button and pick. In first person the camera steps back while the emote plays.
   const ACTION_EMOTE = { helena: ['🪛', 'Tinker'], lucas: ['💻', 'Computer'], oscar: ['📡', 'Antenna'], maya: ['🧪', 'Sample'] };
   const wheelEl = $s('emote-wheel');
   const emotes = () => [['wave', '👋', 'Wave'], ...(ACTION_EMOTE[s.crew] ? [['action', ...ACTION_EMOTE[s.crew]]] : []), ['walk', '🚶', 'Walk'], ['idle', '🧍', 'Idle']];

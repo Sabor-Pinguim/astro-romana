@@ -3,8 +3,16 @@
   const WIDTH = 5, HEIGHT = 5;
   // The checkpoints admit a route through every cell; the last is the endpoint.
   const CHECKPOINTS = [[0, 0], [4, 1], [0, 2], [4, 3], [4, 4]];
+  // Most abundant elements in the Martian crust (by weight): Oxygen, Silicon, Iron, Magnesium, Calcium.
+  const ELEMENTS = [
+    { symbol: 'O', name: 'Oxygen' },
+    { symbol: 'Si', name: 'Silicon' },
+    { symbol: 'Fe', name: 'Iron' },
+    { symbol: 'Mg', name: 'Magnesium' },
+    { symbol: 'Ca', name: 'Calcium' },
+  ];
   const $ = id => document.getElementById(id);
-  const game = $('scout-game'), board = $('scout-board'), dialog = $('minigame-dialog');
+  const game = $('scout-game'), board = $('scout-board'), orderBox = $('scout-order'), dialog = $('minigame-dialog');
   let path = [], active = false, drawing = false;
 
   function checkpointAt(x, y) { return CHECKPOINTS.findIndex(([cx, cy]) => cx === x && cy === y); }
@@ -26,16 +34,24 @@
           if (neighbor[1] > y) cell.classList.add('link-down');
         }
       }
-      cell.textContent = n >= 0 ? String(n + 1) : '';
-      cell.setAttribute('aria-label', `Row ${y + 1}, column ${x + 1}${n >= 0 ? `, waypoint ${n + 1}` : ''}${index !== undefined ? ', on route' : ''}`);
+      const el = n >= 0 ? ELEMENTS[n] : null;
+      cell.textContent = el ? el.symbol : '';
+      cell.title = el ? `${el.symbol} — ${el.name}` : '';
+      cell.setAttribute('aria-label', `Row ${y + 1}, column ${x + 1}${el ? `, element ${el.symbol} (${el.name})` : ''}${index !== undefined ? ', on route' : ''}`);
     });
+    if (orderBox) {
+      orderBox.innerHTML = `<span class="scout-order-label">Order</span>` + ELEMENTS.map((el, i) => {
+        const cls = i < reached ? 'done' : i === reached ? 'next' : '';
+        return `<span class="scout-order-chip ${cls}" title="${el.name}">${el.symbol}</span>`;
+      }).join('<span class="scout-order-arrow" aria-hidden="true">→</span>');
+    }
     $('scout-points').textContent = `${reached} / ${CHECKPOINTS.length} WAYPOINTS`;
     $('scout-time').textContent = `${path.length} / ${WIDTH * HEIGHT} SECTORS`;
   }
   function stop() { active = false; drawing = false; }
   function reset() {
     stop(); path = [CHECKPOINTS[0].slice()]; active = true;
-    $('scout-status').textContent = 'Connect the numbered points in order and cover every sector. Drag, tap adjacent cells, or use the arrows. Trace back to undo.';
+    $('scout-status').textContent = 'Connect the Mars crust elements in the order shown above and cover every sector. Drag, tap adjacent cells, or use the arrows. Trace back to undo.';
     $('scout-start').hidden = false; $('scout-start').textContent = 'Reset route';
     $('minigame-done').hidden = true;
     game.querySelectorAll('[data-scout]').forEach(button => { button.disabled = false; });
@@ -53,7 +69,7 @@
     }
     const checkpoint = checkpointAt(x, y);
     const reached = path.filter(([cx, cy]) => checkpointAt(cx, cy) >= 0).length;
-    if (checkpoint >= 0 && checkpoint !== reached) { $('scout-status').textContent = `Visit waypoint ${reached + 1} next.`; return; }
+    if (checkpoint >= 0 && checkpoint !== reached) { $('scout-status').textContent = `Visit ${ELEMENTS[reached].symbol} (${ELEMENTS[reached].name}) next.`; return; }
     if (checkpoint === CHECKPOINTS.length - 1 && path.length !== WIDTH * HEIGHT - 1) {
       $('scout-status').textContent = 'Cover every sector before reaching the final waypoint.'; return;
     }

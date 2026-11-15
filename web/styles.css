@@ -486,6 +486,12 @@
     .scout-tile{--left:transparent;--right:transparent;--up:transparent;--down:transparent;position:relative;display:grid;place-items:center;min-width:0;padding:0;border:0;background:linear-gradient(var(--up),var(--up)) center top/20% 50% no-repeat,linear-gradient(var(--down),var(--down)) center bottom/20% 50% no-repeat,linear-gradient(var(--left),var(--left)) left center/50% 20% no-repeat,linear-gradient(var(--right),var(--right)) right center/50% 20% no-repeat,#713420;color:var(--starlight-cream);font:700 clamp(.8rem,2vw,1.2rem) var(--heading);cursor:pointer}
     .scout-tile.link-left{--left:var(--solar-amber)}.scout-tile.link-right{--right:var(--solar-amber)}.scout-tile.link-up{--up:var(--solar-amber)}.scout-tile.link-down{--down:var(--solar-amber)}
     .scout-tile.visited{color:#fff}.scout-tile.drone{outline:3px solid var(--starlight-cream);outline-offset:-3px;color:#fff}
+    .scout-order{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;padding:6px 10px;background:var(--f1);clip-path:var(--chamfer)}
+    .scout-order-label{font:700 .62rem var(--heading);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+    .scout-order-chip{display:inline-flex;align-items:center;justify-content:center;min-width:34px;padding:.24rem .55rem;font:700 .76rem var(--heading);letter-spacing:.06em;color:var(--muted);background:var(--f3);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+    .scout-order-chip.done{color:var(--bg-void);background:var(--safe)}
+    .scout-order-chip.next{color:var(--bg-void);background:var(--solar-amber)}
+    .scout-order-arrow{font:700 .7rem var(--heading);color:var(--muted)}
     .scout-controls{display:grid;justify-items:center;gap:4px}.scout-controls div{display:flex;gap:4px}.scout-controls button{width:48px;height:38px;border:1px solid var(--amethyst);background:var(--f1);color:var(--starlight-cream);font-size:1.1rem}.scout-controls button:disabled{opacity:.4}
     #scout-status{min-height:2.4em;font-size:.8rem}#scout-start{justify-self:start}
     .toast{position:fixed;left:50%;bottom:26px;z-index:40;max-width:min(520px,calc(100vw - 32px));padding:.85rem 1.5rem;font:600 .8rem/1.35 var(--heading);letter-spacing:.04em;color:var(--bg-void);background:linear-gradient(165deg,color-mix(in srgb,var(--solar-amber) 72%,var(--starlight-cream)) 0 50%,var(--solar-amber) 50%);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);translate:-50% calc(100% + 40px);visibility:hidden;transition:translate .3s cubic-bezier(.7,0,.2,1),visibility .3s}
