@@ -42,16 +42,14 @@ Use só estes tokens. Os nomes são os das variáveis CSS de `:root`.
 
 **Rampas dos astros** (do escuro para o claro; ficam em `RAMPS` no `index.html`): `mars`, `marsDark`, `ice`, `ocean`, `land`, `jupiter`, `jupiterBand`, `sun`, `rock`, `jezero`, `gale`, `ground`. Cada rampa tem 6 cores. A luz escolhe a cor: a face mais iluminada pega o fim da rampa.
 
-**Cores dos personagens** (variável `--crew` nos cards):
+**Cores dos personagens** (variável `--crew` nos cards e na HUD): a interface usa a cor `Accent` do modelo 3D, para que legenda e avatar sejam sempre reconhecíveis como a mesma pessoa.
 
-| Personagem | Interface (`index.html`) | Modelo 3D (`Accent`) |
-|---|---|---|
-| Helena | `#EAA668` | `#D7263D` |
-| Lucas | `#7EDAC2` | `#F2A900` |
-| Oscar | `#95B8F6` | `#1FA2FF` |
-| Maya | `#D5A5EE` | `#2BB673` |
-
-> ⚠ **Pendente:** as duas colunas divergem. O time precisa escolher um conjunto e atualizar o outro lado (`tools/modeling/characters/<id>.mjs` ou a lista `crew` do `index.html`).
+| Personagem | Interface e modelo 3D (`Accent`) |
+|---|---|
+| Helena | `#D7263D` |
+| Lucas | `#F2A900` |
+| Oscar | `#1FA2FF` |
+| Maya | `#2BB673` |
 
 ## 3. Tipografia
 

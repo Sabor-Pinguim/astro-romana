@@ -3,10 +3,11 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const crew = [
-    {id:'helena',name:'Helena',role:'Commander & Pilot',color:'#EAA668',quote:'A mission only succeeds when every choice has a way home.',tags:['Aerospace Engineering','Test Pilot','Trajectory'],perk:'Precision Piloting',perkText:'Improves the crew’s margin during orbital maneuvers (full game).'},
-    {id:'lucas',name:'Lucas',role:'Systems Engineer',color:'#7EDAC2',quote:'A reliable spacecraft is built from a thousand careful decisions.',tags:['Electrical Power','Structures','Repairs'],perk:'Redundant Engineering',perkText:'Reduces the impact of component failures (full game).'},
-    {id:'oscar',name:'Oscar',role:'Data & Telecom Specialist',color:'#95B8F6',quote:'A discovery that never reaches Earth is a story left untold.',tags:['Data Systems','Communications','Signal Planning'],perk:'Smart Compression',perkText:'Moves more science data through a limited connection (full game).'},
-    {id:'maya',name:'Maya',role:'Mission Scientist & Medical Officer',color:'#D5A5EE',quote:'Every rock on Mars holds a secret waiting to be decoded.',tags:['Planetary Geology','Astrobiology','Crew Health'],perk:'Experimental Synergy',perkText:'Rewards a well-matched set of science instruments (full game).'}
+    // Keep HUD, labels, and lobby accents in sync with each avatar's 3D Accent material.
+    {id:'helena',name:'Helena',role:'Commander & Pilot',color:'#D7263D',quote:'A mission only succeeds when every choice has a way home.',tags:['Aerospace Engineering','Test Pilot','Trajectory'],perk:'Precision Piloting',perkText:'Improves the crew’s margin during orbital maneuvers (full game).'},
+    {id:'lucas',name:'Lucas',role:'Systems Engineer',color:'#F2A900',quote:'A reliable spacecraft is built from a thousand careful decisions.',tags:['Electrical Power','Structures','Repairs'],perk:'Redundant Engineering',perkText:'Reduces the impact of component failures (full game).'},
+    {id:'oscar',name:'Oscar',role:'Data & Telecom Specialist',color:'#1FA2FF',quote:'A discovery that never reaches Earth is a story left untold.',tags:['Data Systems','Communications','Signal Planning'],perk:'Smart Compression',perkText:'Moves more science data through a limited connection (full game).'},
+    {id:'maya',name:'Maya',role:'Mission Scientist & Medical Officer',color:'#2BB673',quote:'Every rock on Mars holds a secret waiting to be decoded.',tags:['Planetary Geology','Astrobiology','Crew Health'],perk:'Experimental Synergy',perkText:'Rewards a well-matched set of science instruments (full game).'}
   ];
   const SITES_INFO = {
     jezero:{name:'Jezero Crater',mission:'Biosignature Hunters',tag:'Ancient delta · biosignatures',desc:'An ancient lake with a river delta, a target in the search for biosignatures. The Perseverance rover has explored the crater since 2021.'},
