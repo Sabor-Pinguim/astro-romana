@@ -102,14 +102,19 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
   - Malha: `IcosahedronGeometry` com detalhe 1 (Sol) ou 2 (planetas) e uma cor por face (`vertexColors`).
   - Material: `MeshLambertMaterial` com `flatShading`.
   - Luz: `PointLight` creme no Sol, então o lado iluminado é sempre o virado para ele, mais `AmbientLight` lilás `#b48cf0` para o lado escuro.
-  - Órbitas: `LineLoop` tracejado de 40 lados.
+  - Sistema completo: os 8 planetas (Saturno com anéis facetados), cinturão de asteroides (170 icosaedros) e transferência Terra→Marte.
+  - Órbitas: `LineLoop` tracejado de 48 lados; a de Marte, o único destino aberto, em laranja sólido.
+  - Aura de Marte: duas cascas de icosaedro vistas por dentro (laranja e âmbar, aditivas), girando e pulsando. É o único brilho permitido: serve para dizer "disponível".
   - Movimento: períodos orbitais reais em proporção (1 ano = 36 s) e inclinação axial real. Os raios são estilizados.
   - A órbita desacelera quando o mouse está sobre um planeta.
   - Os botões HTML seguem a projeção de cada planeta. Sem WebGL, o mapa 2D continua.
 - **Foguetes 3D** (GLBs gerados, carregados de `index.models.js`):
   - Luz: chave creme de cima e da esquerda, ambiente lilás, contraluz laranja-Marte e reflexo suave de sala (`RoomEnvironment`, intensidade 0,5) para o metal não ficar preto.
   - Menu: Saturn V inclinado em voo, girando no próprio eixo, com chama de 3 cones de 7 lados (laranja, âmbar e creme, aditivos, tremulando). No Play ele acelera para longe e a tela troca depois de cerca de 1 s.
-  - Montagem: vista explodida, de baixo para cima: propulsor principal, estágios do meio e cabine (`rocket/*_cutaway.glb`). Motores pendurados sob o estágio (3 motores em triângulo), equipamentos de pé na baia aberta, até 3 por fileira. Estágio desligado aparece como fantasma (14 % de opacidade); estágio selecionado ganha anéis âmbar de 12 lados. A pilha balança ±43° sem esconder o lado aberto, e cada rótulo acompanha seu estágio.
+  - Montagem: vista explodida, de baixo para cima: seção de empuxo do propulsor, estágios do meio (0 a 7) e cabine. As carcaças (`parts/structures/*.glb` e `rocket/cabin_cutaway.glb`) não têm motor nem tanque: as peças encaixam nos nós `Attach_*`. Motores no padrão real do cluster (1 + 8 do Falcon 9, 4 do SLS, 3 + 10 + 20 do Super Heavy); tanque sobre `Attach_Tank`, com a altura comprimida para caber; 1 equipamento por baia; até 4 módulos na cabine, em meia escala.
+  - Pontos de fixação vazios: placa hexagonal âmbar com contorno creme, pulsando; clicar abre a aba certa do catálogo. Módulo selecionado: anéis âmbar de 12 lados. Nos vãos entre módulos, botões hexagonais "+" inserem um estágio.
+  - A pilha balança ±43° sem esconder o lado aberto, e cada rótulo acompanha seu módulo.
+  - Lobby: o tripulante escolhido aparece em 3D (GLB do avatar, animação `idle_loop`; `wave` ao selecionar de novo) sobre um pedestal hexagonal na cor dele.
 - **Terreno** (`facetTerrain`):
   - Linhas de vértices desde um perfil de silhueta (lista de pontos x, y) até a base, mais densas perto do horizonte.
   - Quads divididos em diagonais alternadas.
