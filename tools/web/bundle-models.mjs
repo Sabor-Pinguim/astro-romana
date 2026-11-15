@@ -16,7 +16,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(modelsDir, 'parts/manifest
 // Same filter as the builder in index.html.
 const offered = manifest.parts.filter((p) => (p.category === 'engines' ? p.specs?.engineRole === 'booster'
   : p.category === 'tanks' ? p.specs?.tankRole === 'stage'
-    : ['equipment', 'cabin', 'structures'].includes(p.category)));
+    : ['equipment', 'cabin', 'structures', 'fins'].includes(p.category)));
 const files = [...new Set([
   ...(sources.match(/\b(?:rocket|parts|characters)\/[\w/.-]+\.glb\b/g) ?? []),
   ...offered.map((p) => p.file),

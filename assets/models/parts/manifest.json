@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T11:14:59.231Z",
+  "generatedAt": "2026-11-15T12:27:23.294Z",
   "generator": "tools/modeling/build-parts.mjs",
   "conventions": {
     "units": "meters",
@@ -3337,9 +3337,9 @@
         "meshes": 48
       },
       "stats": {
-        "triangles": 4612,
-        "meshes": 41,
-        "bytes": 362776
+        "triangles": 4864,
+        "meshes": 42,
+        "bytes": 381512
       },
       "references": [
         "references/parts/cockpit/cockpit-pilot/README.md",
@@ -3355,7 +3355,7 @@
       "vehicle": "Main Booster (required base)",
       "role": "Aft skirt with thrust plate: takes the engine cluster below and the tank above",
       "file": "parts/structures/booster-thrust-section.glb",
-      "summary": "Slightly conical white skirt with a black band, four fins, a steel thrust plate and a hexagonal engine mounting boss.",
+      "summary": "Slightly conical white skirt with a black band, a steel thrust plate and a hexagonal engine mounting boss; fins are an optional part.",
       "originNote": "Bottom plane of the thrust plate; engines hang below y = 0",
       "requiredNodes": [
         "Attach_Top",
@@ -3365,9 +3365,9 @@
       ],
       "fx": [],
       "dimensions": {
-        "width": 1.096,
+        "width": 1.07,
         "height": 0.53,
-        "depth": 1.096,
+        "depth": 1.07,
         "minY": -0.03,
         "maxY": 0.5
       },
@@ -3388,9 +3388,9 @@
         "meshes": 6
       },
       "stats": {
-        "triangles": 264,
+        "triangles": 216,
         "meshes": 5,
-        "bytes": 23532
+        "bytes": 20072
       },
       "references": [
         "references/parts/structures/booster-thrust-section/README.md"
@@ -3443,6 +3443,104 @@
       },
       "references": [
         "references/parts/structures/stage-module/README.md"
+      ]
+    },
+    {
+      "id": "fins-small",
+      "name": "Small Fixed Fins",
+      "nodeName": "FinsSmall",
+      "category": "fins",
+      "tier": 1,
+      "vehicle": "Redstone family (Mercury-Redstone, Jupiter-C)",
+      "role": "Light passive stability for the ascent; damps gusts a little",
+      "file": "parts/fins/fins-small.glb",
+      "summary": "Four small swept black fins on the booster skirt diagonals.",
+      "originNote": "Same origin as booster-thrust-section (bottom of the thrust plate); fins on the skirt diagonals",
+      "requiredNodes": [
+        "Attach_Top"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.919,
+        "height": 0.34,
+        "depth": 0.919,
+        "minY": -0.02,
+        "maxY": 0.32
+      },
+      "specs": {
+        "massDryKg": 180,
+        "propellantMassKg": 0,
+        "powerW": 0,
+        "costM": 2,
+        "dataRateKbps": 0,
+        "aeroDriftFactor": 0.8,
+        "sources": {
+          "massDryKg": "game-balance (est.; normalized booster, small fixed fins)",
+          "powerW": "game-balance (passive)",
+          "costM": "game-balance",
+          "aeroDriftFactor": "game-balance (fixed fins move the centre of pressure aft: passive stability)"
+        }
+      },
+      "budget": {
+        "triangles": 400,
+        "meshes": 4
+      },
+      "stats": {
+        "triangles": 48,
+        "meshes": 1,
+        "bytes": 4624
+      },
+      "references": [
+        "references/parts/fins/fins-small/README.md"
+      ]
+    },
+    {
+      "id": "fins-large",
+      "name": "Large Fixed Fins with Fairings",
+      "nodeName": "FinsLarge",
+      "category": "fins",
+      "tier": 2,
+      "vehicle": "Saturn V first stage (S-IC)",
+      "role": "Strong passive stability through Max-Q; heavier and dearer",
+      "file": "parts/fins/fins-large.glb",
+      "summary": "Four large swept white fins reaching below the base, each with a dark engine fairing at the root.",
+      "originNote": "Same origin as booster-thrust-section (bottom of the thrust plate); fins on the skirt diagonals",
+      "requiredNodes": [
+        "Attach_Top"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 1.124,
+        "height": 0.54,
+        "depth": 1.124,
+        "minY": -0.1,
+        "maxY": 0.44
+      },
+      "specs": {
+        "massDryKg": 900,
+        "propellantMassKg": 0,
+        "powerW": 0,
+        "costM": 5.5,
+        "dataRateKbps": 0,
+        "aeroDriftFactor": 0.6,
+        "sources": {
+          "massDryKg": "game-balance (est.; normalized booster, large fins with fairings as on the S-IC)",
+          "powerW": "game-balance (passive)",
+          "costM": "game-balance",
+          "aeroDriftFactor": "game-balance (larger fin area, more passive stability)"
+        }
+      },
+      "budget": {
+        "triangles": 400,
+        "meshes": 4
+      },
+      "stats": {
+        "triangles": 96,
+        "meshes": 2,
+        "bytes": 8888
+      },
+      "references": [
+        "references/parts/fins/fins-large/README.md"
       ]
     }
   ]

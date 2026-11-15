@@ -182,6 +182,8 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   async function booster(r, parts, module = 'booster') {
     const g = new THREE.Group(), hull = await loadGLB(HULL.booster);
     g.userData.module = module; g.add(hull);
+    // Fins (Main Booster only) share the thrust section's origin: they bolt straight onto the skirt.
+    if (module === 'booster' && r.booster.fins) g.add(await loadGLB(parts[r.booster.fins].file));
     const engineY = attach(hull, 'Attach_Engines', 0), tankY = attach(hull, 'Attach_Tank', .5);
     let top = tankY;
     if (r.booster.engine) {

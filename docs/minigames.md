@@ -59,7 +59,7 @@ Os 21 minigames usam só **6 mecânicas base**. Implementando as mecânicas como
 
 | Mecânica | Como funciona | Usada em |
 |---|---|---|
-| **Manter na faixa** | Um indicador deriva sozinho; o jogador corrige (↑/↓ ou slider) para mantê-lo na zona verde por X segundos | H-O1, L-O2, L-S1, O-S2, M-S6; já implementada na decolagem do piloto (`createKeepInRange` no `index.html`) |
+| **Manter na faixa** | Um indicador deriva sozinho; o jogador corrige (↑/↓ ou slider) para mantê-lo na zona verde por X segundos | H-O1, L-O2, L-S1, O-S2, M-S6; já implementada na decolagem do piloto (`createKeepInRange` em `web/app.js`, 1 ou 2 eixos): manter o alvo da navball no centro em arfagem e guinada; as aletas do booster reduzem as rajadas |
 | **Timing** | Um cursor oscila; o jogador aperta no momento certo (variante: ritmo) | L-O1, L-S2, M-O1, M-S5 |
 | **Mira** | Manter ou acertar uma mira 2D num alvo que se move | O-O1, M-S2 |
 | **Escolha sob limite** | Escolher itens com tamanho e valor para caber num limite (tempo, banda, tubos) | H-S2, O-O2, O-S1, M-S4 |

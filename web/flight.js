@@ -303,10 +303,11 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
           throttlePivot.rotation.x = THREE.MathUtils.lerp(throttlePivot.rotation.x, throttleBaseRot - (f.throttle || 0) * 0.65, 0.14);
         }
         if (navball) {
-          const g = f.step === 0 ? f.liftoff : null, err = g ? g.value / g.band : 0;
-          const pitch = THREE.MathUtils.clamp(err * 20, -70, 70) * Math.PI / 180; // nose high → horizon drops
-          const roll = g ? Math.sin(now * 0.0011) * 0.05 * Math.min(3, Math.abs(err)) : 0;
-          navQ.setFromEuler(navE.set(pitch, 0, roll));
+          // [pitch, yaw] error / band × 20°: at the band edge the target on the ball reaches the green brackets.
+          const g = f.step === 0 ? f.liftoff : null, ep = g ? g.value[0] / g.band : 0, ey = g ? g.value[1] / g.band : 0;
+          const deg = e => THREE.MathUtils.clamp(e * 20, -70, 70) * Math.PI / 180;
+          const roll = g ? Math.sin(now * 0.0011) * 0.04 * Math.min(3, Math.hypot(ep, ey)) : 0;
+          navQ.setFromEuler(navE.set(deg(ep), -deg(ey), roll)); // nose high → target drops; nose right → target moves left
           navball.quaternion.slerp(navGoal.copy(navBase).multiply(navQ), 0.3);
         }
         if (stickRHC) {

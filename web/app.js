@@ -27,7 +27,7 @@
   const rule = (key,fallback) => DATA?.rules?.[key] ?? fallback;
   const MAX_STAGES = () => rule('maxInternalStages',7), CABIN_SLOTS = () => rule('cabinModuleSlots',4), TWR_MIN = () => rule('minSafeLiftoffTwr',1.2);
   const budgetOf = level => rule('defaultBudgetM',250)*difficulty[level].factor;
-  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:{booster:{engine:null,tank:null},stages:[{item:null},{item:null}],cabin:[]},sel:{kind:'booster'},tab:'engine'};
+  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:{booster:{engine:null,fins:null,tank:null},stages:[{item:null},{item:null}],cabin:[]},sel:{kind:'booster'},tab:'engine'};
   const money = n => (n<0?'−$':'$')+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<10?1:0})+'M';
   const number = n => n==null?'n/f':Math.round(n).toLocaleString('en-US');
   const tonnes = kg => kg==null?'n/f':(kg/1000).toLocaleString('en-US',{maximumFractionDigits:kg<10000?2:1})+' t';
@@ -92,7 +92,7 @@
   const parseKey = key => key.startsWith('stage-')?{kind:'stage',index:+key.slice(6)}:{kind:key};
   function moduleLabel(key){
     const r=state.rocket;
-    if(key==='booster'){const {engine:e,tank:t}=r.booster;return ['Stage 1 · booster',e&&t?`${shortName(e)} + ${shortName(t)}`:e?'tank missing':t?'engine missing':'engine + tank empty'];}
+    if(key==='booster'){const {engine:e,tank:t,fins:f}=r.booster;return ['Stage 1 · booster',(e&&t?`${shortName(e)} + ${shortName(t)}`:e?'tank missing':t?'engine missing':'engine + tank empty')+(f?' + fins':'')];}
     if(key==='cabin')return ['Cabin',`${r.cabin.length}/${CABIN_SLOTS()} modules`];
     const i=+key.slice(6),stage=r.stages[i],item=stage?.item;if(stage?.type==='booster')return [`Stage ${i+2} · booster`,stage.engine&&stage.tank?`${shortName(stage.engine)} + ${shortName(stage.tank)}`:stage.engine?'tank missing':stage.tank?'engine missing':'engine + tank empty'];return [`Stage ${i+2} · bay`,item?shortName(item):'empty bay'];
   }
@@ -104,6 +104,7 @@
     add(spec('booster-thrust-section'));r.stages.forEach(s=>{if(s.type==='booster'){add(spec('booster-thrust-section'));if(s.engine){const e=spec(s.engine),n=e.defaultClusterCount||1;cost+=n*e.costM;mass+=n*e.massDryKg;}if(s.tank){const t=spec(s.tank);cost+=t.costM;mass+=t.massDryKg+(t.propellantMassKg||0);}}else{add(spec('stage-module'));if(s.item)add(spec(s.item));}});add(rule('cabinHull'));r.cabin.forEach(id=>add(spec(id)));
     if(r.booster.engine){const s=spec(r.booster.engine),n=s.defaultClusterCount||1;cost+=n*s.costM;mass+=n*s.massDryKg;thrust=n*(s.thrustSlKn||0)*1000;isp=s.ispSlS&&s.ispVacS?(s.ispSlS+s.ispVacS)/2:(s.ispSlS||s.ispVacS||0);}
     if(r.booster.tank){const s=spec(r.booster.tank);cost+=s.costM;prop=s.propellantMassKg||0;mass+=s.massDryKg+prop;}
+    if(r.booster.fins)add(spec(r.booster.fins));
     const ready=!!(r.booster.engine&&r.booster.tank);
     return {cost,mass,draw,gen,thrust,isp,prop,ready,twr:mass?thrust/(mass*g0):0,dv:ready&&mass>prop?isp*g0*Math.log(mass/(mass-prop)):0,budget:budgetOf(state.difficulty),leo:rule('earthOrbitDeltaVMs',9400)};
   }
@@ -128,15 +129,15 @@
     $$('#stack-overlay [data-select]').forEach(b=>b.addEventListener('click',()=>selectModule(b.dataset.select)));
     $$('#stack-overlay [data-remove]').forEach(b=>b.addEventListener('click',()=>removeStage(+b.dataset.remove)));
     $$('#stack-overlay [data-insert]').forEach(b=>b.addEventListener('click',()=>addStage(+b.dataset.insert)));
-    const installed=[r.booster.engine,r.booster.tank,...r.stages.flatMap(s=>s.type==='booster'?[s.engine,s.tank]:[s.item]),...r.cabin].filter(Boolean).length;
+    const installed=[r.booster.engine,r.booster.tank,r.booster.fins,...r.stages.flatMap(s=>s.type==='booster'?[s.engine,s.tank]:[s.item]),...r.cabin].filter(Boolean).length;
     $('#rocket-tags').innerHTML=`<span class="tag">${r.stages.length+2} STAGES</span><span class="tag">${installed} PARTS INSTALLED</span>`;
     window.dispatchEvent(new Event('astro:rocket'));
   }
   const isBooster = sel => sel.kind==='booster'||(sel.kind==='stage'&&state.rocket.stages[sel.index]?.type==='booster');
-  const tabsFor = sel => isBooster(sel)?[['engine','Engines'],['tank','Tanks']]:sel.kind==='stage'?EQUIPMENT_GROUPS.map(([k,l])=>[k,l]):CABIN_GROUPS.map(([k,l])=>[k,l]);
+  const tabsFor = sel => isBooster(sel)?[['engine','Engines'],['tank','Tanks'],...(sel.kind==='booster'?[['fins','Fins']]:[])]:sel.kind==='stage'?EQUIPMENT_GROUPS.map(([k,l])=>[k,l]):CABIN_GROUPS.map(([k,l])=>[k,l]);
   function partsFor(sel,tab){
     const all=Object.entries(DATA.parts);
-    if(isBooster(sel))return all.filter(([,p])=>tab==='engine'?p.specs?.engineRole==='booster':p.category==='tanks'&&p.specs?.tankRole==='stage').map(([id])=>id);
+    if(isBooster(sel))return all.filter(([,p])=>tab==='engine'?p.specs?.engineRole==='booster':tab==='fins'?p.category==='fins':p.category==='tanks'&&p.specs?.tankRole==='stage').map(([id])=>id);
     if(sel.kind==='stage'){const g=EQUIPMENT_GROUPS.find(x=>x[0]===tab);return all.filter(([id,p])=>p.category==='equipment'&&g[2].test(id)).map(([id])=>id);}
     return CABIN_GROUPS.find(x=>x[0]===tab)[2];
   }
@@ -144,6 +145,7 @@
   function partMetrics(id){
     const s=spec(id),p=part(id);
     if(p.category==='engines'){const n=s.defaultClusterCount||1;return [`${n}×`,`${number(s.thrustSlKn)} kN${warn(id,'thrustSlKn')}`,`Isp ${number(s.ispSlS)}${s.ispVacS&&s.ispVacS!==s.ispSlS?'–'+number(s.ispVacS):''} s${warn(id,'ispSlS')}`,`${number(s.massDryKg)} kg each${warn(id,'massDryKg')}`,money(n*s.costM)];}
+    if(p.category==='fins')return [`${number(s.massDryKg)} kg`,`gusts −${Math.round((1-(s.aeroDriftFactor??1))*100)}%`,money(s.costM)];
     if(p.category==='tanks')return [`propellant ${tonnes(s.propellantMassKg)}${warn(id,'propellantMassKg')}`,`dry ${tonnes(s.massDryKg)}${warn(id,'massDryKg')}`,money(s.costM)];
     return [`${number(s.massDryKg)} kg${warn(id,'massDryKg')}`,s.powerW>0?`+${number(s.powerW)} W`:`${number(Math.abs(s.powerW||0))} W`,money(s.costM)];
   }
@@ -174,7 +176,7 @@
     $('#category-tabs').innerHTML=tabs.map(([k,l])=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${k===state.tab}">${l}</button>`).join('');
     $$('#category-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;renderCatalog();}));
     $('#selected-stage-tag').textContent=moduleLabel(moduleKey(sel))[0].toUpperCase();
-    $('#catalog-summary').innerHTML=sel.kind==='stage'?`<label>Stage type <select id="stage-type"><option value="bay">Bay</option><option value="booster">Booster</option></select></label><br>${isBooster(sel)?'Choose an engine and tank. Upper-stage propulsion is not yet included in Δv.':'One equipment module per bay.'}`:sel.kind==='booster'?'Stage 1 engine and tank, with real data for each part.':`${state.rocket.cabin.length}/${CABIN_SLOTS()} cabin slots filled. Three modules per specialist.`;
+    $('#catalog-summary').innerHTML=sel.kind==='stage'?`<label>Stage type <select id="stage-type"><option value="bay">Bay</option><option value="booster">Booster</option></select></label><br>${isBooster(sel)?'Choose an engine and tank. Upper-stage propulsion is not yet included in Δv.':'One equipment module per bay.'}`:sel.kind==='booster'?'Stage 1 engine and tank, with real data for each part. Fins (optional) steady the ascent through Max-Q.':`${state.rocket.cabin.length}/${CABIN_SLOTS()} cabin slots filled. Three modules per specialist.`;
     if(sel.kind==='stage'){const control=$('#stage-type');control.value=state.rocket.stages[sel.index].type||'bay';control.addEventListener('change',()=>{state.rocket.stages[sel.index].type=control.value;state.tab=control.value==='booster'?'engine':'power';renderPlanner();});}
     const inst=installedIn(sel),current=isBooster(sel)?(sel.kind==='booster'?state.rocket.booster:state.rocket.stages[sel.index])[state.tab]:sel.kind==='stage'?inst[0]:null;
     $('#parts-list').innerHTML=partsFor(sel,state.tab).map(id=>{const p=part(id),on=inst.includes(id);
@@ -476,6 +478,7 @@
       return {
         ...m,
         overweight: !m.ready || m.twr < TWR_MIN(),
+        finsDrift: r.booster.fins ? (spec(r.booster.fins).aeroDriftFactor ?? 1) : 1, // aerodynamic minigames: gust scale
         overBudget: m.cost > m.budget,
         powerDeficit: m.gen < m.draw,
         lowDv: !m.ready || m.dv < m.leo,
@@ -505,7 +508,7 @@
       flight.pitchY = 0;
       flight.stability = 100;
       flight.liftoff = null;
-      flight.hold = 0;
+      flight.hold = null;
       flight.breakers = [
         flight.design.powerDeficit,
         flight.design.powerDeficit || flight.design.overweight,
@@ -534,15 +537,21 @@
     // Reusable mechanic "keep in range" (docs/minigames.md): a value drifts on its own and the player pushes it
     // back (input −1…1) to keep it inside the green band. The value has inertia, so corrections overshoot.
     // Stars come from the share of time spent inside the band (0–3, docs/minigames.md rule 3).
-    function createKeepInRange({ duration, band, limit, authority, damping = 1.5, drift }) {
-      const g = { t: 0, value: 0, rate: 0, inBand: 0, duration, band, limit, done: false };
+    // axes: 1 (a gauge) or 2 (a reticle: inside the band when the distance to the centre is ≤ band).
+    // drift(t) and input return one number per axis.
+    function createKeepInRange({ duration, band, limit, authority, damping = 1.5, drift, axes = 1 }) {
+      const g = { t: 0, value: Array(axes).fill(0), rate: Array(axes).fill(0), inBand: 0, duration, band, limit, axes, done: false };
       g.tick = (dt, input) => {
         if (g.done) return g;
         g.t = Math.min(duration, g.t + dt);
-        g.rate += (drift(g.t, g.value) + input * authority - g.rate * damping) * dt;
-        g.value = Math.max(-limit, Math.min(limit, g.value + g.rate * dt));
-        if (g.value === limit || g.value === -limit) g.rate = 0;
-        if (Math.abs(g.value) <= band) g.inBand += dt;
+        const d = [].concat(drift(g.t, g.value)), u = [].concat(input);
+        for (let k = 0; k < axes; k++) {
+          g.rate[k] += ((d[k] || 0) + (u[k] || 0) * authority - g.rate[k] * damping) * dt;
+          g.value[k] = Math.max(-limit, Math.min(limit, g.value[k] + g.rate[k] * dt));
+          if (Math.abs(g.value[k]) === limit) g.rate[k] = 0;
+        }
+        g.error = Math.hypot(...g.value);
+        if (g.error <= band) g.inBand += dt;
         g.done = g.t >= duration;
         return g;
       };
@@ -551,17 +560,20 @@
       return g;
     }
 
-    // Liftoff (Helena, keep in range): hold the pitch program through Max-Q. value = pitch error in degrees,
-    // positive = nose above the program. All numbers are game-balance.
-    const LIFTOFF = { duration: 30, band: 2.5, limit: 12, authority: 8, maxQ: [12, 20], throttle: 0.7 };
+    // Liftoff (Helena, keep in range on the navball): hold the ascent program through Max-Q in pitch and yaw.
+    // value = [pitch, yaw] error in degrees (pitch > 0 = nose high, yaw > 0 = nose right); the band is a circle.
+    // Gusts grow at Max-Q and with a low TWR; fins damp them (design.finsDrift). All numbers are game-balance.
+    const LIFTOFF = { duration: 30, band: 3, limit: 12, authority: 8, maxQ: [12, 20], throttle: 0.7 };
     function startLiftoff() {
-      const d = flight.design, wallow = d.overweight ? 1.6 : 1, seed = Math.random() * 100; // low TWR: the stack wallows more
+      const d = flight.design, s1 = Math.random() * 100, s2 = Math.random() * 100;
+      const gust = (d.overweight ? 1.6 : 1) * (d.finsDrift ?? 1); // low TWR: the stack wallows more
       return createKeepInRange({
-        duration: LIFTOFF.duration, band: LIFTOFF.band, limit: LIFTOFF.limit,
+        axes: 2, duration: LIFTOFF.duration, band: LIFTOFF.band, limit: LIFTOFF.limit,
         authority: LIFTOFF.authority * (d.hasCockpitUpgrade ? 1.25 : 1),
         drift: t => {
-          const q = t > LIFTOFF.maxQ[0] && t < LIFTOFF.maxQ[1] ? 2.4 : 1; // gusts peak around Max-Q
-          return wallow * q * (3.2 * Math.sin(t * 0.9 + seed) + 2.6 * Math.sin(t * 2.3 + seed * 1.7) + 1);
+          const k = gust * (t > LIFTOFF.maxQ[0] && t < LIFTOFF.maxQ[1] ? 2.4 : 1); // gusts peak around Max-Q
+          return [k * (3.2 * Math.sin(t * 0.9 + s1) + 2.6 * Math.sin(t * 2.3 + s1 * 1.7) + 1),
+            k * (2.8 * Math.sin(t * 1.1 + s2) + 2.2 * Math.sin(t * 1.9 + s2 * 1.3))];
         },
       });
     }
@@ -569,7 +581,7 @@
       const stars = g.stars(), share = Math.round(g.share() * 100);
       flight.liftoffStars = stars;
       flight.score += (stars - 1) * 4;
-      logFlight(`MECO. Pitch program held ${share}% of the ascent (${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}).`);
+      logFlight(`MECO. Ascent program held ${share}% of the time (${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}).`);
       toast(`Liftoff ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${share}% inside the band`);
       setFlightStep(1);
     }
@@ -692,22 +704,23 @@
       if (flight.step === 0) {
         if (!flight.liftoff && flight.throttle >= LIFTOFF.throttle) {
           flight.liftoff = startLiftoff();
-          logFlight('Liftoff! Keep the navball horizon between the green brackets.');
+          logFlight('Liftoff! Keep the navball target inside the green brackets.');
           renderFlightUI();
         }
         const g = flight.liftoff;
         if (g) {
-          const up = flight.keys.has('KeyW') || flight.keys.has('ArrowUp') || flight.hold > 0;
-          const down = flight.keys.has('KeyS') || flight.keys.has('ArrowDown') || flight.hold < 0;
-          flight.input = (up ? 1 : 0) - (down ? 1 : 0);
-          g.tick(dt, flight.input);
+          const k = flight.keys, h = flight.hold || {};
+          const pitch = (k.has('KeyW') || k.has('ArrowUp') || h.up ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') || h.down ? 1 : 0);
+          const yaw = (k.has('KeyD') || k.has('ArrowRight') || h.right ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') || h.left ? 1 : 0);
+          flight.input = { up: pitch > 0, down: pitch < 0, right: yaw > 0, left: yaw < 0 };
+          g.tick(dt, [pitch, yaw]);
           flight.progress = (g.t / g.duration) * 100;
           flight.altKm = flight.progress * 0.85;
           flight.velMs = Math.round(flight.progress * 26.5);
           flight.stability = Math.round(g.share() * 100);
-          flight.pitchX = 0;
-          flight.pitchY = -g.value / g.limit; // the RHC leans with the error
-          if (Math.abs(g.value) > g.limit * 0.75) flight.hull = Math.max(50, flight.hull - dt * 3); // off-program loads
+          flight.pitchX = g.value[1] / g.limit; // the RHC leans with the error
+          flight.pitchY = -g.value[0] / g.limit;
+          if (g.error > g.limit * 0.75) flight.hull = Math.max(50, flight.hull - dt * 3); // off-program loads
           if (g.done) { finishLiftoff(g); }
         }
       } else if (flight.step === 1) {
@@ -747,12 +760,13 @@
 
       const g = flight.step === 0 ? flight.liftoff : null, mark = $('#kir-mark');
       if (g && mark) {
-        mark.style.top = `${50 - (g.value / g.limit) * 50}%`;
-        mark.classList.toggle('out', Math.abs(g.value) > g.band);
+        mark.style.left = `${50 + (g.value[1] / g.limit) * 50}%`;
+        mark.style.top = `${50 - (g.value[0] / g.limit) * 50}%`;
+        mark.classList.toggle('out', g.error > g.band);
         $('#kir-time').textContent = `${Math.ceil(g.duration - g.t)} s to MECO`;
         $('#kir-share').textContent = `${Math.round(g.share() * 100)}% in band`;
         const st = g.stars(); $('#kir-stars').textContent = '★'.repeat(st) + '☆'.repeat(3 - st);
-        $$('[data-hold]').forEach(b => b.classList.toggle('on', Number(b.dataset.hold) === flight.input));
+        $$('[data-hold]').forEach(b => b.classList.toggle('on', !!flight.input?.[b.dataset.hold]));
       }
       const pip = $('#cockpit-pip');
       if (pip) {
@@ -787,18 +801,18 @@
         const g = flight.liftoff;
         box.innerHTML = `
           <span class="eyebrow">Helena · Liftoff · Keep in range</span>
-          <h4>Hold the pitch program</h4>
-          <p>${g ? 'Keep the navball horizon between the green brackets until MECO. <b>W/↑</b> nose up, <b>S/↓</b> nose down; corrections take a moment to bite.' : `Push <b>Throttle_Lever</b> to ${LIFTOFF.throttle * 100}% (<b>Space</b>) to lift off.`}${flight.design.overweight ? ' <b>Low TWR: the stack wallows more.</b>' : ''}</p>
+          <h4>Hold the ascent program</h4>
+          <p>${g ? 'Keep the navball target centred, inside the green brackets, until MECO. <b>W/S</b> or <b>↑/↓</b> pitch, <b>A/D</b> or <b>←/→</b> yaw; corrections take a moment to bite.' : `Push <b>Throttle_Lever</b> to ${LIFTOFF.throttle * 100}% (<b>Space</b>) to lift off.`}${flight.design.overweight ? ' <b>Low TWR: the stack wallows more.</b>' : ''}${flight.design.finsDrift < 1 ? ` <b>Fins damp the gusts (−${Math.round((1 - flight.design.finsDrift) * 100)}%).</b>` : ''}</p>
           <div class="kir-row">
-            <div class="kir" style="--band:${(LIFTOFF.band / LIFTOFF.limit) * 50}%"><div class="kir-band"></div><div class="kir-mark" id="kir-mark"></div><span class="kir-label top">Nose high</span><span class="kir-label bottom">Nose low</span></div>
-            <div class="kir-ctrl">${g
-              ? '<button class="button secondary" type="button" data-hold="1">▲ Nose up<kbd>W · ↑</kbd></button><button class="button secondary" type="button" data-hold="-1">▼ Nose down<kbd>S · ↓</kbd></button>'
+            <div class="kir kir-2d" style="--band:${(LIFTOFF.band / LIFTOFF.limit) * 100}%"><div class="kir-band"></div><div class="kir-mark" id="kir-mark"></div><span class="kir-label top">Nose high</span><span class="kir-label bottom">Nose low</span></div>
+            <div class="kir-ctrl ${g ? 'kir-pad' : ''}">${g
+              ? '<button class="button secondary up" type="button" data-hold="up">▲<kbd>W · ↑</kbd></button><button class="button secondary left" type="button" data-hold="left">◀<kbd>A · ←</kbd></button><button class="button secondary right" type="button" data-hold="right">▶<kbd>D · →</kbd></button><button class="button secondary down" type="button" data-hold="down">▼<kbd>S · ↓</kbd></button>'
               : `<button class="button primary" type="button" data-act="throttle_up">Throttle ${Math.round(flight.throttle * 100)}%<kbd>Space</kbd></button>`}</div>
           </div>
           <div class="kir-stats"><span id="kir-time">${LIFTOFF.duration} s to MECO</span><span id="kir-share">—</span><span id="kir-stars">☆☆☆</span></div>`;
         $$('[data-hold]', box).forEach(btn => {
-          btn.addEventListener('pointerdown', () => { flight.hold = Number(btn.dataset.hold); });
-          for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => { flight.hold = 0; });
+          btn.addEventListener('pointerdown', () => { flight.hold = { [btn.dataset.hold]: true }; });
+          for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => { flight.hold = null; });
         });
       } else if (flight.step === 1) {
         box.innerHTML = `
@@ -904,7 +918,7 @@
       }
     });
     document.addEventListener('keyup', e => flight.keys.delete(e.code));
-    window.addEventListener('blur', () => { flight.keys.clear(); flight.hold = 0; });
+    window.addEventListener('blur', () => { flight.keys.clear(); flight.hold = null; });
 
     // -------------------------------------------------------------------------
     // FINAL RESULTS, RANKING & ANIMATED PODIUM

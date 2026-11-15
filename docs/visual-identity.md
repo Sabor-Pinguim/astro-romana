@@ -122,8 +122,8 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
   - Lobby: o tripulante escolhido aparece em 3D (GLB do avatar, animação `idle_loop`; `wave` ao selecionar de novo) sobre um pedestal hexagonal na cor dele.
   - Locais de pouso (miniaturas e vista grande do lobby): foto real do HiRISE, 1,5 km em volta do ponto de pouso, norte para cima, com tinta de Marte leve (`sepia`, escolha de jogo); a vista grande marca em tracejado âmbar a área caminhável de 512 m e traz o crédito.
 - **Cockpit** (painel do piloto no layout da Orion, `assets/models/rocket/cockpit_pilot.glb`):
-  - Navball na tela esquerda: bola facetada com céu azul (`Pack`) e solo laranja (`Foam`), horizonte aceso (`Lamp`) e linhas de arfagem a cada 20°, virada para os olhos do piloto. Símbolo do avião âmbar fixo e colchetes verdes fixos marcam a faixa do "manter na faixa".
-  - Cartão do minigame: medidor vertical com faixa verde, marcador creme (laranja fora da faixa), tempo até o MECO, porcentagem na faixa e estrelas.
+  - Navball na tela esquerda: bola facetada com céu azul (`Pack`) e solo laranja (`Foam`), horizonte aceso (`Lamp`), linhas de arfagem a cada 20° e um meridiano, virada para os olhos do piloto. Na frente da bola, um alvo verde (anel e três marcas) que o piloto mantém no centro; fixos, o símbolo do avião âmbar e quatro cantos verdes que marcam a faixa.
+  - Cartão do minigame: mira quadrada com a faixa em octógono verde e um losango creme (laranja fora da faixa), d-pad ao lado com as teclas (W/A/S/D e setas), tempo até o MECO, porcentagem na faixa e estrelas.
 - **Superfície** (pouso, terreno real do HiRISE em `index.terrain.<sítio>.js`):
   - Primeira pessoa com o corpo à vista: o capacete some para a câmera, mas continua fazendo sombra; olhando para baixo aparecem peito, mãos, pernas e pés. `V` troca para a câmera atrás do personagem.
   - Céu: domo de icosaedro facetado, caramelo `#d8a07c` no horizonte e `#7a4c46` no alto; a névoa usa a cor do horizonte (45 a 230 m).

@@ -339,6 +339,12 @@
     .kir-ctrl .button{flex:1;flex-direction:column;gap:.35rem;min-height:0;padding:.55rem .5rem;line-height:1.15}
     .kir-ctrl .button.on{--a:var(--solar-amber);--b:#d98a06;--fg:var(--bg-void)}
     .kir-ctrl kbd{padding:.12rem .4rem;font:600 .6rem var(--heading);letter-spacing:.08em;color:var(--starlight-cream);background:#11071f99}
+    .kir.kir-2d{aspect-ratio:1;height:auto;max-height:180px}
+    .kir-2d .kir-band{left:50%;top:50%;width:var(--band);height:auto;aspect-ratio:1;translate:-50% -50%;border:0;background:#7edac24d;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%)}
+    .kir-2d .kir-mark{left:50%;right:auto;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;clip-path:var(--diamond)}
+    .kir-pad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:4px;width:168px}
+    .kir-pad .button{padding:.3rem .2rem;font-size:.9rem}
+    .kir-pad .up{grid-area:1/2}.kir-pad .left{grid-area:2/1}.kir-pad .right{grid-area:2/3}.kir-pad .down{grid-area:3/2}
     .kir{position:relative;flex:1;height:132px;margin:0;background:repeating-linear-gradient(0deg,var(--f1) 0 11px,var(--f2) 11px 12px);clip-path:var(--chamfer)}
     .kir-band{position:absolute;left:0;right:0;top:calc(50% - var(--band));height:calc(2 * var(--band));background:#7edac22e;border-top:2px solid var(--safe);border-bottom:2px solid var(--safe)}
     .kir-mark{position:absolute;left:12%;right:12%;top:50%;height:4px;margin-top:-2px;background:var(--starlight-cream);transition:background .2s}
