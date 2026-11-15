@@ -1,0 +1,1735 @@
+{
+  "generatedAt": "2026-11-15T03:05:50.397Z",
+  "generator": "tools/modeling/build-parts.mjs",
+  "conventions": {
+    "units": "meters",
+    "up": "+Y",
+    "forward": "+Z",
+    "engineOrigin": "top mounting interface (hangs below y = 0)",
+    "tankOrigin": "bottom interface (stands above y = 0)",
+    "equipmentOrigin": "bottom mounting plate (stands on y = 0 inside cutaway stage bay)",
+    "fxAnchorPrefix": "FX_"
+  },
+  "fxPresets": {
+    "thrust": {
+      "description": "Jato de gás frio do propulsor (inspirado no SAFER da NASA)",
+      "colors": [
+        "#E6F6FF",
+        "#5AA9FF"
+      ],
+      "blending": "additive",
+      "rate": 140,
+      "life": [
+        0.25,
+        0.45
+      ],
+      "speed": [
+        2.5,
+        4
+      ],
+      "spread": 9,
+      "size": [
+        0.08,
+        0.02
+      ],
+      "gravity": 0
+    },
+    "sparks": {
+      "description": "Faíscas da ferramenta de reparo",
+      "colors": [
+        "#FFF3B0",
+        "#FF7A00"
+      ],
+      "blending": "additive",
+      "rate": 90,
+      "life": [
+        0.3,
+        0.7
+      ],
+      "speed": [
+        1.2,
+        2.6
+      ],
+      "spread": 55,
+      "size": [
+        0.035,
+        0.01
+      ],
+      "gravity": 3.71
+    },
+    "signal": {
+      "description": "Pulsos de sinal saindo da antena",
+      "colors": [
+        "#B8F0FF",
+        "#1FA2FF"
+      ],
+      "blending": "additive",
+      "rate": 60,
+      "life": [
+        0.9,
+        1.3
+      ],
+      "speed": [
+        0.5,
+        0.8
+      ],
+      "spread": 90,
+      "size": [
+        0.05,
+        0.015
+      ],
+      "gravity": 0
+    },
+    "dust": {
+      "description": "Poeira marciana levantada pela coleta de amostra",
+      "colors": [
+        "#D08A55",
+        "#8E5A3A"
+      ],
+      "blending": "normal",
+      "rate": 55,
+      "life": [
+        0.8,
+        1.6
+      ],
+      "speed": [
+        0.3,
+        0.9
+      ],
+      "spread": 70,
+      "size": [
+        0.06,
+        0.16
+      ],
+      "gravity": 3.71
+    },
+    "footdust": {
+      "description": "Poeira levantada pelos passos",
+      "colors": [
+        "#C17E4E",
+        "#7A4B33"
+      ],
+      "blending": "normal",
+      "rate": 20,
+      "life": [
+        0.6,
+        1.1
+      ],
+      "speed": [
+        0.2,
+        0.5
+      ],
+      "spread": 80,
+      "size": [
+        0.05,
+        0.13
+      ],
+      "gravity": 3.71
+    },
+    "exhaust_kerolox": {
+      "description": "Pluma de exaustão querolox (LOX / RP-1)",
+      "colors": [
+        "#FFF3B0",
+        "#FF6A00"
+      ],
+      "blending": "additive",
+      "rate": 220,
+      "life": [
+        0.18,
+        0.38
+      ],
+      "speed": [
+        8,
+        14
+      ],
+      "spread": 10,
+      "size": [
+        0.25,
+        0.65
+      ],
+      "gravity": 0
+    },
+    "exhaust_methalox": {
+      "description": "Pluma de exaustão metalox (LOX / CH4)",
+      "colors": [
+        "#D8ECFF",
+        "#4A8CFF"
+      ],
+      "blending": "additive",
+      "rate": 220,
+      "life": [
+        0.16,
+        0.34
+      ],
+      "speed": [
+        9,
+        15
+      ],
+      "spread": 8,
+      "size": [
+        0.22,
+        0.55
+      ],
+      "gravity": 0
+    },
+    "exhaust_hydrolox": {
+      "description": "Pluma de exaustão hidrolox (LOX / LH2)",
+      "colors": [
+        "#FFFDF8",
+        "#9CCBFF"
+      ],
+      "blending": "additive",
+      "rate": 180,
+      "life": [
+        0.15,
+        0.32
+      ],
+      "speed": [
+        10,
+        16
+      ],
+      "spread": 11,
+      "size": [
+        0.2,
+        0.5
+      ],
+      "gravity": 0
+    },
+    "exhaust_hypergolic": {
+      "description": "Pluma de exaustão hipergólica (MMH / NTO)",
+      "colors": [
+        "#FFE0A8",
+        "#FF5A1F"
+      ],
+      "blending": "additive",
+      "rate": 160,
+      "life": [
+        0.14,
+        0.28
+      ],
+      "speed": [
+        7,
+        12
+      ],
+      "spread": 12,
+      "size": [
+        0.12,
+        0.35
+      ],
+      "gravity": 0
+    },
+    "exhaust_mono": {
+      "description": "Pluma de exaustão monopropelente (hidrazina)",
+      "colors": [
+        "#E8F4FF",
+        "#8FA8C8"
+      ],
+      "blending": "additive",
+      "rate": 90,
+      "life": [
+        0.1,
+        0.22
+      ],
+      "speed": [
+        5,
+        9
+      ],
+      "spread": 14,
+      "size": [
+        0.04,
+        0.12
+      ],
+      "gravity": 0
+    },
+    "exhaust_ion": {
+      "description": "Feixe de íons de xenônio",
+      "colors": [
+        "#B8F4FF",
+        "#1F8BFF"
+      ],
+      "blending": "additive",
+      "rate": 120,
+      "life": [
+        0.35,
+        0.65
+      ],
+      "speed": [
+        12,
+        18
+      ],
+      "spread": 3,
+      "size": [
+        0.08,
+        0.14
+      ],
+      "gravity": 0
+    }
+  },
+  "parts": [
+    {
+      "id": "rutherford",
+      "name": "Rutherford (nível do mar)",
+      "nodeName": "Rutherford",
+      "category": "engines",
+      "tier": 1,
+      "vehicle": "Electron (1º estágio)",
+      "role": "Motor querolox elétrico leve · 9 por estágio",
+      "file": "parts/engines/rutherford.glb",
+      "summary": "Motor pequeno alimentado por bombas elétricas, câmara cinza acetinada e sino curto.",
+      "originNote": "Interface superior da placa de montagem",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_kerolox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.298,
+        "height": 0.72,
+        "depth": 0.3,
+        "minY": -0.72,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 528,
+        "meshes": 4,
+        "bytes": 41652
+      },
+      "references": [
+        "references/parts/engines/rutherford/README.md"
+      ]
+    },
+    {
+      "id": "rutherford-vacuum",
+      "name": "Rutherford Vácuo",
+      "nodeName": "RutherfordVacuum",
+      "category": "engines",
+      "tier": 1,
+      "vehicle": "Electron (2º estágio)",
+      "role": "Motor orbital de alta expansão com bombas elétricas",
+      "file": "parts/engines/rutherford-vacuum.glb",
+      "summary": "Mesma cabeça elétrica do Rutherford com sino estendido escuro para operação no vácuo.",
+      "originNote": "Interface superior da placa de montagem",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_kerolox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.7,
+        "height": 1.45,
+        "depth": 0.7,
+        "minY": -1.45,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 448,
+        "meshes": 3,
+        "bytes": 35168
+      },
+      "references": [
+        "references/parts/engines/rutherford-vacuum/README.md"
+      ]
+    },
+    {
+      "id": "mr-107",
+      "name": "MR-107 (Aerojet Rocketdyne)",
+      "nodeName": "Mr107",
+      "category": "engines",
+      "tier": 1,
+      "vehicle": "Controle de reação / trajetória (Viking, Delta II)",
+      "role": "Propulsor monopropelente de hidrazina (RCS / ajuste fino)",
+      "file": "parts/engines/mr-107.glb",
+      "summary": "Pequeno propulsor fixo em aço inoxidável com válvula superior e cone compacto.",
+      "originNote": "Flange de montagem na estrutura",
+      "requiredNodes": [
+        "Attach_Top",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_mono",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.075,
+        "height": 0.22,
+        "depth": 0.075,
+        "minY": -0.159,
+        "maxY": 0.061
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 160,
+        "meshes": 2,
+        "bytes": 13520
+      },
+      "references": [
+        "references/parts/engines/mr-107/README.md"
+      ]
+    },
+    {
+      "id": "merlin-1d",
+      "name": "Merlin 1D (nível do mar)",
+      "nodeName": "Merlin1D",
+      "category": "engines",
+      "tier": 2,
+      "vehicle": "Falcon 9 (1º estágio)",
+      "role": "Motor querolox reutilizável de ciclo aberto · 9 por estágio",
+      "file": "parts/engines/merlin-1d.glb",
+      "summary": "Turbobomba lateral distinta com duto de escape longo e anel coletor na metade do sino.",
+      "originNote": "Topo do bloco de gimbal",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_kerolox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.965,
+        "height": 2.2,
+        "depth": 0.93,
+        "minY": -2.2,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 636,
+        "meshes": 3,
+        "bytes": 48612
+      },
+      "references": [
+        "references/parts/engines/merlin-1d/README.md"
+      ]
+    },
+    {
+      "id": "merlin-1d-vacuum",
+      "name": "Merlin 1D Vácuo (MVac)",
+      "nodeName": "Merlin1DVacuum",
+      "category": "engines",
+      "tier": 2,
+      "vehicle": "Falcon 9 (2º estágio)",
+      "role": "Motor orbital de alta razão de expansão com grande sino de nióbio",
+      "file": "parts/engines/merlin-1d-vacuum.glb",
+      "summary": "Câmara prateada conectada a um imenso sino escuro de resfriamento radiativo e anel coletor.",
+      "originNote": "Topo do poste de gimbal",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_kerolox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 3.3,
+        "height": 5.5,
+        "depth": 3.3,
+        "minY": -5.5,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 768,
+        "meshes": 3,
+        "bytes": 58204
+      },
+      "references": [
+        "references/parts/engines/merlin-1d-vacuum/README.md"
+      ]
+    },
+    {
+      "id": "rl10",
+      "name": "RL10 (Aerojet Rocketdyne)",
+      "nodeName": "Rl10",
+      "category": "engines",
+      "tier": 2,
+      "vehicle": "Centaur III / SLS ICPS",
+      "role": "Motor hidrolox de alta eficiência para estágios superiores",
+      "file": "parts/engines/rl10.glb",
+      "summary": "Ciclo expansor sem gerador de gás aparente, turbobomba horizontal no topo e extensão escura no sino.",
+      "originNote": "Topo do cone de montagem",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_hydrolox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 1.57,
+        "height": 2.46,
+        "depth": 1.57,
+        "minY": -2.46,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 652,
+        "meshes": 3,
+        "bytes": 49748
+      },
+      "references": [
+        "references/parts/engines/rl10/README.md"
+      ]
+    },
+    {
+      "id": "r-4d",
+      "name": "R-4D (Aerojet)",
+      "nodeName": "R4d",
+      "category": "engines",
+      "tier": 2,
+      "vehicle": "Apollo CSM / Orion Aux / Mars Probes",
+      "role": "Propulsor hipergólico compacto de longo alcance",
+      "file": "parts/engines/r-4d.glb",
+      "summary": "Bloco de válvulas retangular no topo com dois tubos e sino escuro elegante de nióbio.",
+      "originNote": "Topo do bloco de válvulas",
+      "requiredNodes": [
+        "Attach_Top",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_hypergolic",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.267,
+        "height": 0.62,
+        "depth": 0.267,
+        "minY": -0.55,
+        "maxY": 0.07
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 220,
+        "meshes": 3,
+        "bytes": 18632
+      },
+      "references": [
+        "references/parts/engines/r-4d/README.md"
+      ]
+    },
+    {
+      "id": "nstar",
+      "name": "NSTAR (Propulsor Iônico de Xenônio)",
+      "nodeName": "Nstar",
+      "category": "engines",
+      "tier": 2,
+      "vehicle": "Deep Space 1 / Dawn",
+      "role": "Propulsor iônico de altíssimo Isp para cruzeiro interplanetário",
+      "file": "parts/engines/nstar.glb",
+      "summary": "Tambor curto e largo em alumínio sem sino, com grade frontal côncava e neutralizador lateral.",
+      "originNote": "Anel de montagem traseiro",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_ion",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.41,
+        "height": 0.35,
+        "depth": 0.41,
+        "minY": -0.35,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 376,
+        "meshes": 3,
+        "bytes": 29932
+      },
+      "references": [
+        "references/parts/engines/nstar/README.md"
+      ]
+    },
+    {
+      "id": "raptor",
+      "name": "Raptor (nível do mar)",
+      "nodeName": "Raptor",
+      "category": "engines",
+      "tier": 3,
+      "vehicle": "Starship / Super Heavy",
+      "role": "Motor metalox de ciclo fechado completo (FFSC)",
+      "file": "parts/engines/raptor.glb",
+      "summary": "Duas turbobombas laterais simétricas com dutos curvos em \"cotovelos\" e sino compacto largo.",
+      "originNote": "Topo do bloco de empuxo",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_methalox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 1.34,
+        "height": 2.9,
+        "depth": 1.34,
+        "minY": -2.9,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 844,
+        "meshes": 3,
+        "bytes": 63620
+      },
+      "references": [
+        "references/parts/engines/raptor/README.md"
+      ]
+    },
+    {
+      "id": "rs-25",
+      "name": "RS-25 (SSME)",
+      "nodeName": "RS25",
+      "category": "engines",
+      "tier": 3,
+      "vehicle": "SLS Core Stage · 4 por estágio",
+      "role": "Motor hidrolox principal de altíssimo empuxo específico",
+      "file": "parts/engines/rs-25.glb",
+      "summary": "Cabeça complexa com pré-queimadores laterais, caixa aviônica frontal e grande sino com 4 anéis de reforço.",
+      "originNote": "Topo do cardã de montagem",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_hydrolox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 2.39,
+        "height": 4.27,
+        "depth": 2.39,
+        "minY": -4.27,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 1180,
+        "meshes": 4,
+        "bytes": 88572
+      },
+      "references": [
+        "references/parts/engines/rs-25/README.md"
+      ]
+    },
+    {
+      "id": "raptor-vacuum",
+      "name": "Raptor Vácuo (RVac)",
+      "nodeName": "RaptorVacuum",
+      "category": "engines",
+      "tier": 3,
+      "vehicle": "Starship (2º estágio · 3 por nave)",
+      "role": "Motor orbital metalox de sino gigante regenerativamente refrigerado",
+      "file": "parts/engines/raptor-vacuum.glb",
+      "summary": "Motor fixo sem gimbal com câmara acobreada e enorme extensão de aço inoxidável de 2,4 m de saída.",
+      "originNote": "Flange estrutural fixa no topo",
+      "requiredNodes": [
+        "Attach_Top",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_methalox",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 2.4,
+        "height": 4.7,
+        "depth": 2.4,
+        "minY": -4.7,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 720,
+        "meshes": 3,
+        "bytes": 54752
+      },
+      "references": [
+        "references/parts/engines/raptor-vacuum/README.md"
+      ]
+    },
+    {
+      "id": "aj10-190",
+      "name": "AJ10-190 (OMS)",
+      "nodeName": "Aj10190",
+      "category": "engines",
+      "tier": 3,
+      "vehicle": "Orion ESM (Módulo de Serviço)",
+      "role": "Motor orbital hipergólico alimentado por pressão, religável em espaço profundo",
+      "file": "parts/engines/aj10-190.glb",
+      "summary": "Caixa de válvulas e gimbal no topo com atuadores inclinados e um longo sino liso de liga escura.",
+      "originNote": "Topo da caixa de montagem do ESM",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_hypergolic",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 1.168,
+        "height": 1.956,
+        "depth": 1.168,
+        "minY": -1.956,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 436,
+        "meshes": 3,
+        "bytes": 34252
+      },
+      "references": [
+        "references/parts/engines/aj10-190/README.md"
+      ]
+    },
+    {
+      "id": "next-c",
+      "name": "NEXT-C (Propulsor Iônico)",
+      "nodeName": "NextC",
+      "category": "engines",
+      "tier": 3,
+      "vehicle": "DART / Missões em Espaço Profundo",
+      "role": "Propulsor iônico de xenônio de alta potência e longa duração",
+      "file": "parts/engines/next-c.glb",
+      "summary": "Tambor curto escuro com três suportes de gimbal a 120°, grande grade frontal plana e neutralizador lateral.",
+      "originNote": "Plano traseiro de montagem",
+      "requiredNodes": [
+        "Attach_Top",
+        "Gimbal",
+        "FX_Exhaust"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Exhaust",
+          "preset": "exhaust_ion",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.524,
+        "height": 0.38,
+        "depth": 0.572,
+        "minY": -0.38,
+        "maxY": 0
+      },
+      "budget": {
+        "triangles": 1500,
+        "meshes": 10
+      },
+      "stats": {
+        "triangles": 304,
+        "meshes": 4,
+        "bytes": 25448
+      },
+      "references": [
+        "references/parts/engines/next-c/README.md"
+      ]
+    },
+    {
+      "id": "electron-stage-1-tank",
+      "name": "Tanque 1º Estágio Electron",
+      "nodeName": "ElectronStage1Tank",
+      "category": "tanks",
+      "tier": 1,
+      "vehicle": "Electron (1º estágio)",
+      "role": "Tanque estrutural leve de fibra de carbono (LOX + RP-1)",
+      "file": "parts/tanks/electron-stage-1-tank.glb",
+      "summary": "Cilindro fino preto fosco de compósito de carbono com faixa branca, domo superior e canaleta de cabos.",
+      "originNote": "Interface inferior (acima da saia dos 9 motores)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 1.21,
+        "height": 11.9,
+        "depth": 1.24,
+        "minY": 0,
+        "maxY": 11.9
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 364,
+        "meshes": 3,
+        "bytes": 28984
+      },
+      "references": [
+        "references/parts/tanks/electron-stage-1-tank/README.md"
+      ]
+    },
+    {
+      "id": "hydrazine-tank",
+      "name": "Tanque Esférico de Hidrazina",
+      "nodeName": "HydrazineTank",
+      "category": "tanks",
+      "tier": 1,
+      "vehicle": "Sondas / RCS monopropelente",
+      "role": "Tanque compacto de titânio para hidrazina (MR-107)",
+      "file": "parts/tanks/hydrazine-tank.glb",
+      "summary": "Esfera metálica pequena de titânio cinza com cintura de solda, quatro abas de montagem e pinos polares.",
+      "originNote": "Ponta do bocal polar inferior",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.52,
+        "height": 0.5,
+        "depth": 0.52,
+        "minY": 0,
+        "maxY": 0.5
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 240,
+        "meshes": 2,
+        "bytes": 19160
+      },
+      "references": [
+        "references/parts/tanks/hydrazine-tank/README.md"
+      ]
+    },
+    {
+      "id": "falcon-9-stage-1-tank",
+      "name": "Tanque 1º Estágio Falcon 9",
+      "nodeName": "Falcon9Stage1Tank",
+      "category": "tanks",
+      "tier": 2,
+      "vehicle": "Falcon 9 (1º estágio)",
+      "role": "Tanque booster reutilizável de alumínio-lítio (LOX + RP-1)",
+      "file": "parts/tanks/falcon-9-stage-1-tank.glb",
+      "summary": "Cilindro alto branco com interestágio preto no topo, 4 pernas de pouso recolhidas, 4 aletas de titânio e canaleta.",
+      "originNote": "Interface inferior sobre os 9 motores Merlin",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 3.96,
+        "height": 47.1,
+        "depth": 3.96,
+        "minY": 0,
+        "maxY": 47.1
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 428,
+        "meshes": 4,
+        "bytes": 34296
+      },
+      "references": [
+        "references/parts/tanks/falcon-9-stage-1-tank/README.md"
+      ]
+    },
+    {
+      "id": "centaur-iii-tank",
+      "name": "Tanque Estágio Superior Centaur III",
+      "nodeName": "CentaurIIITank",
+      "category": "tanks",
+      "tier": 2,
+      "vehicle": "Atlas V Centaur (estágio superior)",
+      "role": "Tanque balão ultraligeiro de aço inox (LOX + LH2)",
+      "file": "parts/tanks/centaur-iii-tank.glb",
+      "summary": "Cápsula robusta de tanque duplo com saia adaptadora superior, túnel lateral, garrafas de hélio e estrutura de empuxo.",
+      "originNote": "Ponta inferior do cone traseiro",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 3.362,
+        "height": 9.591,
+        "depth": 3.07,
+        "minY": -0.141,
+        "maxY": 9.45
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 576,
+        "meshes": 5,
+        "bytes": 45780
+      },
+      "references": [
+        "references/parts/tanks/centaur-iii-tank/README.md"
+      ]
+    },
+    {
+      "id": "dawn-xenon-tank",
+      "name": "Tanque de Xenônio Dawn",
+      "nodeName": "DawnXenonTank",
+      "category": "tanks",
+      "tier": 2,
+      "vehicle": "Sonda Dawn (propulsão iônica NSTAR / NEXT-C)",
+      "role": "Tanque de alta pressão revestido em folha dourada para xenônio",
+      "file": "parts/tanks/dawn-xenon-tank.glb",
+      "summary": "Reservatório quase esférico de compósito: metade superior envolta em MLI dourado e metade inferior preta com saia perfurada.",
+      "originNote": "Borda inferior da saia de montagem",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.95,
+        "height": 0.675,
+        "depth": 0.95,
+        "minY": 0,
+        "maxY": 0.675
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 576,
+        "meshes": 3,
+        "bytes": 44216
+      },
+      "references": [
+        "references/parts/tanks/dawn-xenon-tank/README.md"
+      ]
+    },
+    {
+      "id": "sls-core-stage-tanks",
+      "name": "Tanques Principais SLS (Core Stage)",
+      "nodeName": "SlsCoreStageTanks",
+      "category": "tanks",
+      "tier": 3,
+      "vehicle": "Space Launch System (estágio central)",
+      "role": "Tanque criogênico gigante com espuma isolante laranja (LH2 + LOX)",
+      "file": "parts/tanks/sls-core-stage-tanks.glb",
+      "summary": "Cilindro massivo de 8,4 m de diâmetro em espuma laranja, anéis estruturais brancos, saia traseira e linhas de alimentação laterais.",
+      "originNote": "Plano inferior da seção dos 4 motores RS-25",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom",
+        "Attach_Engine_1",
+        "Attach_Engine_2",
+        "Attach_Engine_3",
+        "Attach_Engine_4"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 9.52,
+        "height": 59.9,
+        "depth": 8.77,
+        "minY": 0,
+        "maxY": 59.9
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 636,
+        "meshes": 3,
+        "bytes": 48724
+      },
+      "references": [
+        "references/parts/tanks/sls-core-stage-tanks/README.md"
+      ]
+    },
+    {
+      "id": "starship-tanks",
+      "name": "Tanques Starship (LOX + CH4)",
+      "nodeName": "StarshipTanks",
+      "category": "tanks",
+      "tier": 3,
+      "vehicle": "Starship V3 (2º estágio)",
+      "role": "Tanque estrutural de aço inox com escudo térmico e flaps traseiros",
+      "file": "parts/tanks/starship-tanks.glb",
+      "summary": "Cilindro de aço inoxidável de 9 m dividido verticalmente com meia casca de telhas pretas e duas grandes aletas traseiras.",
+      "originNote": "Borda inferior da saia de motores",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 15,
+        "height": 36.7,
+        "depth": 9.05,
+        "minY": 0,
+        "maxY": 36.7
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 264,
+        "meshes": 2,
+        "bytes": 20816
+      },
+      "references": [
+        "references/parts/tanks/starship-tanks/README.md"
+      ]
+    },
+    {
+      "id": "orion-esm-tanks",
+      "name": "Tanques Orion ESM (MMH + MON)",
+      "nodeName": "OrionEsmTanks",
+      "category": "tanks",
+      "tier": 3,
+      "vehicle": "Orion Módulo de Serviço Europeu",
+      "role": "Conjunto quádruplo de tanques hipergólicos em torno do motor central",
+      "file": "parts/tanks/orion-esm-tanks.glb",
+      "summary": "Quatro cápsulas verticais de titânio dispostas em quadrado sobre um convés anelar, com dois tanques esféricos de hélio.",
+      "originNote": "Superfície superior do convés (montagem central do AJ10-190 abaixo)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 3.8,
+        "height": 2.592,
+        "depth": 3.8,
+        "minY": -0.05,
+        "maxY": 2.542
+      },
+      "budget": {
+        "triangles": 800,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 520,
+        "meshes": 3,
+        "bytes": 40256
+      },
+      "references": [
+        "references/parts/tanks/orion-esm-tanks/README.md"
+      ]
+    },
+    {
+      "id": "truss-ingenuity",
+      "name": "Baia do Helicóptero Batedor (Ingenuity / SkyFall)",
+      "nodeName": "TrussIngenuity",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Helena · Estágio do Meio (Batedor Aéreo)",
+      "role": "Reconhecimento aéreo em Marte (`H-S1`), revelando alvos e gelo",
+      "file": "parts/equipment/truss-ingenuity.glb",
+      "summary": "Berço treliçado de alumínio abrigando o helicóptero coaxial com fuselagem dourada, painel solar superior, rotores duplos contrarrotativos e pernas de pouso abertas.",
+      "originNote": "Centro da base inferior de fixação (y = 0, encaixe no deck do estágio cutaway)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.591,
+        "height": 0.652,
+        "depth": 0.47,
+        "minY": 0,
+        "maxY": 0.652
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 500,
+        "meshes": 10,
+        "bytes": 44312
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md",
+        "references/experiments/mars-experiments.md"
+      ]
+    },
+    {
+      "id": "edl-trn-medli2",
+      "name": "Módulo TRN, Sensores MEDLI2 & Relógio Atômico DSAC",
+      "nodeName": "EdlTrnMedli2",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Helena · Estágio do Meio (Navegação & EDL)",
+      "role": "Pouso de precisão (`H-S2`), aerofrenagem (`H-O1`) e proteção contra falhas de sensor",
+      "file": "parts/equipment/edl-trn-medli2.glb",
+      "summary": "Plataforma de aviônicos com cubo dourado do Relógio Atômico DSAC, câmera ótica angular LCAM do sistema TRN e coletor de sensores térmicos MEDLI2.",
+      "originNote": "Base da bandeja de amortecimento (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.56,
+        "height": 0.455,
+        "depth": 0.42,
+        "minY": 0,
+        "maxY": 0.455
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 468,
+        "meshes": 9,
+        "bytes": 41272
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md",
+        "references/experiments/mars-experiments.md"
+      ]
+    },
+    {
+      "id": "edl-aspire-loftid",
+      "name": "Morteiro Supersônico ASPIRE & Escudo Inflável LOFTID",
+      "nodeName": "EdlAspireLoftid",
+      "category": "equipment",
+      "tier": 3,
+      "vehicle": "Helena · Estágio do Meio (EDL Pesada)",
+      "role": "Eleva o limite máximo de massa sobrevivente ao pouso em Marte",
+      "file": "parts/equipment/edl-aspire-loftid.glb",
+      "summary": "Tubo central do morteiro do paraquedas supersônico de 21,5 m cercado pelo anel laranja dobrado do escudo inflável HIAD e duas garrafas COPV de nitrogênio.",
+      "originNote": "Anel inferior da base estrutural (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.67,
+        "height": 0.68,
+        "depth": 0.66,
+        "minY": 0,
+        "maxY": 0.68
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 512,
+        "meshes": 7,
+        "bytes": 42844
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md",
+        "references/experiments/mars-experiments.md"
+      ]
+    },
+    {
+      "id": "attitude-reaction-wheels",
+      "name": "Conjunto de 4 Rodas de Reação & Star Trackers",
+      "nodeName": "AttitudeReactionWheels",
+      "category": "equipment",
+      "tier": 1,
+      "vehicle": "Helena · Estágio do Meio (Controle de Atitude)",
+      "role": "Rolagem orbital (`H-O2`) e redundância contra falha mecânica",
+      "file": "parts/equipment/attitude-reaction-wheels.glb",
+      "summary": "Estrutura tetraédrica com quatro volantes de inércia inclinados (3 ativos + 1 reserva) e dois defletores óticos de sensores de estrelas.",
+      "originNote": "Placa circular inferior de montagem (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.6,
+        "height": 0.477,
+        "depth": 0.6,
+        "minY": 0,
+        "maxY": 0.477
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 592,
+        "meshes": 7,
+        "bytes": 48880
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md",
+        "references/experiments/experiments.md"
+      ]
+    },
+    {
+      "id": "power-rosa-solar",
+      "name": "Casulos de Painéis Solares Enroláveis (ROSA / iROSA)",
+      "nodeName": "PowerRosaSolar",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Lucas · Estágio do Meio (Geração Solar)",
+      "role": "Geração elétrica leve em órbita e superfície (`L-O1`)",
+      "file": "parts/equipment/power-rosa-solar.glb",
+      "summary": "Longarina central de acionamento flanqueada por dois cilindros retráteis de manta fotovoltaica flexível com hastes tensoras compostas e terminais dourados.",
+      "originNote": "Base da longarina estrutural (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.586,
+        "height": 0.7,
+        "depth": 0.28,
+        "minY": 0,
+        "maxY": 0.7
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 444,
+        "meshes": 7,
+        "bytes": 37728
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "power-mmrtg-kilopower",
+      "name": "Gerador Nuclear MMRTG / Kilopower & Banco Li-ion",
+      "nodeName": "PowerMmrtgKilopower",
+      "category": "equipment",
+      "tier": 3,
+      "vehicle": "Lucas · Estágio do Meio (Energia Contínua)",
+      "role": "Energia contínua dia/noite imune a tempestades de poeira + picos de 900 W",
+      "file": "parts/equipment/power-mmrtg-kilopower.glb",
+      "summary": "Cilindro branco de MMRTG com 8 aletas radiadoras radiais montado ao lado do cofre térmico dourado de baterias Li-ion para sustentar picos do MOXIE.",
+      "originNote": "Base da plataforma térmica inferior (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.58,
+        "height": 0.66,
+        "depth": 0.4,
+        "minY": 0,
+        "maxY": 0.66
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 268,
+        "meshes": 7,
+        "bytes": 25288
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "isru-moxie-rodwell",
+      "name": "Reator ISRU de Oxigênio MOXIE & Extrator Rodwell",
+      "nodeName": "IsruMoxieRodwell",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Lucas · Estágio do Meio (Produção de O₂ e Água)",
+      "role": "Produz oxigênio do ar marciano (`L-S1`, 300 W) e extrai água do gelo",
+      "file": "parts/equipment/isru-moxie-rodwell.glb",
+      "summary": "Caixa dourada isolada do reator MOXIE a 800 °C com compressor HEPA superior e brilho térmico, acoplada a tanques esféricos de O₂ e haste aquecedora Rodwell.",
+      "originNote": "Placa de suporte inferior (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.56,
+        "height": 0.6,
+        "depth": 0.42,
+        "minY": 0,
+        "maxY": 0.6
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 304,
+        "meshes": 7,
+        "bytes": 27904
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "drill-corer-cryo",
+      "name": "Torre de Perfuração Subsuperficial & Criocooler Ativo",
+      "nodeName": "DrillCorerCryo",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Lucas · Estágio do Meio (Perfuração & Criogenia)",
+      "role": "Coleta núcleos de rocha (`L-S2`), mantém detectores frios (`L-O2`) e reparo EVA",
+      "file": "parts/equipment/drill-corer-cryo.glb",
+      "summary": "Trilhos verticais da broca rotativo-percussiva de 2 m com duas brocas reserva, emparelhados ao circuito criogênico de serpentina de cobre e âncora FX_Sparks.",
+      "originNote": "Placa de base estrutural (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom",
+        "FX_Sparks"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Sparks",
+          "preset": "sparks",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.56,
+        "height": 0.715,
+        "depth": 0.42,
+        "minY": 0,
+        "maxY": 0.715
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 316,
+        "meshes": 7,
+        "bytes": 28556
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "comm-dsoc-laser",
+      "name": "Transceptor Óptico a Laser DSOC (Psyche)",
+      "nodeName": "CommDsocLaser",
+      "category": "equipment",
+      "tier": 3,
+      "vehicle": "Oscar · Estágio do Meio (Telecom Óptica de Alta Banda)",
+      "role": "Transmissão a laser de 8–267 Mbps (`O-O1`), escoando imagens HiRISE/SHARAD",
+      "file": "parts/equipment/comm-dsoc-laser.glb",
+      "summary": "Telescópio ótico de 22 cm envolto em ouro sobre gimbal de dois eixos e amortecedores vibracionais acoplados à caixa de eletrônica de fótons.",
+      "originNote": "Base dos amortecedores de isolamento (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.42,
+        "height": 0.626,
+        "depth": 0.421,
+        "minY": 0,
+        "maxY": 0.626
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 280,
+        "meshes": 7,
+        "bytes": 26288
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "comm-electra-marco",
+      "name": "Rádio Relay UHF Electra & Par de CubeSats MarCO",
+      "nodeName": "CommElectraMarco",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Oscar · Estágio do Meio (Rede de Relay & EDL)",
+      "role": "Gerencia janelas UHF (`O-S1`) e protege contra perda de orbitador (MAVEN)",
+      "file": "parts/equipment/comm-electra-marco.glb",
+      "summary": "Rádio modular Electra de 4 camadas com antena helicoidal central (FX_Antenna) flanqueado por dois dispensadores verticais de CubeSats 6U MarCO.",
+      "originNote": "Placa de suporte inferior (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom",
+        "FX_Antenna"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Antenna",
+          "preset": "signal",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.568,
+        "height": 0.68,
+        "depth": 0.36,
+        "minY": 0,
+        "maxY": 0.68
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 300,
+        "meshes": 8,
+        "bytes": 28400
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "comm-rise-xband",
+      "name": "Transponder Banda X de Rádio-Geodésia RISE",
+      "nodeName": "CommRiseXband",
+      "category": "equipment",
+      "tier": 1,
+      "vehicle": "Oscar · Estágio do Meio (Rádio-Geodésia)",
+      "role": "Mede o núcleo líquido de Marte por efeito Doppler (`O-S2`) via link direto DSN",
+      "file": "parts/equipment/comm-rise-xband.glb",
+      "summary": "Bloco dourado do transponder Banda X com guias de onda em cobre alimentando duas antenas corneta cônicas inclinadas para leste e oeste.",
+      "originNote": "Bandeja inferior de aviônicos (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.569,
+        "height": 0.484,
+        "depth": 0.32,
+        "minY": 0,
+        "maxY": 0.484
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 180,
+        "meshes": 6,
+        "bytes": 18260
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "data-rad750-ssr",
+      "name": "Computador de Voo RAD750 & Gravador Solid-State (SSR)",
+      "nodeName": "DataRad750Ssr",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Oscar · Estágio do Meio (Processamento & Memória)",
+      "role": "Compressão/recorte de imagens (`O-O2`) e armazenamento durante conjunção solar",
+      "file": "parts/equipment/data-rad750-ssr.glb",
+      "summary": "Cofre blindado preto-anodizado contra radiação com aletas superiores de dissipação, 6 lâminas modulares de memória, LEDs de telemetria e chicote SpaceWire.",
+      "originNote": "Quadro inferior de amortecimento (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.501,
+        "height": 0.41,
+        "depth": 0.36,
+        "minY": 0,
+        "maxY": 0.41
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 348,
+        "meshes": 8,
+        "bytes": 31828
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "sci-hirise-sharad",
+      "name": "Pacote Orbital HiRISE, Radar SHARAD & Espectrômetro NOMAD",
+      "nodeName": "SciHiriseSharad",
+      "category": "equipment",
+      "tier": 3,
+      "vehicle": "Maya · Estágio do Meio (Sensoreamento Orbital)",
+      "role": "Fotos de 30 cm (`M-O1`), radar de gelo (`M-O2`) e gases-traço (`M-O3`)",
+      "file": "parts/equipment/sci-hirise-sharad.glb",
+      "summary": "Tubo telescópico de fibra de carbono classe 0,5 m com colar térmico prateado e aranha dourada, acoplado ao espectrômetro NOMAD e aos dipolos do radar SHARAD.",
+      "originNote": "Bancada ótica inferior (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.58,
+        "height": 0.698,
+        "depth": 0.506,
+        "minY": 0,
+        "maxY": 0.698
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 252,
+        "meshes": 8,
+        "bytes": 24872
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "sci-pixl-sherloc-supercam",
+      "name": "Bancada de Astrobiologia PIXL, SHERLOC & Laser SuperCam",
+      "nodeName": "SciPixlSherlocSupercam",
+      "category": "equipment",
+      "tier": 3,
+      "vehicle": "Maya · Estágio do Meio (Astrobiologia & Bioassinaturas)",
+      "role": "Detecta manchas de bioassinatura (`M-S1`) e dispara laser a >7 m (`M-S2`)",
+      "file": "parts/equipment/sci-pixl-sherloc-supercam.glb",
+      "summary": "Mastro branco do SuperCam com grande lente ciclópica e laser (FX_Sparks) junto ao braço robótico dobrado com a torre hexagonal PIXL e o sensor UV SHERLOC.",
+      "originNote": "Deck de calibração inferior (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom",
+        "FX_Sparks"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Sparks",
+          "preset": "sparks",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 0.54,
+        "height": 0.56,
+        "depth": 0.4,
+        "minY": 0,
+        "maxY": 0.56
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 252,
+        "meshes": 9,
+        "bytes": 25800
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "sci-seis-caching",
+      "name": "Sismômetro SEIS (Escudo de Vento) & Carrossel de 43 Tubos",
+      "nodeName": "SciSeisCaching",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Maya · Estágio do Meio (Sismologia & Amostragem)",
+      "role": "Escuta terremotos marcianos (`M-S3`) e sela os núcleos de amostra (`M-S4`)",
+      "file": "parts/equipment/sci-seis-caching.glb",
+      "summary": "Domo hexagonal branco de proteção térmica/eólica do sismômetro SEIS com saia dourada ao lado do carrossel rotativo com tubos de titânio do Perseverance.",
+      "originNote": "Palete inferior de instrumentos (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.583,
+        "height": 0.38,
+        "depth": 0.42,
+        "minY": 0,
+        "maxY": 0.38
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 696,
+        "meshes": 6,
+        "bytes": 55148
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    },
+    {
+      "id": "hab-veggie-rad-astrorad",
+      "name": "Estufa Hidropônica Veggie, Dosímetro RAD & Coletes AstroRad",
+      "nodeName": "HabVeggieRadAstroRad",
+      "category": "equipment",
+      "tier": 2,
+      "vehicle": "Maya · Estágio do Meio (Missão Tripulada)",
+      "role": "Alerta de tempestade solar (`M-S5`), estufa marciana (`M-S6`) e proteção da equipe",
+      "file": "parts/equipment/hab-veggie-rad-astrorad.glb",
+      "summary": "Câmara branca Veggie/APH iluminada com bandejas verdes de mudas, blocos de blindagem AstroRad dobrados à direita e detector cilíndrico RAD montado no topo.",
+      "originNote": "Piso inferior do rack de habitat (y = 0)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 0.56,
+        "height": 0.613,
+        "depth": 0.4,
+        "minY": 0,
+        "maxY": 0.613
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 12
+      },
+      "stats": {
+        "triangles": 236,
+        "meshes": 10,
+        "bytes": 25236
+      },
+      "references": [
+        "references/parts/stage-equipment.md",
+        "docs/resources/equipamentos-estagios.md"
+      ]
+    }
+  ]
+}
