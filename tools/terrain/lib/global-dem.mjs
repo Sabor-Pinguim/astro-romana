@@ -33,12 +33,8 @@ export async function openGlobalDem(url) {
   };
 }
 
-/**
- * Reads every pixel whose center falls in the lon/lat box and returns box-filtered samplers:
- * `mean(lon, lat, radiusLonDeg, radiusLatDeg)` averages the valid heights in the box (NaN if none);
- * `directLight(sun)` gives the same kind of sampler for the direct sunlight on the terrain.
- */
-export async function readGlobalDemBox(dem, { lonMin, lonMax, latMin, latMax }) {
+/** Reads every pixel whose center falls in the lon/lat box. Returns the raw window (nodata as NaN). */
+export async function readGlobalDemWindow(dem, { lonMin, lonMax, latMin, latMax }) {
   if (lonMin < -180 || lonMax > 180) throw new Error('DEM window crosses the ±180° meridian (not supported)');
   const col0 = Math.max(0, Math.floor((lonMin - dem.lon0) / dem.resLon));
   const col1 = Math.min(dem.width, Math.ceil((lonMax - dem.lon0) / dem.resLon) + 1);
@@ -58,7 +54,17 @@ export async function readGlobalDemBox(dem, { lonMin, lonMax, latMin, latMax }) 
       data[r * width + c] = v === dem.nodata ? NaN : v;
     }
   });
+  return { data, width, height, col0, row0, lon0: dem.lon0, lat0: dem.lat0, resLon: dem.resLon, resLat: dem.resLat, radius: dem.radius };
+}
 
+/**
+ * Box-filtered samplers over a window from readGlobalDemWindow (or loaded from disk):
+ * `mean(lon, lat, radiusLonDeg, radiusLatDeg)` averages the valid heights in the box (NaN if none);
+ * `directLight(sun)` gives the same kind of sampler for the direct sunlight on the terrain.
+ */
+export function globalDemSamplers(window) {
+  const { data, width, height, col0, row0 } = window;
+  const dem = window; // lon0, lat0, resLon, resLat, radius
   const geo = { dem, col0, row0, width, height };
   return {
     mean: boxMeanSampler(data, geo),

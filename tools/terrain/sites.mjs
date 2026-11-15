@@ -28,15 +28,22 @@ export const HORIZON = {
   texture: [2048, 1024], // polar texture: texels around × outward (~0.18° × 0.65% of the distance; powers of two)
   jpegQuality: 85,
   nearPixelM: 16, // HiRISE DTM overview used near the site (heights)
-  nearPhotoPixelM: 4, // HiRISE orthoimage overview used near the site (texture)
+  nearPhotoPixelM: 8, // HiRISE orthoimage overview used near the site (texture)
   nearFadeM: [1000, 1800], // HiRISE weight goes from 1 to 0 between these distances
-  ctxPixelM: 40, // CTX DTM overview (heights)
-  ctxPhotoPixelM: 24, // CTX orthoimage overview (texture)
+  ctxPixelM: 80, // CTX DTM overview (heights; ~ the ring spacing past 10 km)
+  ctxPhotoPixelM: 40, // CTX orthoimage overview (texture)
   ctxFadeM: [38000, 45000], // CTX weight goes from 1 to 0 between these distances
   ctxFeatherM: 4000, // soft edge where a CTX strip ends
 };
 
-/** Middle distance of the horizon: USGS CTX stereo DTMs (~20 m) and their orthoimages (~6 m). */
+/** Credit lines for the source products (also written in each site's README in references). */
+export const CREDITS = {
+  hirise: 'NASA/JPL-Caltech/University of Arizona (HiRISE on MRO); DTM by the University of Arizona, distributed by USGS Astrogeology',
+  ctx: 'NASA/JPL-Caltech/Malin Space Science Systems (CTX on MRO); DTM and orthoimage by USGS Astrogeology (Ames Stereo Pipeline)',
+  hrscMola: 'MOLA: NASA/GSFC (Mars Global Surveyor); HRSC: ESA/DLR/FU Berlin (Mars Express); blend by USGS Astrogeology (Fergason, Hare & Laura 2018)',
+};
+
+/** Middle distance of the horizon: USGS CTX stereo DTMs and their orthoimages (~20 m). */
 export const CTX_COLLECTION = 'mro_ctx_controlled_usgs_dtms';
 
 /** Global DEM used beyond the HiRISE data (one uncompressed GeoTIFF; read row by row). */

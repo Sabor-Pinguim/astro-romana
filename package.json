@@ -16,6 +16,7 @@
     "web:models": "node tools/web/bundle-models.mjs",
     "web:sites": "node tools/web/site-photos.mjs",
     "terrain:build": "node tools/terrain/build-terrain.mjs",
+    "terrain:fetch": "node tools/terrain/build-terrain.mjs --fetch",
     "terrain:validate": "node tools/terrain/validate-terrain.mjs",
     "terrain": "npm run terrain:build && npm run terrain:validate",
     "audio:fetch": "node tools/audio/fetch-rad.mjs",

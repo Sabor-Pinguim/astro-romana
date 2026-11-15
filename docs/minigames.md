@@ -29,7 +29,7 @@ A coluna **Candidato a MVP** marca 1 minigame de órbita e 1 de solo por persona
 |---|---|---|---|---|---|---|
 | H-O1 | Helena | Órbita | Aerofrenagem | MRO, TGO | Manter na faixa | Sim |
 | H-O2 | Helena | Órbita | Rolagem para o radar | MRO (2025) | Pilotagem | Não |
-| H-S1 | Helena | Solo | Voo do helicóptero | Ingenuity | Pilotagem | Sim |
+| H-S1 | Helena | Solo | Rota de escolta | Reconhecimento / Ingenuity | Planejamento de rota | Sim |
 | H-S2 | Helena | Solo | Pouso de precisão | Perseverance (TRN) | Escolha sob limite | Não |
 | L-O1 | Lucas | Órbita | Painel solar enrolável | ROSA / iROSA | Timing | Sim |
 | L-O2 | Lucas | Órbita | Manter o detector frio | CRISM (MRO) | Manter na faixa | Não |
@@ -64,9 +64,10 @@ Os 21 minigames usam só **6 mecânicas base**. Implementando as mecânicas como
 | **Mira** | Manter ou acertar uma mira 2D num alvo que se move | O-O1, M-S2 |
 | **Escolha sob limite** | Escolher itens com tamanho e valor para caber num limite (tempo, banda, tubos) | H-S2, O-O2, O-S1, M-S4 |
 | **Busca de padrão** | Achar o sinal certo no meio do ruído: grade, gráfico ou espectro | M-O2, M-O3, M-S1, M-S3 |
-| **Pilotagem** | Controle direto de um veículo com recurso limitado (bateria, combustível) | H-O2, H-S1 |
+| **Planejamento de rota** | Traçar um caminho contínuo em grade conectando marcos em ordem sem cruzar a rota | H-S1 |
+| **Pilotagem** | Controle direto de um veículo com recurso limitado (bateria, combustível) | H-O2 |
 
-Os 8 candidatos a MVP usam as 6 mecânicas. Trocando H-S1 por H-S2, a pilotagem sai do MVP e ficam 5 mecânicas.
+Os 8 candidatos a MVP usam 5 mecânicas (o planejamento de rota em grade substituiu a antiga pilotagem de helicóptero em H-S1, mantendo o H-O2 fora do MVP).
 
 ---
 
@@ -76,7 +77,7 @@ As quatro etapas do cockpit têm um minigame cronometrado. Os tempos, os limites
 
 | Etapa | Dono | Minigame | Consequência |
 |---|---|---|---|
-| 01 · Liftoff & Max-Q | Helena | manter o alvo do navball no centro em dois eixos | uma ascensão ruim cria um disjuntor extra na separação |
+| 01 · Liftoff & Max-Q | Helena | manter o alvo do navball no centro em dois eixos; a duração segue o TWR de decolagem (15 s com TWR 1,5; proporcional a 1/√(TWR − 1), entre 9 e 30 s): mais empuxo por tonelada, subida mais curta | uma ascensão ruim cria um disjuntor extra na separação. Sem motor capaz de acender no estágio 1 (sem motor, sem tanque ou propelente trocado) ou com TWR abaixo de 1,0, o foguete não sai da plataforma: a missão falha, o debriefing mostra a causa e o pódio fica vazio |
 | 02 · Cabin docking | Helena | alinhar a escotilha da cabine em 3D no monitor central com `← →` (`A/D`), `↑ ↓` e `E/Q` (`W/S`), sem gastar todo o combustível | falha exibe X vermelho, custa pontos e avança para a próxima etapa |
 | 03 · Orbital docking | Oscar e Maya | manter a nave alinhada com o tanque na câmera externa do monitor central; depois, transferir propelente | aproximação ruim dificulta a injeção transmarciana; a janela vencida usa captura automática com penalidade |
 | 04 · Mars landing | Helena | repetir o navball da decolagem durante o pouso em Marte | pouco tempo na faixa reduz a pontuação da missão |
@@ -114,15 +115,14 @@ As quatro etapas do cockpit têm um minigame cronometrado. Os tempos, os limites
 
 ### Solo
 
-#### H-S1 · Voo do helicóptero (candidato a MVP)
-- **Base real:** Ingenuity (2021–24) · `EN9`. Sucessor: SkyFall (2028).
-- **Minigame "Batedor"** *(pilotagem)*:
-  - Voar por pontos de reconhecimento antes da bateria acabar (~90 s por sol).
-  - Areia lisa e sem textura confunde a câmera de navegação: voar sobre ela causa queda.
-- **Acertou:** revela no mapa obstáculos e alvos científicos para o rover (ajuda Maya). Com SkyFall, também revela gelo.
-- **Errou:** pouso forçado, e o helicóptero pode quebrar.
-- **Custo:** 1,8 kg; ~350 W durante o voo. Depende do rover como relay, ou seja, da banda de Oscar.
-- **Fato real:** "O Ingenuity foi planejado para 5 voos e fez 72, voando 17 km. Acabou em 2024, quando a câmera se perdeu sobre areia lisa e as pás quebraram no pouso."
+#### H-S1 · Rota de escolta (Reconhecimento de superfície — candidato a MVP)
+- **Base real:** planejamento de rotas de travessia em Marte com apoio de reconhecimento aéreo (*Ingenuity*, `EN9`, 72 voos e 17 km voados entre 2021 e 2024).
+- **Minigame "Escolta"** *(planejamento de rota em grade 5×5)*:
+  - Traçar uma rota contínua de escolta pelos setores seguros da grade 5×5, visitando em sequência os pontos de passagem, marcados com os símbolos dos elementos mais abundantes da crosta marciana (`O → Si → Fe → Mg → Ca`), e desviando das áreas de areia fofa (`⚠`).
+- **Acertou:** define a rota segura da tripulação pelo terreno e revela alvos científicos para Maya.
+- **Errou:** rota incompleta deixa trechos de areia fofa sem mapeamento de risco.
+- **Custo:** tempo de navegação e reconhecimento da equipe na superfície (relays coordenados com Oscar).
+- **Fato real:** "Rotas de reconhecimento em Marte evitam ondulações de areia lisa sem textura: o Ingenuity foi planejado para 5 voos e fez 72 (17 km no total), encerrando em jan/2024 quando a câmera de navegação perdeu referência visual sobre areia lisa no voo 72."
 
 #### H-S2 · Pouso de precisão
 - **Base real:** Terrain Relative Navigation do Perseverance (2021) · `EN4`
@@ -358,7 +358,7 @@ Estas ligações fazem os minigames de um personagem dependerem dos outros. É o
 ```text
 Helena H-O1 (aerofrenagem) ──► economiza massa ──► mais instrumentos para Maya
 Helena H-O2 (rolagem) ──────► alvo especial no radar de Maya (M-O2)
-Helena H-S1 (helicóptero) ──► revela alvos no mapa ──► Maya escolhe onde investigar
+Helena H-S1 (escolta) ───────► garante rota segura ───► Maya escolhe onde investigar
                          └──► depende do relay do rover (banda de Oscar)
 Lucas  L-O1 (painel) ───────► energia para todos os experimentos
 Lucas  L-O2 (resfriador) ───► mantém vivo o espectrômetro de Maya

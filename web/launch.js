@@ -2,13 +2,17 @@
 // Launch pad: the rocket the crew designed stands on the pad while the camera circles it and the countdown
 // runs. At zero the engines light, the stack starts to climb and the camera flies up to the pilot's windows
 // (the closed cabin faces +Z); the screen fades and the cockpit, in the pilot's view, takes over.
-// window.ASTRO_LAUNCHPAD() shows this screen and resolves when the cockpit should start.
+// The climb pace follows the net thrust (lift.accel, from the liftoff TWR in web/app.js). A rocket that cannot lift
+// off (lift.ok false) stays on the pad: nothing lights without a working engine; with thrust below its weight the
+// engines burn, the stack strains and the engines shut down. The screen then fades to the debrief.
+// window.ASTRO_LAUNCHPAD(lift) shows this screen and resolves when the cockpit (or the debrief) should start.
 const THREE = await import('three');
 const screen = document.getElementById('launchpad'), host = document.getElementById('launchpad-view');
 const $id = id => document.getElementById(id);
 const ui = window.ASTRO, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-// game: countdown length, how long the engines burn on screen before the camera moves, the fly-in time.
-const COUNT = 10, IGNITION_HOLD = 1.6, FLY_IN = 2.2;
+// game: countdown length, how long the engines burn on screen before the camera moves, the fly-in time; on a
+// failed liftoff, how long the engines burn on the pad before the shutdown and how long the pad stays on screen.
+const COUNT = 10, IGNITION_HOLD = 1.6, FLY_IN = 2.2, PAD_BURN = 3, FAIL_HOLD = 4.5;
 const STATUS = [[10, 'Final checks'], [7, 'Go for launch'], [5, 'Tower arm retracting'], [2, 'Engines armed'], [0, 'Ignition · liftoff']];
 
 let renderer = null;
@@ -149,17 +153,18 @@ function buildTower(v) {
   v.arm.position.set(x - .35, cabinY, 0); v.arm.rotation.y = 0;
 }
 
-function countdownText(t) {
-  const left = Math.max(0, Math.ceil(COUNT - t));
-  $id('launchpad-count').textContent = t < COUNT ? `T−${String(left).padStart(2, '0')}` : 'LIFTOFF';
-  $id('launchpad-status').textContent = ([...STATUS].reverse().find(([s]) => s >= left) ?? STATUS[0])[1]; // the latest step reached
+function countdownText(t, lift) {
+  const left = Math.max(0, Math.ceil(COUNT - t)), zero = t >= COUNT, failed = zero && !lift.ok, count = $id('launchpad-count');
+  count.textContent = !zero ? `T−${String(left).padStart(2, '0')}` : lift.ok ? 'LIFTOFF' : lift.pad;
+  count.classList.toggle('fail', failed);
+  $id('launchpad-status').textContent = failed ? lift.status : ([...STATUS].reverse().find(([s]) => s >= left) ?? STATUS[0])[1]; // the latest step reached
 }
 
-window.ASTRO_LAUNCHPAD = () => new Promise(async resolve => {
+window.ASTRO_LAUNCHPAD = (lift = { ok: true, accel: 1 }) => new Promise(async resolve => {
   ui.show('launchpad');
   const site = ui.sites?.[ui.state.site];
   $id('launchpad-title').textContent = `Mission: ${site?.mission ?? 'Mars'}`;
-  $id('launchpad-fade').classList.remove('on'); $id('launchpad-count').style.opacity = '';
+  $id('launchpad-fade').classList.remove('on'); $id('launchpad-count').style.opacity = ''; $id('launchpad-count').classList.remove('fail');
   let done = false;
   const finish = () => { if (done) return; done = true; $id('launchpad-fade').classList.add('on'); setTimeout(resolve, reduce ? 0 : 350); };
   $id('launchpad-skip').onclick = finish;
@@ -168,7 +173,7 @@ window.ASTRO_LAUNCHPAD = () => new Promise(async resolve => {
 
   if (!renderer || !window.ASTRO_BUILD_ROCKET) { // no 3D: the countdown alone
     const t0 = performance.now();
-    const tick = () => { if (done) return; const t = (performance.now() - t0) / 1000; countdownText(t); if (t >= COUNT) finish(); else requestAnimationFrame(tick); };
+    const tick = () => { if (done) return; const t = (performance.now() - t0) / 1000; countdownText(t, lift); if (t >= COUNT + (lift.ok ? 0 : FAIL_HOLD)) finish(); else requestAnimationFrame(tick); };
     tick(); return;
   }
   view ||= initScene();
@@ -184,6 +189,7 @@ window.ASTRO_LAUNCHPAD = () => new Promise(async resolve => {
   v.smoke.forEach(m => { m.material.opacity = 0; m.scale.setScalar(.01); });
   const mid = new THREE.Vector3(), cabin = new THREE.Vector3(), look = new THREE.Vector3(), into = new THREE.Vector3();
   const R = v.height * 1.15 + 4;
+  const lights = lift.ok || lift.reason === 'low-twr', accel = lift.ok ? Math.max(.05, lift.accel ?? 1) : 0;
   let t = reduce ? COUNT : 0, last = performance.now(), flyFrom = null, lookFrom = null;
   function frame(now) {
     if (done || !screen.classList.contains('active')) return;
@@ -191,13 +197,14 @@ window.ASTRO_LAUNCHPAD = () => new Promise(async resolve => {
     const dt = Math.min(.1, Math.max(0, (now - last) / 1000)); last = now; t += dt; // rAF time can precede performance.now()
     if (window.ASTRO_LAUNCH_PAUSE) t -= dt; // tests: hold the moment
     if (window.ASTRO_LAUNCH_JUMP != null) { t = window.ASTRO_LAUNCH_JUMP; window.ASTRO_LAUNCH_JUMP = null; } // tests: jump in time
-    countdownText(t);
-    const lit = Math.max(0, t - COUNT), climb = Math.max(0, lit - .8);
-    v.rocket.position.y = base + climb * climb * .9; // slow at first, then faster
+    countdownText(t, lift);
+    const zero = Math.max(0, t - COUNT), lit = lights ? zero : 0, climb = Math.max(0, lit - .8);
+    v.rocket.position.y = base + climb * climb * .9 * accel; // slow at first, then faster; the net thrust sets the pace
     // Tower arm swings away at T−5.
     v.arm.rotation.y = -Math.min(1, Math.max(0, (t - (COUNT - 5)) / 2)) * 1.4;
-    // Ignition: plume, glow, smoke.
-    const flame = Math.min(1, lit / .6);
+    // Ignition: plume, glow, smoke. A rocket too heavy to lift strains on the pad until the engines shut down.
+    const flame = Math.min(1, lit / .6) * (lift.ok ? 1 : Math.max(0, Math.min(1, (PAD_BURN - lit) / .6)));
+    v.rocket.position.x = lift.ok || reduce ? 0 : (Math.random() - .5) * .05 * flame;
     v.plume.scale.set(flame, flame * (1 + .08 * Math.sin(now * .05)), flame);
     v.glow.position.set(0, v.rocket.position.y + stackGroup.userData.minY - .5, 0); v.glow.intensity = flame * (28 + 6 * Math.sin(now * .04));
     v.smoke.forEach((m, i) => {
@@ -207,13 +214,14 @@ window.ASTRO_LAUNCHPAD = () => new Promise(async resolve => {
     });
     stackGroup.userData.cabin.getWorldPosition(cabin);
     mid.set(0, v.rocket.position.y + v.height * .45, 0);
-    if (t < COUNT + IGNITION_HOLD) {
-      // Orbit around the rocket; a little shake once the engines are lit.
-      // At ignition the camera drops and looks at the base, so the flame and the smoke are in frame.
-      const a = .6 + t * .32, shake = flame * .06, low = Math.min(1, lit / .8), baseY = v.rocket.position.y + stackGroup.userData.minY + 1.2;
+    if (t < COUNT + IGNITION_HOLD || !lift.ok) {
+      // Orbit around the rocket; a little shake once the engines are lit (more when it strains on the pad).
+      // At T−0 the camera drops and looks at the base, so the flame and the smoke (or their absence) are in frame.
+      const a = .6 + t * .32, shake = flame * (lift.ok ? .06 : .12), low = Math.min(1, zero / .8), baseY = v.rocket.position.y + stackGroup.userData.minY + 1.2;
       look.set(0, mid.y + (baseY - mid.y) * low * .85, 0);
       camera.position.set(Math.sin(a) * R + (Math.random() - .5) * shake, look.y + Math.sin(t * .5) * 1.2 * (1 - low) + 1.5 * low + (Math.random() - .5) * shake, Math.cos(a) * R);
       camera.lookAt(look);
+      if (!lift.ok && zero >= FAIL_HOLD) finish();
     } else {
       // Fly up to the pilot's windows (+Z), following the climbing rocket; the fade covers the way in.
       if (!flyFrom) { flyFrom = camera.position.clone(); lookFrom = look.clone(); }

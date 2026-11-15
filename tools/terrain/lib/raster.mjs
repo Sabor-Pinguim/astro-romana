@@ -19,10 +19,10 @@ export async function openCog(url) {
   return { url, originX, originY, nodata, levels };
 }
 
-/** Coarsest level whose pixel size is still <= `maxPixelSize` meters (or the full image). */
+/** Coarsest level whose pixel size is still <= `maxPixelSize` meters, 5% tolerance (or the full image). */
 export function pickLevel(cog, maxPixelSize) {
   let chosen = cog.levels[0];
-  for (const level of cog.levels) if (Math.abs(level.resX) <= maxPixelSize) chosen = level;
+  for (const level of cog.levels) if (Math.abs(level.resX) <= maxPixelSize * 1.05) chosen = level;
   return chosen;
 }
 
@@ -34,11 +34,10 @@ function isInvalid(value, nodata) {
 }
 
 /**
- * Reads the window of `level` that covers every projected point in `points` (plus a
- * small margin) and returns a bilinear sampler: (x, y) -> value, or NaN when the point
- * falls outside the data or next to a nodata pixel.
+ * Reads the window of `level` that covers every projected point in `points` (plus a small
+ * margin). Returns the raw window: values (nodata already NaN) and where it sits in the raster.
  */
-export async function readRegion(cog, level, points, marginPx = 3) {
+export async function readWindow(cog, level, points, marginPx = 3) {
   let minCol = Infinity;
   let maxCol = -Infinity;
   let minRow = Infinity;
@@ -57,19 +56,21 @@ export async function readRegion(cog, level, points, marginPx = 3) {
   const y1 = Math.min(level.height, Math.ceil(maxRow) + 1 + marginPx);
   if (x1 <= x0 || y1 <= y0) throw new Error(`site falls outside ${cog.url}`);
 
-  const [data] = await level.image.readRasters({ window: [x0, y0, x1, y1], samples: [0] });
-  const width = x1 - x0;
-  const height = y1 - y0;
-  const nodata = cog.nodata;
-  const read = (c, r) => {
-    if (c < 0 || r < 0 || c >= width || r >= height) return NaN;
-    const v = data[r * width + c];
-    return isInvalid(v, nodata) ? NaN : v;
-  };
+  const [raw] = await level.image.readRasters({ window: [x0, y0, x1, y1], samples: [0] });
+  const data = new Float32Array(raw.length);
+  for (let k = 0; k < raw.length; k++) data[k] = isInvalid(raw[k], cog.nodata) ? NaN : raw[k];
+  return { data, width: x1 - x0, height: y1 - y0, x0, y0, originX: cog.originX, originY: cog.originY, resX: level.resX, resY: level.resY };
+}
 
+/**
+ * Bilinear sampler over a window from readWindow (or loaded from disk): (x, y) in projected
+ * meters -> value, or NaN when the point falls outside the data or next to a nodata pixel.
+ */
+export function regionFromWindow({ data, width, height, x0, y0, originX, originY, resX, resY }) {
+  const read = (c, r) => (c < 0 || r < 0 || c >= width || r >= height ? NaN : data[r * width + c]);
   const sample = (x, y) => {
-    const col = (x - cog.originX) / level.resX - 0.5 - x0;
-    const row = (y - cog.originY) / level.resY - 0.5 - y0;
+    const col = (x - originX) / resX - 0.5 - x0;
+    const row = (y - originY) / resY - 0.5 - y0;
     const c = Math.floor(col);
     const r = Math.floor(row);
     const fx = col - c;
@@ -78,8 +79,7 @@ export async function readRegion(cog, level, points, marginPx = 3) {
     const bottom = read(c, r + 1) * (1 - fx) + read(c + 1, r + 1) * fx;
     return top * (1 - fy) + bottom * fy; // NaN propagates from any missing neighbor
   };
-
-  return { sample, window: [x0, y0, x1, y1], pixelSize: Math.abs(level.resX) };
+  return { sample, window: [x0, y0, x0 + width, y0 + height], pixelSize: Math.abs(resX) };
 }
 
 /** Local east/north positions of a square grid, row 0 = north edge. */

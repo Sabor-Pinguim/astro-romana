@@ -58,13 +58,13 @@
       },
       "shadingCheck": {
         "photoSun": 0.227,
-        "oppositeSun": -0.206
+        "oppositeSun": -0.207
       },
       "deshading": {
         "ambientRatio": 0.25,
         "castShadowFraction": 0,
         "photoVsRelief": 0.227,
-        "textureVsRelief": 0.031
+        "textureVsRelief": 0.03
       },
       "horizon": {
         "innerM": 256,
@@ -87,19 +87,19 @@
             45000
           ]
         },
-        "globalDemShiftM": 0.8,
+        "globalDemShiftM": 0.7,
         "farTextureMatch": {
-          "offset": -347.92,
-          "gain": 5.0538
+          "offset": -336.33,
+          "gain": 4.9277
         },
         "textureStretch": {
           "site": [
-            60.95,
-            160.61
+            61.62,
+            158.72
           ],
           "region": [
-            57.64,
-            215.58
+            59.64,
+            212.61
           ],
           "blendM": [
             1200,
@@ -111,7 +111,7 @@
           "castShadows": true,
           "lighting": "the game lights the ring as level ground; the texture carries the relief shading"
         },
-        "highestDeg": 4.87,
+        "highestDeg": 4.86,
         "highestAzimuthDeg": 263,
         "source": {
           "near": "HiRISE DTM and orthoimage of this site (coarse overviews)",
@@ -130,12 +130,12 @@
                 "lastModified": "Sun, 14 May 2023 03:27:40 GMT"
               },
               "license": "CC0-1.0",
-              "heightShiftM": -30.9,
+              "heightShiftM": -31.3,
               "brightness": {
                 "ctxMean": 0.31,
                 "ctxSpread": 0.04,
-                "gain": 365.9594,
-                "correlation": 0.693
+                "gain": 360.5813,
+                "correlation": 0.729
               }
             },
             {
@@ -152,12 +152,12 @@
                 "lastModified": "Sun, 14 May 2023 03:44:33 GMT"
               },
               "license": "CC0-1.0",
-              "heightShiftM": -19.2,
+              "heightShiftM": -18.8,
               "brightness": {
                 "ctxMean": 0.32,
                 "ctxSpread": 0.06,
-                "gain": 199.1675,
-                "correlation": 0.354
+                "gain": 193.5498,
+                "correlation": 0.375
               }
             },
             {
@@ -174,12 +174,12 @@
                 "lastModified": "Sun, 14 May 2023 03:00:46 GMT"
               },
               "license": "CC0-1.0",
-              "heightShiftM": -24.7,
+              "heightShiftM": -24.4,
               "brightness": {
                 "ctxMean": 0.52,
                 "ctxSpread": 0.03,
-                "gain": 445.7724,
-                "correlation": 0.683
+                "gain": 432.1862,
+                "correlation": 0.634
               }
             }
           ],
@@ -269,14 +269,14 @@
         "label": "https://hirise-pds.lpl.arizona.edu/PDS/RDR/PSP/ORB_010500_010599/PSP_010573_1755/PSP_010573_1755_RED.LBL"
       },
       "shadingCheck": {
-        "photoSun": 0.663,
-        "oppositeSun": -0.662
+        "photoSun": 0.661,
+        "oppositeSun": -0.659
       },
       "deshading": {
-        "ambientRatio": 0.499,
+        "ambientRatio": 0.507,
         "castShadowFraction": 0,
-        "photoVsRelief": 0.663,
-        "textureVsRelief": -0.006
+        "photoVsRelief": 0.661,
+        "textureVsRelief": -0.004
       },
       "horizon": {
         "innerM": 256,
@@ -301,17 +301,17 @@
         },
         "globalDemShiftM": -8.9,
         "farTextureMatch": {
-          "offset": -606.04,
-          "gain": 4.6876
+          "offset": -598.1,
+          "gain": 4.6428
         },
         "textureStretch": {
           "site": [
-            140.89,
-            179.3
+            141.6,
+            179.02
           ],
           "region": [
-            -32.73,
-            293
+            -28.89,
+            291.2
           ],
           "blendM": [
             1200,
@@ -319,11 +319,11 @@
           ]
         },
         "shading": {
-          "ambientRatio": 0.499,
+          "ambientRatio": 0.507,
           "castShadows": true,
           "lighting": "the game lights the ring as level ground; the texture carries the relief shading"
         },
-        "highestDeg": 12.32,
+        "highestDeg": 12.29,
         "highestAzimuthDeg": 135,
         "source": {
           "near": "HiRISE DTM and orthoimage of this site (coarse overviews)",
@@ -346,8 +346,8 @@
               "brightness": {
                 "ctxMean": 0.41,
                 "ctxSpread": 0.06,
-                "gain": 273.688,
-                "correlation": 0.844
+                "gain": 269.8518,
+                "correlation": 0.858
               }
             },
             {
@@ -364,12 +364,12 @@
                 "lastModified": "Fri, 07 Feb 2025 04:30:46 GMT"
               },
               "license": "CC0-1.0",
-              "heightShiftM": -2.3,
+              "heightShiftM": -2.8,
               "brightness": {
                 "ctxMean": 0.37,
                 "ctxSpread": 0.04,
-                "gain": 439.3744,
-                "correlation": 0.854
+                "gain": 440.7651,
+                "correlation": 0.865
               }
             },
             {
@@ -386,12 +386,12 @@
                 "lastModified": "Fri, 07 Feb 2025 04:30:46 GMT"
               },
               "license": "CC0-1.0",
-              "heightShiftM": 124.8,
+              "heightShiftM": 124.7,
               "brightness": {
                 "ctxMean": 0.32,
                 "ctxSpread": 0.05,
-                "gain": 343.7896,
-                "correlation": 0.851
+                "gain": 342.5071,
+                "correlation": 0.861
               }
             }
           ],
@@ -481,13 +481,13 @@
         "label": "https://hirise-pds.lpl.arizona.edu/PDS/RDR/ESP/ORB_036500_036599/ESP_036506_2640/ESP_036506_2640_RED.LBL"
       },
       "shadingCheck": {
-        "photoSun": 0.59,
-        "oppositeSun": -0.513
+        "photoSun": 0.592,
+        "oppositeSun": -0.515
       },
       "deshading": {
-        "ambientRatio": 0.271,
+        "ambientRatio": 0.27,
         "castShadowFraction": 0,
-        "photoVsRelief": 0.59,
+        "photoVsRelief": 0.592,
         "textureVsRelief": -0.016
       },
       "holesFilled": 0,

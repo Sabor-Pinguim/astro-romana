@@ -2,27 +2,30 @@
 // a HiRISE stereo DTM gives the heights, its orthoimage gives the texture (with the shading
 // the DTM explains divided out, so the game light does not double it), and sites with
 // `horizonKm` get a horizon ring from the same DTM plus a global DEM.
-// Only the bytes of the site are downloaded (HTTP range requests).
+// The build reads only the copies of the sources kept in references/datasets/mars-terrain/<site>/
+// (no network): the terrain is the same on every machine. `--fetch` downloads them again (only the
+// bytes of each crop, by HTTP range requests), rewrites that folder and its README, then builds.
 //
-//   npm run terrain:build                      # every site
-//   npm run terrain:build -- jezero            # some sites
+//   npm run terrain:build                      # every site, offline
 //   npm run terrain:build -- jezero --preview  # also write tools/terrain/preview/*.png
+//   npm run terrain:fetch -- jezero            # download the sources again, then build
 //
 // Output: assets/terrain/<id>.glb and assets/terrain/manifest.json
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CTX_COLLECTION, DEFAULTS, HORIZON, HORIZON_DEM, SITES, STAC_API } from './sites.mjs';
+import { CREDITS, CTX_COLLECTION, DEFAULTS, HORIZON, HORIZON_DEM, SITES, STAC_API } from './sites.mjs';
 import { deshade, directLight } from './lib/deshade.mjs';
 import { writeGlb } from './lib/glb.mjs';
-import { openGlobalDem, readGlobalDemBox } from './lib/global-dem.mjs';
+import { globalDemSamplers, openGlobalDem, readGlobalDemWindow } from './lib/global-dem.mjs';
 import { buildHorizonMesh, horizonRadii, horizonTexture } from './lib/horizon.mjs';
 import { encodeJpegGray } from './lib/jpeg.mjs';
 import { encodePng } from './lib/png.mjs';
 import { withRetry } from './lib/net.mjs';
 import { createSiteFrame, projectionFromProjjson } from './lib/mars.mjs';
 import { renderCrop, renderOverview } from './lib/preview.mjs';
-import { borderPoints, fillHoles, openCog, pickLevel, readRegion, sampleGrid } from './lib/raster.mjs';
+import { borderPoints, fillHoles, openCog, pickLevel, readWindow, regionFromWindow, sampleGrid } from './lib/raster.mjs';
+import { openStore } from './lib/source-store.mjs';
 import { buildTerrainMesh, correlation, hillshade, imageAtVertices } from './lib/terrain-mesh.mjs';
 
 const HIRISE_PDS = 'https://hirise-pds.lpl.arizona.edu/PDS/RDR';
@@ -30,42 +33,24 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const OUT_DIR = path.join(ROOT, 'assets/terrain');
 const MANIFEST = path.join(OUT_DIR, 'manifest.json');
 const PREVIEW_DIR = path.join(ROOT, 'tools/terrain/preview');
+const SOURCES_DIR = path.join(ROOT, 'references/datasets/mars-terrain');
 
 const DEG = Math.PI / 180;
 const round = (value, digits) => Number(value.toFixed(digits));
 const mean = (values) => values.reduce((sum, v) => sum + v, 0) / values.length;
-
-async function getJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${url}`);
-  return response.json();
-}
-
-/** ETag / Last-Modified, so the manifest records exactly which file version was used. */
-async function fileVersion(url) {
-  const response = await fetch(url, { method: 'HEAD' });
-  return {
-    etag: response.headers.get('etag')?.replaceAll('"', '') ?? null,
-    lastModified: response.headers.get('last-modified'),
-  };
-}
 
 /**
  * Sun position when the photo was taken, from the original HiRISE PDS label.
  * (The STAC catalog's view:sun_* fields are not usable: its "sun_elevation" holds the
  * local time, and its "sun_azimuth" is measured from the image's 3 o'clock direction.)
  */
-async function photoSun(orthoName) {
+async function photoSun(orthoName, store) {
   const [, phase, orbit, target] = orthoName.match(/^([A-Z]{3})_(\d{6})_(\d{4})_/) ?? [];
   if (!phase) throw new Error(`cannot read the HiRISE observation id from ${orthoName}`);
   const observation = `${phase}_${orbit}_${target}`;
   const orbitDir = `ORB_${orbit.slice(0, 4)}00_${orbit.slice(0, 4)}99`;
   const url = `${HIRISE_PDS}/${phase}/${orbitDir}/${observation}/${observation}_RED.LBL`;
-  const label = await withRetry(async () => {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${url}`);
-    return response.text();
-  });
+  const label = await store.text(`${observation}_RED.LBL`, url, { role: 'sun position of the photo (PDS label of the HiRISE observation)', license: 'NASA PDS public data', credit: CREDITS.hirise });
   const value = (key) => {
     const match = label.match(new RegExp(`^\\s*${key}\\s*=\\s*"?([^"<\\r\\n]+)`, 'm'));
     if (!match) throw new Error(`${key} missing in ${url}`);
@@ -86,12 +71,16 @@ async function photoSun(orthoName) {
   };
 }
 
-/** Opens a COG and reads the site window; a failed read reopens the file from scratch. */
-function readSiteRegion(url, maxPixelSize, border) {
-  return withRetry(async () => {
+/**
+ * Window of a COG covering `points`, at the coarsest level with pixels <= maxPixelSize, kept in the
+ * site's source folder (downloaded in fetch mode, read from disk otherwise). Returns a sampler.
+ */
+async function storedRegion(store, name, kind, url, maxPixelSize, points, meta, stepM = 0) {
+  const window = await store.raster(name, kind, () => withRetry(async () => {
     const cog = await openCog(url);
-    return { cog, region: await readRegion(cog, pickLevel(cog, maxPixelSize), border) };
-  });
+    return readWindow(cog, pickLevel(cog, maxPixelSize), points);
+  }), { url, ...meta }, { stepM });
+  return regionFromWindow(window);
 }
 
 function findOrthoAsset(item, orthoName) {
@@ -125,7 +114,7 @@ function stretchToBytes(values) {
  * brightness by mean and spread. The texture is in the photo's units, so the game lights the ring as
  * level ground.
  */
-async function buildHorizon({ cfg, frame, projection, dtmUrl, orthoUrl, reference, sun, photo, log }) {
+async function buildHorizon({ cfg, store, frame, projection, item: hirise, dtmUrl, orthoUrl, reference, sun, photo, log }) {
   const outerM = cfg.horizonKm * 1000;
   const innerM = cfg.sizeM * HORIZON.innerFraction;
   const logRatio = Math.log(outerM / innerM);
@@ -164,11 +153,11 @@ async function buildHorizon({ cfg, frame, projection, dtmUrl, orthoUrl, referenc
 
   // Near: HiRISE.
   const nearBorder = borderPoints(frame, 2 * HORIZON.nearFadeM[1]);
-  const nearHeight = rasterMean((await readSiteRegion(dtmUrl, HORIZON.nearPixelM, nearBorder)).region, projection);
-  const nearPhoto = rasterMean((await readSiteRegion(orthoUrl, HORIZON.nearPhotoPixelM, nearBorder)).region, projection);
+  const nearMeta = { product: hirise.id, catalog: `${STAC_API}/collections/${cfg.collection}/items/${cfg.item}`, license: hirise.properties.license, credit: CREDITS.hirise };
+  const nearHeight = rasterMean(await storedRegion(store, 'hirise_dtm_near', 'height', dtmUrl, HORIZON.nearPixelM, nearBorder, { ...nearMeta, role: 'horizon heights up to ~1.8 km (HiRISE DTM overview)' }, 0.05), projection);
+  const nearPhoto = rasterMean(await storedRegion(store, 'hirise_ortho_near', 'photo', orthoUrl, HORIZON.nearPhotoPixelM, nearBorder, { ...nearMeta, role: 'horizon texture up to ~1.8 km (HiRISE orthoimage overview)' }), projection);
 
   // Far: global DEM.
-  const dem = await withRetry(() => openGlobalDem(HORIZON_DEM.url));
   const box = { lonMin: Infinity, lonMax: -Infinity, latMin: Infinity, latMax: -Infinity };
   for (let a = 0; a < 360; a += 5) {
     const [lon, lat] = frame.toLonLat(1.02 * outerM * Math.sin(a * DEG), 1.02 * outerM * Math.cos(a * DEG));
@@ -177,7 +166,12 @@ async function buildHorizon({ cfg, frame, projection, dtmUrl, orthoUrl, referenc
     box.latMin = Math.min(box.latMin, lat);
     box.latMax = Math.max(box.latMax, lat);
   }
-  const far = await readGlobalDemBox(dem, box);
+  const farWindow = await store.raster('global_dem', 'integer', async () => readGlobalDemWindow(await withRetry(() => openGlobalDem(HORIZON_DEM.url)), box), {
+    url: HORIZON_DEM.url, product: HORIZON_DEM.name, catalog: HORIZON_DEM.page, citation: HORIZON_DEM.citation, license: HORIZON_DEM.license, credit: CREDITS.hrscMola,
+    role: 'horizon heights beyond the CTX strips (m, areoid); also shaded with the photo sun for the far texture',
+  });
+  const far = globalDemSamplers(farWindow);
+  const dem = { radius: farWindow.radius };
   const farLight = far.directLight(sun);
   log(`horizon: ${far.rows} × ${far.columns} pixels of the global DEM (${far.pixelM.toFixed(0)} m), shaded with the photo's sun`);
   const degPerM = 180 / (Math.PI * dem.radius);
@@ -191,13 +185,16 @@ async function buildHorizon({ cfg, frame, projection, dtmUrl, orthoUrl, referenc
   const COVERAGE = [720, 160]; // azimuths × distances
   const middle = [];
   for (const id of cfg.ctx ?? []) {
-    const item = await withRetry(() => getJson(`${STAC_API}/collections/${CTX_COLLECTION}/items/${id}`));
+    const n = middle.length + 1;
+    const catalog = `${STAC_API}/collections/${CTX_COLLECTION}/items/${id}`;
+    const item = await store.json(`stac_ctx${n}`, catalog, { role: `STAC item of CTX DTM ${n} (projection, assets, provenance)`, license: 'CC0-1.0' });
+    const ctxMeta = { product: id, catalog, license: item.properties.license, credit: CREDITS.ctx };
     const proj = projectionFromProjjson(item.properties['proj:projjson']);
     const border = borderPoints(createSiteFrame(cfg.center, proj), 2 * HORIZON.ctxFadeM[1]);
     const dtmAsset = item.assets.geoid_adjusted_dem ?? item.assets.dtm ?? item.assets.dem;
-    const dtmRegion = (await readSiteRegion(dtmAsset.href, HORIZON.ctxPixelM, border)).region;
+    const dtmRegion = await storedRegion(store, `ctx${n}_dtm`, 'height', dtmAsset.href, HORIZON.ctxPixelM, border, { ...ctxMeta, role: `horizon heights ~1.8–45 km (CTX DTM ${n}, ${dtmAsset.title})` }, 0.5);
     const height = rasterMean(dtmRegion, proj);
-    const brightness = rasterMean((await readSiteRegion(item.assets.orthoimage.href, HORIZON.ctxPhotoPixelM, border)).region, proj);
+    const brightness = rasterMean(await storedRegion(store, `ctx${n}_ortho`, 'photo', item.assets.orthoimage.href, HORIZON.ctxPhotoPixelM, border, { ...ctxMeta, role: `horizon texture ~1.8–45 km (CTX orthoimage ${n})` }), proj);
     const shift = median(overlap.map((points) => nearHeight(points) - height(points)));
     const pairs = overlap.map((points) => [brightness(points), nearPhoto(points)]).filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
     if (pairs.length < 30 || !Number.isFinite(shift)) throw new Error(`CTX ${id} does not overlap the HiRISE data near the site`);
@@ -228,9 +225,9 @@ async function buildHorizon({ cfg, frame, projection, dtmUrl, orthoUrl, referenc
       photo: (points) => my + gain * (brightness(points) - mx),
       info: {
         item: id,
-        catalog: `${STAC_API}/collections/${CTX_COLLECTION}/items/${id}`,
-        dtm: { url: dtmAsset.href, ...(await withRetry(() => fileVersion(dtmAsset.href))) },
-        ortho: { url: item.assets.orthoimage.href, ...(await withRetry(() => fileVersion(item.assets.orthoimage.href))) },
+        catalog,
+        dtm: { url: dtmAsset.href, ...(await store.version(dtmAsset.href)) },
+        ortho: { url: item.assets.orthoimage.href, ...(await store.version(item.assets.orthoimage.href)) },
         license: item.properties.license,
         heightShiftM: round(shift, 1),
         brightness: { ctxMean: round(mx, 2), ctxSpread: round(sx, 2), gain: round(gain, 4), correlation: round(corr, 3) },
@@ -361,18 +358,20 @@ async function buildHorizon({ cfg, frame, projection, dtmUrl, orthoUrl, referenc
       source: {
         near: 'HiRISE DTM and orthoimage of this site (coarse overviews)',
         middle: middle.map((m) => m.info),
-        far: { ...HORIZON_DEM, pixelM: round(far.pixelM, 1), ...(await withRetry(() => fileVersion(HORIZON_DEM.url))) },
+        far: { ...HORIZON_DEM, pixelM: round(far.pixelM, 1), ...(await store.version(HORIZON_DEM.url)) },
         planetRadiusM: dem.radius,
       },
     },
   };
 }
 
-async function buildSite(site, { preview }) {
+async function buildSite(site, { preview, store }) {
   const cfg = { ...DEFAULTS, ...site };
   const log = (message) => console.log(`  ${site.id}: ${message}`);
 
-  const item = await withRetry(() => getJson(`${STAC_API}/collections/${cfg.collection}/items/${cfg.item}`));
+  const catalog = `${STAC_API}/collections/${cfg.collection}/items/${cfg.item}`;
+  const item = await store.json('stac_hirise', catalog, { role: 'STAC item of the HiRISE DTM (projection, assets, description)', license: 'CC0-1.0' });
+  const hiriseMeta = { product: cfg.item, catalog, license: item.properties.license, credit: CREDITS.hirise };
   const projection = projectionFromProjjson(item.properties['proj:projjson']);
   const frame = createSiteFrame(cfg.center, projection);
   const orthoAsset = findOrthoAsset(item, cfg.ortho);
@@ -380,7 +379,7 @@ async function buildSite(site, { preview }) {
 
   // Heights: DTM sampled on the mesh grid, from the overview closest to half the spacing.
   const gridStep = cfg.sizeM / (cfg.gridVertices - 1);
-  const { cog: dtm, region: dtmRegion } = await readSiteRegion(item.assets.dtm.href, gridStep / 2, border);
+  const dtmRegion = await storedRegion(store, 'hirise_dtm', 'height', item.assets.dtm.href, gridStep / 2, border, { ...hiriseMeta, role: 'heights of the walkable terrain (HiRISE DTM, m, areoid)' });
   const heightGrid = sampleGrid(dtmRegion, frame, cfg.gridVertices, cfg.sizeM, false);
   const reference = dtmRegion.sample(...frame.toProjected(0, 0));
   const holeFraction = heightGrid.invalid / heightGrid.values.length;
@@ -395,7 +394,7 @@ async function buildSite(site, { preview }) {
 
   // Texture: orthoimage sampled at pixel centers, stretched to 8-bit grayscale.
   const texelM = cfg.sizeM / cfg.textureSize;
-  const { region: orthoRegion } = await readSiteRegion(orthoAsset.href, texelM / 2, border);
+  const orthoRegion = await storedRegion(store, 'hirise_ortho', 'photo', orthoAsset.href, texelM, border, { ...hiriseMeta, product: cfg.ortho, role: 'texture of the walkable terrain (HiRISE orthoimage, the photo itself)' });
   const textureGrid = sampleGrid(orthoRegion, frame, cfg.textureSize, cfg.sizeM, true);
   if (textureGrid.invalid / textureGrid.values.length > cfg.maxHoleFraction) {
     throw new Error(`orthoimage ${cfg.ortho} does not cover the site`);
@@ -404,7 +403,7 @@ async function buildSite(site, { preview }) {
   log(`texture from ${orthoRegion.pixelSize.toFixed(1)} m orthoimage pixels`);
 
   // Sun of the photo: its shadows are in the texture, so the game light should match it.
-  const sun = await photoSun(cfg.ortho);
+  const sun = await photoSun(cfg.ortho, store);
 
   // Sanity check: if heights and photo are aligned and north-up, the relief shaded with
   // the photo's sun looks like the photo. The opposite sun must give a worse match.
@@ -443,9 +442,15 @@ async function buildSite(site, { preview }) {
     maxH = Math.max(maxH, h);
   }
 
+  if (store.online) { // fetch mode: reference image of where the crop sits
+    const cog = await withRetry(() => openCog(item.assets.dtm.href));
+    await writeFile(path.join(store.dir, 'overview.png'), await renderOverview(cog, frame, cfg.sizeM));
+    store.index.files['overview.png'] = { file: 'overview.png', role: 'reference image: the whole HiRISE DTM shaded (light from the north-west), the site square in red', url: item.assets.dtm.href, license: item.properties.license, credit: CREDITS.hirise };
+  }
+
   const horizon = cfg.horizonKm
     ? await buildHorizon({
-      cfg, frame, projection, dtmUrl: item.assets.dtm.href, orthoUrl: orthoAsset.href, reference, sun, log,
+      cfg, store, item, frame, projection, dtmUrl: item.assets.dtm.href, orthoUrl: orthoAsset.href, reference, sun, log,
       photo: { lo: stretched.lo, hi: stretched.hi, meanRaw: mean(flat.values), ambientRatio: flat.ambientRatio ?? 0.5 },
     })
     : null;
@@ -485,7 +490,6 @@ async function buildSite(site, { preview }) {
 
   if (preview) {
     await mkdir(PREVIEW_DIR, { recursive: true });
-    await writeFile(path.join(PREVIEW_DIR, `${site.id}_overview.png`), await renderOverview(dtm, frame, cfg.sizeM));
     await writeFile(
       path.join(PREVIEW_DIR, `${site.id}_crop.png`),
       renderCrop({ texture, textureSize: cfg.textureSize, heights: heightGrid.values, gridCount: cfg.gridVertices, step: gridStep, sun }),
@@ -526,10 +530,37 @@ async function buildSite(site, { preview }) {
       license: item.properties.license,
       catalog: `${STAC_API}/collections/${cfg.collection}/items/${cfg.item}`,
       description: item.properties.description,
-      dtm: { url: item.assets.dtm.href, gsdM: round(item.properties.gsd, 4), ...(await withRetry(() => fileVersion(item.assets.dtm.href))) },
-      ortho: { name: cfg.ortho, url: orthoAsset.href, ...(await withRetry(() => fileVersion(orthoAsset.href))) },
+      dtm: { url: item.assets.dtm.href, gsdM: round(item.properties.gsd, 4), ...(await store.version(item.assets.dtm.href)) },
+      ortho: { name: cfg.ortho, url: orthoAsset.href, ...(await store.version(orthoAsset.href)) },
     },
   };
+}
+
+/** README of a site's source folder, generated from sources.json (fetch mode). */
+function siteReadme(site, index, built) {
+  const rows = Object.entries(index.files).map(([name, f]) => {
+    const what = [f.role, f.size ? `${f.size[0]} × ${f.size[1]} px${f.georeference?.resX ? `, ${Math.abs(f.georeference.resX).toFixed(f.georeference.resLon ? 6 : 2)} ${f.georeference.resLon ? '°' : 'm'}/px` : ''}` : null].filter(Boolean).join('; ');
+    const version = index.versions[f.url];
+    const source = [f.catalog ? `[catalog](${f.catalog})` : null, f.url ? `[file](${f.url})` : null].filter(Boolean).join(' · ');
+    return `| \`${f.file}\` | ${what} | ${f.product ? `\`${f.product}\`<br>` : ''}${source} | ${version ? `${version.etag ?? ''}<br>${version.lastModified ?? ''}` : ''} | ${f.license ?? ''}<br>${f.credit ?? ''} |`;
+  });
+  return `# ${built.name} (\`${site.id}\`): sources
+
+Generated by \`npm run terrain:fetch\` (tools/terrain/build-terrain.mjs) on ${index.retrieved}. Do not edit by hand.
+Everything the terrain build reads for this site is in this folder; \`npm run terrain\` does not use the network.
+How the files are used, the licenses and the caveats: [../README.md](../README.md).
+
+Site center ${built.center.lat}°, ${built.center.lon}° (east-positive), ${built.sizeM} × ${built.sizeM} m walkable crop${built.horizon ? `, horizon ring to ${built.horizon.radiusM / 1000} km` : ''}.
+
+| File | What | Source | Version (ETag, Last-Modified) | License, credit |
+|---|---|---|---|---|
+${rows.join('\n')}
+
+- **PNG rasters:** value = offset + scale × (u − 1), u = 0 is nodata; \`offset\`, \`scale\` and where the window sits in the
+  source raster (\`georeference\`) are in \`sources.json\`. Photos are 8-bit; heights 16-bit (meters).
+- **Images:** \`hirise_ortho.png\` is the HiRISE photo of the walkable crop; \`overview.png\` shows where the crop sits
+  in the whole DTM.
+`;
 }
 
 async function main() {
@@ -548,10 +579,17 @@ async function main() {
     // first build
   }
 
+  const online = args.includes('--fetch');
   const built = new Map();
   for (const site of selected) {
-    console.log(`▶ ${site.id}`);
-    built.set(site.id, await buildSite(site, { preview }));
+    console.log(`▶ ${site.id}${online ? ' (fetching sources)' : ''}`);
+    const store = await openStore(path.join(SOURCES_DIR, site.id), { online, retry: withRetry });
+    built.set(site.id, await buildSite(site, { preview, store }));
+    if (online) {
+      await store.save();
+      await writeFile(path.join(store.dir, 'README.md'), siteReadme(site, store.index, built.get(site.id)));
+      console.log(`  ${site.id}: sources in ${path.relative(ROOT, store.dir)}/`);
+    }
   }
 
   // Keep entries of sites not rebuilt this time, in the order of sites.mjs.

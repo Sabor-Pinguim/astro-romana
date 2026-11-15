@@ -476,7 +476,9 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
           edlSwitch.rotation.x = THREE.MathUtils.lerp(edlSwitch.rotation.x, f.edlChuteDeployed ? -0.65 : 0.25, 0.16);
         }
 
-        // Exterior planet & stars motion according to flight progress
+        // Exterior planet & stars motion according to flight progress. Mars only shows up on arrival: the
+        // liftoff and both dockings happen at Earth.
+        marsPlanet.visible = f.step === 3;
         const prog = Math.max(0, Math.min(1, (f.progress || 0) / 100));
         const marsScale = 0.6 + prog * 1.45;
         marsPlanet.scale.setScalar(marsScale);
@@ -584,6 +586,10 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
     }));
 
     function applyRanking(ranked) {
+      // An empty ranking (launch failure: the crew never flew) leaves the podium empty.
+      const empty = Array.isArray(ranked) && !ranked.length;
+      for (const id of CREW_IDS) if (actors[id]) actors[id].model.visible = !empty;
+      if (empty) return;
       const list = Array.isArray(ranked) && ranked.length
         ? ranked
         : CREW_IDS.map((id, i) => ({ id, pos: i + 1 }));

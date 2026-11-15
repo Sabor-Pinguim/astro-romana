@@ -924,12 +924,13 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   promptEl.addEventListener('click', interact);
 
   // Experiments: the owner runs the minigame next to the block.
-  const COMPLETE_DELAY_MS = 2500; // game-balance: time to read the confirmation.
+  const COMPLETE_DELAY_MS = 3400; // game-balance: time to read the confirmation and real fact card.
+  const MINIGAME_PANELS = { 'H-S1': 'scout-game', 'L-S1': 'moxie-game', 'O-S1': 'relay-game', 'M-S1': 'bio-game' };
   let completionTimer = null;
   const confirmation = document.createElement('div');
   confirmation.className = 'minigame-complete';
   confirmation.setAttribute('role', 'status');
-  confirmation.innerHTML = '<span class="minigame-check" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 24 L19 34 L40 12"/></svg></span><strong>Experiment complete</strong>';
+  confirmation.innerHTML = '<span class="minigame-check" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 24 L19 34 L40 12"/></svg></span><strong>Experiment complete</strong><p class="minigame-fact" id="minigame-fact"></p>';
   dlg.querySelector('.dialog-inner').append(confirmation);
   const nearBlock = () => world.blocks.find(b => Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z) <= REACH) ?? null;
   const nearLander = () => Math.hypot(s.pos.x, s.pos.z) <= BOARD_REACH;
@@ -945,16 +946,17 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     s.keys.clear();
     $s('minigame-kicker').textContent = `Experiment ${e.id} · ${owner.name}`;
     $s('minigame-title').textContent = e.title;
-    $s('minigame-brief').textContent = e.id === 'H-S1' ? 'Plan a continuous reconnaissance route for the helicopter, visiting each waypoint and mapping every sector.' : e.desc;
+    $s('minigame-brief').textContent = e.desc;
     $s('minigame-summary').innerHTML = [['Minigame', e.minigame], ['Mechanic', e.mechanic], ['Based on', e.basis]].map(([k, v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
     dlg.dataset.exp = e.id;
-    const scout = e.id === 'H-S1';
-    $s('scout-game').hidden = !scout;
-    $s('minigame-summary').hidden = scout;
-    $s('minigame-placeholder').hidden = scout;
-    $s('minigame-done').hidden = scout;
+    const panelId = MINIGAME_PANELS[e.id] || null;
+    Object.values(MINIGAME_PANELS).forEach(id => { $s(id).hidden = id !== panelId; });
+    $s('minigame-summary').hidden = false;
+    $s('minigame-placeholder').hidden = Boolean(panelId);
+    $s('minigame-done').hidden = Boolean(panelId);
     $s('minigame-done').textContent = 'Complete experiment';
-    if (scout) window.ASTRO_SCOUT.reset();
+    $s('minigame-fact').textContent = '';
+    window.ASTRO_MINIGAMES?.open(e.id);
     dlg.showModal();
   }
   $s('minigame-close').addEventListener('click', () => dlg.close());
@@ -964,12 +966,18 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     const b = world.blocks.find(x => x.userData.exp.id === id);
     if (!isDone(id)) return;
     if (b) { b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done'); }
+    $s('minigame-fact').textContent = b?.userData.exp.fact || '';
     dlg.classList.add('is-complete');
     completionTimer = setTimeout(() => { if (dlg.open) dlg.close(); }, COMPLETE_DELAY_MS);
   }
   $s('minigame-done').addEventListener('click', () => finishExperiment(dlg.dataset.exp));
   dlg.addEventListener('astro:minigame-completed', event => finishExperiment(event.detail.id));
-  dlg.addEventListener('close', () => { clearTimeout(completionTimer); completionTimer = null; dlg.classList.remove('is-complete'); });
+  dlg.addEventListener('close', () => {
+    clearTimeout(completionTimer);
+    completionTimer = null;
+    dlg.classList.remove('is-complete');
+    window.ASTRO_MINIGAMES?.close();
+  });
   dlg.addEventListener('click', event => {
     if (event.target !== dlg) return;
     const bounds = dlg.getBoundingClientRect();
