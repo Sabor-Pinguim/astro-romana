@@ -31,7 +31,7 @@
         <div class="dossier-left">
           <div class="dossier-row"><span class="micro">Planet</span><strong>Mars</strong></div>
           <div class="dossier-block"><div class="block-label"><span class="micro">Landing site</span></div><div class="site-thumbs"><button class="site-thumb" type="button" data-site="jezero" aria-pressed="true"><span class="thumb-art"></span><span class="thumb-name">Jezero</span></button><button class="site-thumb" type="button" data-site="gale" aria-pressed="false"><span class="thumb-art"></span><span class="thumb-name">Gale</span></button></div></div>
-          <div class="dossier-block"><div class="block-label"><span class="micro">Crew</span><span class="tag" id="crew-count">1/4 PLAYERS</span></div><div class="crew-grid" id="crew-grid"></div></div>
+          <div class="dossier-block"><div class="block-label"><span class="micro">Crew</span><span class="tag" id="crew-count">1/4 PLAYERS</span></div><div class="crew-grid" id="crew-grid"></div><div class="room-panel" id="room-panel" aria-live="polite"></div></div>
         </div>
         <div class="dossier-right">
           <div class="detail-head"><span class="eyebrow" id="detail-kind">Crew member</span><h4 id="detail-name">Helena</h4><span id="detail-role"></span><p id="detail-desc"></p><div class="detail-status"><span class="micro">Status</span><strong id="detail-status"></strong></div></div>
@@ -263,6 +263,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </main>
 <script src="index.models.js"></script>
+<script src="multiplayer/client/room-client.js"></script>
+<script src="web/net.js"></script>
 <script src="web/app.js"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
 <script src="web/orbit.js"></script>

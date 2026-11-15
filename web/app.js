@@ -76,7 +76,7 @@
   }
   const budgetOf = level => rule('defaultBudgetM',250)*difficulty[level].factor;
   const defaultRocket=()=>({booster:{engine:'merlin-1d',fins:'fins-small',tank:'falcon-9-stage-1-tank'},stages:[{item:'power-rosa-solar'},{item:null}],cabin:[]});
-  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:defaultRocket(),sel:{kind:'booster'},tab:'engine'};
+  const state={screen:'menu',difficulty:'normal',site:'jezero',detail:{kind:'crew',id:'helena'},rocket:defaultRocket(),sel:{kind:'booster'},tab:'engine'};
   const money = n => (n<0?'−$':'$')+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<10?1:0})+'M';
   const number = n => n==null?'n/f':Math.round(n).toLocaleString('en-US');
   const tonnes = kg => kg==null?'n/f':(kg/1000).toLocaleString('en-US',{maximumFractionDigits:kg<10000?2:1})+' t';
@@ -102,7 +102,10 @@
     ['s3','75,42 106.4,29 106.4,55'],['s3','75,42 106.4,55 88,73.4'],
     ['v1','50,30 62,22 88,22 100,30 98,52 75,60 52,52'],['v2','50,30 62,22 88,22 52,52'],['v3','55,31 63,26 77,26 59,37']
   ].map(([c,p])=>`<polygon class="${c}" points="${p}"/>`).join('')}</svg>`;
-  const showScreen = id => {state.screen=id;$$('.screen').forEach(screen=>screen.classList.toggle('active',screen.id===id));window.scrollTo(0,0);if(id==='planner')renderPlanner();};
+  // Multiplayer (web/net.js, docs/multiplayer.md). Solo when the script or the server is missing.
+  const net = window.ASTRO_NET || {mode:'solo',isHost:false,isGuest:false,peers:[],cached:{},available:()=>false,owns:()=>true,peerOf:()=>null,on:()=>()=>{},setPhase(){},setState(){},emit(){},act(){},start(){}};
+  // The host tells the room which screen it is on; a guest follows (guestScreen) and never changes it alone.
+  const showScreen = id => {state.screen=id;$$('.screen').forEach(screen=>screen.classList.toggle('active',screen.id===id));window.scrollTo(0,0);if(id==='planner')renderPlanner();net.setPhase(id);lockGuest();};
   let toastTimer;
   const toast = message => {const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3500);};
 
@@ -112,18 +115,49 @@
     $('#mission-name').textContent=site.mission;
     $('#planner-title').textContent='Mission: '+site.mission;
     $$('[data-site]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.site===state.site)));
-    $('#crew-count').textContent=`${state.friends.size+1}/4 PLAYERS`;
-    $('#crew-grid').innerHTML=crew.map((p,i)=>{const host=i===0,friend=state.friends.has(p.id),picked=state.detail.kind==='crew'&&state.detail.id===p.id;
-      return `<article class="crew-card ${picked?'selected':''}" style="--crew:${p.color}"><div class="crew-stage">${astronaut(p)}</div><div class="crew-info"><h4 class="crew-name">${p.name}</h4><span class="crew-role">${p.role}</span><span class="status ${host||friend?'player':''}"><span class="dot"></span>${host?'HOST (PLAYER)':friend?'FRIEND (PLAYER)':'AI (NPC)'}</span></div><div class="crew-actions"><button class="pick" type="button" data-pick="${p.id}" aria-label="Details: ${p.name}" aria-pressed="${picked}">Details</button></div></article>`;}).join('');
+    $('#crew-count').textContent=`${playerCount()}/4 PLAYERS`;
+    $('#crew-grid').innerHTML=crew.map(p=>{const seat=seatStatus(p.id),picked=state.detail.kind==='crew'&&state.detail.id===p.id,take=net.isGuest&&net.joinable&&!seat.player;
+      return `<article class="crew-card ${picked?'selected':''}" style="--crew:${p.color}"><div class="crew-stage">${astronaut(p)}</div><div class="crew-info"><h4 class="crew-name">${p.name}</h4><span class="crew-role">${p.role}</span><span class="status ${seat.player?'player':''}"><span class="dot"></span>${seat.text}</span></div><div class="crew-actions">${take?`<button class="invite" type="button" data-take="${p.id}" aria-label="Play as ${p.name}">Take seat</button>`:''}<button class="pick" type="button" data-pick="${p.id}" aria-label="Details: ${p.name}" aria-pressed="${picked}">Details</button></div></article>`;}).join('');
     $$('#crew-grid [data-pick]').forEach(b=>b.addEventListener('click',()=>{state.detail={kind:'crew',id:b.dataset.pick};renderLobby();}));
-    renderDetail();
+    $$('#crew-grid [data-take]').forEach(b=>b.addEventListener('click',()=>net.setSeat(b.dataset.take)));
+    renderRoom();renderDetail();syncSetup();
+  }
+  // Who plays each crew member: the room's peers, or (solo) the player as Helena and the AI for the rest.
+  function seatStatus(id){
+    if(net.mode==='solo'){const host=id===crew[0].id;return {player:host,text:host?'HOST (PLAYER)':'AI (NPC)'};}
+    const peer=net.peerOf(id);
+    if(!peer)return {player:false,text:'AI (NPC)'};
+    const you=peer.id===net.you.id?' · YOU':'';
+    return {player:true,text:(peer.host?'HOST':'PLAYER')+(peer.online?'':' (OFFLINE)')+you};
+  }
+  const playerCount = () => net.mode==='solo'?1:net.peers.filter(p=>p.online).length;
+  // Room panel under the crew: create a room (host) or join one with its code; in a room, its code and invite link.
+  function renderRoom(){
+    const panel=$('#room-panel');if(!panel)return;
+    if(net.mode==='solo'){
+      const off=!net.available();
+      panel.innerHTML=`<span class="micro">Co-op</span><button class="button" type="button" id="room-create" ${off?'disabled':''}>Create room</button><span class="room-or">or</span><input id="room-code" maxlength="4" placeholder="CODE" aria-label="Room code" autocomplete="off" ${off?'disabled':''}><button class="button quiet" type="button" id="room-join" ${off?'disabled':''}>Join</button>${off?'<span class="room-note">No room server configured (?server=wss://…/ws).</span>':''}`;
+      $('#room-create').addEventListener('click',()=>enterRoom(()=>net.create(state.screen)));
+      $('#room-join').addEventListener('click',()=>enterRoom(()=>net.join($('#room-code').value)));
+      $('#room-code').addEventListener('keydown',e=>{if(e.key==='Enter')$('#room-join').click();});
+      return;
+    }
+    const lost=net.status!=='open';
+    panel.innerHTML=`<span class="micro">Room</span><strong class="room-code">${net.code}</strong><button class="button" type="button" id="room-copy">Copy invite link</button><button class="button quiet" type="button" id="room-leave">Leave</button><span class="room-note">${lost?'Reconnecting…':net.isHost?'You host: the mission runs on your screen. Empty seats are AI crew.':'The host runs the mission. Pick a free crew member to play.'}</span>`;
+    $('#room-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(net.link);toast('Invite link copied.');}catch{prompt('Copy the invite link:',net.link);}});
+    $('#room-leave').addEventListener('click',()=>{net.leave();});
+  }
+  async function enterRoom(go){
+    $$('#room-panel button').forEach(b=>{b.disabled=true;});
+    try{await go();}catch(err){toast(net.message(err));}
+    renderLobby();
   }
   function renderDetail(){
     const d=state.detail,view=$('#detail-view');
     if(d.kind==='crew'){
-      const p=crew.find(c=>c.id===d.id),i=crew.indexOf(p);
+      const p=crew.find(c=>c.id===d.id);
       $('#detail-kind').textContent='Crew member';$('#detail-name').textContent=p.name;$('#detail-role').textContent=p.role;$('#detail-desc').textContent='“'+p.quote+'”';
-      $('#detail-status').textContent=i===0?'HOST (PLAYER)':state.friends.has(p.id)?'FRIEND (PLAYER)':'AI (NPC)';
+      $('#detail-status').textContent=seatStatus(p.id).text;
       $('#detail-extra').innerHTML=p.tags.map(t=>`<span class="tag">${t}</span>`).join('')+`<div class="perk"><strong>${p.perk}</strong><p>${p.perkText}</p></div>`;
       view.classList.remove('site');view.style.setProperty('--crew',p.color);
     }else{
@@ -306,24 +340,45 @@
     $$('#category-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;renderCatalog();}));
     $('#selected-stage-tag').textContent=moduleLabel(moduleKey(sel))[0].toUpperCase();
     $('#catalog-summary').innerHTML=sel.kind==='stage'?`<label>Stage type <select id="stage-type"><option value="bay">Bay</option><option value="booster">Booster</option></select></label><br>${isBooster(sel)?`Upper stage: a vacuum engine and a tank with the same propellants. It lights when the stage below runs dry and drops once empty; it needs a thrust-to-weight of ${UPPER_TWR().toFixed(1)} at ignition to keep climbing.`:'One equipment module per bay.'}`:sel.kind==='booster'?'Stage 1 engine and tank, with real data for each part; both must use the same propellants. Fins (optional) steady the ascent through Max-Q.':`${state.rocket.cabin.length}/${CABIN_SLOTS()} cabin slots filled. Three modules per specialist.`;
-    if(sel.kind==='stage'){const control=$('#stage-type');control.value=state.rocket.stages[sel.index].type||'bay';control.addEventListener('change',()=>{state.rocket.stages[sel.index].type=control.value;state.tab=control.value==='booster'?'engine':'power';renderPlanner();});}
+    if(sel.kind==='stage'){const control=$('#stage-type');control.value=state.rocket.stages[sel.index].type||'bay';control.addEventListener('change',()=>{state.tab=control.value==='booster'?'engine':'power';plan('stageType',sel.index,control.value);});}
     const inst=installedIn(sel),current=isBooster(sel)?(sel.kind==='booster'?state.rocket.booster:state.rocket.stages[sel.index])[state.tab]:sel.kind==='stage'?inst[0]:null;
     $('#parts-list').innerHTML=partsFor(sel,state.tab).map(id=>{const p=part(id),on=inst.includes(id);
       return `<article class="part ${on?'equipped':''}"><div class="part-head"><div class="part-thumb" data-part-thumb="${id}">${partThumbFallback(id,p)}</div><div class="part-body"><div class="part-top"><span class="part-name">${p.name}</span><span class="part-slot">Tier ${p.tier}</span></div><p>${(p.role||'').replace(/`/g,'')}</p></div></div><div class="part-metrics">${partMetrics(id).map(x=>`<span>${x}</span>`).join('')}</div><button type="button" data-part="${id}">${on?'REMOVE':current?'SWAP':'INSTALL'}</button></article>`;}).join('');
     $$('#parts-list [data-part]').forEach(b=>b.addEventListener('click',()=>togglePart(b.dataset.part)));
     window.dispatchEvent(new Event('astro:catalog'));
   }
-  function renderPlanner(){renderTelemetry();renderRocket();renderCatalog();}
+  function renderPlanner(){renderTelemetry();renderRocket();renderCatalog();syncSetup();}
   function selectModule(key,tab){state.sel=parseKey(key);const r=state.rocket;state.tab=tab||(state.sel.kind==='booster'?(r.booster.engine&&!r.booster.tank?'tank':'engine'):state.sel.kind==='cabin'?'helena':'power');window.dispatchEvent(new CustomEvent('astro:focus-module',{detail:key}));renderPlanner();}
-  function addStage(index){const r=state.rocket;if(r.stages.length>=MAX_STAGES())return;r.stages.splice(index,0,{item:null});toast(`Stage ${index+2} added.`);selectModule(`stage-${index}`);}
-  function removeStage(index){state.rocket.stages.splice(index,1);toast('Stage removed.');state.sel=parseKey(index>0?`stage-${index-1}`:'booster');state.tab=isBooster(state.sel)?'engine':'power';window.dispatchEvent(new CustomEvent('astro:stage-removed',{detail:moduleKey(state.sel)}));renderPlanner();}
-  function togglePart(id){
-    const r=state.rocket,sel=state.sel;
-    if(isBooster(sel)){const k=state.tab,target=sel.kind==='booster'?r.booster:r.stages[sel.index];target[k]=target[k]===id?null:id;}
-    else if(sel.kind==='stage'){const s=r.stages[sel.index];s.item=s.item===id?null:id;}
-    else{const i=r.cabin.indexOf(id);if(i>=0)r.cabin.splice(i,1);else if(r.cabin.length>=CABIN_SLOTS()){toast(`The cabin is full: ${CABIN_SLOTS()} modules at most.`);return;}else r.cabin.push(id);}
-    renderPlanner();
+  // Rocket changes (the shared planner): each one is an action the host applies (plan → ROCKET_ACTIONS) and then
+  // sends to the room; a guest sends it to the host instead. The selection and the tab stay on each screen, so the
+  // part actions carry the module they apply to. An action returns an error text for the one who did it.
+  const ROCKET_ACTIONS = {
+    addStage(index){const r=state.rocket;if(r.stages.length>=MAX_STAGES()||!(index>=0&&index<=r.stages.length))return 'No room for another stage.';r.stages.splice(index,0,{item:null});},
+    removeStage(index){const r=state.rocket;if(!(index>=0&&index<r.stages.length))return 'That stage is gone.';r.stages.splice(index,1);},
+    stageType(index,type){const s=state.rocket.stages[index];if(!s||!['bay','booster'].includes(type))return 'That stage is gone.';s.type=type;},
+    togglePart(id,sel,tab){
+      const r=state.rocket;if(!part(id))return 'Unknown part.';
+      if(!['booster','stage','cabin'].includes(sel?.kind))return 'Unknown module.';
+      if(sel.kind==='stage'&&!r.stages[sel.index])return 'That stage is gone.';
+      if(isBooster(sel)){if(!['engine','tank','fins'].includes(tab))return 'Unknown slot.';const target=sel.kind==='booster'?r.booster:r.stages[sel.index];target[tab]=target[tab]===id?null:id;}
+      else if(sel.kind==='stage'){const s=r.stages[sel.index];s.item=s.item===id?null:id;}
+      else{const i=r.cabin.indexOf(id);if(i>=0)r.cabin.splice(i,1);else if(r.cabin.length>=CABIN_SLOTS())return `The cabin is full: ${CABIN_SLOTS()} modules at most.`;else r.cabin.push(id);}
+    },
+  };
+  function plan(name,...args){
+    if(net.isGuest){
+      if(name==='togglePart'){const [id,sel]=args;if(sel.kind==='cabin'&&!state.rocket.cabin.includes(id)&&state.rocket.cabin.length>=CABIN_SLOTS()){toast(`The cabin is full: ${CABIN_SLOTS()} modules at most.`);return false;}}
+      net.act('rocket',name,...args);return true;
+    }
+    const error=ROCKET_ACTIONS[name](...args);
+    if(error){toast(error);return false;}
+    fitSelection();renderPlanner();return true;
   }
+  // After someone else's change, a selected stage that no longer exists falls back to the booster.
+  function fitSelection(){if(state.sel.kind==='stage'&&!state.rocket.stages[state.sel.index]){state.sel={kind:'booster'};state.tab='engine';}}
+  function addStage(index){if(plan('addStage',index)){toast(`Stage ${index+2} added.`);if(!net.isGuest)selectModule(`stage-${index}`);}}
+  function removeStage(index){if(!plan('removeStage',index))return;toast('Stage removed.');if(net.isGuest)return;state.sel=parseKey(index>0?`stage-${index-1}`:'booster');state.tab=isBooster(state.sel)?'engine':'power';window.dispatchEvent(new CustomEvent('astro:stage-removed',{detail:moduleKey(state.sel)}));renderPlanner();}
+  function togglePart(id){plan('togglePart',id,{...state.sel},state.tab);}
   function showLaunch(){
     const m=metrics(),lift=liftoffOf(m),abort=lift.ok?abortOf(m):null,warnings=[];
     if(!lift.ok)warnings.push(`${lift.status[0].toUpperCase()+lift.status.slice(1).toLowerCase()}: the mission ends on the pad`);
@@ -335,7 +390,7 @@
     if(m.orbit&&!m.marsOk)warnings.push(`Mars out of reach even after refueling (${number(m.marsDv)} of ${number(m.transfer)} m/s): the crew returns to Earth`);
     $('#launch-title').textContent=!lift.ok?'This rocket will not leave the pad':abort?(abort.reason==='no-orbit'?'This rocket will not reach orbit':'This rocket cannot reach Mars'):warnings.length?'Review the mission risks':'Mission ready to launch';
     $('#launch-message').textContent=!lift.ok?`${lift.detail} Launching now ends the mission on the pad.`:abort?`${abort.warn} The mission fails.`:warnings.length&&!LV().failures?'Easy: these are warnings only. The mission flies anyway.':warnings.length?'These choices will have consequences at launch or on arrival. Revise the design or launch with risks.':'The crew is ready for liftoff, orbital checklist, Mars landing, and surface operations.';
-    $('#launch-summary').innerHTML=[['Crew',`${state.friends.size+1} player${state.friends.size?'s':''} · ${3-state.friends.size} AI`],['Site',SITES_INFO[state.site].name],['Difficulty',{easy:'EASY',normal:'NORMAL',hard:'HARD'}[state.difficulty]],['Stages',`${state.rocket.stages.length+2}`],['Budget remaining',money(m.budget-m.cost)],['Liftoff mass',tonnes(m.mass)],['Thrust-to-weight',m.ready?`${m.twr.toLocaleString('en-US',{maximumFractionDigits:2})} · ${lift.ok?`${lift.seconds} s ascent`:'no liftoff'}`:'— · no ignition'],['Δv to orbit',m.ready?`${number(m.dv)} / ${number(m.leo)} m/s`:'—'],['Mars transfer',m.orbit?`${number(m.marsDv)} / ${number(m.transfer)} m/s`:'—'],['Orbital refuel',m.marsOk?(m.refuelKg>0?`${Math.ceil(m.refuelPct)}% · ${tonnes(m.refuelKg)}`:'Not needed'):'—'],['Power',`${number(m.gen)} / ${number(m.draw)} W`],['Risks',warnings.length?warnings.join('; '):'All clear']].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');
+    $('#launch-summary').innerHTML=[['Crew',`${playerCount()} player${playerCount()>1?'s':''} · ${crew.length-playerCount()} AI`],['Site',SITES_INFO[state.site].name],['Difficulty',{easy:'EASY',normal:'NORMAL',hard:'HARD'}[state.difficulty]],['Stages',`${state.rocket.stages.length+2}`],['Budget remaining',money(m.budget-m.cost)],['Liftoff mass',tonnes(m.mass)],['Thrust-to-weight',m.ready?`${m.twr.toLocaleString('en-US',{maximumFractionDigits:2})} · ${lift.ok?`${lift.seconds} s ascent`:'no liftoff'}`:'— · no ignition'],['Δv to orbit',m.ready?`${number(m.dv)} / ${number(m.leo)} m/s`:'—'],['Mars transfer',m.orbit?`${number(m.marsDv)} / ${number(m.transfer)} m/s`:'—'],['Orbital refuel',m.marsOk?(m.refuelKg>0?`${Math.ceil(m.refuelPct)}% · ${tonnes(m.refuelKg)}`:'Not needed'):'—'],['Power',`${number(m.gen)} / ${number(m.draw)} W`],['Risks',warnings.length?warnings.join('; '):'All clear']].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');
     $('#launch-confirm').textContent=!lift.ok||abort?'Launch anyway →':warnings.length&&!LV().failures?'Launch with warnings →':warnings.length?'Launch with risks →':'Launch mission →';
     $('#launch-dialog').showModal();
   }
@@ -359,8 +414,9 @@
     const next=$('#objective-next');next.disabled=!open;next.textContent=open?'Plan this mission →':'Unavailable';
     window.dispatchEvent(new CustomEvent('astro:world',{detail:w}));
   }
-  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>selectWorld(button.dataset.world)));
-  $$('[data-site]').forEach(button=>button.addEventListener('click',()=>{state.site=button.dataset.site;state.detail={kind:'site',id:state.site};renderLobby();}));
+  // The destination, the landing site and the difficulty are host controls; a guest only looks at the site details.
+  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>{if(net.isGuest)return;selectWorld(button.dataset.world);syncSetup();}));
+  $$('[data-site]').forEach(button=>button.addEventListener('click',()=>{if(!net.isGuest)state.site=button.dataset.site;state.detail={kind:'site',id:button.dataset.site};renderLobby();}));
   $('#play-button').addEventListener('click',()=>{const go=()=>showScreen('orbit');window.ASTRO_LAUNCH?window.ASTRO_LAUNCH().then(go):go();});
   $('#lobby-back').addEventListener('click',()=>showScreen('orbit'));
   $('#to-assembly').addEventListener('click',()=>showScreen('planner'));
@@ -368,7 +424,8 @@
   $('#quit-button').addEventListener('click',()=>$('#quit-dialog').showModal());
   $('#quit-cancel').addEventListener('click',()=>$('#quit-dialog').close());
   $('#quit-confirm').addEventListener('click',()=>$('#quit-dialog').close());
-  $$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));renderBadge();renderTelemetry();}));
+  const setDifficulty=level=>{state.difficulty=level;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item.dataset.difficulty===level)));renderBadge();renderTelemetry();};
+  $$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{if(net.isGuest)return;setDifficulty(button.dataset.difficulty);syncSetup();}));
   $('#launch-button').addEventListener('click',showLaunch);
   $('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());
   // Launch: the pad and the countdown (web/launch.js), then the cockpit in the pilot's view. The pad already
@@ -1541,6 +1598,68 @@
   $$('#difficulty-buttons button').forEach(b=>{b.title=difficulty[b.dataset.difficulty].about;});
   window.ASTRO_ART={RAMPS,PLANETS};
   window.ASTRO={state,crew,sites:SITES_INFO,toast,show:showScreen,showScreen,land:()=>SIM.startSurface(),data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL};
-  paintArt();renderLobby();renderBadge();renderPlanner();setupStars();
+  // ---- Multiplayer: lobby, screens and the shared planner (docs/multiplayer.md, items 1–4) ----------------------
+  // The host sends the mission setup (state 'setup') whenever it changes; guests copy it. Only what everyone must
+  // agree on travels: the selection, the tab and the open details stay on each screen.
+  const GUEST_SCREENS = ['menu','orbit','lobby','planner']; // screens a guest can show today; the flight comes next
+  let lastSetup='';
+  function syncSetup(){
+    if(!net.isHost)return;
+    const setup={world:state.world,site:state.site,difficulty:state.difficulty,rocket:state.rocket},text=JSON.stringify(setup);
+    if(text===lastSetup)return;
+    lastSetup=text;net.setState('setup',setup);
+  }
+  // Guests copy the host's setup. A host that reloaded the page gets its own setup back from the room (force).
+  function applySetup(s,force){
+    if(!s||!(net.isGuest||force))return;
+    if(WORLD_NAMES[s.world]&&s.world!==state.world)selectWorld(s.world);
+    if(SITES_INFO[s.site])state.site=s.site;
+    if(difficulty[s.difficulty]&&s.difficulty!==state.difficulty)setDifficulty(s.difficulty);
+    if(s.rocket?.booster&&Array.isArray(s.rocket.stages)&&Array.isArray(s.rocket.cabin))state.rocket=s.rocket;
+    fitSelection();renderLobby();renderPlanner();lockGuest();
+  }
+  // A guest follows the host's screen. The buttons that change screens or launch stay off, saying who decides.
+  const HOST_BUTTONS=['#orbit-back','#objective-next','#lobby-back','#to-assembly','#planner-back','#launch-button'];
+  function lockGuest(){
+    const guest=net.isGuest;let unlocked=false;
+    HOST_BUTTONS.forEach(sel=>{const b=$(sel);if(!b)return;
+      if(guest){if(b.dataset.label==null)b.dataset.label=b.innerHTML;b.disabled=true;b.textContent='Waiting for host';}
+      else if(b.dataset.label!=null){b.innerHTML=b.dataset.label;b.disabled=false;delete b.dataset.label;unlocked=true;}});
+    if(unlocked)selectWorld(state.world); // the objective button depends on the destination
+    $$('#difficulty-buttons button,[data-world]').forEach(b=>b.toggleAttribute('aria-disabled',guest));
+    document.body.classList.toggle('is-guest',guest);
+  }
+  function guestScreen(phase){
+    if(!net.isGuest||!phase||phase===state.screen)return;
+    if(GUEST_SCREENS.includes(phase)){showScreen(phase);return;}
+    toast('The host launched the mission. Multiplayer flight is not wired in yet: follow it on the host screen.');
+  }
+  net.on('welcome',m=>{
+    lastSetup='';
+    if(net.isGuest){applySetup(net.cached.setup);guestScreen(net.phase);if(m.t!=='resumed')toast(`You joined room ${net.code}.`);}
+    else if(m.t==='resumed'){applySetup(net.cached.setup,true);if(GUEST_SCREENS.includes(net.phase)&&net.phase!==state.screen)showScreen(net.phase);else net.setPhase(state.screen);}
+    else{net.setPhase(state.screen);syncSetup();}
+    lockGuest();renderLobby();
+  });
+  net.on('peers',()=>{renderLobby();if(state.detail.kind==='crew')renderDetail();});
+  net.on('phase',guestScreen);
+  net.on('state',(key,data)=>{if(key==='setup')applySetup(data);});
+  net.on('status',()=>renderRoom());
+  net.on('closed',reason=>{lastSetup='';lockGuest();renderLobby();if(reason!=='left')toast(net.message(reason));});
+  net.on('error',err=>toast(net.message(err)));
+  // Host: a guest's planner action, checked against the list of rocket actions (the server stamps who sent it).
+  net.on('act',(data,from)=>{
+    if(!net.isHost||!data||data.name!=='rocket')return;
+    const [name,...args]=Array.isArray(data.args)?data.args:[];
+    if(!Object.hasOwn(ROCKET_ACTIONS,name))return;
+    if(!['lobby','planner'].includes(state.screen))return; // the rocket is frozen once launched
+    let error;
+    try{error=ROCKET_ACTIONS[name](...args);}catch{error='That change did not apply.';}
+    if(error){net.send({k:'toast',text:error},from.id);return;}
+    fitSelection();renderPlanner();
+  });
+  net.on('msg',data=>{if(data?.k==='toast'&&typeof data.text==='string')toast(data.text);});
+
+  paintArt();renderLobby();renderBadge();renderPlanner();setupStars();lockGuest();net.start();
   if(!DATA)fetch('assets/models/parts/manifest.json').then(r=>r.json()).then(m=>{useData(m);renderBadge();renderPlanner();}).catch(()=>toast('Could not load the part specs.'));
 })();

@@ -62,7 +62,7 @@ multiplayer/            servidor de salas (Node + ws, Cloud Run), cliente RoomCl
 | Assets | `assets/` (models, audio, terrain), saída dos geradores offline | Um só lugar para o jogo, o visualizador e os pacotes da página |
 | Linguagem (código do jogo MVP) | **HTML / CSS / JS (ES modules CDN)** sem etapa de build | Edição imediata, zero dependências de runtime além do Three.js 0.186.1 |
 | Godot | Não é mais usado (removido em 2026-11) | O MVP é só web |
-| Multiplayer | Servidor de salas em `multiplayer/` (WebSocket, Cloud Run) que só repassa mensagens; o host (Helena) roda as regras. Integração do cliente: [docs/multiplayer.md](docs/multiplayer.md) | O fluxo e o game loop atuais seguem no navegador; vaga sem jogador fica com a IA |
+| Multiplayer | Servidor de salas em `multiplayer/` (WebSocket, Cloud Run) que só repassa mensagens; o host (Helena) roda as regras. No jogo, `web/net.js` (`window.ASTRO_NET`); plano e estado da integração: [docs/multiplayer.md](docs/multiplayer.md) | O fluxo e o game loop atuais seguem no navegador; vaga sem jogador fica com a IA |
 | Ferramentas | Node ≥ 20; `three` fixado em **0.186.1** (mesma versão nos import maps do visualizador e do `index.html`) | Builds reprodutíveis |
 
 ---

@@ -1,6 +1,6 @@
 # Multiplayer
 
-Partida cooperativa online de 1 a 4 jogadores. O **servidor de salas** já está pronto em [multiplayer/](../multiplayer/README.md) (protocolo, testes e deploy no Cloud Run). Este documento é o **plano do que muda no cliente** (`index.html` e `web/`) para ligar o jogo a ele. Nada daqui foi implementado ainda.
+Partida cooperativa online de 1 a 4 jogadores. O **servidor de salas** já está pronto em [multiplayer/](../multiplayer/README.md) (protocolo, testes e deploy no Cloud Run). Este documento é o **plano do que muda no cliente** (`index.html` e `web/`) para ligar o jogo a ele. Os itens marcados com ✅ já estão no jogo; os outros ainda são plano.
 
 ## Princípios
 
@@ -15,9 +15,9 @@ Partida cooperativa online de 1 a 4 jogadores. O **servidor de salas** já está
 
 | Tela (`state.screen`) | Hoje | No multiplayer |
 |---|---|---|
-| `menu`, `orbit` | `selectWorld` local | O host anda pelas telas e manda `phase`. O destino vai em `state lobby` |
-| `lobby` | Vagas falsas (`state.friends`), `site`, `difficulty` | Vagas reais (`peers`). `site` e `difficulty` vão em `state lobby`; convidados mudam via `act` |
-| `planner` | `togglePart`, `addStage`, `removeStage` mudam `state.rocket` | Convidado manda `act`; o host aplica e manda `state planner` |
+| `menu`, `orbit` | `selectWorld` local | O host anda pelas telas e manda `phase`. O destino vai em `state setup` |
+| `lobby` | Vagas falsas (`state.friends`), `site`, `difficulty` | Vagas reais (`peers`). `site` e `difficulty` são do host e vão em `state setup` |
+| `planner` | `togglePart`, `addStage`, `removeStage` mudam `state.rocket` | Convidado manda `act`; o host aplica e manda `state setup` |
 | `cockpit` | `startFlight` + `flightTick`; ações em `handleCockpitAction` | O host roda o voo e manda `state flight` (~10 Hz); as ações dos convidados chegam por `act` |
 | `surface` | `surfaceTick` (timer) + `step()` em `views.js`; a IA move os colegas | O host manda `state surface` (locais, timer, feitos, quem controla quem, ~2 Hz) e roda a IA; cada um manda `pose` (~10 Hz) dos astronautas que controla |
 | `results` | `showResults` | O host manda `event results`; cada cliente roda o mesmo `showResults` |
@@ -26,49 +26,40 @@ Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só vol
 
 ## O que muda, por arquivo
 
-### 1. Carregar o cliente: `index.html` e `web/net.js` (novo)
-- O `index.html` passa a carregar `multiplayer/client/room-client.js` e depois `web/net.js`, os dois **antes** de `web/app.js`. São scripts clássicos e funcionam em `file://`.
+### 1. Carregar o cliente: `index.html` e `web/net.js` ✅
+- O `index.html` carrega `multiplayer/client/room-client.js` e depois `web/net.js`, os dois **antes** de `web/app.js`. São scripts clássicos e funcionam em `file://`.
 - O `web/net.js` liga o `RoomClient` ao jogo e expõe `window.ASTRO_NET`:
-  - `mode`: `'solo'`, `'host'` ou `'guest'`;
-  - `seat`, `isHost`, `peers`;
-  - `act(name, ...args)`;
-  - `owns(seat)`: a vaga é minha, ou é da IA e eu sou o host.
-- A URL do servidor fica numa constante nomeada (`NET_SERVER = 'wss://…run.app/ws'`). Pode ser trocada com `?server=`, e em `localhost` aponta para `ws://localhost:8787/ws`.
-- Ao abrir a página:
-  - com sessão salva, `room.rejoin()`;
-  - com `?room=CODE`, `room.join(code)`;
-  - sem nenhum dos dois, solo.
+  - `mode` (`'solo'`, `'host'` ou `'guest'`), `isHost`, `isGuest`, `seat`, `peers`, `code` e `link`;
+  - `act(name, ...args)`, `setPhase`, `setState`, `emit`, `pose`, `send` e `setSeat`; cada um só envia no papel certo (host ou convidado);
+  - `owns(seat)`: a vaga é minha, ou é da IA e eu sou o host;
+  - `on(tipo, fn)` repassa os eventos da sala para o jogo.
+- **Servidor:** a constante `NET_SERVER` fica vazia até o deploy. Páginas abertas do disco ou em `localhost` usam `ws://localhost:8787/ws`, e qualquer página aceita `?server=`. Sem servidor, "Create room" fica desativado ou mostra um toast, e o jogo continua no solo.
+- **Ao abrir a página:** com sessão salva, volta para a sala (`rejoin`); com `?room=CODE`, entra nela; sem nenhum dos dois, fica no solo.
 
-### 2. Lobby: `web/app.js` (`renderLobby`, `renderDetail`)
-- **Host:** o botão "Invite player" vira "Create room". Ele mostra o código e o link (`RoomClient.linkFor(code)`) com um botão de copiar.
-- **Convidado:** um campo "Join" (código) ou o link.
-- O status de cada card vem de `peers`, não mais de `state.friends`:
-  - `HOST (PLAYER)` para o host;
-  - `PLAYER` para uma vaga ocupada (o card marca se é você);
-  - `AI (NPC)` para uma vaga livre.
-- `#crew-count` conta quem está online.
-- No convidado, clicar numa vaga livre chama `room.setSeat(seat)`.
+### 2. Lobby: `web/app.js` (`renderLobby`, `renderRoom`) ✅
+- **Painel da sala**, embaixo da tripulação:
+  - no solo: "Create room", ou um código e "Join";
+  - na sala: o código, "Copy invite link" e "Leave".
+- O status de cada card vem de `peers` (`seatStatus`): `HOST`, `PLAYER`, `(OFFLINE)` e `· YOU`, ou `AI (NPC)` numa vaga livre. `#crew-count` conta quem está online.
+- **Convidado:** cada vaga livre ganha o botão "Take seat" (`room.setSeat`) enquanto a sala está numa fase de entrada.
+- **Destino, local de pouso e dificuldade são controles do host.** A tela já dizia "Host control". O convidado vê os botões desativados e pode abrir os detalhes de cada local.
 - O resumo do lançamento ("Crew: N players · M AI") usa `peers`.
 
-### 3. Telas: `showScreen`
-- **No host**, `showScreen(id)` também chama `room.setPhase(id)`.
+### 3. Telas: `showScreen` ✅
+- **No host**, `showScreen(id)` também chama `setPhase(id)`.
 - **No convidado:**
-  - a tela segue o `phase` recebido;
-  - os botões de avançar ou voltar (`#objective-next`, `#to-assembly`, `#launch-button`, `#launch-confirm`, `#play-button`) ficam desativados, com o texto "Waiting for host";
-  - entrar no cockpit e na superfície acontece quando o host avisa (ver 5 e 6).
+  - a tela segue o `phase` recebido (`guestScreen`), por enquanto até o `planner`;
+  - os botões que trocam de tela ou lançam (`#orbit-back`, `#objective-next`, `#lobby-back`, `#to-assembly`, `#planner-back`, `#launch-button`) ficam desativados, com o texto "Waiting for host";
+  - quando o host lança, o convidado vê um toast e espera; o cockpit e a superfície vêm nos itens 5 e 6.
+- **Host que recarrega a página** volta para a mesma sala, com a montagem e a tela guardadas no servidor.
 
-### 4. Planner: `web/app.js`
-- Criar `act(name, ...args)` e a tabela `ACTIONS`, que é a lista de ações permitidas: `world`, `site`, `difficulty`, `addStage`, `removeStage`, `togglePart`.
-  - No solo e no host, `act` aplica a mutação e manda `state planner`.
-  - No convidado, `act` manda `{name, args}` para o host.
-  - O host recebe o `act`, confere se o nome está na lista e aplica.
-- Os handlers de clique passam a chamar `act(...)` em vez das funções direto.
-- `togglePart(id)` hoje lê a seleção local (`state.sel`, `state.tab`). Ela passa a receber `togglePart(id, selKey, tab)`, e o convidado manda a seleção dele.
-- Criar `snapshot()` e `applySnapshot()`.
-  - Sincronizam: `site`, `difficulty`, `world` e `rocket`.
-  - Continuam locais: `sel`, `tab` e `detail`.
-  - Depois de aplicar, se o estágio selecionado sumiu, a seleção cai no booster.
-- Os toasts das mutações (como "Stage removed.") vão para todos via `event`.
+### 4. Planner e montagem compartilhados: `web/app.js` ✅
+- **Estado `setup`:** o host manda `{world, site, difficulty, rocket}` sempre que algo muda (`syncSetup`), e o convidado copia (`applySetup`). Continuam locais em cada tela: `sel`, `tab` e `detail`.
+- **Ações do foguete (`ROCKET_ACTIONS`):** `addStage(index)`, `removeStage(index)`, `stageType(index, tipo)` e `togglePart(id, sel, tab)`. Cada uma confere os argumentos e devolve um texto de erro quando não se aplica.
+  - `plan(nome, ...args)`: no solo e no host, aplica e redesenha; no convidado, manda `act('rocket', nome, ...args)`.
+  - O host só aceita nomes da tabela, e só no lobby e no planner. Um erro volta só para quem enviou, como toast (`send`).
+  - `togglePart` leva o módulo e a aba de quem clicou, porque a seleção é de cada um.
+- Depois de uma mudança de outro jogador, se o estágio selecionado sumiu, a seleção cai no booster (`fitSelection`).
 
 ### 5. Cockpit: `web/app.js` e `web/flight.js`
 - **Entrada:** o host roda `startFlight()` e manda `state flight`. Ao ver `phase = 'cockpit'`, o convidado mostra a tela e desenha a partir do estado. Para isso, `startFlight` e `renderFlightUI` passam a ser exportados em `ASTRO_SIM`.
