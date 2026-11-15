@@ -48,6 +48,7 @@ export function createAvatar({ id, accent, visor = 'Visor' }) {
   const pivots = {};
   const restQuaternions = {};
   const parts = {};
+  const props = new Map();
   for (const joint of RIG) {
     const node = new THREE.Group();
     node.name = joint.name;
@@ -69,20 +70,39 @@ export function createAvatar({ id, accent, visor = 'Visor' }) {
     restPositions: Object.fromEntries(RIG.map((j) => [j.name, new THREE.Vector3(...j.pos)])),
     fx: [],
     part: (pivot) => parts[pivot],
+    /** Temporary prop group (`Prop_*`), attached to `root` or a rig pivot. */
+    prop(parentName, propName) {
+      const parent = parentName === 'root' ? root : pivots[parentName];
+      if (!parent) throw new Error(`Unknown prop parent "${parentName}"`);
+      if (!propName) throw new Error('Prop name must be a non-empty string');
+      const key = propName.startsWith('Prop_') ? propName : `Prop_${propName}`;
+      if (!props.has(key)) {
+        const group = new THREE.Group();
+        group.name = key;
+        parent.add(group);
+        props.set(key, { group, parentName, partSet: new PartSet(materials) });
+      } else if (props.get(key).parentName !== parentName) {
+        throw new Error(`Prop "${key}" is already attached to "${props.get(key).parentName}"`);
+      }
+      return props.get(key).partSet;
+    },
     /** Empty node used as a particle emitter in the viewer and in the game. Emits along its local +Y. */
     anchor(name, pivot, { p = [0, 0, 0], r = [0, 0, 0] } = {}, fx = null) {
       if (!name.startsWith('FX_')) throw new Error(`FX anchors must start with "FX_": ${name}`);
+      const parent = pivot === 'root' ? root : pivots[pivot];
+      if (!parent) throw new Error(`Unknown anchor parent "${pivot}"`);
       const node = new THREE.Object3D();
       node.name = name;
       node.position.set(...p);
       node.rotation.set(r[0] * DEG, r[1] * DEG, r[2] * DEG);
       if (fx) node.userData = { fx: fx.preset };
-      pivots[pivot].add(node);
+      parent.add(node);
       if (fx) avatar.fx.push({ anchor: name, ...fx });
       return node;
     },
     finish() {
       for (const name of PIVOT_NAMES) parts[name].attachTo(pivots[name], name);
+      for (const [key, { group, partSet }] of props) partSet.attachTo(group, key);
       return root;
     },
   };

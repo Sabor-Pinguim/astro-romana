@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T12:27:23.294Z",
+  "generatedAt": "2026-11-15T16:08:37.458Z",
   "generator": "tools/modeling/build-avatars.mjs",
   "conventions": {
     "units": "meters",
@@ -320,7 +320,7 @@
       "role": "Comandante e Piloto",
       "accent": "#D7263D",
       "file": "characters/helena.glb",
-      "summary": "Faixa central vermelha no capacete, listras no arnês do peito, duplas faixas horizontais nas coxas, visor dourado e propulsor SAFER nas costas.",
+      "summary": "Faixa central vermelha no capacete, listras no arnês do peito, duplas faixas horizontais nas coxas, visor dourado, propulsor SAFER nas costas e kit de manutenção com chave de fenda.",
       "equipment": [
         {
           "item": "Faixa vermelha central no capacete, no arnês e duplas faixas nas coxas",
@@ -341,91 +341,17 @@
         {
           "item": "Checklist no pulso esquerdo",
           "basis": "Cuff checklist usado em caminhadas espaciais"
+        },
+        {
+          "item": "Chave de fenda EVA e painel de manutenção da nave (ação)",
+          "basis": "Ferramenta manual de reparo e caixa de junção usadas em manutenção de espaçonaves e EVAs"
         }
       ],
       "animations": {
         "idle_loop": "Parada, respirando",
         "walk_loop": "Caminhada em baixa gravidade",
         "wave": "Aceno",
-        "action_loop": "Pairando com o propulsor (partículas nos bocais)"
-      },
-      "fx": [
-        {
-          "anchor": "FX_Thruster_L",
-          "preset": "thrust",
-          "clips": [
-            "action_loop"
-          ]
-        },
-        {
-          "anchor": "FX_Thruster_R",
-          "preset": "thrust",
-          "clips": [
-            "action_loop"
-          ]
-        },
-        {
-          "anchor": "FX_Foot_L",
-          "preset": "footdust",
-          "clips": [
-            "walk_loop"
-          ]
-        },
-        {
-          "anchor": "FX_Foot_R",
-          "preset": "footdust",
-          "clips": [
-            "walk_loop"
-          ]
-        }
-      ],
-      "budget": {
-        "triangles": 3000
-      },
-      "stats": {
-        "triangles": 2740,
-        "meshes": 44,
-        "bytes": 263148
-      }
-    },
-    {
-      "id": "lucas",
-      "name": "Lucas",
-      "role": "Engenheiro de Sistemas",
-      "accent": "#F2A900",
-      "file": "characters/lucas.glb",
-      "summary": "Duas listras paralelas âmbar no capacete, joelheiras e biqueiras reforçadas, faixas duplas nas canelas e faixa no antebraço, painel ROSA e furadeira.",
-      "equipment": [
-        {
-          "item": "Duas listras paralelas no capacete, faixas duplas nas canelas e faixa no antebraço",
-          "basis": "Marcações âmbar de alta visibilidade para identificação do engenheiro"
-        },
-        {
-          "item": "Painel solar enrolado sobre a mochila",
-          "basis": "ROSA, painel solar que se desenrola, testado na ISS"
-        },
-        {
-          "item": "Módulo de bateria com LEDs de carga",
-          "basis": "Baterias que cobrem picos de consumo (Perseverance)"
-        },
-        {
-          "item": "Furadeira de mão",
-          "basis": "Pistol Grip Tool, ferramenta motorizada das caminhadas espaciais na ISS"
-        },
-        {
-          "item": "Cinto com bolsas de ferramentas",
-          "basis": "Ferramentas presas ao traje por cabos e bolsas nas EVAs"
-        },
-        {
-          "item": "Joelheiras e biqueiras âmbar",
-          "basis": "Reforço de abrasão (estilizado)"
-        }
-      ],
-      "animations": {
-        "idle_loop": "Parado, respirando",
-        "walk_loop": "Caminhada em baixa gravidade",
-        "wave": "Aceno",
-        "action_loop": "Consertando com a furadeira (faíscas na ponta)"
+        "action_loop": "Usa a chave de fenda para ajustar um painel de manutenção da nave"
       },
       "fx": [
         {
@@ -454,9 +380,73 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2956,
+        "triangles": 2952,
         "meshes": 49,
-        "bytes": 283500
+        "bytes": 284924
+      }
+    },
+    {
+      "id": "lucas",
+      "name": "Lucas",
+      "role": "Engenheiro de Sistemas",
+      "accent": "#F2A900",
+      "file": "characters/lucas.glb",
+      "summary": "Duas listras paralelas âmbar no capacete, joelheiras e biqueiras reforçadas, faixas duplas nas canelas e faixa no antebraço, painel ROSA e computador portátil de campo.",
+      "equipment": [
+        {
+          "item": "Duas listras paralelas no capacete, faixas duplas nas canelas e faixa no antebraço",
+          "basis": "Marcações âmbar de alta visibilidade para identificação do engenheiro"
+        },
+        {
+          "item": "Painel solar enrolado sobre a mochila",
+          "basis": "ROSA, painel solar que se desenrola, testado na ISS"
+        },
+        {
+          "item": "Módulo de bateria com LEDs de carga",
+          "basis": "Baterias que cobrem picos de consumo (Perseverance)"
+        },
+        {
+          "item": "Computador portátil rugerizado de campo (EVA)",
+          "basis": "Laptops de operação e diagnóstico usados em EVAs / estação espacial"
+        },
+        {
+          "item": "Cinto com bolsas de ferramentas",
+          "basis": "Ferramentas presas ao traje por cabos e bolsas nas EVAs"
+        },
+        {
+          "item": "Joelheiras e biqueiras âmbar",
+          "basis": "Reforço de abrasão (estilizado)"
+        }
+      ],
+      "animations": {
+        "idle_loop": "Parado, respirando",
+        "walk_loop": "Caminhada em baixa gravidade",
+        "wave": "Aceno",
+        "action_loop": "Segura o computador portátil de campo e digita comandos de diagnóstico"
+      },
+      "fx": [
+        {
+          "anchor": "FX_Foot_L",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        },
+        {
+          "anchor": "FX_Foot_R",
+          "preset": "footdust",
+          "clips": [
+            "walk_loop"
+          ]
+        }
+      ],
+      "budget": {
+        "triangles": 3000
+      },
+      "stats": {
+        "triangles": 2936,
+        "meshes": 50,
+        "bytes": 284180
       }
     },
     {
@@ -465,7 +455,7 @@
       "role": "Especialista de Dados e Telecom",
       "accent": "#1FA2FF",
       "file": "characters/oscar.glb",
-      "summary": "Faixa azul frontal na aba do capacete, ombreiras e bandas triplas de telemetria nos braços, antenas na mochila e tablet no pulso.",
+      "summary": "Faixa azul frontal na aba do capacete, ombreiras e bandas triplas de telemetria nos braços, antenas na mochila, tablet no pulso e antena portátil de solo.",
       "equipment": [
         {
           "item": "Listra frontal no capacete, ombreiras azuis, bandas triplas nos braços e faixa alta nas coxas",
@@ -486,13 +476,17 @@
         {
           "item": "Câmera extra no capacete",
           "basis": "Câmera HD do conjunto de luzes e câmeras do capacete (EHIP) na ISS"
+        },
+        {
+          "item": "Antena parabólica portátil de solo com tripé (ação)",
+          "basis": "Terminais portáteis de solo e antenas de alto ganho usadas para enlace orbital"
         }
       ],
       "animations": {
         "idle_loop": "Parado, respirando",
         "walk_loop": "Caminhada em baixa gravidade",
         "wave": "Aceno",
-        "action_loop": "Transmitindo pelo tablet (pulsos na antena)"
+        "action_loop": "Agacha para alinhar uma antena portátil de solo"
       },
       "fx": [
         {
@@ -521,9 +515,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2876,
-        "meshes": 47,
-        "bytes": 269820
+        "triangles": 2972,
+        "meshes": 50,
+        "bytes": 285504
       }
     },
     {
@@ -588,9 +582,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2800,
-        "meshes": 48,
-        "bytes": 271672
+        "triangles": 2892,
+        "meshes": 50,
+        "bytes": 279812
       }
     }
   ],

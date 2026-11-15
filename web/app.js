@@ -25,7 +25,8 @@
   const useData = manifest => { DATA = {rules:manifest.missionRules,parts:Object.fromEntries(manifest.parts.map(p=>[p.id,p]))}; };
   if (window.ASTRO_FILES?.['parts/manifest.json']) useData(window.ASTRO_FILES['parts/manifest.json']);
   const rule = (key,fallback) => DATA?.rules?.[key] ?? fallback;
-  const MAX_STAGES = () => rule('maxInternalStages',7), CABIN_SLOTS = () => rule('cabinModuleSlots',4), TWR_MIN = () => rule('minSafeLiftoffTwr',1.2);
+  const MAX_STAGES = () => rule('maxInternalStages',7), CABIN_SLOTS = () => rule('cabinModuleSlots',4), TWR_MIN = () => rule('minSafeLiftoffTwr',1.2), TWR_BARE = () => rule('minBareLiftoffTwr',1);
+  const stageName = key => key==='booster'?'stage 1':`stage ${+key.slice(6)+2}`;
   const budgetOf = level => rule('defaultBudgetM',250)*difficulty[level].factor;
   const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:{booster:{engine:null,fins:null,tank:null},stages:[{item:null},{item:null}],cabin:[]},sel:{kind:'booster'},tab:'engine'};
   const money = n => (n<0?'−$':'$')+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<10?1:0})+'M';
@@ -90,23 +91,64 @@
   // Planner: Main Booster (engine cluster + tank) → 0 to 7 middle stages (1 module each) → cabin (4 modules).
   const moduleKey = sel => sel.kind==='stage'?`stage-${sel.index}`:sel.kind;
   const parseKey = key => key.startsWith('stage-')?{kind:'stage',index:+key.slice(6)}:{kind:key};
-  function moduleLabel(key){
-    const r=state.rocket;
-    if(key==='booster'){const {engine:e,tank:t,fins:f}=r.booster;return ['Stage 1 · booster',(e&&t?`${shortName(e)} + ${shortName(t)}`:e?'tank missing':t?'engine missing':'engine + tank empty')+(f?' + fins':'')];}
-    if(key==='cabin')return ['Cabin',`${r.cabin.length}/${CABIN_SLOTS()} modules`];
-    const i=+key.slice(6),stage=r.stages[i],item=stage?.item;if(stage?.type==='booster')return [`Stage ${i+2} · booster`,stage.engine&&stage.tank?`${shortName(stage.engine)} + ${shortName(stage.tank)}`:stage.engine?'tank missing':stage.tank?'engine missing':'engine + tank empty'];return [`Stage ${i+2} · bay`,item?shortName(item):'empty bay'];
+  // [title, contents, status]; the status line (Δv of a propulsive stage or why it cannot fire) needs metrics().
+  function moduleLabel(key,m){
+    const r=state.rocket,st=m?.stack.find(s=>s.key===key);
+    const engineSub=s=>s.engine&&s.tank?`${shortName(s.engine)} + ${shortName(s.tank)}`:s.engine?'tank missing':s.tank?'engine missing':'engine + tank empty';
+    const status=!st?'':st.issue==='propellant'?'propellant mismatch':st.dv?`Δv ${number(st.dv)} m/s`:st.issue&&key!=='booster'?'dead weight':'';
+    if(key==='booster')return ['Stage 1 · booster',engineSub(r.booster)+(r.booster.fins?' + fins':''),status];
+    if(key==='cabin')return ['Cabin',`${r.cabin.length}/${CABIN_SLOTS()} modules`,''];
+    const i=+key.slice(6),stage=r.stages[i],item=stage?.item;if(stage?.type==='booster')return [`Stage ${i+2} · booster`,engineSub(stage),status];return [`Stage ${i+2} · bay`,item?shortName(item):'empty bay',''];
   }
-  // Totals: cost, mass and cruise power of every module; thrust, Isp and Δv (Tsiolkovsky) of the booster.
+  // An engine and a tank work together only when they hold the same propellants (specs: `propellants`).
+  const fuelOf = id => (spec(id).propellants||[]).join('/');
+  const sameFuel = (engine,tank) => [...(spec(engine).propellants||[])].sort().join('/')===[...(spec(tank).propellants||[])].sort().join('/');
+  // Totals: cost, mass and cruise power of every module, plus the staged Δv (references/parts/parts.md: Tsiolkovsky
+  // per stage, m0 = the stage and everything above it, fuelled).
+  // - Propulsive stages are the Main Booster and every middle stage set to "booster". They fire bottom-up; each
+  //   one drops its engines, tank, thrust section (and the fins, on stage 1) when its tank runs dry.
+  // - Stage 1 uses the Isp averaged between sea level and vacuum; upper stages use the vacuum Isp.
+  // - A stage with a missing part or mismatched propellants cannot fire: it rides along as dead weight.
+  // - Equipment bays and the cabin ride all the way to Mars.
+  // - Orbit: the stage burning when the running Δv reaches low Earth orbit refuels in orbit. Refilled, it and the
+  //   stages above must give the Mars transfer Δv; the refuel is the propellant it is missing for that.
   // Engine pumps draw power only during the ascent, so engines stay out of the cruise power balance.
   function metrics(){
-    const r=state.rocket,g0=rule('g0Ms2',9.80665);let cost=0,mass=0,draw=0,gen=0,thrust=0,isp=0,prop=0;
-    const add=s=>{if(!s)return;cost+=s.costM||0;mass+=s.massDryKg||0;if(s.powerW<0)draw-=s.powerW;else gen+=s.powerW||0;};
-    add(spec('booster-thrust-section'));r.stages.forEach(s=>{if(s.type==='booster'){add(spec('booster-thrust-section'));if(s.engine){const e=spec(s.engine),n=e.defaultClusterCount||1;cost+=n*e.costM;mass+=n*e.massDryKg;}if(s.tank){const t=spec(s.tank);cost+=t.costM;mass+=t.massDryKg+(t.propellantMassKg||0);}}else{add(spec('stage-module'));if(s.item)add(spec(s.item));}});add(rule('cabinHull'));r.cabin.forEach(id=>add(spec(id)));
-    if(r.booster.engine){const s=spec(r.booster.engine),n=s.defaultClusterCount||1;cost+=n*s.costM;mass+=n*s.massDryKg;thrust=n*(s.thrustSlKn||0)*1000;isp=s.ispSlS&&s.ispVacS?(s.ispSlS+s.ispVacS)/2:(s.ispSlS||s.ispVacS||0);}
-    if(r.booster.tank){const s=spec(r.booster.tank);cost+=s.costM;prop=s.propellantMassKg||0;mass+=s.massDryKg+prop;}
-    if(r.booster.fins)add(spec(r.booster.fins));
-    const ready=!!(r.booster.engine&&r.booster.tank);
-    return {cost,mass,draw,gen,thrust,isp,prop,ready,twr:mass?thrust/(mass*g0):0,dv:ready&&mass>prop?isp*g0*Math.log(mass/(mass-prop)):0,budget:budgetOf(state.difficulty),leo:rule('earthOrbitDeltaVMs',9400)};
+    const r=state.rocket,g0=rule('g0Ms2',9.80665),leo=rule('earthOrbitDeltaVMs',9400),transfer=rule('marsTransferDeltaVMs',4300);
+    let cost=0,draw=0,gen=0,payload=0;
+    const take=s=>{if(!s)return 0;cost+=s.costM||0;if(s.powerW<0)draw-=s.powerW;else gen+=s.powerW||0;return s.massDryKg||0;};
+    const engineStage=(key,m,first)=>{
+      const e=m.engine?spec(m.engine):null,t=m.tank?spec(m.tank):null,n=e?(e.defaultClusterCount||1):0;
+      let hw=take(spec('booster-thrust-section'));
+      if(e){cost+=n*(e.costM||0);hw+=n*(e.massDryKg||0);}
+      if(t){cost+=t.costM||0;hw+=t.massDryKg||0;}
+      if(first&&m.fins)hw+=take(spec(m.fins));
+      const issue=!e||!t?'incomplete':sameFuel(m.engine,m.tank)?null:'propellant';
+      const ispVac=e?.ispVacS||0,isp=first&&e?.ispSlS?(e.ispSlS+ispVac)/2:ispVac;
+      return {key,hw,prop:t?.propellantMassKg||0,isp,ispVac,thrustSl:n*(e?.thrustSlKn||0)*1000,issue,ready:!issue,dv:0};
+    };
+    const stack=[engineStage('booster',r.booster,true)];
+    r.stages.forEach((s,i)=>{if(s.type==='booster')stack.push(engineStage(`stage-${i}`,s,false));else payload+=take(spec('stage-module'))+take(s.item?spec(s.item):null);});
+    payload+=take(rule('cabinHull'));r.cabin.forEach(id=>{payload+=take(spec(id));});
+    stack.slice(1).forEach(s=>{if(!s.ready)payload+=s.hw+s.prop;});
+    const ready=stack[0].ready,firing=ready?stack.filter(s=>s.ready):[];
+    const mass=payload+stack.reduce((a,s)=>a+(s.ready||s===stack[0]?s.hw+s.prop:0),0);
+    let m=mass;
+    for(const s of firing){s.m0=m;s.mf=m-s.prop;s.dv=s.prop&&s.mf>0?s.isp*g0*Math.log(s.m0/s.mf):0;m=s.mf-s.hw;}
+    const dv=firing.reduce((a,s)=>a+s.dv,0),orbit=ready&&dv>=leo;
+    let marsDv=0,refuelKg=0,refuelStage=null;
+    if(orbit){
+      let k=0,run=0;while(k<firing.length-1&&run+firing[k].dv<leo)run+=firing[k++].dv;
+      const s=firing[k],left=s.m0*Math.exp(-(leo-run)/(s.isp*g0))-s.mf; // propellant still in stage k at orbit
+      const above=firing.slice(k+1).reduce((a,x)=>a+x.dv,0),owed=Math.max(0,transfer-above);
+      marsDv=s.ispVac*g0*Math.log(s.m0/s.mf)+above; // stage k refilled, burning in vacuum
+      refuelKg=Math.max(0,Math.min(s.prop,owed?s.mf*(Math.exp(owed/(s.ispVac*g0))-1):0)-left);
+      refuelStage=s;
+    }
+    const thrust=ready?stack[0].thrustSl:0;
+    return {cost,mass,draw,gen,thrust,ready,issue:stack[0].issue,stack,twr:ready&&mass?thrust/(mass*g0):0,dv,orbit,
+      marsDv,marsOk:orbit&&marsDv>=transfer,refuelKg,refuelPct:refuelStage?refuelKg/refuelStage.prop*100:0,refuelStage,
+      budget:budgetOf(state.difficulty),leo,transfer};
   }
   function setBar(id,frac,mode){const el=$(id);el.style.width=Math.min(100,Math.max(0,frac*100))+'%';el.classList.toggle('danger',mode==='danger');el.classList.toggle('short',mode==='short');}
   function renderTelemetry(){
@@ -115,16 +157,28 @@
     $('#cost-value').textContent=`${money(m.cost)} / ${money(m.budget)}`;setBar('#cost-fill',m.cost/m.budget,m.cost>m.budget?'danger':'');
     $('#twr-value').textContent=m.ready?m.twr.toLocaleString('en-US',{maximumFractionDigits:2}):'—';setBar('#twr-fill',m.ready?m.twr/2:0,m.ready&&m.twr<TWR_MIN()?'danger':'');
     $('#power-value').textContent=`${number(m.gen)} W / ${number(m.draw)} W`;setBar('#power-fill',m.draw?m.gen/(m.draw*1.5):0,m.gen<m.draw?'danger':'');
-    $('#dv-value').textContent=m.ready?`${number(m.dv)} m/s`:'—';setBar('#dv-fill',m.dv/m.leo,m.ready&&m.dv<m.leo?'short':'');
+    $('#dv-value').textContent=m.ready?`${number(m.dv)} / ${number(m.leo)} m/s`:'—';setBar('#dv-fill',m.dv/m.leo,m.ready&&!m.orbit?'short':'');
+    $('#mars-value').textContent=m.orbit?`${number(m.marsDv)} / ${number(m.transfer)} m/s`:'—';setBar('#mars-fill',m.marsDv/m.transfer,m.orbit&&!m.marsOk?'short':'');
+    $('#mars-hint').textContent=(!m.orbit?'Reach low Earth orbit first: the stage burning there refuels, then it and the stages above make the transfer.'
+      :!m.marsOk?`Even with a full tank, ${stageName(m.refuelStage.key)} and the stages above fall short.`
+      :m.refuelKg>0?`Orbital refuel: ${Math.ceil(m.refuelPct)}% of the ${stageName(m.refuelStage.key)} tank (${tonnes(m.refuelKg)}).`:'No refuel needed: the tanks already hold enough.')+` Target ≈ ${number(m.transfer)} m/s ⚠.`;
     $('#mass-value').textContent=tonnes(m.mass);
-    $('#booster-alert').classList.toggle('show',!m.ready);$('#twr-alert').classList.toggle('show',m.ready&&m.twr<TWR_MIN());
+    const b=state.rocket.booster,dead=m.stack.slice(1).find(s=>s.issue);
+    $('#booster-alert').textContent=m.issue==='propellant'?`PROPELLANT MISMATCH! The stage 1 engine burns ${fuelOf(b.engine)}; the tank holds ${fuelOf(b.tank)}.`:'BOOSTER INCOMPLETE! Install an engine and a tank.';
+    $('#booster-alert').classList.toggle('show',!m.ready);
+    $('#stage-alert').textContent=dead?`${stageName(dead.key).toUpperCase()} ${dead.issue==='propellant'?'PROPELLANT MISMATCH':'INCOMPLETE'}! It cannot fire and rides along as dead weight.`:'';
+    $('#stage-alert').classList.toggle('show',!!dead);
+    $('#twr-alert').textContent=m.twr<TWR_BARE()?`WON'T LEAVE THE PAD! Thrust-to-weight below ${TWR_BARE()}.`:`NOT ENOUGH THRUST! Thrust-to-weight below ${TWR_MIN()}.`;
+    $('#twr-alert').classList.toggle('show',m.ready&&m.twr<TWR_MIN());
+    $('#dv-alert').textContent=!m.orbit?`CAN'T REACH ORBIT! Add a bigger tank or an upper stage.`:`MARS OUT OF REACH! Refuelled, the rocket gives ${number(m.marsDv)} of ${number(m.transfer)} m/s.`;
+    $('#dv-alert').classList.toggle('show',m.ready&&!m.marsOk);
     $('#budget-alert').classList.toggle('show',m.cost>m.budget);$('#power-alert').classList.toggle('show',m.gen<m.draw);
     $('#budget-remaining').textContent=money(m.budget-m.cost);$('#budget-readout').classList.toggle('negative',m.cost>m.budget);
     return m;
   }
   function renderRocket(){
-    const r=state.rocket,keys=['booster',...r.stages.map((_,i)=>`stage-${i}`),'cabin'],cur=moduleKey(state.sel);
-    $('#stack-overlay').innerHTML=keys.map((k,i)=>{const [title,sub]=moduleLabel(k),rem=k.startsWith('stage-')?`<button class="remove-stage" type="button" data-remove="${k.slice(6)}" title="Remove ${title}" aria-label="Remove ${title}">×</button>`:'';return `<div class="stage-node ${i%2?'right':'left'}" data-module="${k}"><button class="rocket-stage ${k===cur?'selected':''}" type="button" data-select="${k}" aria-pressed="${k===cur}"><strong>${title}</strong><small>${sub}</small></button>${rem}</div>`;}).join('')
+    const r=state.rocket,keys=['booster',...r.stages.map((_,i)=>`stage-${i}`),'cabin'],cur=moduleKey(state.sel),m=DATA?metrics():null;
+    $('#stack-overlay').innerHTML=keys.map((k,i)=>{const [title,sub,status]=moduleLabel(k,m),rem=k.startsWith('stage-')?`<button class="remove-stage" type="button" data-remove="${k.slice(6)}" title="Remove ${title}" aria-label="Remove ${title}">×</button>`:'';return `<div class="stage-node ${i%2?'right':'left'}" data-module="${k}"><button class="rocket-stage ${k===cur?'selected':''}" type="button" data-select="${k}" aria-pressed="${k===cur}"><strong>${title}</strong><small>${sub}</small>${status?`<small>${status}</small>`:''}</button>${rem}</div>`;}).join('')
       +(r.stages.length<MAX_STAGES()?Array.from({length:r.stages.length+1},(_,i)=>`<button class="add-stage" type="button" data-insert="${i}" title="Add stage" aria-label="Add a stage at position ${i+2}">+</button>`).join(''):'');
     $$('#stack-overlay [data-select]').forEach(b=>b.addEventListener('click',()=>selectModule(b.dataset.select)));
     $$('#stack-overlay [data-remove]').forEach(b=>b.addEventListener('click',()=>removeStage(+b.dataset.remove)));
@@ -137,16 +191,23 @@
   const tabsFor = sel => isBooster(sel)?[['engine','Engines'],['tank','Tanks'],...(sel.kind==='booster'?[['fins','Fins']]:[])]:sel.kind==='stage'?EQUIPMENT_GROUPS.map(([k,l])=>[k,l]):CABIN_GROUPS.map(([k,l])=>[k,l]);
   function partsFor(sel,tab){
     const all=Object.entries(DATA.parts);
-    if(isBooster(sel))return all.filter(([,p])=>tab==='engine'?p.specs?.engineRole==='booster':tab==='fins'?p.category==='fins':p.category==='tanks'&&p.specs?.tankRole==='stage').map(([id])=>id);
+    // Stage 1 takes sea-level engines; the upper stages take the vacuum ones (thrustSlKn = 0: they cannot lift off).
+    if(isBooster(sel))return all.filter(([,p])=>tab==='engine'?p.specs?.engineRole===(sel.kind==='booster'?'booster':'upper-stage'):tab==='fins'?p.category==='fins':p.category==='tanks'&&p.specs?.tankRole==='stage').map(([id])=>id);
     if(sel.kind==='stage'){const g=EQUIPMENT_GROUPS.find(x=>x[0]===tab);return all.filter(([id,p])=>p.category==='equipment'&&g[2].test(id)).map(([id])=>id);}
     return CABIN_GROUPS.find(x=>x[0]===tab)[2];
   }
   const installedIn = sel => isBooster(sel)?Object.values(sel.kind==='booster'?state.rocket.booster:{engine:state.rocket.stages[sel.index].engine,tank:state.rocket.stages[sel.index].tank}).filter(Boolean):sel.kind==='stage'?[state.rocket.stages[sel.index]?.item].filter(Boolean):state.rocket.cabin;
+  // Flags a catalog engine or tank whose propellants differ from the partner already installed in the selected stage.
+  function fuelClash(id){
+    const sel=state.sel;if(!isBooster(sel))return '';
+    const m=sel.kind==='booster'?state.rocket.booster:state.rocket.stages[sel.index],partner=part(id)?.category==='engines'?'tank':'engine',other=m[partner];
+    return other&&!sameFuel(id,other)?` <span class="warn" title="Different propellants from the installed ${partner}">≠ ${partner}</span>`:'';
+  }
   function partMetrics(id){
     const s=spec(id),p=part(id);
-    if(p.category==='engines'){const n=s.defaultClusterCount||1;return [`${n}×`,`${number(s.thrustSlKn)} kN${warn(id,'thrustSlKn')}`,`Isp ${number(s.ispSlS)}${s.ispVacS&&s.ispVacS!==s.ispSlS?'–'+number(s.ispVacS):''} s${warn(id,'ispSlS')}`,`${number(s.massDryKg)} kg each${warn(id,'massDryKg')}`,money(n*s.costM)];}
+    if(p.category==='engines'){const n=s.defaultClusterCount||1,sl=s.thrustSlKn>0;return [`${n}×`,sl?`${number(s.thrustSlKn)} kN${warn(id,'thrustSlKn')}`:`${number(s.thrustVacKn)} kN vac${warn(id,'thrustVacKn')}`,sl?`Isp ${number(s.ispSlS)}${s.ispVacS&&s.ispVacS!==s.ispSlS?'–'+number(s.ispVacS):''} s${warn(id,'ispSlS')}`:`Isp ${number(s.ispVacS)} s vac${warn(id,'ispVacS')}`,`${number(s.massDryKg)} kg each${warn(id,'massDryKg')}`,fuelOf(id)+fuelClash(id),money(n*s.costM)];}
     if(p.category==='fins')return [`${number(s.massDryKg)} kg`,`gusts −${Math.round((1-(s.aeroDriftFactor??1))*100)}%`,money(s.costM)];
-    if(p.category==='tanks')return [`propellant ${tonnes(s.propellantMassKg)}${warn(id,'propellantMassKg')}`,`dry ${tonnes(s.massDryKg)}${warn(id,'massDryKg')}`,money(s.costM)];
+    if(p.category==='tanks')return [`propellant ${tonnes(s.propellantMassKg)}${warn(id,'propellantMassKg')}`,`dry ${tonnes(s.massDryKg)}${warn(id,'massDryKg')}`,fuelOf(id)+fuelClash(id),money(s.costM)];
     return [`${number(s.massDryKg)} kg${warn(id,'massDryKg')}`,s.powerW>0?`+${number(s.powerW)} W`:`${number(Math.abs(s.powerW||0))} W`,money(s.costM)];
   }
   function partThumbFallback(id, p) {
@@ -176,7 +237,7 @@
     $('#category-tabs').innerHTML=tabs.map(([k,l])=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${k===state.tab}">${l}</button>`).join('');
     $$('#category-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;renderCatalog();}));
     $('#selected-stage-tag').textContent=moduleLabel(moduleKey(sel))[0].toUpperCase();
-    $('#catalog-summary').innerHTML=sel.kind==='stage'?`<label>Stage type <select id="stage-type"><option value="bay">Bay</option><option value="booster">Booster</option></select></label><br>${isBooster(sel)?'Choose an engine and tank. Upper-stage propulsion is not yet included in Δv.':'One equipment module per bay.'}`:sel.kind==='booster'?'Stage 1 engine and tank, with real data for each part. Fins (optional) steady the ascent through Max-Q.':`${state.rocket.cabin.length}/${CABIN_SLOTS()} cabin slots filled. Three modules per specialist.`;
+    $('#catalog-summary').innerHTML=sel.kind==='stage'?`<label>Stage type <select id="stage-type"><option value="bay">Bay</option><option value="booster">Booster</option></select></label><br>${isBooster(sel)?'Upper stage: a vacuum engine and a tank with the same propellants. It lights when the stage below runs dry and drops once empty.':'One equipment module per bay.'}`:sel.kind==='booster'?'Stage 1 engine and tank, with real data for each part; both must use the same propellants. Fins (optional) steady the ascent through Max-Q.':`${state.rocket.cabin.length}/${CABIN_SLOTS()} cabin slots filled. Three modules per specialist.`;
     if(sel.kind==='stage'){const control=$('#stage-type');control.value=state.rocket.stages[sel.index].type||'bay';control.addEventListener('change',()=>{state.rocket.stages[sel.index].type=control.value;state.tab=control.value==='booster'?'engine':'power';renderPlanner();});}
     const inst=installedIn(sel),current=isBooster(sel)?(sel.kind==='booster'?state.rocket.booster:state.rocket.stages[sel.index])[state.tab]:sel.kind==='stage'?inst[0]:null;
     $('#parts-list').innerHTML=partsFor(sel,state.tab).map(id=>{const p=part(id),on=inst.includes(id);
@@ -197,14 +258,17 @@
   }
   function showLaunch(){
     const m=metrics(),warnings=[];
-    if(!m.ready)warnings.push('Booster without an engine or a tank');
-    if(m.ready&&m.twr<TWR_MIN())warnings.push('Thrust-to-weight below 1.2');
+    if(!m.ready)warnings.push(m.issue==='propellant'?'Stage 1 engine and tank use different propellants':'Booster without an engine or a tank');
+    m.stack.slice(1).filter(s=>s.issue).forEach(s=>warnings.push(`${stageName(s.key)[0].toUpperCase()+stageName(s.key).slice(1)} cannot fire (dead weight)`));
+    if(m.ready&&m.twr<TWR_BARE())warnings.push(`Thrust-to-weight below ${TWR_BARE()}: the rocket cannot leave the pad`);
+    else if(m.ready&&m.twr<TWR_MIN())warnings.push(`Thrust-to-weight below ${TWR_MIN()}`);
     if(m.cost>m.budget)warnings.push('Over budget');
     if(m.gen<m.draw)warnings.push('Power deficit');
-    if(m.ready&&m.dv<m.leo)warnings.push('Δv below low Earth orbit (orbital refueling is not simulated yet)');
+    if(m.ready&&!m.orbit)warnings.push(`Δv below low Earth orbit (${number(m.dv)} of ${number(m.leo)} m/s)`);
+    if(m.orbit&&!m.marsOk)warnings.push(`Mars out of reach even after refueling (${number(m.marsDv)} of ${number(m.transfer)} m/s)`);
     $('#launch-title').textContent=warnings.length?'Review the mission risks':'Mission ready to launch';
     $('#launch-message').textContent=warnings.length?'These choices will have consequences at launch or on arrival. Revise the design or launch with risks.':'The crew is ready for liftoff, orbital checklist, Mars landing, and surface operations.';
-    $('#launch-summary').innerHTML=[['Crew',`${state.friends.size+1} player${state.friends.size?'s':''} · ${3-state.friends.size} AI`],['Site',SITES_INFO[state.site].name],['Difficulty',{easy:'EASY',normal:'NORMAL',hard:'HARD'}[state.difficulty]],['Stages',`${state.rocket.stages.length+2}`],['Budget remaining',money(m.budget-m.cost)],['Liftoff mass',tonnes(m.mass)],['Thrust-to-weight',m.ready?m.twr.toLocaleString('en-US',{maximumFractionDigits:2}):'—'],['Booster Δv',m.ready?`${number(m.dv)} m/s`:'—'],['Power',`${number(m.gen)} / ${number(m.draw)} W`],['Risks',warnings.length?warnings.join('; '):'All clear']].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');
+    $('#launch-summary').innerHTML=[['Crew',`${state.friends.size+1} player${state.friends.size?'s':''} · ${3-state.friends.size} AI`],['Site',SITES_INFO[state.site].name],['Difficulty',{easy:'EASY',normal:'NORMAL',hard:'HARD'}[state.difficulty]],['Stages',`${state.rocket.stages.length+2}`],['Budget remaining',money(m.budget-m.cost)],['Liftoff mass',tonnes(m.mass)],['Thrust-to-weight',m.ready?m.twr.toLocaleString('en-US',{maximumFractionDigits:2}):'—'],['Δv to orbit',m.ready?`${number(m.dv)} / ${number(m.leo)} m/s`:'—'],['Mars transfer',m.orbit?`${number(m.marsDv)} / ${number(m.transfer)} m/s`:'—'],['Orbital refuel',m.marsOk?(m.refuelKg>0?`${Math.ceil(m.refuelPct)}% · ${tonnes(m.refuelKg)}`:'Not needed'):'—'],['Power',`${number(m.gen)} / ${number(m.draw)} W`],['Risks',warnings.length?warnings.join('; '):'All clear']].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');
     $('#launch-confirm').textContent=warnings.length?'Launch with risks →':'Launch mission →';
     $('#launch-dialog').showModal();
   }
@@ -367,7 +431,9 @@
   // PHASES 5–7 SIMULATION ENGINE & RAD SOUNDSCAPE (Cockpit -> Mars Surface -> Results)
   // ===========================================================================
   const SIM = (() => {
-    const TARGET_FUEL = 100;
+    // Orbital refuel: the share of the tank the design is missing for the Mars transfer (metrics → captureDesign).
+    // Each pump moves PUMP_STEP percentage points (game-balance).
+    const refuelTarget = () => flight.design?.refuelTarget ?? 100, PUMP_STEP = 25;
     const radAudio = {
       muted: false,
       bed: null,
@@ -476,14 +542,17 @@
     function captureDesign() {
       const r = state.rocket;
       const installed = new Set([r.booster.engine, r.booster.tank, ...r.stages.map(s => s.item), ...r.cabin].filter(Boolean));
-      const m = DATA ? metrics() : { cost: 0, mass: 0, draw: 0, gen: 0, dv: 0, budget: budgetOf(state.difficulty), leo: 9400, twr: 0, ready: false };
+      const m = DATA ? metrics() : { cost: 0, mass: 0, draw: 0, gen: 0, dv: 0, budget: budgetOf(state.difficulty), leo: 9400, twr: 0, ready: false, orbit: false, marsOk: false, refuelPct: 0 };
       return {
         ...m,
+        // Share of the refuelling stage's tank to pump in orbit (metrics); a full tank when Mars is out of reach.
+        refuelTarget: m.marsOk ? Math.ceil(m.refuelPct) : 100,
+        refuelTank: m.marsOk && m.refuelStage ? stageName(m.refuelStage.key) : null,
         overweight: !m.ready || m.twr < TWR_MIN(),
         finsDrift: r.booster.fins ? (spec(r.booster.fins).aeroDriftFactor ?? 1) : 1, // aerodynamic minigames: gust scale
         overBudget: m.cost > m.budget,
         powerDeficit: m.gen < m.draw,
-        lowDv: !m.ready || m.dv < m.leo,
+        lowDv: !m.orbit,
         hasHera: installed.has('cabin-hera-dosimetry'),
         hasShelter: installed.has('cabin-storm-shelter') || installed.has('hab-veggie-rad-astrorad'),
         hasCockpitUpgrade: installed.has('cabin-orion-cockpit') || installed.has('cabin-autonav-conjunction'),
@@ -598,7 +667,7 @@
         radAudio.tone(320, 0.14, 'sawtooth', 0.06);
       } else if (nextStep === 2) {
         flight.radRate = 810;
-        logFlight(`ORBIT ACHIEVED. Target refueling reserve: ${TARGET_FUEL}%. MSL RAD warns of 810 µGy/h solar particle event!`);
+        logFlight(`ORBIT ACHIEVED. ${refuelTarget() ? `Refuel ${refuelTarget()}% of the ${flight.design.refuelTank || 'top stage'} tank.` : 'No refuel needed for Mars.'} MSL RAD warns of 810 µGy/h solar particle event!`);
         radAudio.tone(660, 0.12, 'triangle', 0.05);
       } else if (nextStep === 3) {
         flight.altKm = 125;
@@ -645,9 +714,11 @@
         toast('Reset all tripped Breaker_Bank switches before stage separation.');
       } else if (actionId === 'pump_fuel') {
         if (flight.step === 2) {
-          flight.refuelDone = Math.min(TARGET_FUEL, flight.refuelDone + 25);
-          flight.progress = Math.min(100, (flight.refuelDone / TARGET_FUEL) * 100);
-          logFlight(`Orbital propellant transfer: ${flight.refuelDone}% / ${TARGET_FUEL}%.`);
+          const target = refuelTarget();
+          if (flight.refuelDone >= target) return;
+          flight.refuelDone = Math.min(target, flight.refuelDone + PUMP_STEP);
+          flight.progress = Math.min(100, (flight.refuelDone / target) * 100);
+          logFlight(`Orbital propellant transfer: ${flight.refuelDone}% / ${target}%.`);
           radAudio.tone(500, 0.06, 'sine', 0.04);
         }
       } else if (actionId === 'shield_storm') {
@@ -664,7 +735,7 @@
           radAudio.tone(820, 0.12, 'triangle', 0.06);
         }
       } else if (actionId === 'complete_step') {
-        if (flight.step === 2 && flight.refuelDone >= TARGET_FUEL) {
+        if (flight.step === 2 && flight.refuelDone >= refuelTarget()) {
           if (!flight.stormShielded && !flight.design.hasHera) {
             flight.score -= 10;
             logFlight('Radiation dose absorbed during unshielded solar storm (-10 pts).');
@@ -780,7 +851,7 @@
       $('#cockpit-alert-tag').textContent = hasAlert ? 'C&W MATRIX ALERT ACTIVE' : 'ALL SYSTEMS NOMINAL';
       $('#cockpit-rad-tag').textContent = `MSL RAD: ${flight.radRate} µGy/h`;
       const actionBtn = $('#cockpit-minigame [data-act="complete_step"]');
-      if (actionBtn && flight.step === 2) actionBtn.disabled = flight.refuelDone < TARGET_FUEL;
+      if (actionBtn && flight.step === 2) actionBtn.disabled = flight.refuelDone < refuelTarget();
     }
 
     function renderFlightUI() {
@@ -826,13 +897,13 @@
       } else if (flight.step === 2) {
         box.innerHTML = `
           <span class="eyebrow">Oscar &amp; Maya · Phase 06A</span>
-          <h4>Refuel (${TARGET_FUEL}%) &amp; Shield Solar Storm</h4>
-          <p>Cryogenic tanker docked. Pump fuel to your planned reserve and shield the crew from the 810 µGy/h storm (2024-05-20 RAD dataset).</p>
+          <h4>${refuelTarget() ? `Refuel (${refuelTarget()}%) &amp; ` : ''}Shield Solar Storm</h4>
+          <p>Cryogenic tanker docked. ${refuelTarget() ? `Pump the ${flight.design.refuelTank || 'top stage'} tank to ${refuelTarget()}% for the Mars transfer` : 'Your tanks already hold enough for the Mars transfer'}; shield the crew from the 810 µGy/h storm (2024-05-20 RAD dataset).</p>
           <div class="control-grid">
-            <button class="button secondary" type="button" data-act="pump_fuel">Pump Fuel (${flight.refuelDone}/${TARGET_FUEL}%)</button>
+            <button class="button secondary" type="button" data-act="pump_fuel" ${flight.refuelDone >= refuelTarget() ? 'disabled' : ''}>${refuelTarget() ? `Pump Fuel (${flight.refuelDone}/${refuelTarget()}%)` : 'Tanks full ✓'}</button>
             <button class="button secondary" type="button" data-act="shield_storm" ${flight.stormShielded ? 'disabled' : ''}>${flight.stormShielded ? 'Shelter Sealed ✓' : flight.design.hasShelter ? 'Seal Storm Shelter' : 'Deploy Water Wall'}</button>
           </div>
-          <button class="button primary" type="button" data-act="complete_step" ${flight.refuelDone < TARGET_FUEL ? 'disabled' : ''}>Commit to Mars EDL →</button>`;
+          <button class="button primary" type="button" data-act="complete_step" ${flight.refuelDone < refuelTarget() ? 'disabled' : ''}>Commit to Mars EDL →</button>`;
       } else {
         box.innerHTML = `
           <span class="eyebrow">Helena · Minigame H-S1/S2</span>

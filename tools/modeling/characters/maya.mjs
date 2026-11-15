@@ -69,12 +69,21 @@ export default {
     avatar.part('Hips').add('Bag', box(0.105, 0.135, 0.065), { p: [0.248, -0.075, 0.02], r: [0, 0, 8] });
     avatar.part('Hips').add('Accent', box(0.108, 0.028, 0.068), { p: [0.254, -0.015, 0.02], r: [0, 0, 8] });
 
-    // Long-handled scoop held in the right hand.
-    const hand = avatar.part('Hand_R');
-    hand.add('Metal', cyl(0.012, 0.012, 0.86, 6), { p: [0, -0.36, 0.04] });
-    hand.add('Accent', cyl(0.017, 0.017, 0.1, 6), { p: [0, -0.02, 0.04] });
-    hand.add('Metal', box(0.11, 0.025, 0.13), { p: [0, -0.8, 0.08], r: [20, 0, 0] });
-    hand.add('Metal', box(0.11, 0.05, 0.015), { p: [0, -0.78, 0.14], r: [20, 0, 0] });
+    // Temporary action props: long-handled scoop in Hand_R and regolith sample mound + canister on the ground.
+    const scoop = avatar.prop('Hand_R', 'Scoop');
+    scoop
+      .add('Metal', cyl(0.012, 0.012, 0.86, 6), { p: [0, -0.36, 0.04] })
+      .add('Accent', cyl(0.017, 0.017, 0.1, 6), { p: [0, -0.02, 0.04] })
+      .add('Metal', box(0.11, 0.025, 0.13), { p: [0, -0.8, 0.08], r: [20, 0, 0] })
+      .add('Metal', box(0.11, 0.05, 0.015), { p: [0, -0.78, 0.14], r: [20, 0, 0] });
+
+    const sample = avatar.prop('root', 'Sample');
+    sample
+      .add('Foam', cyl(0.14, 0.22, 0.07, 6), { p: [0.02, 0.037, 0.44] })
+      .add('Foam', cyl(0.07, 0.13, 0.05, 5), { p: [0.04, 0.08, 0.45], r: [5, 18, -6] })
+      .add('Foam', box(0.055, 0.03, 0.048), { p: [-0.07, 0.019, 0.39], r: [0, 25, 0] })
+      .add('Accent', cyl(0.036, 0.038, 0.15, 6), { p: [-0.18, 0.077, 0.38] })
+      .add('Accent', box(0.082, 0.022, 0.082), { p: [-0.18, 0.155, 0.38] });
 
     avatar.anchor('FX_Scoop', 'Hand_R', { p: [0, -0.8, 0.08] }, { preset: 'dust', clips: ['action_loop'] });
   },
@@ -86,7 +95,7 @@ export default {
       const d = smooth(0.08, 0.35, u) * (1 - smooth(0.7, 0.95, u));
       const scoop = Math.sin(Math.PI * Math.min(1, Math.max(0, (u - 0.38) / 0.32)));
       return {
-        Hips: { p: [0, -0.18 * d, 0] },
+        Hips: { p: [0, -0.18 * d * d, 0] },
         UpperLeg_L: { r: [-45 * d, 0, 4 * d] },
         UpperLeg_R: { r: [-45 * d, 0, -4 * d] },
         LowerLeg_L: { r: [80 * d, 0, 0] },
@@ -94,10 +103,10 @@ export default {
         Foot_L: { r: [-35 * d, 0, 0] },
         Foot_R: { r: [-35 * d, 0, 0] },
         Torso: { r: [28 * d, 0, 0] },
-        Head: { r: [18 * d, 0, 0] },
-        UpperArm_R: { r: [-30 * d - 12 * scoop, 0, -4 * d] },
-        LowerArm_R: { r: [-15 * d, 0, 0] },
-        Hand_R: { r: [10 * scoop, 0, 0] },
+        Head: { r: [22 * d, 0, 0] },
+        UpperArm_R: { r: [-8 * d - 10 * scoop, 0, 24 * d] },
+        LowerArm_R: { r: [-76 * d + 6 * scoop, 0, 0] },
+        Hand_R: { r: [64 * d - 14 * scoop, 0, 0] },
         UpperArm_L: { r: [-25 * d, 0, 8 * d] },
         LowerArm_L: { r: [-45 * d, 0, 0] },
       };

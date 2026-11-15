@@ -533,11 +533,13 @@
         'Alarm_Master_Red',
         'Alarm_Caution_Amber',
       ]);
-      const fxNodes = [], pivotNodes = [];
+      const fxNodes = [], pivotNodes = [], props = [];
       root.traverse((o) => {
+        if (o.name.startsWith('Prop_')) props.push(o);
         if (o.name.startsWith('FX_')) fxNodes.push(o);
         else if (pivotNames.has(o.name) || o.name.startsWith('Attach_') || o.name === 'Gimbal') pivotNodes.push(o);
       });
+      for (const p of props) p.visible = state.clip === 'action_loop';
       const helpers = [];
       for (const o of fxNodes) {
         const arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.18, 0xff00ff, 0.05, 0.03);
@@ -553,7 +555,7 @@
       }
       helpers.forEach((h) => (h.visible = $('helpers').checked));
 
-      return { entry, isPart, gltf, root, mixer, actions, emitters, helpers, current: null, stats: { triangles, meshes, size } };
+      return { entry, isPart, gltf, root, mixer, actions, emitters, helpers, props, current: null, stats: { triangles, meshes, size } };
     }
 
     // ------------------------------------------------------------------------
@@ -885,6 +887,7 @@
     function playClip(name) {
       state.clip = name;
       for (const m of visibleModels()) {
+        if (m.props) for (const p of m.props) p.visible = name === 'action_loop';
         const next = m.actions[name];
         if (!next) continue;
         next.reset().setLoop(THREE.LoopRepeat, Infinity).play();

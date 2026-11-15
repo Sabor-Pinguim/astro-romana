@@ -9,12 +9,12 @@ export default {
   accent: '#F2A900',
   visor: 'Visor',
   summary:
-    'Duas listras paralelas âmbar no capacete, joelheiras e biqueiras reforçadas, faixas duplas nas canelas e faixa no antebraço, painel ROSA e furadeira.',
+    'Duas listras paralelas âmbar no capacete, joelheiras e biqueiras reforçadas, faixas duplas nas canelas e faixa no antebraço, painel ROSA e computador portátil de campo.',
   equipment: [
     { item: 'Duas listras paralelas no capacete, faixas duplas nas canelas e faixa no antebraço', basis: 'Marcações âmbar de alta visibilidade para identificação do engenheiro' },
     { item: 'Painel solar enrolado sobre a mochila', basis: 'ROSA, painel solar que se desenrola, testado na ISS' },
     { item: 'Módulo de bateria com LEDs de carga', basis: 'Baterias que cobrem picos de consumo (Perseverance)' },
-    { item: 'Furadeira de mão', basis: 'Pistol Grip Tool, ferramenta motorizada das caminhadas espaciais na ISS' },
+    { item: 'Computador portátil rugerizado de campo (EVA)', basis: 'Laptops de operação e diagnóstico usados em EVAs / estação espacial' },
     { item: 'Cinto com bolsas de ferramentas', basis: 'Ferramentas presas ao traje por cabos e bolsas nas EVAs' },
     { item: 'Joelheiras e biqueiras âmbar', basis: 'Reforço de abrasão (estilizado)' },
   ],
@@ -22,7 +22,7 @@ export default {
     idle_loop: 'Parado, respirando',
     walk_loop: 'Caminhada em baixa gravidade',
     wave: 'Aceno',
-    action_loop: 'Consertando com a furadeira (faíscas na ponta)',
+    action_loop: 'Segura o computador portátil de campo e digita comandos de diagnóstico',
   },
 
   build(avatar) {
@@ -63,39 +63,37 @@ export default {
     hips.add('Accent', box(0.088, 0.022, 0.056), { p: [-0.195, -0.065, 0.12], r: [0, -28, 0] });
     hips.add('Metal', box(0.02, 0.14, 0.012), { p: [0.242, -0.125, -0.01] });
 
-    // Pistol-grip drill in the right hand, pointing forward.
-    const hand = avatar.part('Hand_R');
-    hand.add('GloveTip', box(0.036, 0.09, 0.048), { p: [0, -0.11, 0.03] });
-    hand.add('Accent', box(0.062, 0.072, 0.195), { p: [0, -0.07, 0.11] });
-    hand.add('Metal', cyl(0.022, 0.022, 0.04, 6), { p: [0, -0.07, 0.225], r: [90, 0, 0] });
-    hand.add('Metal', cyl(0.007, 0.003, 0.09, 5), { p: [0, -0.07, 0.29], r: [90, 0, 0] });
-
-    avatar.anchor('FX_Sparks', 'Hand_R', { p: [0, -0.07, 0.34], r: [90, 0, 0] }, {
-      preset: 'sparks',
-      clips: ['action_loop'],
-    });
+    // Temporary action prop: rugged field laptop resting on Hand_L.
+    const laptop = avatar.prop('Hand_L', 'Laptop');
+    laptop
+      .add('HullBlack', box(0.024, 0.2, 0.26), { p: [-0.058, -0.095, -0.13] })
+      .add('SuitGrey', box(0.008, 0.14, 0.22), { p: [-0.072, -0.078, -0.13] })
+      .add('HullBlack', box(0.18, 0.018, 0.26), { p: [-0.155, -0.226, -0.13], r: [0, 0, 20] })
+      .add('Screen', box(0.145, 0.006, 0.225), { p: [-0.158, -0.217, -0.13], r: [0, 0, 20] });
   },
 
   action: {
-    duration: 1.6,
+    duration: 2.2,
     samples: 24,
     pose(u) {
-      const jitter = wave(u, 6);
+      const tap = wave(u, 3);
+      const nod = wave(u);
       return {
-        Hips: { p: [0, -0.02, 0] },
-        Torso: { r: [12, -10, 0] },
-        Head: { r: [10, -6, 0] },
-        UpperArm_R: { r: [-70, 0, 6] },
-        LowerArm_R: { r: [-15 + 1.5 * jitter, 0, 0] },
-        Hand_R: { r: [90, 0, 0] },
-        UpperArm_L: { r: [-50, 0, -12] },
-        LowerArm_L: { r: [-45, 0, 0] },
-        UpperLeg_L: { r: [-15, 0, 0] },
-        LowerLeg_L: { r: [25, 0, 0] },
-        Foot_L: { r: [-10, 0, 0] },
-        UpperLeg_R: { r: [5, 0, 0] },
-        LowerLeg_R: { r: [10, 0, 0] },
-        Foot_R: { r: [-15, 0, 0] },
+        Hips: { p: [0, -0.005, 0] },
+        UpperLeg_L: { r: [-8, 0, 2] },
+        LowerLeg_L: { r: [14, 0, 0] },
+        Foot_L: { r: [-6, 0, 0] },
+        UpperLeg_R: { r: [-8, 0, -2] },
+        LowerLeg_R: { r: [14, 0, 0] },
+        Foot_R: { r: [-6, 0, 0] },
+        Torso: { r: [6, 0, 0] },
+        Head: { r: [24 + 2 * nod, 0, 0] },
+        UpperArm_L: { r: [-22, -20, -18] },
+        LowerArm_L: { r: [-74, 0, 0] },
+        Hand_L: { r: [0, 80, 0] },
+        UpperArm_R: { r: [-18, 22, 26] },
+        LowerArm_R: { r: [-86 + 3 * tap, 0, 0] },
+        Hand_R: { r: [-6 + 5 * tap, -70, 0] },
       };
     },
   },

@@ -127,7 +127,7 @@ Hips > Torso > Head
      > UpperLeg_R > LowerLeg_R > Foot_R
 ```
 
-- Pivôs são nós vazios na articulação. As meshes ficam como filhas e se chamam `<Pivô>_<Material>`.
+- Pivôs são nós vazios na articulação. As meshes ficam como filhas e se chamam `<Pivô>_<Material>`. Itens temporários de `action_loop` usam nós `Prop_<Nome>` (via `avatar.prop()`), exibidos apenas enquanto `action_loop` toca.
 - **Não renomeie pivôs.** Para adicionar um, atualize juntos:
   - `RIG` em `lib/avatar.mjs`;
   - `validate.mjs`;
@@ -152,15 +152,14 @@ Hips > Torso > Head
 ### 5.6 Partículas
 O glTF não transporta partículas, então o projeto usa âncoras:
 - **Âncoras:** nós vazios chamados `FX_<Nome>`. Emitem ao longo do seu **+Y local** e guardam `userData.fx = "<preset>"`, que vira `extras` no glTF.
-- **Registro:** cada âncora é registrada com `clips`, a lista de animações em que fica ativa. Exemplo: o propulsor da Helena só liga em `action_loop`.
+- **Registro:** cada âncora é registrada com `clips`, a lista de animações em que fica ativa. Exemplo: as faíscas (`FX_Sparks`) da Helena só ligam em `action_loop`.
 - **Presets:** ficam em `lib/fx-presets.mjs`, em unidades SI, com a gravidade de Marte de 3,71 m/s². O gerador os copia para o `manifest.json`.
 - **No jogo:** as partículas devem ser criadas a partir desses mesmos números.
 - **Âncoras atuais:**
 
   | Âncora | Personagem | Preset |
   |---|---|---|
-  | `FX_Thruster_L/R` | Helena | thrust |
-  | `FX_Sparks` | Lucas | sparks |
+  | `FX_Sparks` | Helena | sparks |
   | `FX_Antenna` | Oscar | signal |
   | `FX_Scoop` | Maya | dust |
   | `FX_Foot_L/R` | todos | footdust |
