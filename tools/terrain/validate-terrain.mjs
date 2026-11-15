@@ -1,7 +1,7 @@
 // Validates every site listed in assets/terrain/manifest.json:
 //   1. Khronos glTF Validator (spec errors fail the run)
-//   2. Project rules: size limit, collision node name, grid, bounds match the manifest,
-//      embedded texture, sun and source recorded.
+//   2. Project rules: size limit, root node name, grid, bounds match the manifest,
+//      embedded texture, sun and source recorded, de-shading worked, horizon ring (if any).
 //
 //   npm run terrain:validate
 import { readFile } from 'node:fs/promises';
@@ -47,18 +47,48 @@ async function validateSite(site) {
   }
 
   const image = gltf.images?.[0];
-  if (!image || image.mimeType !== 'image/png') problems.push('missing embedded PNG texture');
+  if (!image || !['image/png', 'image/jpeg'].includes(image.mimeType)) problems.push('missing embedded texture');
   if (!(site.sun?.elevationDeg > 0 && site.sun.elevationDeg < 90)) problems.push('sun elevation missing or out of range');
   if (!site.source?.dtm?.url || !site.source?.ortho?.url || !site.source?.license) problems.push('source not recorded');
   if (site.shadingCheck && !(site.shadingCheck.photoSun > site.shadingCheck.oppositeSun)) {
     problems.push('texture and relief do not line up (shading check)');
+  }
+  const d = site.deshading;
+  if (!d) problems.push('de-shading not recorded');
+  else if (d.ambientRatio !== null && !(Math.abs(d.textureVsRelief) < Math.abs(d.photoVsRelief))) {
+    problems.push(`de-shading did not reduce the relief shading in the texture (${d.photoVsRelief} → ${d.textureVsRelief})`);
+  }
+
+  let horizonSummary = '';
+  const horizonNode = gltf.nodes.findIndex((n) => n.name === 'Horizon');
+  if (site.horizon || horizonNode >= 0) {
+    if (!site.horizon) problems.push('GLB has a "Horizon" node but the manifest has no horizon entry');
+    else if (horizonNode < 0) problems.push('manifest lists a horizon but the GLB has no "Horizon" node');
+    else {
+      const primitive = gltf.meshes[gltf.nodes[horizonNode].mesh].primitives[0];
+      const ring = gltf.accessors[primitive.attributes.POSITION];
+      const expected = site.horizon.rings * (site.horizon.segments + 1);
+      if (ring.count !== expected) problems.push(`horizon has ${ring.count} vertices, manifest says ${expected}`);
+      if (ring.count > MAX_VERTICES) problems.push(`horizon has ${ring.count} vertices > ${MAX_VERTICES}`);
+      const material = gltf.materials[primitive.material];
+      if (primitive.attributes.TEXCOORD_0 === undefined || material?.pbrMetallicRoughness?.baseColorTexture === undefined) {
+        problems.push('horizon has no texture (TEXCOORD_0 + baseColorTexture)');
+      }
+      const reach = Math.max(-ring.min[0], ring.max[0], -ring.min[2], ring.max[2]);
+      if (!(reach > site.horizon.radiusM * 0.99 && reach <= site.horizon.radiusM)) {
+        problems.push(`horizon reaches ${reach.toFixed(0)} m, manifest says ${site.horizon.radiusM} m`);
+      }
+      const far = site.horizon.source?.far;
+      if (!far?.url || !far?.citation || !far?.license) problems.push('horizon source not recorded');
+      horizonSummary = `, horizon ${site.horizon.radiusM / 1000} km (${site.horizon.triangles} triangles)`;
+    }
   }
 
   return {
     problems,
     summary: `${(bytes.length / 1048576).toFixed(2)} MB, ${position.count} vertices, ` +
       `relief ${site.elevation.reliefM} m, sun az ${site.sun.azimuthDeg}° el ${site.sun.elevationDeg}°, ` +
-      `${report.issues.numWarnings} warnings, ${report.issues.numInfos} infos`,
+      `${report.issues.numWarnings} warnings, ${report.issues.numInfos} infos${horizonSummary}`,
   };
 }
 
