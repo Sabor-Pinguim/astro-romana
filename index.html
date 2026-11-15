@@ -318,7 +318,12 @@
     .cockpit-hud-top{position:absolute;top:14px;left:16px;right:16px;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
     .cockpit-hud-bottom{position:absolute;left:16px;right:16px;bottom:14px;z-index:3;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;pointer-events:none}
     .cockpit-reticle[hidden]{display:none}
-    .kir{position:relative;height:120px;margin:.3rem 0;background:repeating-linear-gradient(0deg,var(--f1) 0 11px,var(--f2) 11px 12px);clip-path:var(--chamfer)}
+    .kir-row{display:flex;gap:8px;align-items:stretch;margin:.3rem 0}
+    .kir-ctrl{display:flex;flex-direction:column;gap:6px;width:150px}
+    .kir-ctrl .button{flex:1;flex-direction:column;gap:.35rem;min-height:0;padding:.55rem .5rem;line-height:1.15}
+    .kir-ctrl .button.on{--a:var(--solar-amber);--b:#d98a06;--fg:var(--bg-void)}
+    .kir-ctrl kbd{padding:.12rem .4rem;font:600 .6rem var(--heading);letter-spacing:.08em;color:var(--starlight-cream);background:#11071f99}
+    .kir{position:relative;flex:1;height:132px;margin:0;background:repeating-linear-gradient(0deg,var(--f1) 0 11px,var(--f2) 11px 12px);clip-path:var(--chamfer)}
     .kir-band{position:absolute;left:0;right:0;top:calc(50% - var(--band));height:calc(2 * var(--band));background:#7edac22e;border-top:2px solid var(--safe);border-bottom:2px solid var(--safe)}
     .kir-mark{position:absolute;left:12%;right:12%;top:50%;height:4px;margin-top:-2px;background:var(--starlight-cream);transition:background .2s}
     .kir-mark.out{background:var(--mars-orange)}
@@ -1372,7 +1377,8 @@
         if (g) {
           const up = flight.keys.has('KeyW') || flight.keys.has('ArrowUp') || flight.hold > 0;
           const down = flight.keys.has('KeyS') || flight.keys.has('ArrowDown') || flight.hold < 0;
-          g.tick(dt, (up ? 1 : 0) - (down ? 1 : 0));
+          flight.input = (up ? 1 : 0) - (down ? 1 : 0);
+          g.tick(dt, flight.input);
           flight.progress = (g.t / g.duration) * 100;
           flight.altKm = flight.progress * 0.85;
           flight.velMs = Math.round(flight.progress * 26.5);
@@ -1424,6 +1430,7 @@
         $('#kir-time').textContent = `${Math.ceil(g.duration - g.t)} s to MECO`;
         $('#kir-share').textContent = `${Math.round(g.share() * 100)}% in band`;
         const st = g.stars(); $('#kir-stars').textContent = '★'.repeat(st) + '☆'.repeat(3 - st);
+        $$('[data-hold]').forEach(b => b.classList.toggle('on', Number(b.dataset.hold) === flight.input));
       }
       const pip = $('#cockpit-pip');
       if (pip) {
@@ -1460,11 +1467,13 @@
           <span class="eyebrow">Helena · Liftoff · Keep in range</span>
           <h4>Hold the pitch program</h4>
           <p>${g ? 'Keep the navball horizon between the green brackets until MECO. <b>W/↑</b> nose up, <b>S/↓</b> nose down; corrections take a moment to bite.' : `Push <b>Throttle_Lever</b> to ${LIFTOFF.throttle * 100}% (<b>Space</b>) to lift off.`}${flight.design.overweight ? ' <b>Low TWR: the stack wallows more.</b>' : ''}</p>
-          <div class="kir" style="--band:${(LIFTOFF.band / LIFTOFF.limit) * 50}%"><div class="kir-band"></div><div class="kir-mark" id="kir-mark"></div><span class="kir-label top">Nose high</span><span class="kir-label bottom">Nose low</span></div>
-          <div class="kir-stats"><span id="kir-time">${LIFTOFF.duration} s to MECO</span><span id="kir-share">—</span><span id="kir-stars">☆☆☆</span></div>
-          <div class="control-grid">${g
-            ? '<button class="button secondary" type="button" data-hold="1">▲ Nose up</button><button class="button secondary" type="button" data-hold="-1">▼ Nose down</button>'
-            : `<button class="button primary" type="button" data-act="throttle_up">Push Throttle (${Math.round(flight.throttle * 100)}%)</button>`}</div>`;
+          <div class="kir-row">
+            <div class="kir" style="--band:${(LIFTOFF.band / LIFTOFF.limit) * 50}%"><div class="kir-band"></div><div class="kir-mark" id="kir-mark"></div><span class="kir-label top">Nose high</span><span class="kir-label bottom">Nose low</span></div>
+            <div class="kir-ctrl">${g
+              ? '<button class="button secondary" type="button" data-hold="1">▲ Nose up<kbd>W · ↑</kbd></button><button class="button secondary" type="button" data-hold="-1">▼ Nose down<kbd>S · ↓</kbd></button>'
+              : `<button class="button primary" type="button" data-act="throttle_up">Throttle ${Math.round(flight.throttle * 100)}%<kbd>Space</kbd></button>`}</div>
+          </div>
+          <div class="kir-stats"><span id="kir-time">${LIFTOFF.duration} s to MECO</span><span id="kir-share">—</span><span id="kir-stars">☆☆☆</span></div>`;
         $$('[data-hold]', box).forEach(btn => {
           btn.addEventListener('pointerdown', () => { flight.hold = Number(btn.dataset.hold); });
           for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => { flight.hold = 0; });
@@ -1581,10 +1590,13 @@
     document.addEventListener('keydown', e => {
       if (state.screen === 'cockpit') {
         flight.keys.add(e.code);
+        if (e.code.startsWith('Arrow')) e.preventDefault(); // steer, do not scroll the page
+        if (e.code === 'Space' && e.repeat) { e.preventDefault(); return; }
         if (e.code === 'Space') { e.preventDefault(); handleCockpitAction(flight.step === 0 ? 'throttle_up' : flight.step === 1 ? 'stage_sep' : flight.step === 2 ? 'pump_fuel' : 'edl_arm'); }
       }
     });
     document.addEventListener('keyup', e => flight.keys.delete(e.code));
+    window.addEventListener('blur', () => { flight.keys.clear(); flight.hold = 0; });
 
     // -------------------------------------------------------------------------
     // FINAL RESULTS, RANKING & ANIMATED PODIUM
