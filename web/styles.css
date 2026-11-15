@@ -26,7 +26,7 @@
     /* clip-path hides outlines, so clipped controls show focus inside */
     :is(.button,.step,.crew-card,.site-option,.part button,.rocket-stage,.remove-stage,.category-tabs button,.segmented button,.switch,.invite,.icon-button):focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--solar-amber)}
     .muted{color:var(--muted)}
-    #app{min-height:100vh;position:relative;overflow:hidden}
+    #app{min-height:100vh;position:relative;overflow:hidden;z-index:1}
     .screen{display:none;min-height:100vh;flex-direction:column}
     .screen.active{display:flex;animation:wipe .55s cubic-bezier(.7,0,.2,1) backwards}
 
@@ -94,7 +94,6 @@
     .orbit-map.slab{min-height:600px;overflow:hidden;background:linear-gradient(112deg,#1c1d48 0 28%,var(--bg-viewport) 28% 69%,#131431 69%)}
     .orbit-map::before,.blueprint::before{content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;background:repeating-linear-gradient(0deg,#c4b7e4 0 1px,transparent 1px 42px),repeating-linear-gradient(60deg,#c4b7e4 0 1px,transparent 1px 42px),repeating-linear-gradient(120deg,#c4b7e4 0 1px,transparent 1px 42px)}
     .orbit-map h3{position:absolute;top:24px;left:28px;z-index:2;max-width:60%;font-size:clamp(1.2rem,2vw,1.9rem);color:var(--starlight-cream);text-transform:uppercase}
-    .map-caption{position:absolute;left:28px;bottom:22px;z-index:2;font:600 .62rem var(--heading);letter-spacing:.14em;color:var(--muted)}
     .orbit-system{position:absolute;left:50%;top:53%;width:min(60vw,640px);aspect-ratio:1;translate:-50% -50%}
     .orbit-rings{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
     .orbit-rings polygon{fill:none;stroke:#c9a6ff;stroke-opacity:.24;stroke-width:.18}
@@ -110,6 +109,17 @@
     .planet-disc{display:block;width:100%;height:100%}
     .world-name{position:absolute;top:calc(100% + 8px);left:50%;translate:-50% 0;white-space:nowrap;font:600 .64rem var(--heading);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
     .orbit-world.selected .world-name{top:calc(140% + 10px);color:var(--solar-amber)}
+    .orbit-world.selected:not(.mars-target)::before{background:var(--muted)}
+    .orbit-world.selected:not(.mars-target) .world-name{color:var(--muted);opacity:1}
+    .orbit-world.selected:not(.mars-target) .world-name::after{content:" · unavailable"}
+    #objective-status.locked{color:var(--muted)}
+    .button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.7)}
+    /* Planning background: the orbit scene, zoomed on the chosen planet, behind the lobby and the planner */
+    .space-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .8s}
+    .space-bg.on{opacity:1}
+    .space-bg>canvas{display:block;width:100%;height:100%}
+    body.space-focus #lobby,body.space-focus #planner{background:linear-gradient(100deg,#11071fd0 0 38%,#11071f80 70%,#11071f30)}
+    body.space-focus #lobby .slab,body.space-focus #planner .slab{background:linear-gradient(112deg,#24143ab8 0 17%,#1d1128b8 17% 62%,#1a0e26b8 62%)}
     .orbit-world.selected::before{content:"";position:absolute;inset:-40%;background:var(--solar-amber);clip-path:polygon(evenodd,50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%,50% 0,50% 4%,89.5% 27%,89.5% 73%,50% 96%,10.5% 73%,10.5% 27%,50% 4%);animation:spin 14s linear infinite}
     .orbit-marker{position:absolute;left:3%;top:49%;display:flex;align-items:center;gap:.45rem;font:600 .6rem var(--heading);letter-spacing:.14em;color:var(--solar-amber)}
     /* 3D mode (three.js): the system fills the map and the buttons follow the planets */
@@ -148,6 +158,11 @@
     .site-thumb{position:relative;width:140px;height:96px;padding:0;border:0;overflow:hidden;background:var(--f1);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
     .thumb-art{position:absolute;inset:0}
     .thumb-art svg{display:block;width:100%;height:100%}
+    /* Real HiRISE photo (grayscale) with a light Mars tint (game choice) */
+    .site-photo{display:block;width:100%;height:100%;object-fit:cover;filter:sepia(.55) saturate(1.6) hue-rotate(-12deg) brightness(.92)}
+    .site-walk{position:absolute;left:50%;top:50%;width:33.34%;aspect-ratio:1;translate:-50% -50%;border:2px dashed var(--solar-amber);pointer-events:none}
+    .site-walk small{position:absolute;left:-2px;bottom:calc(100% + 4px);padding:.15rem .4rem;font:600 .58rem var(--heading);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;color:var(--bg-void);background:var(--solar-amber)}
+    .site-credit{position:absolute;right:10px;bottom:8px;padding:.15rem .4rem;font:500 .6rem var(--body);color:var(--starlight-cream);background:#11071fb3}
     .thumb-name{position:absolute;left:0;right:0;bottom:0;padding:.3rem .55rem;text-align:left;font:700 .62rem var(--heading);letter-spacing:.12em;text-transform:uppercase;color:var(--starlight-cream);background:#11071Fcc}
     .site-thumb:hover .thumb-name{color:var(--solar-amber)}
     .site-thumb[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--solar-amber)}
@@ -179,9 +194,9 @@
     .detail-view{--crew:var(--amethyst);position:relative;flex:1;min-height:300px;overflow:hidden;background:linear-gradient(170deg,#1c1d48 0 40%,var(--bg-viewport) 40% 72%,#131431 72%);clip-path:var(--chamfer)}
     .detail-view::after{content:"";position:absolute;left:50%;bottom:7%;width:min(46%,220px);height:34px;translate:-50% 0;background:color-mix(in srgb,var(--crew) 34%,var(--f2));clip-path:polygon(18% 0,82% 0,100% 50%,82% 100%,18% 100%,0 50%)}
     .detail-view>canvas{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%}
-    .detail-site{position:absolute;inset:0}
+    .detail-site{position:absolute;inset:0;z-index:2} /* above the avatar canvas (z-index 1) */
     .detail-site svg{display:block;width:100%;height:100%}
-    .detail-view.site>canvas,.detail-view.site::after,.detail-view:not(.site) .detail-site{display:none}
+    .detail-view.site>canvas,.detail-view.site::after,.detail-view:not(.site) .detail-site{display:none!important}
     .detail-extra{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
     .detail-extra .perk{flex-basis:100%;padding:.8rem 1rem;background:var(--f1)}
     .perk strong{font-family:var(--heading);letter-spacing:.06em;color:var(--solar-amber)}

@@ -3,6 +3,8 @@
 // tilts (degrees) are real, from the NASA NSSDC Planetary Fact Sheet; distances and sizes are stylized.
 // Only Mars is open in this prototype, so it gets a faceted aura and a highlighted orbit.
 // The HTML buttons follow each planet, so clicks and labels stay accessible. Without WebGL the 2D map stays.
+// Behind the planning screens (lobby, planner) the same scene becomes the background: the camera zooms in on
+// the chosen planet and follows it along its orbit while the rest of the system keeps moving.
 const THREE = await import('three');
 const art = window.ASTRO_ART, system = document.querySelector('.orbit-system'), screen = document.getElementById('orbit');
 let renderer;
@@ -82,28 +84,59 @@ if (art && system && renderer) {
   scene.add(transfer);
   const r1 = 2.3, r2 = 2.95, ecc = (r2 - r1) / (r2 + r1), p = (r1 + r2) / 2 * (1 - ecc * ecc);
 
+  // Faint stars, only seen in the close-up (the orbit screen has its own background).
+  const stars = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(Array.from({ length: 1200 }, (_, i) => {
+    const a = (i * 2.399963) % (Math.PI * 2), z = 1 - 2 * ((i * 0.618034) % 1), r = 60, k = Math.sqrt(1 - z * z); return [r * k * Math.cos(a), r * z, r * k * Math.sin(a)];
+  }).flat(), 3)), new THREE.PointsMaterial({ color: 0xfce8a6, size: .12, transparent: true, opacity: 0 }));
+  scene.add(stars);
+  const bg = document.createElement('div');
+  bg.className = 'space-bg'; bg.setAttribute('aria-hidden', 'true'); document.body.prepend(bg);
+  const PLANNING = ['lobby', 'planner'], isOn = id => document.getElementById(id)?.classList.contains('active');
+  let focusId = 'mars', focus = 0;
+  window.addEventListener('astro:world', e => { focusId = e.detail; });
+  const mapPos = new THREE.Vector3(), mapLook = new THREE.Vector3(0, -.4, 0), camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
+  const out = new THREE.Vector3(), side = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), right = new THREE.Vector3();
   const marker = system.querySelector('.orbit-marker'), v = new THREE.Vector3(), edge = new THREE.Vector3();
   let width = 0, height = 0, time = 0, speed = 1, last = performance.now();
   function resize() {
-    width = system.clientWidth; height = system.clientHeight;
+    const host = renderer.domElement.parentElement || system;
+    width = host.clientWidth; height = host.clientHeight;
     if (!width || !height) return;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    const vHalf = THREE.MathUtils.degToRad(camera.fov / 2), hHalf = Math.atan(Math.tan(vHalf) * camera.aspect);
-    const d = Math.max(7.7 / Math.tan(hHalf), 4.9 / Math.tan(vHalf)), tilt = THREE.MathUtils.degToRad(30);
-    camera.position.set(0, d * Math.sin(tilt), d * Math.cos(tilt));
-    camera.lookAt(0, -.4, 0);
+    // The map framing fits the whole system in the orbit screen's box, whatever box the canvas is in now.
+    const vHalf = THREE.MathUtils.degToRad(camera.fov / 2), tilt = THREE.MathUtils.degToRad(30);
+    const mapAspect = (system.clientWidth || width) / (system.clientHeight || height);
+    const hHalf = Math.atan(Math.tan(vHalf) * mapAspect), d = Math.max(7.7 / Math.tan(hHalf), 4.9 / Math.tan(vHalf));
+    mapPos.set(0, d * Math.sin(tilt), d * Math.cos(tilt));
     camera.updateProjectionMatrix();
   }
-  new ResizeObserver(resize).observe(system);
+  const ro = new ResizeObserver(resize); ro.observe(system); ro.observe(bg);
+  // Close-up: sunward of the planet and 60° around it (lit side with a terminator), a bit above,
+  // aimed left of the planet so it sits on the right of the screen, away from the panels.
+  function closeUp(w) {
+    const d = w.size * 5.5;
+    out.copy(w.pivot.position).normalize(); side.crossVectors(up, out).normalize();
+    camPos.copy(w.pivot.position).addScaledVector(out, -d * .5).addScaledVector(side, d * .87).addScaledVector(up, d * .32);
+    right.subVectors(w.pivot.position, camPos).normalize().cross(up).normalize();
+    camLook.copy(w.pivot.position).addScaledVector(right, -d * .2);
+  }
+  const look = new THREE.Vector3();
   const toScreen = vec => { vec.project(camera); return [(vec.x + 1) / 2 * width, (1 - vec.y) / 2 * height]; };
 
   function frame(now) {
     requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000); last = now;
-    if (!screen.classList.contains('active') || !width) return;
+    const map = screen.classList.contains('active'), planning = PLANNING.some(isOn);
+    bg.classList.toggle('on', planning); document.body.classList.toggle('space-focus', planning);
+    if (!map && !planning) return;
+    const host = map ? system : bg;
+    if (renderer.domElement.parentElement !== host) { host.prepend(renderer.domElement); resize(); }
+    if (!width) return;
+    focus += ((planning ? 1 : 0) - focus) * Math.min(1, dt * 1.4);
+    if (window.ASTRO_FOCUS_NOW) focus = planning ? 1 : 0; // tests: skip the zoom animation
     // Slow down while a planet is hovered, so it is easy to click.
-    speed += ((worlds.some(w => w.hovered) ? .12 : 1) - speed) * .1;
+    speed += ((map && worlds.some(w => w.hovered) ? .12 : 1) - speed) * .1;
     if (!reduce) time += dt * speed;
     sun.rotation.y = time * .15;
     belt.rotation.y = -time * Math.PI * 2 / (4.6 * YEAR);
@@ -116,7 +149,7 @@ if (art && system && renderer) {
       w.mesh.rotation.y = time * .9 / Math.sqrt(w.size);
       w.hover += ((w.hovered ? 1 : 0) - w.hover) * .2;
       w.pivot.scale.setScalar(1 + w.hover * .2);
-      if (!w.button) continue;
+      if (!w.button || !map) continue;
       // Keep the button centred on the planet and as big as its projection.
       const [x, y] = toScreen(v.copy(w.pivot.position));
       edge.copy(camera.up).cross(v.copy(camera.position).sub(w.pivot.position)).normalize().multiplyScalar(w.size).add(w.pivot.position);
@@ -130,6 +163,13 @@ if (art && system && renderer) {
       return new THREE.Vector3(r * Math.cos(earth + t), 0, -r * Math.sin(earth + t));
     }));
     transfer.computeLineDistances();
+    // Camera: the map framing blends into the close-up of the chosen planet (eased).
+    const k = focus * focus * (3 - 2 * focus), w = worlds.find(x => x.id === focusId) || mars;
+    closeUp(w);
+    camera.position.lerpVectors(mapPos, camPos, k);
+    camera.lookAt(look.lerpVectors(mapLook, camLook, k));
+    stars.material.opacity = .7 * k;
+    aura.children.forEach((m, i) => { m.material.opacity = (i ? .12 : .3) * (1 - .6 * k); });
     renderer.render(scene, camera);
   }
   resize();

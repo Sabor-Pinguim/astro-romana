@@ -82,7 +82,7 @@
       const s=SITES_INFO[d.id];
       $('#detail-kind').textContent='Landing site';$('#detail-name').textContent=s.name;$('#detail-role').textContent=s.tag;$('#detail-desc').textContent=s.desc;
       $('#detail-status').textContent=state.site===d.id?'SELECTED SITE':'AVAILABLE';
-      $('#detail-extra').innerHTML='';$('#detail-site').innerHTML=siteScene(d.id);view.classList.add('site');
+      $('#detail-extra').innerHTML='';$('#detail-site').innerHTML=sitePhoto(d.id,true);view.classList.add('site');
     }
     window.dispatchEvent(new CustomEvent('astro:detail',{detail:d}));
   }
@@ -210,7 +210,23 @@
   const WORLD_NAMES={mercury:'Mercury',venus:'Venus',earth:'Earth',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn',uranus:'Uranus',neptune:'Neptune'};
   $('#orbit-back').addEventListener('click',()=>showScreen('menu'));
   $('#objective-next').addEventListener('click',()=>showScreen('lobby'));
-  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>{const w=button.dataset.world;toast(w==='mars'?'Mars is the destination of this mission.':w==='earth'?'Earth is the launch origin. Select Mars to plan the mission.':`${WORLD_NAMES[w]} is not available yet. This prototype only opens Mars.`);}));
+  // Every planet can be picked; only Mars opens a mission in this prototype, the others show as unavailable.
+  // The orbit map listens to astro:world (reticle, and the planet the planning background zooms into).
+  state.world = state.world || 'mars';
+  function selectWorld(w){
+    state.world=w;
+    $$('[data-world]').forEach(b=>{const on=b.dataset.world===w;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on));});
+    const open=w==='mars',name=WORLD_NAMES[w];
+    $('#objective-title').textContent=open?'Explore Mars':name;
+    $('#objective-description').textContent=open?'Land a crew, investigate ancient environments, and return discoveries to Earth.':w==='earth'?'The launch origin. Pick Mars to plan a mission.':`${name} is not open in this prototype. Mars is the only destination you can plan now.`;
+    $('#objective-profile').textContent=open?'CREWED · SURFACE':'—';
+    $('#objective-constraint').textContent=open?'MASS · POWER · DATA':'—';
+    $('#objective-status').textContent=open?'READY TO PLAN':w==='earth'?'LAUNCH ORIGIN':'UNAVAILABLE';
+    $('#objective-status').classList.toggle('locked',!open);
+    const next=$('#objective-next');next.disabled=!open;next.textContent=open?'Plan this mission →':'Unavailable';
+    window.dispatchEvent(new CustomEvent('astro:world',{detail:w}));
+  }
+  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>selectWorld(button.dataset.world)));
   $$('[data-site]').forEach(button=>button.addEventListener('click',()=>{state.site=button.dataset.site;state.detail={kind:'site',id:state.site};renderLobby();}));
   $('#play-button').addEventListener('click',()=>{const go=()=>showScreen('orbit');window.ASTRO_LAUNCH?window.ASTRO_LAUNCH().then(go):go();});
   $('#lobby-back').addEventListener('click',()=>showScreen('orbit'));
@@ -317,7 +333,10 @@
     jezero: { ramp: RAMPS.jezero, seed: 4, profile: [[0, .34], [.12, .3], [.22, .38], [.35, .44], [.5, .46], [.65, .45], [.78, .39], [.9, .31], [1, .35]] },
     gale: { ramp: RAMPS.gale, seed: 9, profile: [[0, .52], [.15, .5], [.3, .47], [.42, .36], [.5, .22], [.58, .3], [.68, .42], [.82, .49], [1, .5]] }
   };
-  const siteScene = id => `<svg class="${id}" viewBox="0 0 160 100" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><rect width="160" height="100" fill="#17183B"/>${poly([[0, 0], [160, 0], [0, 48]], '#1c1a45')}${poly([[160, 0], [160, 56], [30, 56]], '#241848')}${poly([[0, 40], [160, 30], [160, 60], [0, 60]], '#3a1f4a')}<g transform="translate(92 16) scale(4)">${facetPolys({ ramp: RAMPS.rock, seed: 3, rings: [5, 9] })}</g>${facetTerrain(SITES[id])}</svg>`;
+  // Landing site photo: the real HiRISE orthoimage around the landing point (assets/sites, tools/web/site-photos.mjs).
+  // The big view marks the 512 m walkable terrain (centre third of the 1.5 km photo) and credits the source.
+  const sitePhoto = (id, big) => `<img class="site-photo" src="assets/sites/${id}.png" alt="${big ? `HiRISE orbital photo around the ${SITES_INFO[id].name} landing point` : ''}">`
+    + (big ? `<span class="site-walk" aria-hidden="true"><small>512 m walk area</small></span><span class="site-credit">HiRISE (MRO) · 1.5 km wide · north up · NASA/JPL/UArizona, USGS (CC0)</span>` : '');
   function menuMars() {
     const tilt = -14 * Math.PI / 180, at = t => { const x = 1.45 * Math.cos(t), y = .36 * Math.sin(t); return [x * Math.cos(tilt) - y * Math.sin(tilt), x * Math.sin(tilt) + y * Math.cos(tilt)]; };
     const arc = (t0, t1) => Array.from({ length: 13 }, (_, k) => at(t0 + (t1 - t0) * k / 12).map(v => v.toFixed(3)).join(',')).join(' ');
@@ -338,7 +357,7 @@
     $('.earth .planet-disc').innerHTML = facetPlanet({ ...PLANETS.earth, seed: 2, rings: [5, 10, 15] });
     $('.mars-target .planet-disc').innerHTML = facetPlanet({ ...PLANETS.mars, seed: 8, rings: [6, 12, 17] });
     $('.jupiter .planet-disc').innerHTML = facetPlanet({ ...PLANETS.jupiter, seed: 6, rings: [6, 12, 18] });
-    $$('.site-thumb .thumb-art').forEach(el => { el.innerHTML = siteScene(el.parentElement.dataset.site); });
+    $$('.site-thumb .thumb-art').forEach(el => { el.innerHTML = sitePhoto(el.parentElement.dataset.site); });
   }
   // ===========================================================================
   // PHASES 5–7 SIMULATION ENGINE & RAD SOUNDSCAPE (Cockpit -> Mars Surface -> Results)
