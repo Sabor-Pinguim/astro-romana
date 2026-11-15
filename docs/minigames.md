@@ -6,6 +6,7 @@ Todos os números vêm de missões reais. Os dados completos e as fontes estão 
 
 - [mars-experiments.md](../references/experiments/mars-experiments.md): o catálogo de Marte. Os códigos entre crases, como `EN10`, apontam para lá.
 - [experiments.md](../references/experiments/experiments.md): o histórico geral.
+- [minigames/](../references/experiments/minigames/): especificação dos modelos 3D e animações de cada minigame de solo do MVP (H-S1, L-S1, O-S1, M-S1), no formato das peças do foguete ([_template.md](../references/experiments/minigames/_template.md)).
 
 ---
 
