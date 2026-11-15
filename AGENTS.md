@@ -67,7 +67,7 @@ package.json            dependências e scripts dos geradores (npm run models, n
 
 ### HTML e three.js (o jogo, `index.html`)
 - **Identidade visual:** siga [docs/visual-identity.md](docs/visual-identity.md) (low poly facetado, paleta, fontes, formas, arte gerada). Se mudar o visual, atualize esse arquivo no mesmo commit.
-- **Arquivo único, sem build.** O three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D e a planta 2D são o fallback).
+- **Arquivos separados, sem build:** `index.html` contém a estrutura e `web/` reúne estilos e scripts por responsabilidade. Os scripts locais devem funcionar também em `file://`; o three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D e a planta 2D são o fallback).
 - **3D e dados na página:** vêm de `index.models.js` e de `index.terrain.<sítio>.js` (terreno de cada local de pouso, carregado no pouso), gerados por `npm run web:models` (o `file://` bloqueia `fetch`); `npm run models` já o roda.
 - **Números de balanceamento** (massa, potência, custo, velocidades) ficam em dados ou constantes nomeadas, nunca soltos no código. Cada valor diz se é real (com a fonte em `references/`) ou de jogo (`game-balance`).
 - **Superfície:** `index.html#surface-<sítio>` abre direto o pouso; `window.ASTRO_SURFACE` expõe estado e `goTo(id)` para testes.

@@ -1,4 +1,4 @@
-import { addLimbBand, addLimbStripe } from '../lib/avatar.mjs';
+import { addHarnessStripe, addHelmetStripe, addLimbBand, addLimbStripe } from '../lib/avatar.mjs';
 import { ball, box, cyl } from '../lib/shapes.mjs';
 import { wave } from '../lib/animations.mjs';
 
@@ -8,8 +8,10 @@ export default {
   role: 'Especialista de Dados e Telecom',
   accent: '#1FA2FF',
   visor: 'Visor',
-  summary: 'Antena de chicote na mochila como a da Apollo, mini-antena parabólica, tablet no pulso e câmera no capacete.',
+  summary:
+    'Faixa azul frontal na aba do capacete, ombreiras e bandas triplas de telemetria nos braços, antenas na mochila e tablet no pulso.',
   equipment: [
+    { item: 'Listra frontal no capacete, ombreiras azuis, bandas triplas nos braços e faixa alta nas coxas', basis: 'Padrão azul de telemetria inspirado nas alças e costuras dos trajes Artemis OCSS' },
     { item: 'Antena de chicote no topo da mochila', basis: 'Antena de rádio da mochila (PLSS) das EVAs da Apollo' },
     { item: 'Mini-antena parabólica', basis: 'Antenas de alto ganho (estilizado)' },
     { item: 'Tablet no antebraço esquerdo', basis: 'Display no pulso, evolução do cuff checklist' },
@@ -23,33 +25,44 @@ export default {
   },
 
   build(avatar) {
+    // Signature electric-blue telemetry pattern: horizontal brow band on helmet, shoulder/clavicle
+    // yoke stripes, triple bands on upper arms, single bold upper-thigh ring, outer calf stripe.
+    addHelmetStripe(avatar, 'brow');
+    addHarnessStripe(avatar, 'Torso', { p: [0.19, 0.44, 0.08], s: [0.11, 0.032, 0.14], r: [8, 0, -18] });
+    addHarnessStripe(avatar, 'Torso', { p: [-0.19, 0.44, 0.08], s: [0.11, 0.032, 0.14], r: [8, 0, 18] });
+    addHarnessStripe(avatar, 'Torso', { p: [0.11, 0.24, -0.456], s: [0.028, 0.3, 0.012] });
+    addHarnessStripe(avatar, 'Torso', { p: [-0.11, 0.24, -0.456], s: [0.028, 0.3, 0.012] });
+
     for (const [s, side] of [['L', 1], ['R', -1]]) {
-      addLimbBand(avatar, `UpperArm_${s}`, { y: -0.1, radius: 0.077 });
-      addLimbBand(avatar, `UpperArm_${s}`, { y: -0.17, radius: 0.076, height: 0.02 });
-      addLimbStripe(avatar, `LowerLeg_${s}`, side, { y: -0.17, length: 0.26, offset: 0.083 });
+      addLimbBand(avatar, `UpperArm_${s}`, { y: -0.095, radius: 0.106, height: 0.022, x: side * 0.015 });
+      addLimbBand(avatar, `UpperArm_${s}`, { y: -0.125, radius: 0.108, height: 0.014, x: side * 0.015 });
+      addLimbBand(avatar, `UpperArm_${s}`, { y: -0.245, radius: 0.101, height: 0.022, x: side * 0.015 });
+      addLimbBand(avatar, `UpperLeg_${s}`, { y: -0.065, radius: 0.13, height: 0.036, x: side * 0.016 });
+      addLimbStripe(avatar, `LowerLeg_${s}`, side, { y: -0.19, length: 0.24, offset: 0.14 });
     }
 
     const torso = avatar.part('Torso');
     // Whip antenna on the top-left of the pack.
-    torso.add('Metal', box(0.05, 0.05, 0.05), { p: [0.17, 0.6, -0.32] });
-    torso.add('Metal', cyl(0.007, 0.007, 0.5, 5), { p: [0.17, 0.85, -0.32] });
-    torso.add('Screen', ball(0.02, 6, 4), { p: [0.17, 1.1, -0.32] });
+    torso.add('Metal', box(0.055, 0.055, 0.055), { p: [0.175, 0.59, -0.35] });
+    torso.add('Metal', cyl(0.008, 0.008, 0.5, 5), { p: [0.175, 0.84, -0.35] });
+    torso.add('Screen', ball(0.022, 6, 4), { p: [0.175, 1.09, -0.35] });
     // Small dish on the top-right of the pack.
-    torso.add('Metal', cyl(0.012, 0.012, 0.08, 6), { p: [-0.15, 0.62, -0.3] });
-    torso.add('Helmet', cyl(0.09, 0.025, 0.035, 10), { p: [-0.15, 0.68, -0.32], r: [-35, 0, 0] });
-    torso.add('Metal', cyl(0.005, 0.005, 0.07, 4), { p: [-0.15, 0.72, -0.3], r: [-35, 0, 0] });
+    torso.add('Metal', cyl(0.012, 0.012, 0.08, 6), { p: [-0.165, 0.61, -0.34] });
+    torso.add('Helmet', cyl(0.092, 0.028, 0.038, 8), { p: [-0.165, 0.67, -0.36], r: [-35, 0, 0] });
+    torso.add('Metal', cyl(0.005, 0.005, 0.07, 4), { p: [-0.165, 0.71, -0.34], r: [-35, 0, 0] });
 
     // Data pad on the left forearm.
-    avatar.part('LowerArm_L').add('Strap', box(0.1, 0.13, 0.022), { p: [0, -0.12, 0.072] });
-    avatar.part('LowerArm_L').add('Screen', box(0.084, 0.11, 0.004), { p: [0, -0.12, 0.084] });
+    avatar.part('LowerArm_L').add('Pack', box(0.105, 0.135, 0.024), { p: [0.008, -0.12, 0.096] });
+    avatar.part('LowerArm_L').add('Screen', box(0.088, 0.114, 0.006), { p: [0.008, -0.12, 0.109] });
+    avatar.part('LowerArm_L').add('Accent', box(0.108, 0.018, 0.028), { p: [0.008, -0.188, 0.096] });
 
-    // Extra helmet camera with a red "recording" light.
+    // Extra helmet camera mounted above the right temple pod of the larger EMU helmet.
     const head = avatar.part('Head');
-    head.add('SuitGrey', box(0.05, 0.05, 0.09), { p: [-0.11, 0.33, 0.03], r: [0, 0, -30] });
-    head.add('Visor', cyl(0.016, 0.016, 0.02, 6), { p: [-0.11, 0.33, 0.08], r: [90, 0, 0] });
-    head.add('LedRed', box(0.012, 0.012, 0.012), { p: [-0.095, 0.36, 0.07] });
+    head.add('SuitGrey', box(0.054, 0.054, 0.095), { p: [-0.175, 0.34, 0.03], r: [0, 0, -24] });
+    head.add('Visor', cyl(0.018, 0.018, 0.022, 6), { p: [-0.175, 0.34, 0.082], r: [90, 0, 0] });
+    head.add('LedRed', box(0.013, 0.013, 0.013), { p: [-0.16, 0.37, 0.072] });
 
-    avatar.anchor('FX_Antenna', 'Torso', { p: [0.17, 1.1, -0.32] }, { preset: 'signal', clips: ['action_loop'] });
+    avatar.anchor('FX_Antenna', 'Torso', { p: [0.175, 1.09, -0.35] }, { preset: 'signal', clips: ['action_loop'] });
   },
 
   action: {

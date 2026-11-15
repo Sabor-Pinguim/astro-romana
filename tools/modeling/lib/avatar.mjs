@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createPalette } from './palette.mjs';
-import { PartSet, box, cyl, ball, ring, shell } from './shapes.mjs';
+import { PartSet, box, cyl, ball, ring, lathe, shell } from './shapes.mjs';
 
 const DEG = THREE.MathUtils.DEG2RAD;
 
@@ -36,9 +36,9 @@ export const PIVOT_NAMES = RIG.map((j) => j.name);
 export const SIDES = { L: 1, R: -1 };
 
 /**
- * Creates the base astronaut (suit, helmet, backpack, gloves, boots).
- * Characters add their own gear with `avatar.part(pivot).add(...)` and
- * `avatar.anchor(...)`, then call `avatar.finish()`.
+ * Creates the base astronaut (oversized bubble helmet, bulky bellowed pressurized suit,
+ * chest DCM + umbilical ports, PLSS backpack, wrist rings, insulated gloves and boots).
+ * Characters add their own gear and identifying stripes, then call `avatar.finish()`.
  */
 export function createAvatar({ id, accent, visor = 'Visor' }) {
   const materials = createPalette(accent);
@@ -94,76 +94,201 @@ export function createAvatar({ id, accent, visor = 'Visor' }) {
 function buildBody(avatar, visorMaterial) {
   const P = avatar.part;
 
-  // Hips: soft lower torso, waist bearing (xEMU-style hip ring), hip joints.
+  // Hips: fuller bellowed pelvis, metallic waist bearing ring, padded hip bellows & lower harness.
   P('Hips')
-    .add('Suit', cyl(0.19, 0.17, 0.2, 8), { p: [0, -0.02, 0], s: [1, 1, 0.75] })
-    .add('Metal', ring(0.19, 0.022, 12), { p: [0, 0.08, 0], s: [1, 1, 0.78] })
-    .add('Suit', ball(0.1, 8, 6), { p: [0.11, -0.07, 0] })
-    .add('Suit', ball(0.1, 8, 6), { p: [-0.11, -0.07, 0] });
+    .add('Suit', lathe([
+      [0.16, -0.13],
+      [0.215, -0.06],
+      [0.228, 0.01],
+      [0.215, 0.07],
+      [0.185, 0.11],
+    ], 8), { s: [1.06, 1, 0.84] })
+    .add('Metal', cyl(0.218, 0.214, 0.032, 8), { p: [0, 0.085, 0], s: [1.05, 1, 0.84] })
+    .add('Suit', ball(0.118, 6, 4), { p: [0.118, -0.06, 0] })
+    .add('Suit', ball(0.118, 6, 4), { p: [-0.118, -0.06, 0] })
+    .add('Pack', box(0.052, 0.17, 0.022), { p: [0.095, -0.02, 0.182], r: [8, 0, 26] })
+    .add('Pack', box(0.052, 0.17, 0.022), { p: [-0.095, -0.02, 0.182], r: [8, 0, -26] })
+    .add('Metal', box(0.056, 0.044, 0.028), { p: [0, -0.085, 0.19] });
 
-  // Torso: abdomen + octagonal hard upper torso, chest display/control box, navy life-support pack.
+  // Torso: pleated lower abdomen + broad sculpted Hard Upper Torso (no straight cylinders),
+  // shoulder cowls, Display & Control Module (DCM) with umbilical ports, V-harness, and PLSS pack.
   P('Torso')
-    .add('Suit', cyl(0.2, 0.19, 0.12, 8), { p: [0, 0.04, 0], s: [1, 1, 0.78] })
-    .add('Suit', cyl(0.25, 0.21, 0.34, 8), { p: [0, 0.27, 0], s: [1, 1, 0.74] })
-    .add('Suit', cyl(0.17, 0.25, 0.06, 8), { p: [0, 0.47, 0], s: [1, 1, 0.74] })
-    .add('SuitGrey', box(0.24, 0.12, 0.08), { p: [0, 0.25, 0.19] })
-    .add('Visor', box(0.1, 0.035, 0.006), { p: [0, 0.27, 0.233] })
-    .add('Metal', cyl(0.016, 0.016, 0.03, 6), { p: [0.08, 0.23, 0.235], r: [90, 0, 0] })
-    .add('Metal', cyl(0.016, 0.016, 0.03, 6), { p: [-0.08, 0.23, 0.235], r: [90, 0, 0] })
-    .add('Pack', box(0.46, 0.56, 0.2), { p: [0, 0.27, -0.27] })
-    .add('Accent', box(0.47, 0.05, 0.21), { p: [0, 0.56, -0.27] })
-    .add('Accent', box(0.47, 0.03, 0.21), { p: [0, -0.01, -0.27] })
-    .add('SuitGrey', box(0.3, 0.12, 0.03), { p: [0, 0.38, -0.38] })
-    .add('Strap', box(0.06, 0.32, 0.02), { p: [0.13, 0.28, 0.165], r: [8, 0, 0] })
-    .add('Strap', box(0.06, 0.32, 0.02), { p: [-0.13, 0.28, 0.165], r: [8, 0, 0] });
+    .add('Suit', lathe([
+      [0.18, -0.04],
+      [0.215, 0.02],
+      [0.20, 0.09],
+      [0.27, 0.22],
+      [0.295, 0.34],
+      [0.265, 0.43],
+      [0.175, 0.49],
+    ], 8), { s: [1.06, 1, 0.78] })
+    .add('Suit', ball(0.125, 6, 4), { p: [0.255, 0.4, 0], s: [1.05, 0.88, 0.92] })
+    .add('Suit', ball(0.125, 6, 4), { p: [-0.255, 0.4, 0], s: [1.05, 0.88, 0.92] })
+    // Chest DCM (Display and Control Module) & lower gas/water umbilical ports.
+    .add('SuitGrey', box(0.25, 0.17, 0.095), { p: [0, 0.245, 0.22] })
+    .add('Suit', box(0.26, 0.05, 0.105), { p: [0, 0.335, 0.215], r: [22, 0, 0] })
+    .add('Visor', box(0.115, 0.045, 0.008), { p: [0, 0.28, 0.268] })
+    .add('Metal', cyl(0.02, 0.02, 0.028, 6), { p: [0.085, 0.21, 0.268], r: [90, 0, 0] })
+    .add('Metal', cyl(0.015, 0.015, 0.028, 6), { p: [-0.085, 0.21, 0.268], r: [90, 0, 0] })
+    .add('Pack', box(0.05, 0.032, 0.024), { p: [0, 0.21, 0.268] })
+    .add('Metal', cyl(0.024, 0.028, 0.036, 6), { p: [0.11, 0.1, 0.22], r: [82, -16, 0] })
+    .add('Metal', cyl(0.024, 0.028, 0.036, 6), { p: [-0.11, 0.1, 0.22], r: [82, 16, 0] })
+    // Front V-harness straps over the chest.
+    .add('Pack', box(0.052, 0.34, 0.022), { p: [0.125, 0.3, 0.195], r: [10, 0, 14] })
+    .add('Pack', box(0.052, 0.34, 0.022), { p: [-0.125, 0.3, 0.195], r: [10, 0, -14] })
+    // Sculpted PLSS life-support backpack placed cleanly behind the larger helmet.
+    .add('Pack', box(0.46, 0.56, 0.19), { p: [0, 0.27, -0.325] })
+    .add('Suit', box(0.49, 0.14, 0.21), { p: [0, 0.51, -0.335], r: [-12, 0, 0] })
+    .add('SuitGrey', box(0.32, 0.34, 0.045), { p: [0, 0.24, -0.43] })
+    .add('Metal', cyl(0.048, 0.048, 0.42, 6), { p: [0.215, 0.24, -0.35] })
+    .add('Metal', cyl(0.048, 0.048, 0.42, 6), { p: [-0.215, 0.24, -0.35] });
 
-  // Head: colored neck ring (character identity), dome helmet, visor, side lamps (EMU helmet lights).
+  // Head: larger, wider NASA EMU / Artemis pressurized helmet (top at ~1.91 m in world space),
+  // outer protective EVVA shroud + brow hood, wide panoramic bubble visor, heavy neck ring,
+  // chin bail frame, and side EHIP camera/lamp pods.
   P('Head')
-    .add('Accent', ring(0.14, 0.03, 12), { p: [0, 0.0, 0] })
-    .add('Helmet', ball(0.18, 12, 9), { p: [0, 0.17, 0] })
-    .add(visorMaterial, shell(0.186, 8, 4, Math.PI / 2 - 0.95, 1.9, 0.6, 1.1), { p: [0, 0.17, 0] });
+    .add('Accent', cyl(0.168, 0.174, 0.026, 8), { p: [0, -0.014, 0] })
+    .add('Metal', cyl(0.162, 0.172, 0.042, 8), { p: [0, 0.015, 0] })
+    .add('Metal', ring(0.172, 0.024, 8, 3), { p: [0, 0.036, 0] })
+    .add('Helmet', ball(0.205, 10, 6), { p: [0, 0.185, -0.005], s: [1.0, 1.0, 1.02] })
+    // Outer EVVA sun-visor brow hood & side cheek cowls for the chunky layered EMU helmet look.
+    .add('Helmet', box(0.28, 0.05, 0.13), { p: [0, 0.352, 0.095], r: [16, 0, 0] })
+    .add('Helmet', box(0.32, 0.09, 0.22), { p: [0, 0.345, -0.055], r: [-8, 0, 0] })
+    .add('Helmet', box(0.055, 0.19, 0.2), { p: [0.188, 0.23, -0.04] })
+    .add('Helmet', box(0.055, 0.19, 0.2), { p: [-0.188, 0.23, -0.04] })
+    // Panoramic bubble visor + grey visor trim & lower Artemis-style bail wire.
+    .add(visorMaterial, shell(0.212, 8, 4, Math.PI / 2 - 1.06, 2.12, 0.56, 1.24), { p: [0, 0.182, 0.004] })
+    .add('SuitGrey', box(0.27, 0.024, 0.04), { p: [0, 0.328, 0.145], r: [16, 0, 0] })
+    .add('Metal', box(0.24, 0.014, 0.016), { p: [0, 0.065, 0.172], r: [-18, 0, 0] })
+    .add('Metal', box(0.016, 0.014, 0.14), { p: [0.132, 0.072, 0.115], r: [-8, 22, 0] })
+    .add('Metal', box(0.016, 0.014, 0.14), { p: [-0.132, 0.072, 0.115], r: [-8, -22, 0] });
+
   for (const side of [1, -1]) {
     P('Head')
-      .add('SuitGrey', box(0.05, 0.065, 0.08), { p: [side * 0.185, 0.2, 0.03] })
-      .add('Lamp', box(0.032, 0.035, 0.01), { p: [side * 0.185, 0.2, 0.072] });
+      .add('SuitGrey', box(0.058, 0.075, 0.105), { p: [side * 0.214, 0.21, 0.025] })
+      .add('Lamp', box(0.038, 0.042, 0.012), { p: [side * 0.214, 0.21, 0.08] });
   }
 
   for (const [suffix, side] of [['L', 1], ['R', -1]]) {
-    // Arms: shoulder bearing, upper arm, elbow, forearm, wrist ring, glove.
+    // Upper arm: padded shoulder ball, metal scye bearing, bellowed sleeve, side utility pocket.
     P(`UpperArm_${suffix}`)
-      .add('Suit', ball(0.1, 8, 6), { p: [0, 0, 0] })
-      .add('Metal', ring(0.088, 0.018, 10), { p: [0, -0.06, 0] })
-      .add('Suit', cyl(0.075, 0.07, 0.25, 8), { p: [0, -0.18, 0] });
-    P(`LowerArm_${suffix}`)
-      .add('Suit', ball(0.07, 8, 5), { p: [0, 0, 0] })
-      .add('Suit', cyl(0.068, 0.062, 0.21, 8), { p: [0, -0.12, 0] })
-      .add('Metal', ring(0.064, 0.016, 10), { p: [0, -0.235, 0] });
-    P(`Hand_${suffix}`)
-      .add('Glove', box(0.085, 0.1, 0.1), { p: [0, -0.05, 0] })
-      .add('Glove', box(0.08, 0.06, 0.092), { p: [0, -0.13, 0.004] })
-      .add('GloveTip', box(0.082, 0.026, 0.094), { p: [0, -0.172, 0.004] })
-      .add('Glove', box(0.03, 0.06, 0.035), { p: [-side * 0.045, -0.07, 0.04], r: [0, 0, side * 12] });
+      .add('Suit', ball(0.115, 6, 4), { p: [side * 0.012, -0.01, 0], s: [1.08, 0.96, 1.04] })
+      .add('Metal', cyl(0.108, 0.102, 0.034, 8), { p: [side * 0.015, -0.065, 0], r: [0, 0, -side * 12] })
+      .add('Suit', lathe([
+        [0.074, -0.29],
+        [0.098, -0.23],
+        [0.084, -0.175],
+        [0.104, -0.12],
+        [0.092, -0.06],
+      ], 8), { p: [side * 0.015, 0, 0] })
+      .add('Suit', box(0.036, 0.1, 0.076), { p: [side * 0.106, -0.175, 0] });
 
-    // Legs: thigh, knee, shin, boot with dark sole.
+    // Forearm: elbow puff, bellowed sleeve, heavy metallic wrist disconnect ring, right wrist mirror.
+    P(`LowerArm_${suffix}`)
+      .add('Suit', ball(0.086, 6, 4), { p: [side * 0.012, -0.004, 0] })
+      .add('Suit', lathe([
+        [0.07, -0.225],
+        [0.092, -0.165],
+        [0.082, -0.115],
+        [0.096, -0.065],
+        [0.082, -0.01],
+      ], 8), { p: [side * 0.008, 0, 0] })
+      .add('Metal', cyl(0.076, 0.08, 0.042, 8), { p: [0, -0.228, 0] });
+    if (suffix === 'R') {
+      P('LowerArm_R')
+        .add('Metal', box(0.044, 0.068, 0.018), { p: [-0.04, -0.155, 0.078], r: [0, -24, 0] });
+    }
+
+    // Hand: gauntlet cuff, thick EVA padded palm, articulated finger mitt, thumb.
+    P(`Hand_${suffix}`)
+      .add('Glove', cyl(0.068, 0.062, 0.048, 8), { p: [0, -0.018, 0] })
+      .add('Glove', box(0.092, 0.095, 0.106), { p: [0, -0.07, 0.002] })
+      .add('Glove', box(0.088, 0.064, 0.094), { p: [0, -0.135, 0.012], r: [12, 0, 0] })
+      .add('GloveTip', box(0.09, 0.028, 0.096), { p: [0, -0.172, 0.02], r: [12, 0, 0] })
+      .add('Glove', box(0.034, 0.064, 0.038), { p: [-side * 0.048, -0.078, 0.042], r: [8, 0, side * 14] });
+
+    // Upper leg: bellowed thigh (offset outward to avoid inner-thigh clipping), cargo pocket, quilted knee pad.
     P(`UpperLeg_${suffix}`)
-      .add('Suit', cyl(0.105, 0.09, 0.36, 8), { p: [0, -0.19, 0] })
-      .add('Suit', ball(0.088, 8, 5), { p: [0, -0.38, 0] });
+      .add('Suit', lathe([
+        [0.096, -0.365],
+        [0.118, -0.3],
+        [0.105, -0.22],
+        [0.13, -0.12],
+        [0.11, -0.01],
+      ], 8), { p: [side * 0.016, 0, 0] })
+      .add('Suit', ball(0.1, 6, 4), { p: [side * 0.016, -0.375, 0] })
+      .add('Suit', box(0.145, 0.096, 0.054), { p: [side * 0.016, -0.365, 0.092] })
+      .add('Suit', box(0.044, 0.15, 0.12), { p: [side * 0.135, -0.18, 0.01] })
+      .add('Suit', box(0.048, 0.026, 0.124), { p: [side * 0.135, -0.12, 0.01] });
+
+    // Lower leg: bellowed calf with lower gaiter flare, outer shin pouch.
     P(`LowerLeg_${suffix}`)
-      .add('Suit', cyl(0.085, 0.08, 0.33, 8), { p: [0, -0.18, 0] })
-      .add('SuitGrey', ring(0.082, 0.02, 10), { p: [0, -0.33, 0] });
+      .add('Suit', lathe([
+        [0.098, -0.385],
+        [0.088, -0.31],
+        [0.114, -0.185],
+        [0.108, -0.095],
+        [0.096, -0.02],
+      ], 8), { p: [side * 0.016, 0, 0] })
+      .add('Suit', box(0.04, 0.14, 0.1), { p: [side * 0.118, -0.19, 0.005] });
+
+    // Boot: bulky EVA lunar/Mars boot + chunky sole sitting flat at world y = 0 (Foot local y = -0.12).
     P(`Foot_${suffix}`)
-      .add('Boot', box(0.15, 0.1, 0.27), { p: [0, -0.05, 0.035] })
-      .add('Boot', box(0.13, 0.05, 0.1), { p: [0, 0.01, -0.02] })
-      .add('Sole', box(0.16, 0.035, 0.29), { p: [0, -0.1025, 0.035] });
+      .add('Boot', box(0.145, 0.06, 0.13), { p: [side * 0.016, 0, -0.015] })
+      .add('Boot', box(0.165, 0.085, 0.265), { p: [side * 0.016, -0.045, 0.03] })
+      .add('Boot', box(0.155, 0.06, 0.09), { p: [side * 0.016, -0.058, 0.155], r: [12, 0, 0] })
+      .add('Sole', box(0.178, 0.042, 0.305), { p: [side * 0.016, -0.099, 0.042] });
   }
 }
 
-/** Accent stripe on the outer side of a limb (NASA uses colored stripes to tell crew apart). */
-export function addLimbStripe(avatar, pivot, side, { y, length, offset = 0.093, width = 0.05 }) {
-  avatar.part(pivot).add('Accent', box(0.014, length, width), { p: [side * offset, y, 0] });
+/** Accent stripe on the outer side of a limb (colored EVA suit ID stripe). */
+export function addLimbStripe(
+  avatar,
+  pivot,
+  side,
+  { y, length, offset = 0.118, width = 0.052, depth = 0.016, material = 'Accent' },
+) {
+  avatar.part(pivot).add(material, box(depth, length, width), { p: [side * offset, y, 0] });
 }
 
-/** Accent band around a limb segment. */
-export function addLimbBand(avatar, pivot, { y, radius, height = 0.04 }) {
-  avatar.part(pivot).add('Accent', cyl(radius, radius, height, 8), { p: [0, y, 0] });
+/** Accent band wrapping around a limb segment. */
+export function addLimbBand(
+  avatar,
+  pivot,
+  { y, radius, height = 0.034, x = 0, s = [1, 1, 1], r = [0, 0, 0], segments = 8, material = 'Accent' },
+) {
+  avatar.part(pivot).add(material, cyl(radius, radius, height, segments), { p: [x, y, 0], r, s });
+}
+
+/** Diagonal or vertical chest/hip harness stripe for character differentiation. */
+export function addHarnessStripe(avatar, pivot, { p, s, r = [0, 0, 0], material = 'Accent' }) {
+  avatar.part(pivot).add(material, box(s[0], s[1], s[2]), { p, r });
+}
+
+/** Punctual identifying stripe pattern on the helmet hood (`crest`, `twin`, `brow`, or `temple`). */
+export function addHelmetStripe(avatar, style, material = 'Accent') {
+  const head = avatar.part('Head');
+  if (style === 'crest') {
+    head
+      .add(material, box(0.056, 0.032, 0.145), { p: [0, 0.372, 0.088], r: [16, 0, 0] })
+      .add(material, box(0.056, 0.032, 0.22), { p: [0, 0.386, -0.058], r: [-8, 0, 0] })
+      .add(material, box(0.056, 0.14, 0.032), { p: [0, 0.295, -0.195], r: [20, 0, 0] });
+  } else if (style === 'twin') {
+    for (const side of [1, -1]) {
+      head
+        .add(material, box(0.036, 0.03, 0.14), { p: [side * 0.072, 0.368, 0.088], r: [16, 0, 0] })
+        .add(material, box(0.036, 0.03, 0.21), { p: [side * 0.072, 0.382, -0.058], r: [-8, 0, 0] });
+    }
+  } else if (style === 'brow') {
+    head
+      .add(material, box(0.285, 0.028, 0.03), { p: [0, 0.352, 0.148], r: [16, 0, 0] })
+      .add(material, box(0.022, 0.028, 0.14), { p: [0.155, 0.348, 0.06], r: [8, 0, 0] })
+      .add(material, box(0.022, 0.028, 0.14), { p: [-0.155, 0.348, 0.06], r: [8, 0, 0] });
+  } else if (style === 'temple') {
+    for (const side of [1, -1]) {
+      head
+        .add(material, box(0.026, 0.044, 0.19), { p: [side * 0.214, 0.29, -0.02] })
+        .add(material, box(0.024, 0.026, 0.13), { p: [side * 0.212, 0.326, 0.015], r: [12, 0, 0] });
+    }
+  }
 }

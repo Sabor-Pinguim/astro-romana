@@ -11,13 +11,14 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '../..');
 const modelsDir = path.join(root, 'assets/models');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const sources = [html, ...fs.readdirSync(path.join(root, 'web')).filter((file) => file.endsWith('.js')).map((file) => fs.readFileSync(path.join(root, 'web', file), 'utf8'))].join('\n');
 const manifest = JSON.parse(fs.readFileSync(path.join(modelsDir, 'parts/manifest.json'), 'utf8'));
 // Same filter as the builder in index.html.
 const offered = manifest.parts.filter((p) => (p.category === 'engines' ? p.specs?.engineRole === 'booster'
   : p.category === 'tanks' ? p.specs?.tankRole === 'stage'
     : ['equipment', 'cabin', 'structures'].includes(p.category)));
 const files = [...new Set([
-  ...(html.match(/\b(?:rocket|parts|characters)\/[\w/.-]+\.glb\b/g) ?? []),
+  ...(sources.match(/\b(?:rocket|parts|characters)\/[\w/.-]+\.glb\b/g) ?? []),
   ...offered.map((p) => p.file),
 ])].sort();
 

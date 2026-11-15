@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T11:14:59.231Z",
+  "generatedAt": "2026-11-15T11:28:53.976Z",
   "generator": "tools/modeling/build-avatars.mjs",
   "conventions": {
     "units": "meters",
@@ -320,14 +320,14 @@
       "role": "Comandante e Piloto",
       "accent": "#D7263D",
       "file": "characters/helena.glb",
-      "summary": "Faixas vermelhas como as de comandante da Apollo e de EV1 na ISS, visor dourado e propulsor de emergência nas costas.",
+      "summary": "Faixa central vermelha no capacete, listras no arnês do peito, duplas faixas horizontais nas coxas, visor dourado e propulsor SAFER nas costas.",
       "equipment": [
         {
-          "item": "Faixas vermelhas nas pernas e braços",
+          "item": "Faixa vermelha central no capacete, no arnês e duplas faixas nas coxas",
           "basis": "Comandantes da Apollo e o EV1 na ISS usam faixas vermelhas para identificação"
         },
         {
-          "item": "Visor dourado",
+          "item": "Visor dourado panorâmico",
           "basis": "Visor com camada de ouro dos capacetes Apollo/EMU"
         },
         {
@@ -335,7 +335,7 @@
           "basis": "SAFER, propulsor de resgate preso à base da mochila do EMU"
         },
         {
-          "item": "Controle de mão no peito",
+          "item": "Controle de mão abaixo do módulo do peito",
           "basis": "Controle manual do SAFER, montado no módulo de display do peito"
         },
         {
@@ -383,9 +383,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2384,
-        "meshes": 45,
-        "bytes": 238440
+        "triangles": 2740,
+        "meshes": 44,
+        "bytes": 263148
       }
     },
     {
@@ -394,8 +394,12 @@
       "role": "Engenheiro de Sistemas",
       "accent": "#F2A900",
       "file": "characters/lucas.glb",
-      "summary": "Cor âmbar de engenharia, painel solar enrolado e bateria na mochila, cinto de ferramentas e furadeira de mão.",
+      "summary": "Duas listras paralelas âmbar no capacete, joelheiras e biqueiras reforçadas, faixas duplas nas canelas e faixa no antebraço, painel ROSA e furadeira.",
       "equipment": [
+        {
+          "item": "Duas listras paralelas no capacete, faixas duplas nas canelas e faixa no antebraço",
+          "basis": "Marcações âmbar de alta visibilidade para identificação do engenheiro"
+        },
         {
           "item": "Painel solar enrolado sobre a mochila",
           "basis": "ROSA, painel solar que se desenrola, testado na ISS"
@@ -450,9 +454,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2560,
+        "triangles": 2956,
         "meshes": 49,
-        "bytes": 255332
+        "bytes": 283500
       }
     },
     {
@@ -461,8 +465,12 @@
       "role": "Especialista de Dados e Telecom",
       "accent": "#1FA2FF",
       "file": "characters/oscar.glb",
-      "summary": "Antena de chicote na mochila como a da Apollo, mini-antena parabólica, tablet no pulso e câmera no capacete.",
+      "summary": "Faixa azul frontal na aba do capacete, ombreiras e bandas triplas de telemetria nos braços, antenas na mochila e tablet no pulso.",
       "equipment": [
+        {
+          "item": "Listra frontal no capacete, ombreiras azuis, bandas triplas nos braços e faixa alta nas coxas",
+          "basis": "Padrão azul de telemetria inspirado nas alças e costuras dos trajes Artemis OCSS"
+        },
         {
           "item": "Antena de chicote no topo da mochila",
           "basis": "Antena de rádio da mochila (PLSS) das EVAs da Apollo"
@@ -513,9 +521,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2452,
-        "meshes": 45,
-        "bytes": 238548
+        "triangles": 2876,
+        "meshes": 47,
+        "bytes": 269820
       }
     },
     {
@@ -524,8 +532,12 @@
       "role": "Cientista de Missão e Oficial Médica",
       "accent": "#2BB673",
       "file": "characters/maya.glb",
-      "summary": "Pá de coleta como a da Apollo 17, bolsas de amostra, câmera no peito e símbolo de primeiros socorros.",
+      "summary": "Listras laterais verdes no capacete, faixa transversal no peito, listras verticais nas coxas e faixas únicas nas panturrilhas e punhos, com pá de coleta.",
       "equipment": [
+        {
+          "item": "Listras laterais no capacete, faixa no peito, verticais nas coxas e faixas na panturrilha e punho",
+          "basis": "Marcações verdes para identificação da cientista e oficial médica"
+        },
         {
           "item": "Pá/ancinho de coleta com cabo longo",
           "basis": "Ferramentas de geologia de Harrison Schmitt na Apollo 17"
@@ -576,9 +588,9 @@
         "triangles": 3000
       },
       "stats": {
-        "triangles": 2404,
-        "meshes": 46,
-        "bytes": 242252
+        "triangles": 2800,
+        "meshes": 48,
+        "bytes": 271672
       }
     }
   ],
