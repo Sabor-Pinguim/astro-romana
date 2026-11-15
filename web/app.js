@@ -240,7 +240,9 @@
   $$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));renderBadge();renderTelemetry();}));
   $('#launch-button').addEventListener('click',showLaunch);
   $('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());
-  $('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();window.ASTRO_SIM?.startFlight();});
+  // Launch: the pad and the countdown (web/launch.js), then the cockpit in the pilot's view. The pad already
+  // showed the ignition, so the ascent (liftoff minigame) starts at once.
+  $('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();const fly=()=>{const sim=window.ASTRO_SIM;sim?.startFlight();if(sim?.flight)sim.flight.throttle=Math.max(sim.flight.throttle,.7);};window.ASTRO_LAUNCHPAD?window.ASTRO_LAUNCHPAD().then(fly):fly();});
   // Low-poly art: planets and terrain are flat-shaded triangles, like the 3D models.
   const RAMPS = {
     mars:['#3a0f1c','#8F241E','#b8391f','#E04F26','#EE7B57','#f6a07f'],

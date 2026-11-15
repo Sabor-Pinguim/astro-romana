@@ -275,6 +275,23 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   }
   window.addEventListener('astro:rocket', rebuild);
   rebuild();
+  // Launch pad (web/launch.js): the same assembly, stacked without gaps, mounting points or selection rings.
+  window.ASTRO_BUILD_ROCKET = async () => {
+    const data = ui.data(), r = ui.state.rocket;
+    const groups = await Promise.all([booster(r, data.parts), ...r.stages.map((_, i) => stage(r, i, data.parts)), cabin(r, data.parts)]);
+    const rocket = new THREE.Group();
+    let y = 0;
+    for (const g of groups) {
+      g.traverse(o => { if (o.userData.pulse) o.visible = false; });
+      g.position.y = y; rocket.add(g); y += g.userData.top;
+    }
+    const cab = groups[groups.length - 1], mark = new THREE.Object3D();
+    mark.position.y = cab.userData.top / 2; cab.add(mark);
+    rocket.updateMatrixWorld(true);
+    const minY = new THREE.Box3().setFromObject(rocket).min.y;
+    rocket.userData = { height: y, minY, cabin: mark, cabinMid: cab.position.y + cab.userData.top / 2 };
+    return rocket;
+  };
 
   // Clicks: a mounting point selects its module and catalog tab; anything else selects its module.
   const ray = new THREE.Raycaster(), pointer = new THREE.Vector2();

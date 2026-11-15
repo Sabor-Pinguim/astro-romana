@@ -64,6 +64,15 @@
     <footer class="app-foot"><div class="hint">Build the booster (engine + tank), fill the bays and the cabin, then launch.</div><div class="foot-actions"><button class="button primary" id="launch-button" type="button">Launch mission <span aria-hidden="true">↗</span></button></div></footer>
   </section>
 
+  <section id="launchpad" class="screen" aria-labelledby="launchpad-title">
+    <div class="launchpad-view" id="launchpad-view">
+      <div class="launchpad-card slab"><span class="eyebrow">Launch pad · Earth</span><h2 id="launchpad-title">Mission</h2><span class="micro" id="launchpad-status">Final checks</span></div>
+      <div class="launchpad-count" id="launchpad-count" aria-live="polite">T−10</div>
+      <button class="button quiet launchpad-skip" id="launchpad-skip" type="button">Skip ▸▸ <kbd>Esc</kbd></button>
+      <div class="launchpad-fade" id="launchpad-fade"></div>
+    </div>
+  </section>
+
   <section id="cockpit" class="screen" aria-labelledby="cockpit-title">
     <header class="app-header">
       <div class="header-title">
@@ -195,5 +204,6 @@
 <script src="web/views.js"></script>
 
 <script src="web/flight.js"></script>
+<script src="web/launch.js"></script>
 </body>
 </html>

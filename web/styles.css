@@ -337,6 +337,17 @@
     .cockpit-hud-top{position:absolute;top:14px;left:16px;right:16px;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
     .cockpit-hud-bottom{position:absolute;left:16px;right:16px;bottom:14px;z-index:3;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;pointer-events:none}
     .cockpit-reticle[hidden]{display:none}
+    /* Launch pad: the designed rocket, the countdown, then the fly-in to the cockpit */
+    #launchpad{height:100vh;height:100dvh;min-height:0}
+    .launchpad-view{position:relative;flex:1;overflow:hidden;background:var(--bg-plum)}
+    .launchpad-view>canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+    .launchpad-card{position:absolute;z-index:2;top:16px;left:16px;padding:14px 20px 12px}
+    .launchpad-card h2{margin:.25rem 0 .1rem;font-size:clamp(1.05rem,2vw,1.5rem);color:var(--starlight-cream);text-transform:uppercase}
+    .launchpad-count{position:absolute;z-index:2;left:50%;bottom:9%;translate:-50% 0;font:700 clamp(3rem,9vw,6.5rem)/1 var(--heading);letter-spacing:.06em;font-variant-numeric:tabular-nums;color:var(--starlight-cream);text-shadow:0 4px 0 var(--mars-orange),0 0 24px #11071f}
+    .launchpad-skip{position:absolute;z-index:2;right:16px;bottom:16px;--a:var(--f1);--b:var(--f1)}
+    .launchpad-skip kbd{font:600 .6rem var(--heading);padding:.1rem .35rem;background:#11071f99}
+    .launchpad-fade{position:absolute;z-index:3;inset:0;background:var(--bg-void);opacity:0;pointer-events:none;transition:opacity .35s}
+    .launchpad-fade.on{opacity:1}
     .kir-row{display:flex;gap:8px;align-items:stretch;margin:.3rem 0}
     .kir-ctrl{display:flex;flex-direction:column;gap:6px;width:150px}
     .kir-ctrl .button{flex:1;flex-direction:column;gap:.35rem;min-height:0;padding:.55rem .5rem;line-height:1.15}
