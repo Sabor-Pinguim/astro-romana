@@ -69,7 +69,7 @@
     .app-foot .hint{font-size:.8rem;color:var(--muted)}
     .foot-actions{display:flex;gap:.6rem}
     /* faceted backdrop: two hard-edged fans overlap into flat polygons */
-    #orbit,#lobby,#planner{background:
+    #orbit,#lobby,#planner,#cockpit,#surface,#results{background:
       conic-gradient(from 10deg at 84% 8%,#ffffff06 0deg 38deg,transparent 38deg 84deg,#ffffff09 84deg 128deg,transparent 128deg 196deg,#ffffff04 196deg 252deg,transparent 252deg),
       conic-gradient(from -40deg at 10% 96%,#9b5de50c 0deg 28deg,transparent 28deg 66deg,#9b5de512 66deg 104deg,transparent 104deg 150deg,#6d28d90a 150deg 214deg,transparent 214deg),
       var(--bg-void)}
@@ -342,6 +342,87 @@
     .craft::after{content:"";position:absolute;left:0;right:0;bottom:0;height:24%;background:var(--mars-orange)}
     .landing-caption{position:absolute;top:18px;left:20px;font:600 .66rem var(--heading);letter-spacing:.16em;color:var(--starlight-cream)}
 
+    /* Phase 5 & 6: 1st-Person Cockpit Flight & Minigames */
+    .flight-stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:min(1600px,100%);margin:14px auto 0;padding:0 clamp(16px,3vw,44px)}
+    .flight-pill{padding:.55rem .8rem;font:700 .64rem/1.2 var(--heading);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--f2);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+    .flight-pill.done{color:var(--bg-void);background:var(--safe)}
+    .flight-pill.active{color:var(--bg-void);background:linear-gradient(165deg,var(--coral-hover) 0 52%,var(--mars-orange) 52%)}
+    .cockpit-layout{flex:1;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,420px);gap:14px;width:min(1600px,100%);margin:0 auto;padding:14px clamp(16px,3vw,44px) 22px}
+    .cockpit-viewport.slab{position:relative;min-height:540px;overflow:hidden;background:linear-gradient(180deg,#090616 0 46%,#17183B 46% 100%)}
+    .cockpit-viewport canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+    .cockpit-viewport.is-3d .cockpit-fallback{display:none}
+    .cockpit-fallback{position:absolute;inset:14% 8% 12%;display:grid;place-items:center;padding:24px;text-align:center;background:linear-gradient(145deg,#1d1128 0 45%,#281147 45%);clip-path:var(--chamfer)}
+    .cockpit-hud-top{position:absolute;top:14px;left:16px;right:16px;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+    .cockpit-hud-bottom{position:absolute;left:16px;right:16px;bottom:14px;z-index:3;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;pointer-events:none}
+    .cockpit-reticle{position:absolute;left:50%;top:38%;z-index:2;width:128px;height:128px;translate:-50% -50%;pointer-events:none;border:2px solid #7edac255;clip-path:polygon(16% 0,84% 0,100% 16%,100% 84%,84% 100%,16% 100%,0 84%,0 16%)}
+    .cockpit-pip{position:absolute;left:50%;top:50%;width:16px;height:16px;translate:-50% -50%;background:var(--solar-amber);clip-path:var(--diamond);transition:translate .06s linear}
+    .cockpit-pip.danger{background:var(--coral-hover)}
+    .cockpit-deck{display:flex;flex-direction:column;gap:12px;padding:20px}
+    .flight-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .metric-box{padding:.65rem .8rem;background:var(--f1);clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
+    .metric-box span{display:block;font:600 .58rem var(--heading);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .metric-box strong{display:block;margin-top:2px;font:700 1.05rem var(--heading);font-variant-numeric:tabular-nums;color:var(--starlight-cream)}
+    .minigame-card{display:flex;flex-direction:column;gap:10px;padding:14px;background:var(--f1);clip-path:var(--chamfer);box-shadow:inset 3px 0 0 var(--mars-orange)}
+    .minigame-card h4{font-size:1rem;text-transform:uppercase;color:var(--starlight-cream)}
+    .minigame-card p{font-size:.84rem;color:var(--muted)}
+    .control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .breaker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .breaker-btn{padding:.55rem .4rem;border:0;font:700 .66rem var(--heading);letter-spacing:.08em;text-transform:uppercase;color:var(--bg-void);background:var(--safe);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+    .breaker-btn.tripped{color:var(--text-white);background:var(--crimson-alert);animation:blink .8s steps(2,end) infinite}
+    .flight-log{margin-top:auto;max-height:130px;overflow-y:auto;padding:.75rem .9rem;font-size:.76rem;color:var(--muted);background:var(--f0);clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
+    .flight-log div+div{margin-top:4px;padding-top:4px;border-top:1px solid #ffffff10}
+
+    /* Phase 7: Mars Surface Exploration */
+    .compass-bar.slab{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;width:min(1600px,calc(100% - clamp(32px,6vw,88px)));margin:14px auto 0;padding:10px 18px}
+    .compass-track{position:relative;height:34px;overflow:hidden;background:var(--f0);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+    .compass-ticks{display:flex;justify-content:space-between;align-items:center;height:100%;padding:0 14px;font:700 .7rem var(--heading);letter-spacing:.14em;color:var(--muted)}
+    .compass-ticks b{color:var(--solar-amber)}
+    .compass-marker{position:absolute;top:2px;bottom:2px;width:4px;background:var(--mars-orange);translate:-50% 0;transition:left .12s linear}
+    .timer-readout{padding:.45rem .9rem;font:700 1.25rem/1 var(--heading);font-variant-numeric:tabular-nums;color:var(--bg-void);background:var(--solar-amber);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+    .timer-readout.urgent{color:var(--text-white);background:var(--crimson-alert);animation:blink .7s steps(2,end) infinite}
+    .surface-grid{flex:1;display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:14px;width:min(1600px,100%);margin:0 auto;padding:14px clamp(16px,3vw,44px) 14px}
+    .mission-panel{display:flex;flex-direction:column;gap:10px;padding:18px}
+    .task-list{display:flex;flex-direction:column;gap:8px}
+    .task-item{display:flex;flex-direction:column;gap:4px;padding:.85rem .95rem;border:0;text-align:left;color:var(--text-white);background:var(--f1);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);box-shadow:inset 3px 0 0 var(--amethyst);transition:background .15s}
+    .task-item:hover{background:var(--f4)}
+    .task-item.active{background:linear-gradient(112deg,#35183e 0 42%,#21122e 42%);box-shadow:inset 3px 0 0 var(--solar-amber)}
+    .task-item.done{box-shadow:inset 3px 0 0 var(--safe);opacity:.85}
+    .task-item strong{font:700 .8rem var(--heading);letter-spacing:.06em;text-transform:uppercase;color:var(--starlight-cream)}
+    .task-item small{font-size:.76rem;color:var(--muted)}
+    .surface-viewport.slab{position:relative;min-height:470px;overflow:hidden;background:linear-gradient(180deg,#2a1026 0 45%,#6e261f 45% 100%)}
+    .surface-viewport canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+    .surface-viewport.is-3d .surface-map-fallback{display:none}
+    .surface-map-fallback{position:absolute;inset:0;display:block}
+    .surface-controls{position:absolute;right:14px;bottom:14px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .dpad{display:grid;grid-template-columns:repeat(3,38px);gap:4px}
+    .dpad button{height:34px;border:0;font:700 .78rem var(--heading);color:var(--starlight-cream);background:#11071Fe6;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
+    .dpad button:hover{color:var(--bg-void);background:var(--solar-amber)}
+    .surface-dock{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;width:min(1600px,100%);margin:0 auto;padding:0 clamp(16px,3vw,44px) 18px}
+    .dock-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px 16px}
+    .crew-switch,.inventory-slots{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+    .crew-pill{flex:1;min-width:110px;padding:.5rem .7rem;border:0;text-align:left;color:var(--text-white);background:var(--f1);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);box-shadow:inset 3px 0 0 var(--crew,var(--amethyst))}
+    .crew-pill.active{color:var(--bg-void);background:var(--crew,var(--solar-amber))}
+    .crew-pill strong{display:block;font:700 .72rem var(--heading);letter-spacing:.08em;text-transform:uppercase}
+    .crew-pill small{display:block;font-size:.66rem;opacity:.85}
+    .inv-slot{flex:1;min-width:105px;padding:.5rem .65rem;font:600 .66rem var(--heading);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--f0);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+    .inv-slot.filled{color:var(--bg-void);background:var(--safe)}
+
+    /* Final Results & Podium */
+    .results-grid{flex:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:16px;width:min(1600px,100%);margin:0 auto;padding:18px clamp(16px,3vw,44px) 24px}
+    .podium-viewport.slab{position:relative;min-height:460px;overflow:hidden;background:linear-gradient(160deg,#1c1d48 0 36%,#17183B 36% 72%,#11071F 72%)}
+    .podium-viewport canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+    .podium-viewport.is-3d .podium-fallback{display:none}
+    .podium-fallback{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);align-items:end;gap:10px;padding:70px 24px 24px}
+    .podium-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+    .podium-step{width:100%;padding:10px 6px;text-align:center;font:700 .76rem var(--heading);color:var(--bg-void);background:var(--solar-amber);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+    .results-card{display:flex;flex-direction:column;gap:14px;padding:24px}
+    .rank-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;background:var(--f1);clip-path:var(--chamfer)}
+    .rank-letter{display:grid;place-items:center;min-width:86px;height:78px;padding:0 14px;font:700 2.6rem/1 var(--heading);color:var(--bg-void);background:linear-gradient(155deg,var(--starlight-cream) 0 42%,var(--solar-amber) 42%);clip-path:var(--hex)}
+    .leaderboard{display:grid;gap:6px}
+    .leader-row{display:grid;grid-template-columns:42px 1fr auto auto;align-items:center;gap:10px;padding:.65rem .9rem;background:var(--f1);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+    .leader-pos{font:700 .88rem var(--heading);color:var(--solar-amber)}
+    .leader-grade{padding:.25rem .55rem;font:700 .74rem var(--heading);color:var(--bg-void);background:var(--safe);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
+
     /* Dialogs and toast */
     dialog{width:min(560px,calc(100vw - 32px));padding:0;border:0;color:var(--text-white);background:linear-gradient(150deg,var(--f4) 0 26%,var(--f2) 26% 72%,var(--f1) 72%);clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px)}
     dialog[open]{animation:wipe .4s cubic-bezier(.7,0,.2,1) backwards}
@@ -377,6 +458,7 @@
       .orbit-system{width:min(86vw,460px)}
       .crew-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .brief-layout.active{grid-template-columns:1fr}
+      .cockpit-layout,.surface-grid,.surface-dock,.results-grid{grid-template-columns:1fr}
       .step small{display:none}
     }
     @media (max-width:640px){
@@ -392,6 +474,9 @@
       .astronaut{width:112px;height:160px}
       .assembly-grid.active{grid-template-columns:1fr}
       .blueprint.slab{min-height:500px}
+      .flight-stepper{grid-template-columns:repeat(2,1fr)}
+      .cockpit-viewport.slab,.surface-viewport.slab,.podium-viewport.slab{min-height:360px}
+      .compass-bar.slab{grid-template-columns:1fr;gap:8px}
       .step{padding:.6rem .7rem .6rem 1.5rem}
       .step:first-child{padding-left:.8rem}
       .step strong{font-size:.62rem}
@@ -443,6 +528,169 @@
     <footer class="app-foot"><div class="hint" id="step-hint">Select a rocket section, then equip parts to shape the mission.</div><div class="foot-actions"><button class="button quiet" id="step-back" type="button">Back</button><button class="button primary" id="step-next" type="button">Next step <span aria-hidden="true">→</span></button></div></footer>
   </section>
 
+  <section id="cockpit" class="screen" aria-labelledby="cockpit-title">
+    <header class="app-header">
+      <div class="header-title">
+        <button class="button quiet" id="cockpit-abort" type="button">← Planner</button>
+        <div>
+          <div class="eyebrow" id="cockpit-eyebrow">Flight Operations / Phase 05</div>
+          <h2 id="cockpit-title">Launch &amp; Orbit Insertion</h2>
+        </div>
+      </div>
+      <div class="header-side">
+        <button class="button quiet" id="audio-toggle-cockpit" type="button">Audio: On</button>
+        <span class="badge" id="cockpit-badge">NOMINAL</span>
+      </div>
+    </header>
+    <div class="flight-stepper" id="flight-stepper" aria-label="Flight operation phases">
+      <div class="flight-pill active" data-fstep="0">01 / Liftoff &amp; Max-Q</div>
+      <div class="flight-pill" data-fstep="1">02 / Bus &amp; Stage Sep</div>
+      <div class="flight-pill" data-fstep="2">03 / Refuel &amp; Storm</div>
+      <div class="flight-pill" data-fstep="3">04 / Mars EDL Landing</div>
+    </div>
+    <div class="cockpit-layout">
+      <div class="cockpit-viewport slab" id="cockpit-viewport">
+        <div class="cockpit-hud-top">
+          <span class="tag" id="cockpit-view-tag">1ST PERSON FLIGHT DECK · CAMERA_PILOT</span>
+          <span class="tag" id="cockpit-alert-tag">ALL SYSTEMS NOMINAL</span>
+        </div>
+        <div class="cockpit-reticle" aria-hidden="true"><div class="cockpit-pip" id="cockpit-pip"></div></div>
+        <div class="cockpit-fallback">
+          <div>
+            <span class="eyebrow">2D Telemetry Fallback</span>
+            <h3>Pilot Flight Deck</h3>
+            <p class="muted" style="margin-top:8px">WebGL unavailable or disabled. Use the Mission Controls panel on the right to fly launch, stage separation, refueling, and Mars landing.</p>
+          </div>
+        </div>
+        <div class="cockpit-hud-bottom">
+          <span class="tag">Click 3D levers/switches or use Controls &amp; WASD</span>
+          <span class="tag" id="cockpit-rad-tag">MSL RAD: 232 µGy/sol</span>
+        </div>
+      </div>
+      <aside class="panel slab cockpit-deck" aria-label="Cockpit controls and telemetry">
+        <div class="panel-heading">
+          <h3>Flight Telemetry</h3>
+          <span class="dot" id="cockpit-status-dot" style="color:var(--safe)" aria-hidden="true"></span>
+        </div>
+        <div class="flight-metrics">
+          <div class="metric-box"><span>Progress</span><strong id="flight-progress-val">0%</strong></div>
+          <div class="metric-box"><span>Altitude</span><strong id="flight-alt-val">0.0 km</strong></div>
+          <div class="metric-box"><span>Velocity</span><strong id="flight-vel-val">0 m/s</strong></div>
+          <div class="metric-box"><span>Propellant / Hull</span><strong id="flight-hull-val">100% / 100%</strong></div>
+        </div>
+        <div class="meter">
+          <div class="meter-head"><span class="meter-label" id="flight-goal-label">Ascent Corridor Alignment</span><strong class="meter-value" id="flight-goal-val">100%</strong></div>
+          <div class="meter-track"><div class="meter-fill" id="flight-goal-fill" style="width:100%"></div></div>
+        </div>
+        <div class="minigame-card" id="cockpit-minigame"></div>
+        <div class="flight-log" id="flight-log" aria-live="polite"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="surface" class="screen" aria-labelledby="surface-title">
+    <header class="app-header">
+      <div class="header-title">
+        <button class="button quiet" id="surface-back" type="button">← Flight Log</button>
+        <div>
+          <div class="eyebrow" id="surface-eyebrow">Phase 07 / Mars Surface EVA</div>
+          <h2 id="surface-title">Jezero Crater Surface Ops</h2>
+        </div>
+      </div>
+      <div class="header-side">
+        <button class="button quiet" id="audio-toggle-surface" type="button">Audio: On</button>
+        <span class="tag" id="surface-rad-badge">RAD: 232 µGy/sol · CALM</span>
+        <div class="timer-readout" id="surface-timer" aria-live="polite">03:00</div>
+      </div>
+    </header>
+    <div class="compass-bar slab" aria-label="Surface navigation compass">
+      <span class="tag" id="surface-coords">18.38°N · 77.58°E</span>
+      <div class="compass-track">
+        <div class="compass-ticks"><span>W 270°</span><span>NW</span><b>N 000°</b><span>NE</span><span>E 090°</span><span>SE</span><span>S 180°</span></div>
+        <div class="compass-marker" id="compass-marker" style="left:50%" title="Active waypoint bearing"></div>
+      </div>
+      <span class="tag" id="surface-bearing-label">HDG 000° · WP LANDER</span>
+    </div>
+    <div class="surface-grid">
+      <aside class="panel slab mission-panel" aria-label="Surface science missions">
+        <div class="panel-heading">
+          <h3>Surface Missions</h3>
+          <span class="tag" id="surface-progress-tag">0 / 3 DONE</span>
+        </div>
+        <p class="muted" style="font-size:.82rem">Select a task to lock waypoint on the compass and guide the assigned specialist. Return to the ascent vehicle before launch window closes.</p>
+        <div class="task-list" id="surface-task-list"></div>
+        <button class="button primary" id="surface-action-btn" type="button" style="margin-top:auto">Move to Active Beacon →</button>
+        <button class="button secondary" id="surface-board-btn" type="button">Board Ascent Vehicle &amp; Depart →</button>
+      </aside>
+      <div class="surface-viewport slab" id="surface-viewport">
+        <div class="cockpit-hud-top">
+          <span class="tag" id="surface-active-crew-tag">ACTIVE: MAYA · ASTROBIOLOGY</span>
+          <span class="tag" id="surface-dist-tag">DIST TO WAYPOINT: 0 m</span>
+        </div>
+        <svg class="surface-map-fallback" id="surface-svg-fallback" viewBox="0 0 600 420" role="img" aria-label="2D Mars surface tactical map"></svg>
+        <div class="surface-controls">
+          <div class="dpad" aria-label="Surface movement controls">
+            <span></span><button type="button" data-move="0,-1" aria-label="Move North">▲</button><span></span>
+            <button type="button" data-move="-1,0" aria-label="Move West">◀</button><button type="button" data-move="0,1" aria-label="Move South">▼</button><button type="button" data-move="1,0" aria-label="Move East">▶</button>
+          </div>
+          <span class="tag">WASD / Arrows or Click Terrain</span>
+        </div>
+      </div>
+    </div>
+    <div class="surface-dock">
+      <section class="panel slab dock-strip" aria-label="Crew specialists">
+        <span class="micro">Crew (1–4)</span>
+        <div class="crew-switch" id="surface-crew-switch"></div>
+      </section>
+      <section class="panel slab dock-strip" aria-label="Mission inventory">
+        <span class="micro">Inventory</span>
+        <div class="inventory-slots" id="surface-inventory"></div>
+      </section>
+    </div>
+  </section>
+
+  <section id="results" class="screen" aria-labelledby="results-title">
+    <header class="app-header">
+      <div class="header-title">
+        <div>
+          <div class="eyebrow">Mission Debrief / Phase 07 Complete</div>
+          <h2 id="results-title">Mars Return &amp; Final Ranking</h2>
+        </div>
+      </div>
+      <div class="header-side">
+        <span class="badge" id="results-status-badge">CREW RETURNED SAFELY</span>
+        <button class="button primary" id="results-replay" type="button">Plan New Mission ↻</button>
+      </div>
+    </header>
+    <div class="results-grid">
+      <div class="podium-viewport slab" id="podium-viewport">
+        <div class="cockpit-hud-top">
+          <span class="tag">CREW PODIUM · 3D LOW-POLY</span>
+          <span class="tag" id="podium-site-tag">JEZERO CRATER EXPEDITION</span>
+        </div>
+        <div class="podium-fallback" id="podium-fallback"></div>
+      </div>
+      <section class="panel slab results-card" aria-label="Mission score and leaderboard">
+        <div class="rank-banner">
+          <div>
+            <span class="eyebrow">Mission Evaluation</span>
+            <h3 id="results-headline" style="font-size:1.5rem;margin-top:4px;text-transform:uppercase;color:var(--starlight-cream)">Mission Accomplished</h3>
+            <p class="muted" id="results-score-text" style="margin-top:4px">Total Score: 0 pts</p>
+          </div>
+          <div class="rank-letter" id="results-rank-letter">A</div>
+        </div>
+        <div>
+          <span class="micro" style="color:var(--solar-amber)">Crew Ranking (1st – 4th)</span>
+          <div class="leaderboard" id="results-leaderboard" style="margin-top:8px"></div>
+        </div>
+        <div>
+          <span class="micro" style="color:var(--amethyst)">Design Cause &amp; Effect Summary</span>
+          <div class="summary-list" id="results-breakdown" style="margin-top:8px"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
   <dialog id="quit-dialog" aria-labelledby="quit-title"><div class="dialog-inner"><span class="eyebrow">Exit mission</span><h3 id="quit-title">Leave the mission?</h3><p>This is a local prototype. You can close this tab whenever you are ready.</p><div class="dialog-actions"><button class="button quiet" id="quit-cancel" type="button">Stay here</button><button class="button secondary" id="quit-confirm" type="button">Close message</button></div></div></dialog>
   <dialog id="launch-dialog" aria-labelledby="launch-title"><div class="dialog-inner"><span class="eyebrow">Mission launch review</span><h3 id="launch-title">Your mission is ready for review</h3><p id="launch-message">The crew's choices will shape launch, transit, landing and the science mission.</p><div class="summary-list" id="launch-summary"></div><div class="dialog-actions"><button class="button quiet" id="launch-close" type="button">Keep editing</button><button class="button primary" id="launch-confirm" type="button">Launch mission →</button></div></div></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -463,19 +711,33 @@
   // Each part points at a generated GLB (godot/assets/models). Cost, mass, power and Δv are game balance.
   const parts = [
     {id:'f1',name:'Merlin 1D ×3',category:'Engines',stage:'stage1',model:'parts/engines/merlin-1d.glb',count:3,cost:52,mass:3500,watts:180,dv:2300,description:'Three sea-level kerolox engines push the stack off the pad.'},
+    {id:'raptor',name:'Raptor ×3',category:'Engines',stage:'stage1',model:'parts/engines/raptor.glb',count:3,cost:76,mass:4890,watts:220,dv:2950,description:'High-chamber-pressure methalox engines for heavy Mars stacks.'},
+    {id:'rs25',name:'RS-25 Cryo Core',category:'Engines',stage:'stage1',model:'parts/engines/rs-25.glb',count:1,cost:105,mass:3526,watts:260,dv:3200,description:'Liquid hydrolox core engine with high specific impulse and gimbal authority.'},
     {id:'vacuum',name:'AJ10-190 Transfer Engine',category:'Engines',stage:'stage3',model:'parts/engines/aj10-190.glb',cost:39,mass:950,watts:90,dv:1850,description:'Restartable storable-propellant engine for the transfer burns.'},
     {id:'mid',name:'RL10 Upper Engine',category:'Engines',stage:'stage2',model:'parts/engines/rl10.glb',cost:33,mass:1400,watts:70,dv:1500,description:'Efficient hydrolox engine that keeps accelerating after separation.'},
     {id:'compact',name:'MMRTG / Kilopower',category:'Reactors',stage:'cabin',model:'parts/equipment/power-mmrtg-kilopower.glb',cost:48,mass:980,watts:0,generate:1600,dv:0,description:'Nuclear power that keeps working through dust storms and nights.'},
     {id:'solar',name:'ROSA Solar Arrays',category:'Reactors',stage:'stage3',model:'parts/equipment/power-rosa-solar.glb',cost:25,mass:650,watts:0,generate:900,dv:0,description:'Roll-out arrays: lightweight generation for the cruise.'},
-    {id:'battery',name:'Backup Battery Rack',category:'Reactors',stage:'cabin',cost:21,mass:540,watts:0,generate:500,dv:0,description:'Prototype reserve for demanding systems (no 3D model yet).'},
+    {id:'eclss',name:'ECLSS 98% Water Recovery',category:'Reactors',stage:'cabin',model:'parts/cabin/cabin-eclss-wrs.glb',cost:24,mass:195,watts:180,dv:0,description:'Closed-loop crew water and air recovery rack.'},
+    {id:'battery',name:'Backup Battery Rack',category:'Reactors',stage:'cabin',cost:21,mass:540,watts:0,generate:500,dv:0,description:'Reserve electrical bank for Max-Q and peak transmitter loads.'},
     {id:'dish',name:'DSOC Laser Terminal',category:'Telecom',stage:'stage3',model:'parts/equipment/comm-dsoc-laser.glb',cost:29,mass:390,watts:220,dv:0,description:'Optical link: send larger science packages to Earth.'},
     {id:'relay',name:'Electra UHF Relay',category:'Telecom',stage:'cabin',model:'parts/equipment/comm-electra-marco.glb',cost:19,mass:260,watts:130,dv:0,description:'Keeps the crew connected through orbiters during transit and landing.'},
     {id:'drill',name:'Subsurface Drill',category:'Science',stage:'cabin',model:'parts/equipment/drill-corer-cryo.glb',cost:42,mass:1100,watts:460,dv:0,description:'Improves the science options after landing.'},
     {id:'spectrometer',name:'PIXL · SHERLOC · SuperCam',category:'Science',stage:'cabin',model:'parts/equipment/sci-pixl-sherloc-supercam.glb',cost:35,mass:520,watts:350,dv:0,description:'Analyze Martian samples and minerals for biosignatures.'},
+    {id:'hera',name:'HERA Radiation Dosimeter',category:'Science',stage:'cabin',model:'parts/cabin/cabin-hera-dosimetry.glb',cost:12,mass:18,watts:25,dv:0,description:'Active Timepix solar storm early-warning sensor matrix.'},
+    {id:'msg_dna',name:'MSG Glovebox & MinION DNA',category:'Science',stage:'cabin',model:'parts/cabin/cabin-msg-minion.glb',cost:26,mass:85,watts:95,dv:0,description:'Sealed cabin glovebox and nanopore sequencer for core samples.'},
     {id:'camera',name:'HiRISE · SHARAD Package',category:'Science',stage:'stage3',model:'parts/equipment/sci-hirise-sharad.glb',cost:24,mass:290,watts:190,dv:0,description:'Survey candidate regions before landing.'},
+    {id:'orion_cockpit',name:'Orion 3-DU Glass Cockpit',category:'Landing',stage:'cabin',model:'parts/cabin/cabin-orion-cockpit.glb',cost:18,mass:75,watts:115,dv:0,description:'Flight deck displays that sharpen manual attitude alignment.'},
+    {id:'shelter',name:'Orion Storm Shelter & SANS',category:'Landing',stage:'cabin',model:'parts/cabin/cabin-storm-shelter.glb',cost:22,mass:55,watts:40,dv:0,description:'Shielded crew refuge and medical bay against solar particle events.'},
     {id:'shield',name:'LOFTID Shield & ASPIRE Chute',category:'Landing',stage:'cabin',model:'parts/equipment/edl-aspire-loftid.glb',cost:28,mass:870,watts:0,dv:0,description:'Protect the crew during atmospheric entry.'},
     {id:'legs',name:'TRN Precision Landing',category:'Landing',stage:'cabin',model:'parts/equipment/edl-trn-medli2.glb',cost:18,mass:580,watts:0,dv:0,description:'Terrain-relative navigation for a safe touchdown.'}
   ];
+  const CREW_MODELS = {
+    helena: 'characters/helena.glb',
+    lucas: 'characters/lucas.glb',
+    oscar: 'characters/oscar.glb',
+    maya: 'characters/maya.glb',
+  };
+  const COCKPIT_MODEL = 'rocket/cockpit_pilot.glb';
   const state={screen:'menu',difficulty:'normal',friends:new Set(),selectedCrew:null,site:'jezero',stage:'cabin',category:'Reactors',enabledStages:new Set(['cabin','stage1']),equipped:new Set(),step:0,fuel:60,aerobraking:false,parachute:false};
   const money = n => '$'+Math.round(n).toLocaleString('en-US')+'M';
   const number = n => Math.round(n).toLocaleString('en-US');
@@ -518,7 +780,7 @@
   $('#objective-next').addEventListener('click',()=>showScreen('lobby'));
   $$('[data-world]').forEach(button=>button.addEventListener('click',()=>{if(button.dataset.world==='mars'){toast('Mars is selected as this prototype mission destination.');return;}toast(button.dataset.world==='earth'?'Earth is your launch origin. Select Mars to plan the mission.':'Jupiter is planned for a future mission. This prototype explores Mars.');}));
   $$('[data-site]').forEach(button=>button.addEventListener('click',()=>{state.site=button.dataset.site;$$('[data-site]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));const jezero=state.site==='jezero';$('#site-note').textContent=jezero?'Selected: Jezero Crater. A former lake and delta make it a compelling target for sampling.':'Selected: Gale Crater. Layered sedimentary rocks reveal chapters of Martian climate history.';$('#preview-copy').textContent=jezero?'JEZERO CRATER - ANCIENT DELTA':'GALE CRATER - LAYERED ROCKS';$('#planner-title').textContent='Mission: '+(jezero?'Jezero':'Gale')+' Exploration';}));
-  $('#play-button').addEventListener('click',()=>{const go=()=>showScreen('orbit');window.ASTRO_LAUNCH?window.ASTRO_LAUNCH().then(go):go();});$('#lobby-back').addEventListener('click',()=>showScreen('orbit'));$('#to-assembly').addEventListener('click',()=>{state.step=0;showScreen('planner');});$('#planner-menu').addEventListener('click',()=>showScreen('lobby'));$('#quit-button').addEventListener('click',()=>$('#quit-dialog').showModal());$('#quit-cancel').addEventListener('click',()=>$('#quit-dialog').close());$('#quit-confirm').addEventListener('click',()=>$('#quit-dialog').close());$('#drawer-close').addEventListener('click',closeDrawer);$('#drawer-shade').addEventListener('click',closeDrawer);document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('#crew-drawer').classList.contains('open'))closeDrawer();});$$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));const mode=difficulty[state.difficulty];$('#modifier-badge').textContent=`${money(mode.budget)} BUDGET · ${mode.risk}`;renderTelemetry();renderLanding();}));$$('.rocket-stage').forEach(button=>button.addEventListener('click',()=>selectStage(button.dataset.stage)));$$('#category-tabs button').forEach(button=>button.addEventListener('click',()=>{state.category=button.dataset.category;renderCatalog();}));$$('.step').forEach(button=>button.addEventListener('click',()=>{state.step=Number(button.dataset.step);renderSteps();}));$('#fuel-slider').addEventListener('input',event=>{state.fuel=Number(event.target.value);renderTelemetry();renderLanding();});$('#aerobraking-toggle').addEventListener('click',()=>{state.aerobraking=!state.aerobraking;renderTelemetry();renderLanding();});$('#parachute-toggle').addEventListener('click',()=>{state.parachute=!state.parachute;renderTelemetry();renderLanding();});$('#step-back').addEventListener('click',()=>{if(state.step===0)showScreen('lobby');else{state.step--;renderSteps();}});$('#step-next').addEventListener('click',()=>{if(state.step<2){state.step++;renderSteps();}else showLaunch();});$('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());$('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();const m=metrics();const failure=m.mass>42000||m.cost>m.budget||m.powerGeneration<m.powerDraw||m.dv<10500||!state.aerobraking||!state.parachute;toast(failure?'Launch preview: engineering risks detected. Revisit your design.':'Launch preview complete. Surface exploration comes in the full game.');});
+  $('#play-button').addEventListener('click',()=>{const go=()=>showScreen('orbit');window.ASTRO_LAUNCH?window.ASTRO_LAUNCH().then(go):go();});$('#lobby-back').addEventListener('click',()=>showScreen('orbit'));$('#to-assembly').addEventListener('click',()=>{state.step=0;showScreen('planner');});$('#planner-menu').addEventListener('click',()=>showScreen('lobby'));$('#quit-button').addEventListener('click',()=>$('#quit-dialog').showModal());$('#quit-cancel').addEventListener('click',()=>$('#quit-dialog').close());$('#quit-confirm').addEventListener('click',()=>$('#quit-dialog').close());$('#drawer-close').addEventListener('click',closeDrawer);$('#drawer-shade').addEventListener('click',closeDrawer);document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('#crew-drawer').classList.contains('open'))closeDrawer();});$$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));const mode=difficulty[state.difficulty];$('#modifier-badge').textContent=`${money(mode.budget)} BUDGET · ${mode.risk}`;renderTelemetry();renderLanding();}));$$('.rocket-stage').forEach(button=>button.addEventListener('click',()=>selectStage(button.dataset.stage)));$$('#category-tabs button').forEach(button=>button.addEventListener('click',()=>{state.category=button.dataset.category;renderCatalog();}));$$('.step').forEach(button=>button.addEventListener('click',()=>{state.step=Number(button.dataset.step);renderSteps();}));$('#fuel-slider').addEventListener('input',event=>{state.fuel=Number(event.target.value);renderTelemetry();renderLanding();});$('#aerobraking-toggle').addEventListener('click',()=>{state.aerobraking=!state.aerobraking;renderTelemetry();renderLanding();});$('#parachute-toggle').addEventListener('click',()=>{state.parachute=!state.parachute;renderTelemetry();renderLanding();});$('#step-back').addEventListener('click',()=>{if(state.step===0)showScreen('lobby');else{state.step--;renderSteps();}});$('#step-next').addEventListener('click',()=>{if(state.step<2){state.step++;renderSteps();}else showLaunch();});$('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());$('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();window.ASTRO_SIM?.startFlight();});
   $$('[data-site]').forEach(button=>button.addEventListener('click',()=>$('.mission-preview').classList.toggle('gale',button.dataset.site==='gale')));
   // Low-poly art: planets and terrain are flat-shaded triangles, like the 3D models.
   const RAMPS = {
@@ -627,8 +889,760 @@
     $('.preview-base').innerHTML = siteScene('jezero') + siteScene('gale');
     $('.landing-art .ground').innerHTML = `<svg viewBox="0 0 160 60" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${facetTerrain({ ramp: RAMPS.ground, seed: 12, w: 160, h: 60, cols: 14, rows: 4, profile: [[0, .25], [.2, .12], [.35, .3], [.55, .18], [.7, .32], [.85, .15], [1, .28]] })}</svg>`;
   }
-  window.ASTRO_ART={RAMPS,PLANETS};window.ASTRO={state,parts,stages};
+  window.ASTRO_ART={RAMPS,PLANETS};window.ASTRO={state,parts,stages,crew,metrics,CREW_MODELS,COCKPIT_MODEL,showScreen,toast};
   paintArt();renderCrew();renderPlanner();setupStars();
+
+  // ===========================================================================
+  // PHASES 5–7 SIMULATION ENGINE & RAD SOUNDSCAPE (Cockpit -> Mars Surface -> Results)
+  // ===========================================================================
+  const SIM = (() => {
+    const radAudio = {
+      muted: false,
+      bed: null,
+      ctx: null,
+      geigerTimer: null,
+      ensureCtx() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx?.state === 'suspended') this.ctx.resume().catch(() => {});
+      },
+      tone(freq, dur = 0.08, type = 'triangle', gain = 0.05) {
+        if (this.muted) return;
+        this.ensureCtx();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        g.gain.setValueAtTime(gain, this.ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+        osc.connect(g).connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + dur);
+      },
+      startSurfaceBed() {
+        if (this.muted) return;
+        try {
+          if (!this.bed) {
+            this.bed = new Audio('godot/assets/audio/rad_surface_bed.wav');
+            this.bed.loop = true;
+            this.bed.volume = 0.35;
+          }
+          this.bed.play().catch(() => {});
+        } catch { /* file:// or autoplay policy fallback */ }
+        clearInterval(this.geigerTimer);
+        this.geigerTimer = setInterval(() => {
+          if (!this.muted && state.screen === 'surface' && Math.random() < 0.38) {
+            this.tone(1400 + Math.random() * 500, 0.015, 'square', 0.018);
+          }
+        }, 420);
+      },
+      stopAll() {
+        if (this.bed) { this.bed.pause(); this.bed.currentTime = 0; }
+        clearInterval(this.geigerTimer);
+      },
+      toggleMute() {
+        this.muted = !this.muted;
+        if (this.muted) this.stopAll();
+        else if (state.screen === 'surface') this.startSurfaceBed();
+        const txt = this.muted ? 'Audio: Off' : 'Audio: On';
+        $('#audio-toggle-cockpit').textContent = txt;
+        $('#audio-toggle-surface').textContent = txt;
+      }
+    };
+    $('#audio-toggle-cockpit').addEventListener('click', () => radAudio.toggleMute());
+    $('#audio-toggle-surface').addEventListener('click', () => radAudio.toggleMute());
+
+    const flight = {
+      active: false,
+      step: 0, // 0=Liftoff & Max-Q, 1=Bus & Stage Sep, 2=Refuel & Solar Storm, 3=Mars EDL
+      progress: 0,
+      altKm: 0,
+      velMs: 0,
+      hull: 100,
+      propellant: 100,
+      throttle: 0.4,
+      pitchX: 0,
+      pitchY: 0,
+      stability: 100,
+      breakers: [false, false, false],
+      stageSeparated: false,
+      refuelDone: 0,
+      stormShielded: false,
+      edlChuteDeployed: false,
+      radRate: 232,
+      score: 100,
+      design: null,
+      keys: new Set(),
+      raf: 0,
+      lastTime: 0,
+      sparksUntil: 0,
+    };
+
+    const SURFACE_TASKS = {
+      jezero: [
+        { id: 'maya_drill', crew: 'maya', title: 'Delta Core Assay', desc: 'Drill & analyze ancient lake sediments with Maya.', x: 11, z: -10, item: 'Delta Core Sample', toolNote: 'PIXL/Drill synergy' },
+        { id: 'lucas_isru', crew: 'lucas', title: 'MOXIE Power & O₂ Rig', desc: 'Stabilize surface power array and produce oxygen.', x: -12, z: -8, item: 'O₂ Telemetry Cell', toolNote: 'Power grid stabilized' },
+        { id: 'oscar_link', crew: 'oscar', title: 'High-Gain Relay Uplinks', desc: 'Align Electra/DSOC beacon on Jezero ridge.', x: 8, z: 11, item: 'Earth Downlink Log', toolNote: 'High-rate telemetry' },
+      ],
+      gale: [
+        { id: 'maya_drill', crew: 'maya', title: 'Aeolis Mons Strata Sample', desc: 'Extract layered clay mineral sample on Mount Sharp.', x: 10, z: -11, item: 'Sulfate Rock Core', toolNote: 'Spectrometer assay' },
+        { id: 'lucas_isru', crew: 'lucas', title: 'MMRTG & RAD Calibration', desc: 'Service power junction & Curiosity RAD station.', x: -13, z: -7, item: 'O₂ Telemetry Cell', toolNote: 'Thermal loop balanced' },
+        { id: 'oscar_link', crew: 'oscar', title: 'Crater Rim Optical Link', desc: 'Lock laser/UHF carrier over Gale basin wall.', x: 9, z: 10, item: 'Earth Downlink Log', toolNote: 'Orbit pass locked' },
+      ],
+    };
+
+    const surf = {
+      active: false,
+      timerSec: 180,
+      lastTick: 0,
+      raf: 0,
+      activeCrew: 'maya',
+      selectedTask: 'maya_drill',
+      completed: new Set(),
+      inventory: ['RAD Log (MSL)'],
+      crewPos: {
+        helena: { x: -1.8, z: 2.2 },
+        lucas: { x: -0.6, z: 2.5 },
+        oscar: { x: 0.7, z: 2.5 },
+        maya: { x: 1.9, z: 2.1 },
+      },
+      moving: { x: 0, z: 0 },
+      keys: new Set(),
+      tasks: [],
+      stranded: [],
+    };
+
+    function logFlight(msg) {
+      const box = $('#flight-log');
+      if (!box) return;
+      const line = document.createElement('div');
+      line.textContent = msg;
+      box.prepend(line);
+      while (box.children.length > 7) box.lastElementChild.remove();
+    }
+
+    function startFlight() {
+      const m = metrics();
+      flight.design = {
+        ...m,
+        overweight: m.mass > 42000,
+        overBudget: m.cost > m.budget,
+        powerDeficit: m.powerGeneration < m.powerDraw,
+        lowDv: m.dv < 10500,
+        hasHera: state.equipped.has('hera'),
+        hasShelter: state.equipped.has('shelter'),
+        hasCockpitUpgrade: state.equipped.has('orion_cockpit'),
+        hasLoftid: state.equipped.has('shield'),
+        hasTrn: state.equipped.has('legs'),
+        hasDrill: state.equipped.has('drill'),
+        hasSpec: state.equipped.has('spectrometer'),
+        hasDna: state.equipped.has('msg_dna'),
+        hasDish: state.equipped.has('dish'),
+      };
+      flight.active = true;
+      flight.step = 0;
+      flight.progress = 0;
+      flight.altKm = 0;
+      flight.velMs = 0;
+      flight.hull = 100;
+      flight.propellant = 100;
+      flight.throttle = 0.35;
+      flight.pitchX = 0;
+      flight.pitchY = 0;
+      flight.stability = 100;
+      flight.breakers = [
+        flight.design.powerDeficit,
+        flight.design.powerDeficit || flight.design.overweight,
+        false,
+      ];
+      flight.stageSeparated = false;
+      flight.refuelDone = 0;
+      flight.stormShielded = false;
+      flight.edlChuteDeployed = false;
+      flight.radRate = 232;
+      flight.score = 100 - (flight.design.overBudget ? 12 : 0) - (flight.design.overweight ? 10 : 0);
+      flight.sparksUntil = flight.design.powerDeficit || flight.design.overweight ? performance.now() + 2800 : 0;
+
+      $('#flight-log').innerHTML = '';
+      logFlight('T-00:00 Flight Deck online. Camera_Pilot locked.');
+      if (flight.design.overweight) logFlight('ALERT: Overweight launch stack (>42,000 kg) — high aerodynamic buffet!');
+      if (flight.design.powerDeficit) logFlight('ALERT: Electrical bus deficit — inspect Breaker_Bank.');
+      if (flight.design.overBudget) logFlight('CAUTION: Mission exceeded budget — finance penalty logged.');
+      showScreen('cockpit');
+      renderFlightUI();
+      cancelAnimationFrame(flight.raf);
+      flight.lastTime = performance.now();
+      flight.raf = requestAnimationFrame(flightTick);
+    }
+
+    function setFlightStep(nextStep) {
+      flight.step = nextStep;
+      flight.progress = 0;
+      if (nextStep === 1) {
+        flight.breakers = [true, flight.design.powerDeficit || flight.design.overweight, true];
+        flight.sparksUntil = performance.now() + 3000;
+        logFlight('MAX-Q SURGE: Power bus tripped! Reset Breaker_Bank then engage Stage_Sep_Switch.');
+        radAudio.tone(320, 0.14, 'sawtooth', 0.06);
+      } else if (nextStep === 2) {
+        flight.radRate = 810;
+        logFlight(`ORBIT ACHIEVED. Target refueling reserve: ${state.fuel}%. MSL RAD warns of 810 µGy/h solar particle event!`);
+        radAudio.tone(660, 0.12, 'triangle', 0.05);
+      } else if (nextStep === 3) {
+        flight.altKm = 125;
+        flight.velMs = 5400;
+        flight.radRate = 232;
+        logFlight(`MARS ENTRY INTERFACE: Prepare ${state.site === 'jezero' ? 'Jezero' : 'Gale'} EDL. Deploy chute in Mach window!`);
+        radAudio.tone(520, 0.15, 'triangle', 0.05);
+      }
+      renderFlightUI();
+    }
+
+    function handleCockpitAction(actionId, arg) {
+      if (!flight.active) return;
+      if (actionId === 'throttle_up') {
+        flight.throttle = Math.min(1, flight.throttle + 0.35);
+        radAudio.tone(240 + flight.throttle * 180, 0.09, 'triangle', 0.05);
+        if (flight.step === 0) logFlight(`Throttle_Lever pushed to ${Math.round(flight.throttle * 100)}%.`);
+      } else if (actionId === 'steer') {
+        const [dx, dy] = arg || [0, 0];
+        const gain = flight.design.hasCockpitUpgrade ? 0.32 : 0.24;
+        flight.pitchX = Math.max(-1, Math.min(1, flight.pitchX + dx * gain));
+        flight.pitchY = Math.max(-1, Math.min(1, flight.pitchY + dy * gain));
+        radAudio.tone(440, 0.04, 'sine', 0.03);
+      } else if (actionId === 'stabilize') {
+        flight.pitchX *= 0.25;
+        flight.pitchY *= 0.25;
+        flight.stability = Math.min(100, flight.stability + 12);
+        radAudio.tone(540, 0.06, 'triangle', 0.04);
+      } else if (actionId === 'breaker') {
+        const idx = typeof arg === 'number' ? arg : flight.breakers.findIndex(Boolean);
+        if (idx >= 0) {
+          flight.breakers[idx] = false;
+          logFlight(`Breaker_Bank #${idx + 1} reset to NOMINAL.`);
+          radAudio.tone(780, 0.07, 'triangle', 0.05);
+        }
+      } else if (actionId === 'stage_sep') {
+        if (flight.step === 1 && !flight.breakers.some(Boolean)) {
+          flight.stageSeparated = true;
+          logFlight('Stage_Sep_Switch actuated! Main booster separated cleanly.');
+          radAudio.tone(880, 0.14, 'triangle', 0.06);
+          setFlightStep(2);
+          return;
+        }
+        toast('Reset all tripped Breaker_Bank switches before stage separation.');
+      } else if (actionId === 'pump_fuel') {
+        if (flight.step === 2) {
+          flight.refuelDone = Math.min(state.fuel, flight.refuelDone + 25);
+          flight.progress = Math.min(100, (flight.refuelDone / state.fuel) * 100);
+          logFlight(`Orbital propellant transfer: ${flight.refuelDone}% / ${state.fuel}%.`);
+          radAudio.tone(500, 0.06, 'sine', 0.04);
+        }
+      } else if (actionId === 'shield_storm') {
+        flight.stormShielded = true;
+        flight.radRate = flight.design.hasShelter ? 140 : 210;
+        logFlight(flight.design.hasShelter ? 'Orion Storm Shelter sealed! Solar storm dose reduced by 82%.' : 'Water bags stacked for solar storm protection.');
+        radAudio.tone(740, 0.1, 'triangle', 0.05);
+      } else if (actionId === 'edl_arm') {
+        if (flight.step === 3 && !flight.edlChuteDeployed) {
+          flight.edlChuteDeployed = true;
+          const bonus = (state.parachute || flight.design.hasLoftid) ? 18 : 6;
+          flight.stability = Math.min(100, flight.stability + bonus);
+          logFlight(`EDL_Arm_Switch ON! ${state.parachute || flight.design.hasLoftid ? 'Supersonic parachute & LOFTID shield inflated.' : 'Backup drogue chute deployed!'}`);
+          radAudio.tone(820, 0.12, 'triangle', 0.06);
+        }
+      } else if (actionId === 'complete_step') {
+        if (flight.step === 2 && flight.refuelDone >= state.fuel) {
+          if (!flight.stormShielded && !flight.design.hasHera) {
+            flight.score -= 10;
+            logFlight('Radiation dose absorbed during unshielded solar storm (-10 pts).');
+          }
+          setFlightStep(3);
+          return;
+        } else if (flight.step === 3 && flight.progress >= 95) {
+          finishFlightAndLand();
+          return;
+        }
+      }
+      renderFlightUI();
+    }
+
+    function finishFlightAndLand() {
+      flight.active = false;
+      cancelAnimationFrame(flight.raf);
+      const hasEdlHardware = state.aerobraking || state.parachute || flight.design.hasLoftid || flight.design.hasTrn;
+      if (!flight.edlChuteDeployed || !hasEdlHardware) {
+        flight.hull = Math.max(45, flight.hull - 20);
+        flight.score -= 12;
+      }
+      if (!flight.design.hasTrn) flight.score -= 4;
+      toast(`Touchdown at ${state.site === 'jezero' ? 'Jezero Crater' : 'Gale Crater'}! Release harnesses for EVA.`);
+      startSurface();
+    }
+
+    function flightTick(now) {
+      if (!flight.active || state.screen !== 'cockpit') return;
+      const dt = Math.min(0.05, (now - flight.lastTime) / 1000);
+      flight.lastTime = now;
+
+      // Keyboard steering
+      if (flight.keys.has('ArrowLeft') || flight.keys.has('KeyA')) flight.pitchX = Math.max(-1, flight.pitchX - dt * 1.4);
+      if (flight.keys.has('ArrowRight') || flight.keys.has('KeyD')) flight.pitchX = Math.min(1, flight.pitchX + dt * 1.4);
+      if (flight.keys.has('ArrowUp') || flight.keys.has('KeyW')) flight.pitchY = Math.max(-1, flight.pitchY - dt * 1.4);
+      if (flight.keys.has('ArrowDown') || flight.keys.has('KeyS')) flight.pitchY = Math.min(1, flight.pitchY + dt * 1.4);
+
+      const driftMag = flight.design.overweight ? 0.55 : 0.28;
+      if (flight.step === 0) {
+        flight.pitchX += (Math.sin(now * 0.0023) * driftMag) * dt;
+        flight.pitchY += (Math.cos(now * 0.0019) * driftMag * 0.7) * dt;
+        const speedMul = flight.throttle > 0.65 ? 16 : 6;
+        flight.progress = Math.min(100, flight.progress + dt * speedMul);
+        flight.altKm = flight.progress * 0.85;
+        flight.velMs = Math.round(flight.progress * 26.5);
+        const err = Math.hypot(flight.pitchX, flight.pitchY);
+        if (err > 0.6) {
+          flight.hull = Math.max(50, flight.hull - dt * 4);
+          flight.stability = Math.max(20, flight.stability - dt * 12);
+        } else {
+          flight.stability = Math.min(100, flight.stability + dt * 8);
+        }
+        if (flight.progress >= 100) setFlightStep(1);
+      } else if (flight.step === 1) {
+        flight.altKm = Math.min(220, flight.altKm + dt * 6);
+        flight.velMs = Math.min(7800, flight.velMs + dt * 210);
+        flight.progress = flight.breakers.filter(b => !b).length * 33;
+      } else if (flight.step === 2) {
+        flight.altKm = 400;
+        flight.velMs = 7670;
+        if (!flight.stormShielded) flight.radRate = 810;
+      } else if (flight.step === 3) {
+        const descentRate = flight.edlChuteDeployed ? 18 : 11;
+        flight.progress = Math.min(100, flight.progress + dt * descentRate);
+        flight.altKm = Math.max(0, 125 * (1 - flight.progress / 100));
+        const brakeFactor = (flight.edlChuteDeployed ? 0.55 : 0.92) * (state.aerobraking || flight.design.hasLoftid ? 0.8 : 1);
+        flight.velMs = Math.max(2, Math.round(5400 * (1 - flight.progress / 100) * brakeFactor));
+        flight.pitchX += Math.sin(now * 0.0031) * (flight.design.hasTrn ? 0.14 : 0.35) * dt;
+        if (flight.progress >= 100) {
+          finishFlightAndLand();
+          return;
+        }
+      }
+
+      flight.propellant = Math.max(8, 100 - flight.step * 18 - flight.progress * 0.14);
+      window.dispatchEvent(new CustomEvent('astro:cockpit', { detail: flight }));
+      updateCockpitHUD();
+      flight.raf = requestAnimationFrame(flightTick);
+    }
+
+    function updateCockpitHUD() {
+      $('#flight-progress-val').textContent = Math.round(flight.progress) + '%';
+      $('#flight-alt-val').textContent = flight.altKm.toFixed(1) + ' km';
+      $('#flight-vel-val').textContent = number(flight.velMs) + ' m/s';
+      $('#flight-hull-val').textContent = `${Math.round(flight.propellant)}% / ${Math.round(flight.hull)}%`;
+      $('#flight-goal-val').textContent = Math.round(flight.stability) + '%';
+      setWidth('#flight-goal-fill', flight.stability, 100, flight.stability < 55);
+
+      const pip = $('#cockpit-pip');
+      if (pip) {
+        pip.style.translate = `calc(-50% + ${Math.round(flight.pitchX * 48)}px) calc(-50% + ${Math.round(flight.pitchY * 48)}px)`;
+        pip.classList.toggle('danger', Math.hypot(flight.pitchX, flight.pitchY) > 0.55);
+      }
+      const hasAlert = flight.breakers.some(Boolean) || (flight.step === 2 && !flight.stormShielded) || (flight.step === 3 && flight.progress > 35 && !flight.edlChuteDeployed);
+      $('#cockpit-badge').textContent = hasAlert ? 'ACTION REQUIRED' : 'NOMINAL';
+      $('#cockpit-alert-tag').textContent = hasAlert ? 'C&W MATRIX ALERT ACTIVE' : 'ALL SYSTEMS NOMINAL';
+      $('#cockpit-rad-tag').textContent = `MSL RAD: ${flight.radRate} µGy/h`;
+      const actionBtn = $('#cockpit-complete-btn');
+      if (actionBtn && flight.step === 2) actionBtn.disabled = flight.refuelDone < state.fuel;
+    }
+
+    function renderFlightUI() {
+      $$('#flight-stepper .flight-pill').forEach((el, idx) => {
+        el.classList.toggle('active', idx === flight.step);
+        el.classList.toggle('done', idx < flight.step);
+      });
+      const titles = [
+        ['Flight Operations / Phase 05', 'Liftoff & Max-Q Corridor'],
+        ['Flight Operations / Phase 05B', 'Electrical Bus & Stage Separation'],
+        ['Transit Operations / Phase 06A', 'Orbital Refueling & Solar Storm'],
+        ['Mars Arrival / Phase 06B', 'Entry, Descent & Landing (EDL)'],
+      ];
+      $('#cockpit-eyebrow').textContent = titles[flight.step][0];
+      $('#cockpit-title').textContent = titles[flight.step][1];
+
+      const box = $('#cockpit-minigame');
+      if (flight.step === 0) {
+        box.innerHTML = `
+          <span class="eyebrow">Helena · Minigame H-O1</span>
+          <h4>Throttle &amp; Attitude Corridor</h4>
+          <p>Push <b>Throttle_Lever</b> above 70% and keep the amber diamond centered inside the reticle with <b>Joystick_RHC</b> or WASD.${flight.design.overweight ? ' <b>(Overweight buffet active!)</b>' : ''}</p>
+          <div class="control-grid">
+            <button class="button primary" type="button" data-act="throttle_up">Push Throttle (${Math.round(flight.throttle * 100)}%)</button>
+            <button class="button secondary" type="button" data-act="stabilize">Center RHC Attitude</button>
+          </div>`;
+      } else if (flight.step === 1) {
+        box.innerHTML = `
+          <span class="eyebrow">Lucas · Minigame L-S4</span>
+          <h4>Reset Breaker_Bank &amp; Separate</h4>
+          <p>Max-Q tripped flight deck buses. Click all flashing red breakers (or click the 3D left wing), then flip <b>Stage_Sep_Switch</b>.</p>
+          <div class="breaker-grid">${flight.breakers.map((t, i) => `<button class="breaker-btn ${t ? 'tripped' : ''}" type="button" data-act="breaker" data-idx="${i}">Bus ${i + 1}: ${t ? 'TRIP' : 'OK'}</button>`).join('')}</div>
+          <button class="button primary" type="button" data-act="stage_sep" ${flight.breakers.some(Boolean) ? 'disabled' : ''}>Engage Stage_Sep_Switch →</button>`;
+      } else if (flight.step === 2) {
+        box.innerHTML = `
+          <span class="eyebrow">Oscar &amp; Maya · Phase 06A</span>
+          <h4>Refuel (${state.fuel}%) &amp; Shield Solar Storm</h4>
+          <p>Cryogenic tanker docked. Pump fuel to your planned reserve and shield the crew from the 810 µGy/h storm (2024-05-20 RAD dataset).</p>
+          <div class="control-grid">
+            <button class="button secondary" type="button" data-act="pump_fuel">Pump Fuel (${flight.refuelDone}/${state.fuel}%)</button>
+            <button class="button secondary" type="button" data-act="shield_storm" ${flight.stormShielded ? 'disabled' : ''}>${flight.stormShielded ? 'Shelter Sealed ✓' : flight.design.hasShelter ? 'Seal Storm Shelter' : 'Deploy Water Wall'}</button>
+          </div>
+          <button class="button primary" id="cockpit-complete-btn" type="button" data-act="complete_step" ${flight.refuelDone < state.fuel ? 'disabled' : ''}>Commit to Mars EDL →</button>`;
+      } else {
+        box.innerHTML = `
+          <span class="eyebrow">Helena · Minigame H-S1/S2</span>
+          <h4>Mars Thin-Air EDL Approach</h4>
+          <p>Arm <b>EDL_Arm_Switch</b> to deploy parachute/heat-shield (${state.aerobraking || flight.design.hasLoftid ? 'LOFTID + ASPIRE armed' : 'No extra heat-shield!'}) and stabilize for touchdown.</p>
+          <div class="control-grid">
+            <button class="button primary" type="button" data-act="edl_arm" ${flight.edlChuteDeployed ? 'disabled' : ''}>${flight.edlChuteDeployed ? 'Chute Deployed ✓' : 'Flip EDL_Arm_Switch'}</button>
+            <button class="button secondary" type="button" data-act="stabilize">${flight.design.hasTrn ? 'TRN Hazard Avoid' : 'Manual THC Flare'}</button>
+          </div>
+          <button class="button primary" id="cockpit-complete-btn" type="button" data-act="complete_step">Final Touchdown →</button>`;
+      }
+      $$('[data-act]', box).forEach(btn => btn.addEventListener('click', () => {
+        const idx = btn.dataset.idx !== undefined ? Number(btn.dataset.idx) : undefined;
+        handleCockpitAction(btn.dataset.act, idx);
+      }));
+      updateCockpitHUD();
+    }
+
+    // -------------------------------------------------------------------------
+    // PHASE 7: MARS SURFACE EXPLORATION
+    // -------------------------------------------------------------------------
+    function startSurface() {
+      surf.active = true;
+      surf.timerSec = state.difficulty === 'easy' ? 210 : state.difficulty === 'hard' ? 140 : 180;
+      surf.activeCrew = 'maya';
+      surf.tasks = SURFACE_TASKS[state.site] || SURFACE_TASKS.jezero;
+      surf.selectedTask = surf.tasks[0].id;
+      surf.completed = new Set();
+      surf.inventory = [flight.design.hasHera ? 'HERA Spectrum' : 'MSL RAD Log'];
+      surf.crewPos = {
+        helena: { x: -1.8, z: 2.2 },
+        lucas: { x: -0.6, z: 2.5 },
+        oscar: { x: 0.7, z: 2.5 },
+        maya: { x: 1.9, z: 2.1 },
+      };
+      surf.stranded = [];
+
+      const jezero = state.site === 'jezero';
+      $('#surface-title').textContent = (jezero ? 'Jezero Crater' : 'Gale Crater') + ' Surface Ops';
+      $('#surface-coords').textContent = jezero ? '18.38°N · 77.58°E' : '4.59°S · 137.44°E';
+      $('#surface-rad-badge').textContent = flight.design.hasHera ? 'RAD: 232 µGy/sol · HERA MONITOR' : 'RAD: 232 µGy/sol · CALM';
+      showScreen('surface');
+      radAudio.startSurfaceBed();
+      renderSurfaceUI();
+      cancelAnimationFrame(surf.raf);
+      surf.lastTick = performance.now();
+      surf.raf = requestAnimationFrame(surfaceTick);
+    }
+
+    function activeTarget() {
+      if (surf.completed.size >= 3 || surf.selectedTask === 'return_ship') {
+        return { id: 'return_ship', crew: surf.activeCrew, title: 'Ascent Vehicle', x: 0, z: 0 };
+      }
+      return surf.tasks.find(t => t.id === surf.selectedTask) || surf.tasks[0];
+    }
+
+    function distanceToTarget(crewId = surf.activeCrew, tgt = activeTarget()) {
+      const p = surf.crewPos[crewId];
+      return Math.hypot(tgt.x - p.x, tgt.z - p.z);
+    }
+
+    function selectSurfaceTask(taskId) {
+      surf.selectedTask = taskId;
+      const t = surf.tasks.find(item => item.id === taskId);
+      if (t) surf.activeCrew = t.crew;
+      renderSurfaceUI();
+      window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf }));
+    }
+
+    function switchSurfaceCrew(crewId) {
+      surf.activeCrew = crewId;
+      renderSurfaceUI();
+      window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf }));
+    }
+
+    function performSurfaceInteract() {
+      const tgt = activeTarget();
+      const pos = surf.crewPos[surf.activeCrew];
+      const dist = distanceToTarget(surf.activeCrew, tgt);
+      if (dist > 2.4) {
+        // Guide specialist directly toward target if clicked from HUD/accessibility button
+        const ang = Math.atan2(tgt.z - pos.z, tgt.x - pos.x);
+        const step = Math.min(dist - 1.2, 4.5);
+        pos.x += Math.cos(ang) * step;
+        pos.z += Math.sin(ang) * step;
+        radAudio.tone(380, 0.06, 'triangle', 0.04);
+      }
+      if (distanceToTarget(surf.activeCrew, tgt) <= 2.5) {
+        if (tgt.id === 'return_ship') {
+          boardShipAndFinish(false);
+          return;
+        }
+        if (!surf.completed.has(tgt.id)) {
+          surf.completed.add(tgt.id);
+          surf.inventory.push(tgt.item);
+          radAudio.tone(860, 0.14, 'triangle', 0.06);
+          toast(`${tgt.title} completed! ${tgt.item} stored in inventory.`);
+          const remaining = surf.tasks.find(item => !surf.completed.has(item.id));
+          if (remaining) selectSurfaceTask(remaining.id);
+          else {
+            surf.selectedTask = 'return_ship';
+            toast('All 3 surface missions complete! Return crew to the Ascent Vehicle.');
+          }
+        }
+      }
+      renderSurfaceUI();
+      window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf }));
+    }
+
+    function boardShipAndFinish(forcedTimeout = false) {
+      surf.active = false;
+      cancelAnimationFrame(surf.raf);
+      radAudio.stopAll();
+      surf.stranded = [];
+      if (forcedTimeout) {
+        for (const p of crew) {
+          const dist = Math.hypot(surf.crewPos[p.id].x, surf.crewPos[p.id].z);
+          if (dist > 11.5) surf.stranded.push(p.name);
+        }
+      }
+      showResults(forcedTimeout);
+    }
+
+    function surfaceTick(now) {
+      if (!surf.active || state.screen !== 'surface') return;
+      const dt = Math.min(0.05, (now - surf.lastTick) / 1000);
+      surf.lastTick = now;
+
+      surf.timerSec = Math.max(0, surf.timerSec - dt);
+      if (surf.timerSec <= 0) {
+        toast('Return launch window reached! Mandatory ascent initiating.');
+        boardShipAndFinish(true);
+        return;
+      }
+
+      let vx = surf.moving.x;
+      let vz = surf.moving.z;
+      if (surf.keys.has('KeyA') || surf.keys.has('ArrowLeft')) vx -= 1;
+      if (surf.keys.has('KeyD') || surf.keys.has('ArrowRight')) vx += 1;
+      if (surf.keys.has('KeyW') || surf.keys.has('ArrowUp')) vz -= 1;
+      if (surf.keys.has('KeyS') || surf.keys.has('ArrowDown')) vz += 1;
+      const mag = Math.hypot(vx, vz);
+      if (mag > 0) {
+        const speed = 6.2;
+        const pos = surf.crewPos[surf.activeCrew];
+        pos.x = Math.max(-18, Math.min(18, pos.x + (vx / mag) * speed * dt));
+        pos.z = Math.max(-18, Math.min(18, pos.z + (vz / mag) * speed * dt));
+        // Auto-complete mission when specialist walks onto beacon
+        const tgt = activeTarget();
+        if (tgt.id !== 'return_ship' && tgt.crew === surf.activeCrew && distanceToTarget(surf.activeCrew, tgt) < 2.2 && !surf.completed.has(tgt.id)) {
+          performSurfaceInteract();
+        }
+      }
+
+      updateSurfaceHUD();
+      window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf, walking: mag > 0 }));
+      surf.raf = requestAnimationFrame(surfaceTick);
+    }
+
+    function updateSurfaceHUD() {
+      const m = Math.floor(surf.timerSec / 60);
+      const s = Math.floor(surf.timerSec % 60);
+      const timerEl = $('#surface-timer');
+      timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      timerEl.classList.toggle('urgent', surf.timerSec <= 30);
+
+      const p = surf.crewPos[surf.activeCrew];
+      const tgt = activeTarget();
+      const dx = tgt.x - p.x;
+      const dz = tgt.z - p.z;
+      const dist = Math.hypot(dx, dz);
+      // 0 deg = North (-Z), 90 deg = East (+X)
+      const deg = ((Math.atan2(dx, -dz) * 180 / Math.PI) + 360) % 360;
+      const markerPct = Math.max(6, Math.min(94, 50 + (deg > 180 ? deg - 360 : deg) / 180 * 44));
+      $('#compass-marker').style.left = markerPct + '%';
+      $('#surface-bearing-label').textContent = `HDG ${String(Math.round(deg)).padStart(3, '0')}° · ${tgt.title.toUpperCase()}`;
+      const person = crew.find(c => c.id === surf.activeCrew);
+      $('#surface-active-crew-tag').textContent = `ACTIVE: ${person.name.toUpperCase()} · ${person.role.toUpperCase()}`;
+      $('#surface-dist-tag').textContent = `DIST TO WAYPOINT: ${Math.round(dist * 3)} m`;
+      const actionBtn = $('#surface-action-btn');
+      if (actionBtn) {
+        if (tgt.id === 'return_ship') actionBtn.textContent = dist <= 2.5 ? 'Board Ascent Vehicle ✓' : 'Guide Crew Back to Ship →';
+        else actionBtn.textContent = dist <= 2.5 ? `Execute ${tgt.title} ✓` : `Guide ${person.name} to ${tgt.title} →`;
+      }
+      renderSurfaceFallbackMap();
+    }
+
+    function renderSurfaceFallbackMap() {
+      const svg = $('#surface-svg-fallback');
+      if (!svg || $('#surface-viewport').classList.contains('is-3d')) return;
+      const mapX = x => 300 + x * 13;
+      const mapY = z => 210 + z * 9.5;
+      const tasksSvg = surf.tasks.map(t => {
+        const done = surf.completed.has(t.id);
+        const col = done ? '#7EDAC2' : '#F59E0B';
+        return `<g transform="translate(${mapX(t.x)} ${mapY(t.z)})"><polygon points="0,-10 10,8 -10,8" fill="${col}"/><text y="20" text-anchor="middle" fill="#FCE8A6" font-size="10" font-family="Chakra Petch">${t.title}</text></g>`;
+      }).join('');
+      const crewSvg = crew.map(c => {
+        const p = surf.crewPos[c.id];
+        const act = c.id === surf.activeCrew;
+        return `<g transform="translate(${mapX(p.x)} ${mapY(p.z)})"><polygon points="0,-8 8,0 0,8 -8,0" fill="${c.color}" stroke="${act ? '#FFFFFF' : 'none'}" stroke-width="2"/><text y="-11" text-anchor="middle" fill="#FFFFFF" font-size="9">${c.name}</text></g>`;
+      }).join('');
+      svg.innerHTML = `<rect width="600" height="420" fill="#2d1424"/><polygon points="0,420 220,300 440,340 600,260 600,420" fill="#5e1d22"/><polygon points="290,190 310,190 318,225 282,225" fill="#FCE8A6"/><text x="300" y="242" text-anchor="middle" fill="#FCE8A6" font-size="10">ASCENT VEHICLE</text>${tasksSvg}${crewSvg}`;
+    }
+
+    function renderSurfaceUI() {
+      $('#surface-progress-tag').textContent = `${surf.completed.size} / 3 DONE`;
+      $('#surface-task-list').innerHTML = surf.tasks.map(t => {
+        const done = surf.completed.has(t.id);
+        const active = surf.selectedTask === t.id;
+        return `<button class="task-item ${active ? 'active' : ''} ${done ? 'done' : ''}" type="button" data-stask="${t.id}"><strong>${done ? '✓ ' : ''}${t.title} (${t.crew.toUpperCase()})</strong><small>${t.desc}</small></button>`;
+      }).join('');
+      $$('[data-stask]', $('#surface-task-list')).forEach(btn => btn.addEventListener('click', () => selectSurfaceTask(btn.dataset.stask)));
+
+      $('#surface-crew-switch').innerHTML = crew.map((c, idx) => {
+        const active = surf.activeCrew === c.id;
+        return `<button class="crew-pill ${active ? 'active' : ''}" style="--crew:${c.color}" type="button" data-screw="${c.id}"><strong>${idx + 1}. ${c.name}</strong><small>${c.role.split('&')[0].trim()}</small></button>`;
+      }).join('');
+      $$('[data-screw]', $('#surface-crew-switch')).forEach(btn => btn.addEventListener('click', () => switchSurfaceCrew(btn.dataset.screw)));
+
+      const slots = [0, 1, 2, 3].map(i => surf.inventory[i] || 'Empty Sample Slot');
+      $('#surface-inventory').innerHTML = slots.map((label, i) => `<div class="inv-slot ${surf.inventory[i] ? 'filled' : ''}">${label}</div>`).join('');
+      updateSurfaceHUD();
+    }
+
+    $('#surface-action-btn').addEventListener('click', performSurfaceInteract);
+    $('#surface-board-btn').addEventListener('click', () => boardShipAndFinish(false));
+    $('#surface-back').addEventListener('click', () => {
+      surf.active = false;
+      cancelAnimationFrame(surf.raf);
+      radAudio.stopAll();
+      showScreen('planner');
+    });
+    $('#cockpit-abort').addEventListener('click', () => {
+      flight.active = false;
+      cancelAnimationFrame(flight.raf);
+      showScreen('planner');
+    });
+
+    $$('[data-move]').forEach(btn => {
+      const [mx, mz] = btn.dataset.move.split(',').map(Number);
+      const startMove = () => { surf.moving = { x: mx, z: mz }; };
+      const stopMove = () => { surf.moving = { x: 0, z: 0 }; };
+      btn.addEventListener('pointerdown', startMove);
+      btn.addEventListener('pointerup', stopMove);
+      btn.addEventListener('pointerleave', stopMove);
+      btn.addEventListener('click', () => {
+        if (!surf.active) return;
+        const p = surf.crewPos[surf.activeCrew];
+        p.x = Math.max(-18, Math.min(18, p.x + mx * 1.4));
+        p.z = Math.max(-18, Math.min(18, p.z + mz * 1.4));
+        updateSurfaceHUD();
+        window.dispatchEvent(new CustomEvent('astro:surface', { detail: surf, walking: true }));
+      });
+    });
+
+    document.addEventListener('keydown', e => {
+      if (state.screen === 'cockpit') {
+        flight.keys.add(e.code);
+        if (e.code === 'Space') { e.preventDefault(); handleCockpitAction(flight.step === 0 ? 'throttle_up' : flight.step === 1 ? 'stage_sep' : flight.step === 2 ? 'pump_fuel' : 'edl_arm'); }
+      } else if (state.screen === 'surface') {
+        surf.keys.add(e.code);
+        if (e.key >= '1' && e.key <= '4') switchSurfaceCrew(crew[Number(e.key) - 1].id);
+        if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); performSurfaceInteract(); }
+      }
+    });
+    document.addEventListener('keyup', e => { flight.keys.delete(e.code); surf.keys.delete(e.code); });
+
+    // -------------------------------------------------------------------------
+    // FINAL RESULTS, RANKING & ANIMATED PODIUM
+    // -------------------------------------------------------------------------
+    function showResults(forcedTimeout) {
+      const d = flight.design;
+      const tasksDone = surf.completed.size;
+      const scienceBonus = (d.hasDrill ? 6 : 0) + (d.hasSpec ? 6 : 0) + (d.hasDna ? 6 : 0) + (d.hasDish ? 5 : 0);
+      const returnBonus = forcedTimeout ? (surf.stranded.length ? -18 : 4) : 18;
+      const edlBonus = (state.aerobraking && state.parachute) || (d.hasLoftid && d.hasTrn) ? 14 : 4;
+      const timeBonus = Math.round(surf.timerSec * 0.08);
+      const total = Math.max(150, Math.round((flight.score * 6.5) + tasksDone * 140 + scienceBonus * 5 + edlBonus * 6 + returnBonus * 6 + timeBonus));
+      const grade = total >= 1150 ? 'S+' : total >= 950 ? 'A' : total >= 740 ? 'B' : 'C';
+
+      $('#results-rank-letter').textContent = grade;
+      $('#results-score-text').textContent = `Total Score: ${number(total)} pts · ${tasksDone}/3 Surface Missions`;
+      $('#results-status-badge').textContent = surf.stranded.length ? `LEFT BEHIND: ${surf.stranded.join(', ').toUpperCase()}` : 'ALL 4 CREW RETURNED';
+      $('#results-headline').textContent = surf.stranded.length ? 'Emergency Extraction Partial' : grade === 'S+' ? 'Historic Mars Triumph' : 'Mission Complete';
+      $('#podium-site-tag').textContent = `${state.site === 'jezero' ? 'JEZERO' : 'GALE'} CRATER · RANK ${grade}`;
+
+      const helenaPts = Math.round(210 + flight.stability * 1.1 + edlBonus * 4);
+      const lucasPts = Math.round(200 + (d.powerDeficit ? 10 : 45) + (surf.completed.has('lucas_isru') ? 130 : 25));
+      const oscarPts = Math.round(195 + (d.hasDish ? 45 : 15) + (surf.completed.has('oscar_link') ? 130 : 25));
+      const mayaPts = Math.round(200 + scienceBonus * 4 + (surf.completed.has('maya_drill') ? 145 : 25));
+      const ranked = [
+        { ...crew[0], pts: helenaPts },
+        { ...crew[1], pts: lucasPts },
+        { ...crew[2], pts: oscarPts },
+        { ...crew[3], pts: mayaPts },
+      ].sort((a, b) => b.pts - a.pts).map((c, idx) => ({
+        ...c,
+        pos: ['1ST', '2ND', '3RD', '4TH'][idx],
+        grade: c.pts >= 360 ? 'S+' : c.pts >= 310 ? 'A' : c.pts >= 240 ? 'B' : 'C',
+      }));
+
+      $('#results-leaderboard').innerHTML = ranked.map(r => `
+        <div class="leader-row">
+          <span class="leader-pos">${r.pos}</span>
+          <span><b>${r.name}</b> <small class="muted">· ${r.role}</small></span>
+          <strong>${r.pts} pts</strong>
+          <span class="leader-grade">${r.grade}</span>
+        </div>`).join('');
+
+      $('#results-breakdown').innerHTML = [
+        ['Budget & Mass', `${d.overBudget ? 'Exceeded' : 'On budget'} · ${d.overweight ? 'Overweight buffet' : 'Within 42 t limit'}`],
+        ['EDL Landing', `${flight.edlChuteDeployed ? 'Chute deployed' : 'Hard burn'} · ${hasEdlLabel(d)}`],
+        ['Solar Storm (RAD)', flight.stormShielded || d.hasShelter ? 'Shielded (low dose)' : 'Unshielded exposure'],
+        ['Surface Window', forcedTimeout ? (surf.stranded.length ? `Timeout — stranded: ${surf.stranded.join(', ')}` : 'Returned on timer') : `Cleared with ${Math.floor(surf.timerSec)}s margin`],
+      ].map(([k, v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
+
+      $('#podium-fallback').innerHTML = ranked.map((r, i) => `
+        <div class="podium-col">
+          ${astronaut(r)}
+          <div class="podium-step" style="background:${r.color};padding-top:${(4 - i) * 10}px">${r.pos} · ${r.name.toUpperCase()} (${r.grade})</div>
+        </div>`).join('');
+
+      showScreen('results');
+      window.dispatchEvent(new CustomEvent('astro:results', { detail: { ranked, grade } }));
+    }
+
+    function hasEdlLabel(d) {
+      if (state.aerobraking && state.parachute) return 'Full EDL suite';
+      if (d.hasLoftid || d.hasTrn) return 'Cabin EDL gear';
+      return 'Minimal EDL gear';
+    }
+
+    $('#results-replay').addEventListener('click', () => showScreen('lobby'));
+
+    return { startFlight, handleCockpitAction, selectSurfaceTask, switchSurfaceCrew, moveActiveTo: (x, z) => {
+      if (!surf.active) return;
+      surf.crewPos[surf.activeCrew] = { x: Math.max(-18, Math.min(18, x)), z: Math.max(-18, Math.min(18, z)) };
+      const tgt = activeTarget();
+      if (tgt.id !== 'return_ship' && tgt.crew === surf.activeCrew && distanceToTarget(surf.activeCrew, tgt) < 2.4 && !surf.completed.has(tgt.id)) {
+        performSurfaceInteract();
+      }
+      updateSurfaceHUD();
+    }, flight, surf };
+  })();
+  window.ASTRO_SIM = SIM;
 })();
 </script>
 <script src="index.models.js"></script>
@@ -942,6 +1956,775 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   }
   requestAnimationFrame(frame);
 })().catch(err => console.warn('3D rocket not shown:', err));
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+(() => {
+  const loader = new GLTFLoader();
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  const CREW_IDS = ['helena', 'lucas', 'oscar', 'maya'];
+  const CREW_COLORS = {
+    helena: '#ff7847',
+    lucas: '#52b7ff',
+    oscar: '#f6c445',
+    maya: '#4be08a',
+  };
+  const DEFAULT_MARS_RAMP = ['#5d291a', '#7c3621', '#9c4328', '#bb5330', '#d26a3b'];
+
+  const bufCache = new Map();
+  async function loadGLBBytes(relPath) {
+    if (bufCache.has(relPath)) return bufCache.get(relPath);
+    const b64 = window.ASTRO_GLB?.[relPath];
+    let buf;
+    if (b64) {
+      const bin = atob(b64);
+      const u8 = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      buf = u8.buffer;
+    } else {
+      const res = await fetch(`godot/assets/models/${relPath}`);
+      if (!res.ok) throw new Error(`Failed to fetch ${relPath}: ${res.status}`);
+      buf = await res.arrayBuffer();
+    }
+    bufCache.set(relPath, buf);
+    return buf;
+  }
+
+  async function parseFreshGLB(relPath) {
+    const buf = await loadGLBBytes(relPath);
+    return loader.parseAsync(buf.slice(0), '');
+  }
+
+  function makeViewport(container, { fov = 50, clearColor = 0x050912, clearAlpha = 1 } = {}) {
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: clearAlpha < 1, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    const w = Math.max(container.clientWidth, 320);
+    const h = Math.max(container.clientHeight, 240);
+    renderer.setSize(w, h, false);
+    renderer.setClearColor(clearColor, clearAlpha);
+    renderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;';
+    container.prepend(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environmentIntensity = 0.55;
+    pmrem.dispose();
+
+    const camera = new THREE.PerspectiveCamera(fov, w / h, 0.05, 300);
+
+    const resize = () => {
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      if (cw > 0 && ch > 0) {
+        renderer.setSize(cw, ch, false);
+        camera.aspect = cw / ch;
+        camera.updateProjectionMatrix();
+      }
+    };
+    if (window.ResizeObserver) {
+      new ResizeObserver(resize).observe(container);
+    } else {
+      window.addEventListener('resize', resize);
+    }
+    container.classList.add('is-3d');
+    return { renderer, scene, camera, resize };
+  }
+
+  function addStandardStudioLights(scene, { warmRim = 0xff7038 } = {}) {
+    scene.add(new THREE.AmbientLight(0xd9e3f5, 0.42));
+    const key = new THREE.DirectionalLight(0xfff4e2, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(warmRim, 0.95);
+    rim.position.set(-5, 3, -6);
+    scene.add(rim);
+  }
+
+  function createFacetedMarsPlanet(radius = 8.5) {
+    const geo = new THREE.IcosahedronGeometry(radius, 2).toNonIndexed();
+    const pos = geo.attributes.position;
+    const colors = new Float32Array(pos.count * 3);
+    const c = new THREE.Color();
+    for (let i = 0; i < pos.count; i += 3) {
+      const cy = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
+      const cx = (pos.getX(i) + pos.getX(i + 1) + pos.getX(i + 2)) / 3;
+      const idx = Math.abs(Math.floor((cy * 1.3 + cx * 0.7) * 2)) % DEFAULT_MARS_RAMP.length;
+      c.set(DEFAULT_MARS_RAMP[idx]);
+      for (let k = 0; k < 3; k++) {
+        colors[(i + k) * 3] = c.r;
+        colors[(i + k) * 3 + 1] = c.g;
+        colors[(i + k) * 3 + 2] = c.b;
+      }
+    }
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.computeVertexNormals();
+    return new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+      vertexColors: true, roughness: 0.9, metalness: 0.04, flatShading: true
+    }));
+  }
+
+  function createStarfield(count = 550, minR = 45, maxR = 120) {
+    const pos = new Float32Array(count * 3);
+    let seed = 1337;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    for (let i = 0; i < count; i++) {
+      const u = rnd() * 2 - 1;
+      const phi = rnd() * Math.PI * 2;
+      const r = minR + rnd() * (maxR - minR);
+      const s = Math.sqrt(1 - u * u);
+      pos[i * 3] = r * s * Math.cos(phi);
+      pos[i * 3 + 1] = r * u;
+      pos[i * 3 + 2] = r * s * Math.sin(phi);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    return new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xeaf0ff, size: 0.35, sizeAttenuation: true }));
+  }
+
+  function findClip(clips, names) {
+    for (const n of names) {
+      const exact = clips.find(c => c.name === n);
+      if (exact) return exact;
+    }
+    for (const n of names) {
+      const pref = clips.find(c => c.name.startsWith(n));
+      if (pref) return pref;
+    }
+    return clips[0] || null;
+  }
+
+  function playClip(actor, clipName, fade = 0.22) {
+    if (!actor?.mixer) return;
+    const action = actor.actions[clipName];
+    if (!action || actor.current === action) return;
+    if (actor.current) actor.current.fadeOut(fade);
+    action.reset().fadeIn(fade).play();
+    actor.current = action;
+  }
+
+  function cloneAlarmMaterials(node) {
+    const mats = [];
+    if (!node) return mats;
+    node.traverse(child => {
+      if (child.isMesh && child.material) {
+        child.material = child.material.clone();
+        mats.push(child.material);
+      }
+    });
+    return mats;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 1. FIRST-PERSON COCKPIT (#cockpit-viewport)
+  // ---------------------------------------------------------------------------
+  async function initCockpit() {
+    const section = document.getElementById('cockpit');
+    const container = document.getElementById('cockpit-viewport');
+    if (!section || !container) return;
+
+    const { renderer, scene, camera } = makeViewport(container, { fov: 62, clearColor: 0x030710 });
+    addStandardStudioLights(scene, { warmRim: 0x5aaeff });
+    const consoleGlow = new THREE.PointLight(0x52d6ff, 1.4, 3.5);
+    consoleGlow.position.set(0, 1.05, -0.2);
+    scene.add(consoleGlow);
+
+    const stars = createStarfield(600, 35, 110);
+    scene.add(stars);
+    const marsPlanet = createFacetedMarsPlanet(7.5);
+    marsPlanet.position.set(4.5, 4.2, -26);
+    scene.add(marsPlanet);
+
+    const gltf = await parseFreshGLB(window.ASTRO?.COCKPIT_MODEL || 'rocket/cockpit_pilot.glb');
+    const root = gltf.scene;
+    scene.add(root);
+
+    const camAnchor = root.getObjectByName('Camera_Pilot');
+    const baseCamPos = camAnchor
+      ? camAnchor.getWorldPosition(new THREE.Vector3())
+      : new THREE.Vector3(0, 1.18, 0.38);
+    const lookTarget = new THREE.Vector3(0, 0.86, -0.55);
+    camera.position.copy(baseCamPos);
+    camera.lookAt(lookTarget);
+
+    const throttlePivot = root.getObjectByName('Throttle_Lever');
+    const stickRHC = root.getObjectByName('Joystick_RHC');
+    const stickTHC = root.getObjectByName('Controller_THC');
+    const breakerBank = root.getObjectByName('Breaker_Bank');
+    const stageSwitch = root.getObjectByName('Stage_Sep_Switch');
+    const edlSwitch = root.getObjectByName('EDL_Arm_Switch');
+    const alarmRedMats = cloneAlarmMaterials(root.getObjectByName('Alarm_Master_Red'));
+    const alarmAmberMats = cloneAlarmMaterials(root.getObjectByName('Alarm_Caution_Amber'));
+
+    const throttleBaseRot = throttlePivot ? throttlePivot.rotation.x : 0;
+    const rhcBaseRot = stickRHC ? stickRHC.rotation.clone() : new THREE.Euler();
+
+    // Tag clickable meshes with their cockpit action
+    const interactiveMeshes = [];
+    const tagPivot = (obj, actionFn) => {
+      if (!obj) return;
+      obj.traverse(ch => {
+        if (ch.isMesh) {
+          ch.userData.onCockpitClick = actionFn;
+          interactiveMeshes.push(ch);
+        }
+      });
+    };
+    tagPivot(throttlePivot, () => window.ASTRO_SIM?.handleCockpitAction('throttle_up'));
+    tagPivot(stickRHC, () => window.ASTRO_SIM?.handleCockpitAction('stabilize'));
+    tagPivot(stickTHC, () => {
+      const f = window.ASTRO_SIM?.flight;
+      if (f?.step === 'radiation') window.ASTRO_SIM?.handleCockpitAction('shield_storm');
+      else window.ASTRO_SIM?.handleCockpitAction('pump_fuel');
+    });
+    tagPivot(breakerBank, () => {
+      const f = window.ASTRO_SIM?.flight;
+      const tripped = f?.breakers ? f.breakers.findIndex(Boolean) : 0;
+      window.ASTRO_SIM?.handleCockpitAction('breaker', tripped >= 0 ? tripped : 0);
+    });
+    tagPivot(stageSwitch, () => window.ASTRO_SIM?.handleCockpitAction('stage_sep'));
+    tagPivot(edlSwitch, () => window.ASTRO_SIM?.handleCockpitAction('edl_arm'));
+
+    // Spark particles for FX_Sparks_Left & FX_Sparks_Right
+    const sparkAnchors = ['FX_Sparks_Left', 'FX_Sparks_Right']
+      .map(n => root.getObjectByName(n))
+      .filter(Boolean);
+    const sparkCount = 48;
+    const sparkPos = new Float32Array(sparkCount * 3);
+    const sparkVel = Array.from({ length: sparkCount }, () => new THREE.Vector3());
+    const sparkGeo = new THREE.BufferGeometry();
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+    const sparkMat = new THREE.PointsMaterial({ color: 0xffb347, size: 0.032, transparent: true, opacity: 0.95 });
+    const sparkPoints = new THREE.Points(sparkGeo, sparkMat);
+    sparkPoints.visible = false;
+    sparkPoints.frustumCulled = false;
+    scene.add(sparkPoints);
+
+    function resetSpark(i) {
+      const anchor = sparkAnchors.length ? sparkAnchors[i % sparkAnchors.length] : null;
+      const wp = anchor ? anchor.getWorldPosition(new THREE.Vector3()) : new THREE.Vector3(i % 2 ? 0.42 : -0.42, 0.92, -0.35);
+      sparkPos[i * 3] = wp.x;
+      sparkPos[i * 3 + 1] = wp.y;
+      sparkPos[i * 3 + 2] = wp.z;
+      sparkVel[i].set((Math.random() - 0.5) * 1.4, 0.5 + Math.random() * 1.3, (Math.random() - 0.3) * 1.1);
+    }
+    for (let i = 0; i < sparkCount; i++) resetSpark(i);
+
+    // Raycast interaction + slight head-look on pointer move
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let hoverOffset = new THREE.Vector2(0, 0);
+
+    renderer.domElement.addEventListener('pointermove', e => {
+      const r = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      hoverOffset.set(pointer.x * 0.04, pointer.y * 0.025);
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(interactiveMeshes, false);
+      renderer.domElement.style.cursor = hits.length ? 'pointer' : 'default';
+    });
+
+    renderer.domElement.addEventListener('click', e => {
+      const r = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(interactiveMeshes, false);
+      if (hits.length && hits[0].object.userData.onCockpitClick) {
+        hits[0].object.userData.onCockpitClick();
+      }
+    });
+
+    let lastT = performance.now();
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!section.classList.contains('active')) {
+        lastT = now;
+        return;
+      }
+      const dt = Math.min((now - lastT) / 1000, 0.05);
+      lastT = now;
+      const f = window.ASTRO_SIM?.flight;
+
+      if (f) {
+        // Animate cockpit controls from live flight state
+        if (throttlePivot) {
+          throttlePivot.rotation.x = THREE.MathUtils.lerp(throttlePivot.rotation.x, throttleBaseRot - (f.throttle || 0) * 0.65, 0.14);
+        }
+        if (stickRHC) {
+          stickRHC.rotation.z = THREE.MathUtils.lerp(stickRHC.rotation.z, rhcBaseRot.z - (f.pitchX || 0) * 0.014, 0.15);
+          stickRHC.rotation.x = THREE.MathUtils.lerp(stickRHC.rotation.x, rhcBaseRot.x + (f.pitchY || 0) * 0.014, 0.15);
+        }
+        if (stageSwitch) {
+          stageSwitch.rotation.x = THREE.MathUtils.lerp(stageSwitch.rotation.x, f.stageSeparated ? -0.65 : 0.25, 0.16);
+        }
+        if (edlSwitch) {
+          edlSwitch.rotation.x = THREE.MathUtils.lerp(edlSwitch.rotation.x, f.edlChuteDeployed ? -0.65 : 0.25, 0.16);
+        }
+
+        // Exterior planet & stars motion according to flight progress
+        const prog = Math.max(0, Math.min(1, (f.progress || 0) / 100));
+        const marsScale = 0.6 + prog * 1.45;
+        marsPlanet.scale.setScalar(marsScale);
+        marsPlanet.position.set(4.5 - prog * 3.8, 4.2 - prog * 3.1, -26 + prog * 9);
+        if (!reducedMotion) {
+          marsPlanet.rotation.y += dt * 0.08;
+          stars.rotation.x += dt * (0.01 + (f.throttle || 0) * 0.03);
+        }
+
+        // Master alarm & sparks
+        const hasBreaker = Array.isArray(f.breakers) && f.breakers.some(Boolean);
+        const offAxis = Math.hypot(f.pitchX || 0, f.pitchY || 0) > 18;
+        const sparking = now < (f.sparksUntil || 0);
+        const blinkRed = (hasBreaker || sparking) && Math.sin(now * 0.014) > 0;
+        const blinkAmber = offAxis && Math.sin(now * 0.009) > 0;
+
+        for (const m of alarmRedMats) {
+          if (m.emissive) m.emissive.setHex(blinkRed ? 0xff2b2b : 0x2a0606);
+          m.emissiveIntensity = blinkRed ? 2.4 : 0.3;
+        }
+        for (const m of alarmAmberMats) {
+          if (m.emissive) m.emissive.setHex(blinkAmber ? 0xf6b73c : 0x2c1c04);
+          m.emissiveIntensity = blinkAmber ? 2.0 : 0.3;
+        }
+
+        sparkPoints.visible = sparking || hasBreaker;
+        if (sparkPoints.visible) {
+          for (let i = 0; i < sparkCount; i++) {
+            sparkVel[i].y -= 3.71 * dt;
+            sparkPos[i * 3] += sparkVel[i].x * dt;
+            sparkPos[i * 3 + 1] += sparkVel[i].y * dt;
+            sparkPos[i * 3 + 2] += sparkVel[i].z * dt;
+            if (sparkPos[i * 3 + 1] < 0.25) resetSpark(i);
+          }
+          sparkGeo.attributes.position.needsUpdate = true;
+        }
+
+        // Camera vibration from engine thrust / parachute opening
+        let sx = 0, sy = 0;
+        if (!reducedMotion && ((f.throttle || 0) > 0.55 || f.edlChuteDeployed || sparking)) {
+          const amp = sparking ? 0.014 : f.edlChuteDeployed ? 0.011 : 0.006 * (f.throttle || 0);
+          sx = (Math.random() - 0.5) * amp;
+          sy = (Math.random() - 0.5) * amp;
+        }
+        camera.position.set(baseCamPos.x + hoverOffset.x + sx, baseCamPos.y + hoverOffset.y + sy, baseCamPos.z);
+        camera.lookAt(lookTarget);
+      }
+
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ---------------------------------------------------------------------------
+  // 2. WALKABLE MARS SURFACE (#surface-viewport)
+  // ---------------------------------------------------------------------------
+  function marsHeight(x, z) {
+    const rCenter = Math.hypot(x, z);
+    const padFlatten = THREE.MathUtils.smoothstep(rCenter, 2.5, 7.5);
+    const raw = Math.sin(x * 0.28) * Math.cos(z * 0.24) * 0.65
+      + Math.sin(x * 0.65 + 1.1) * Math.sin(z * 0.58) * 0.24;
+    return raw * padFlatten;
+  }
+
+  function buildMarsTerrain(siteKey) {
+    const group = new THREE.Group();
+    const ramp = window.ASTRO_ART?.RAMPS?.[siteKey] || DEFAULT_MARS_RAMP;
+    const plane = new THREE.PlaneGeometry(52, 52, 30, 30);
+    plane.rotateX(-Math.PI / 2);
+    const nonIdx = plane.toNonIndexed();
+    const pos = nonIdx.attributes.position;
+    const colors = new Float32Array(pos.count * 3);
+    const col = new THREE.Color();
+
+    for (let i = 0; i < pos.count; i++) {
+      pos.setY(i, marsHeight(pos.getX(i), pos.getZ(i)));
+    }
+    for (let i = 0; i < pos.count; i += 3) {
+      const avgY = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
+      const t = THREE.MathUtils.clamp((avgY + 0.85) / 1.7, 0, 0.999);
+      col.set(ramp[Math.floor(t * ramp.length)]);
+      for (let k = 0; k < 3; k++) {
+        colors[(i + k) * 3] = col.r;
+        colors[(i + k) * 3 + 1] = col.g;
+        colors[(i + k) * 3 + 2] = col.b;
+      }
+    }
+    nonIdx.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    nonIdx.computeVertexNormals();
+
+    const terrainMesh = new THREE.Mesh(nonIdx, new THREE.MeshStandardMaterial({
+      vertexColors: true, roughness: 0.94, metalness: 0.03, flatShading: true
+    }));
+    terrainMesh.name = 'Mars_Ground';
+    group.add(terrainMesh);
+
+    // Scattered low-poly rocks outside center pad
+    const rockGeo = new THREE.IcosahedronGeometry(0.42, 0).toNonIndexed();
+    rockGeo.computeVertexNormals();
+    const rockMat = new THREE.MeshStandardMaterial({ color: ramp[1] || '#7c3621', roughness: 0.92, flatShading: true });
+    let s = 42;
+    const rnd = () => { s = (s * 48271) % 2147483647; return (s - 1) / 2147483646; };
+    for (let i = 0; i < 36; i++) {
+      const ang = rnd() * Math.PI * 2;
+      const dist = 5.2 + rnd() * 17;
+      const rx = Math.cos(ang) * dist;
+      const rz = Math.sin(ang) * dist;
+      const rock = new THREE.Mesh(rockGeo, rockMat);
+      const sc = 0.45 + rnd() * 1.4;
+      rock.scale.set(sc * 1.25, sc * 0.65, sc);
+      rock.position.set(rx, marsHeight(rx, rz) + sc * 0.14, rz);
+      rock.rotation.set(rnd() * 3, rnd() * 6, rnd() * 3);
+      group.add(rock);
+    }
+
+    // Central Mars Ascent Vehicle lander at (0, 0, 0)
+    const mav = new THREE.Group();
+    const hullMat = new THREE.MeshStandardMaterial({ color: 0xe6edf6, roughness: 0.55, metalness: 0.25, flatShading: true });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x263143, roughness: 0.6, metalness: 0.4, flatShading: true });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xe8a832, roughness: 0.35, metalness: 0.65, flatShading: true });
+
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 1.15, 2.8, 8).toNonIndexed(), hullMat);
+    body.position.y = 2.0;
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.85, 1.25, 8).toNonIndexed(), hullMat);
+    nose.position.y = 4.02;
+    const foil = new THREE.Mesh(new THREE.CylinderGeometry(1.18, 1.22, 0.55, 8).toNonIndexed(), goldMat);
+    foil.position.y = 0.85;
+    mav.add(body, nose, foil);
+
+    for (let l = 0; l < 4; l++) {
+      const a = (l / 4) * Math.PI * 2 + Math.PI / 4;
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.1, 0.14), darkMat);
+      leg.position.set(Math.cos(a) * 1.15, 0.48, Math.sin(a) * 1.15);
+      leg.rotation.z = Math.cos(a) * 0.45;
+      leg.rotation.x = -Math.sin(a) * 0.45;
+      mav.add(leg);
+    }
+    group.add(mav);
+
+    return { group, terrainMesh };
+  }
+
+  async function initSurface() {
+    const section = document.getElementById('surface');
+    const container = document.getElementById('surface-viewport');
+    if (!section || !container) return;
+
+    const { renderer, scene, camera } = makeViewport(container, { fov: 50, clearColor: 0x2d1614 });
+    scene.fog = new THREE.FogExp2(0x3a1c17, 0.022);
+    scene.add(new THREE.HemisphereLight(0xf3b391, 0x3b1a14, 0.72));
+    const sun = new THREE.DirectionalLight(0xffe6cc, 2.1);
+    sun.position.set(14, 22, 10);
+    scene.add(sun);
+
+    let currentSite = window.ASTRO?.state?.site || 'jezero';
+    let { group: marsGroup, terrainMesh } = buildMarsTerrain(currentSite);
+    scene.add(marsGroup);
+
+    // Load 4 animated characters
+    const crewActors = {};
+    await Promise.all(CREW_IDS.map(async id => {
+      const rel = window.ASTRO?.CREW_MODELS?.[id] || `characters/${id}.glb`;
+      const gltf = await parseFreshGLB(rel);
+      const model = gltf.scene;
+      scene.add(model);
+      const mixer = new THREE.AnimationMixer(model);
+      const actions = {};
+      const idle = findClip(gltf.animations, ['idle_loop', 'idle']);
+      const walk = findClip(gltf.animations, ['walk_loop', 'walk']);
+      const action = findClip(gltf.animations, ['action_loop', 'action']);
+      const wave = findClip(gltf.animations, ['wave']);
+      if (idle) actions.idle = mixer.clipAction(idle);
+      if (walk) actions.walk = mixer.clipAction(walk);
+      if (action) actions.action = mixer.clipAction(action);
+      if (wave) {
+        actions.wave = mixer.clipAction(wave);
+        actions.wave.setLoop(THREE.LoopOnce, 1);
+        actions.wave.clampWhenFinished = true;
+      }
+      const actor = {
+        id,
+        model,
+        mixer,
+        actions,
+        current: null,
+        pos: new THREE.Vector3(),
+        heading: 0,
+        lastSimX: 0,
+        lastSimZ: 0,
+      };
+      playClip(actor, 'idle', 0);
+      crewActors[id] = actor;
+    }));
+
+    // Mission beacon diamonds
+    const beacons = new Map();
+    const diamondGeo = new THREE.OctahedronGeometry(0.45, 0).toNonIndexed();
+    diamondGeo.computeVertexNormals();
+
+    function syncBeacons() {
+      const tasks = window.ASTRO_SIM?.surf?.tasks || [];
+      for (const task of tasks) {
+        if (!beacons.has(task.id)) {
+          const mat = new THREE.MeshStandardMaterial({
+            color: CREW_COLORS[task.crew] || '#52d6ff',
+            emissive: CREW_COLORS[task.crew] || '#52d6ff',
+            emissiveIntensity: 0.75,
+            roughness: 0.35,
+            flatShading: true
+          });
+          const mesh = new THREE.Mesh(diamondGeo, mat);
+          mesh.userData.taskId = task.id;
+          scene.add(mesh);
+          beacons.set(task.id, mesh);
+        }
+        const mesh = beacons.get(task.id);
+        const done = window.ASTRO_SIM?.surf?.completed?.has(task.id);
+        mesh.visible = !done;
+        mesh.position.set(task.x, marsHeight(task.x, task.z) + 1.35, task.z);
+      }
+    }
+    syncBeacons();
+    window.addEventListener('astro:surface', syncBeacons);
+
+    // Click terrain to walk / click beacon to target task; drag horizontally to orbit camera
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let camYaw = 0.35;
+    let camPitch = 0.42;
+    let isDragging = false;
+    let dragDist = 0;
+    let prevX = 0, prevY = 0;
+
+    renderer.domElement.addEventListener('pointerdown', e => {
+      isDragging = true;
+      dragDist = 0;
+      prevX = e.clientX;
+      prevY = e.clientY;
+    });
+    window.addEventListener('pointermove', e => {
+      if (!isDragging || !section.classList.contains('active')) return;
+      const dx = e.clientX - prevX;
+      const dy = e.clientY - prevY;
+      dragDist += Math.hypot(dx, dy);
+      camYaw -= dx * 0.007;
+      camPitch = THREE.MathUtils.clamp(camPitch + dy * 0.005, 0.18, 1.05);
+      prevX = e.clientX;
+      prevY = e.clientY;
+    });
+    window.addEventListener('pointerup', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (dragDist > 7 || !section.classList.contains('active')) return;
+      const r = renderer.domElement.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+      pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+
+      const activeBeacons = Array.from(beacons.values()).filter(b => b.visible);
+      const bHits = raycaster.intersectObjects(activeBeacons, false);
+      if (bHits.length && bHits[0].object.userData.taskId) {
+        const tid = bHits[0].object.userData.taskId;
+        window.ASTRO_SIM?.selectSurfaceTask?.(tid);
+        const task = window.ASTRO_SIM?.surf?.tasks?.find(t => t.id === tid);
+        if (task) window.ASTRO_SIM?.moveActiveTo?.(task.x, task.z);
+        return;
+      }
+
+      const gHits = raycaster.intersectObject(terrainMesh, false);
+      if (gHits.length) {
+        const pt = gHits[0].point;
+        window.ASTRO_SIM?.moveActiveTo?.(
+          THREE.MathUtils.clamp(pt.x, -21, 21),
+          THREE.MathUtils.clamp(pt.z, -21, 21)
+        );
+      }
+    });
+
+    let lastT = performance.now();
+    const camGoal = new THREE.Vector3();
+    const lookGoal = new THREE.Vector3();
+
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!section.classList.contains('active')) {
+        lastT = now;
+        return;
+      }
+      const dt = Math.min((now - lastT) / 1000, 0.05);
+      lastT = now;
+
+      const wantedSite = window.ASTRO?.state?.site || 'jezero';
+      if (wantedSite !== currentSite) {
+        currentSite = wantedSite;
+        scene.remove(marsGroup);
+        ({ group: marsGroup, terrainMesh } = buildMarsTerrain(currentSite));
+        scene.add(marsGroup);
+        syncBeacons();
+      }
+
+      const surf = window.ASTRO_SIM?.surf;
+      if (surf) {
+        for (const id of CREW_IDS) {
+          const actor = crewActors[id];
+          const target = surf.crewPos?.[id];
+          if (!actor || !target) continue;
+
+          const dx = target.x - actor.pos.x;
+          const dz = target.z - actor.pos.z;
+          const dist = Math.hypot(dx, dz);
+
+          if (dist > 0.06) {
+            const step = Math.min(dist, 5.2 * dt);
+            actor.pos.x += (dx / dist) * step;
+            actor.pos.z += (dz / dist) * step;
+            const desiredYaw = Math.atan2(dx, dz); // +Z forward per AGENTS.md §5.2
+            let diff = desiredYaw - actor.heading;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            actor.heading += diff * Math.min(1, dt * 10);
+            playClip(actor, 'walk');
+          } else {
+            const nearTask = surf.tasks?.find(
+              t => t.crew === id && surf.completed?.has(t.id) && Math.hypot(t.x - actor.pos.x, t.z - actor.pos.z) < 2.2
+            );
+            playClip(actor, nearTask ? 'action' : 'idle');
+          }
+
+          actor.pos.y = marsHeight(actor.pos.x, actor.pos.z);
+          actor.model.position.copy(actor.pos);
+          actor.model.rotation.y = actor.heading;
+          actor.mixer.update(dt);
+        }
+
+        // Bob visible beacons
+        beacons.forEach(mesh => {
+          if (!mesh.visible) return;
+          if (!reducedMotion) {
+            mesh.rotation.y += dt * 1.4;
+            mesh.position.y = marsHeight(mesh.position.x, mesh.position.z) + 1.35 + Math.sin(now * 0.004) * 0.16;
+          }
+        });
+
+        // Smooth chase camera around active crew member
+        const focus = crewActors[surf.activeCrew]?.pos || new THREE.Vector3();
+        const camDist = 6.2;
+        camGoal.set(
+          focus.x + Math.sin(camYaw) * Math.cos(camPitch) * camDist,
+          focus.y + 1.3 + Math.sin(camPitch) * camDist,
+          focus.z + Math.cos(camYaw) * Math.cos(camPitch) * camDist
+        );
+        camera.position.lerp(camGoal, Math.min(1, dt * 7));
+        lookGoal.set(focus.x, focus.y + 1.15, focus.z);
+        camera.lookAt(lookGoal);
+      }
+
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ---------------------------------------------------------------------------
+  // 3. ANIMATED 3D PODIUM (#podium-viewport)
+  // ---------------------------------------------------------------------------
+  async function initPodium() {
+    const section = document.getElementById('results');
+    const container = document.getElementById('podium-viewport');
+    if (!section || !container) return;
+
+    const { renderer, scene, camera } = makeViewport(container, { fov: 44, clearColor: 0x0b1019 });
+    addStandardStudioLights(scene, { warmRim: 0xf6b73c });
+
+    // Slot coordinates for 1st, 2nd, 3rd, 4th places (x, height, z)
+    const SLOTS = [
+      { x: -0.35, h: 0.92, z: 0.25, col: 0xf6b73c }, // 1st Gold
+      { x: -1.75, h: 0.64, z: 0.05, col: 0xc8d3e0 }, // 2nd Silver
+      { x: 1.05, h: 0.44, z: 0.05, col: 0xd97a4a },  // 3rd Bronze
+      { x: 2.35, h: 0.22, z: -0.25, col: 0x5c6b82 }, // 4th Slate
+    ];
+
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0x1c2536, roughness: 0.65, metalness: 0.25, flatShading: true });
+    for (const s of SLOTS) {
+      const colMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.54, 0.62, s.h, 6).toNonIndexed(), baseMat);
+      colMesh.position.set(s.x, s.h * 0.5, s.z);
+      const capMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.56, 0.56, 0.07, 6).toNonIndexed(),
+        new THREE.MeshStandardMaterial({ color: s.col, emissive: s.col, emissiveIntensity: 0.3, roughness: 0.35, flatShading: true })
+      );
+      capMesh.position.set(s.x, s.h + 0.035, s.z);
+      scene.add(colMesh, capMesh);
+    }
+
+    const actors = {};
+    await Promise.all(CREW_IDS.map(async id => {
+      const rel = window.ASTRO?.CREW_MODELS?.[id] || `characters/${id}.glb`;
+      const gltf = await parseFreshGLB(rel);
+      const model = gltf.scene;
+      scene.add(model);
+      const mixer = new THREE.AnimationMixer(model);
+      const actions = {};
+      const idle = findClip(gltf.animations, ['idle_loop', 'idle']);
+      const action = findClip(gltf.animations, ['action_loop', 'action']);
+      const wave = findClip(gltf.animations, ['wave']);
+      if (idle) actions.idle = mixer.clipAction(idle);
+      if (action) actions.action = mixer.clipAction(action);
+      if (wave) {
+        actions.wave = mixer.clipAction(wave);
+        actions.wave.setLoop(THREE.LoopRepeat, Infinity);
+      }
+      const actor = { id, model, mixer, actions, current: null };
+      playClip(actor, 'idle', 0);
+      actors[id] = actor;
+    }));
+
+    function applyRanking(ranked) {
+      const list = Array.isArray(ranked) && ranked.length
+        ? ranked
+        : CREW_IDS.map((id, i) => ({ id, pos: i + 1 }));
+      list.forEach((entry, idx) => {
+        const slot = SLOTS[Math.min(idx, SLOTS.length - 1)];
+        const actor = actors[entry.id];
+        if (!actor) return;
+        actor.model.position.set(slot.x, slot.h + 0.07, slot.z);
+        actor.model.rotation.y = (0.15 - idx * 0.08);
+        playClip(actor, idx === 0 ? 'wave' : idx === 1 ? 'action' : 'idle', 0.25);
+      });
+    }
+    applyRanking();
+    window.addEventListener('astro:results', e => applyRanking(e.detail?.ranked));
+
+    let lastT = performance.now();
+    let angle = 0;
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!section.classList.contains('active')) {
+        lastT = now;
+        return;
+      }
+      const dt = Math.min((now - lastT) / 1000, 0.05);
+      lastT = now;
+      for (const id of CREW_IDS) actors[id]?.mixer.update(dt);
+      if (!reducedMotion) angle += dt * 0.35;
+      camera.position.set(0.3 + Math.sin(angle) * 0.55, 2.35, 5.4);
+      camera.lookAt(0.3, 1.35, 0);
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  initCockpit().catch(err => console.warn('3D cockpit fallback active:', err));
+  initSurface().catch(err => console.warn('3D surface fallback active:', err));
+  initPodium().catch(err => console.warn('3D podium fallback active:', err));
+})();
 </script>
 </body>
 </html>

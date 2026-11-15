@@ -51,15 +51,12 @@ package.json            dependências e scripts dos geradores (npm run models, n
 
 | Tema | Decisão | Por quê |
 |---|---|---|
-| Engine | **Godot 4.7.2** | Versão instalada e usada pelo time |
-| Linguagem | **GDScript** (sem C#) | A exportação web com C# não é confiável |
-| Renderizador | **GL Compatibility** | É o único que roda na web; não trocar para Forward+/Mobile |
-| Export web | **Thread Support desligado** | Roda em itch.io/hospedagem estática sem headers COOP/COEP |
-| Física | Jolt (já configurado em `project.godot`) | Padrão do projeto |
-| Multiplayer, rede | Autoload `Network` cria o *peer*; o resto do jogo não sabe qual é | Troca de transporte sem reescrever o jogo |
-| Multiplayer, protótipo | P2P via **ENet**, só desktop/editor (*listen server*, host = peer 1) | No navegador, P2P exigiria WebRTC + sinalização |
-| Multiplayer, produção | Servidor **dedicado headless** + `WebSocketMultiplayerPeer`, atrás de Caddy (`wss://`) numa VM da GCP | Navegadores só falam WebSocket/WebRTC |
-| Autoridade | **O servidor manda no estado**; clientes só pedem ações | Funciona igual em P2P e dedicado |
+| Entrega executável (MVP Hackathon) | **Web / JavaScript + Three.js (`0.186.1`)** em `index.html` + `index.models.js` | Reaproveita 100% das telas 3D/2D já prontas, os GLBs e os WAVs gerados; roda direto no navegador (`file://` ou hospedado) sem fricção de export |
+| Assets compartilhados | `godot/assets/models/` e `godot/assets/audio/` + Godot 4.7.2 | Mantêm-se como diretórios canônicos de saída dos geradores offline e base futura caso o projeto retome build nativa |
+| Linguagem (código do jogo MVP) | **HTML / CSS / JS (ES modules CDN)** sem etapa de build | Edição imediata, zero dependências de runtime além do Three.js 0.186.1 |
+| GDScript (opcional / legado futuro) | **GDScript** (sem C#) / **GL Compatibility** / Thread Support desligado | Mantido caso o time decida portar o MVP web para executável/servidor Godot dedicado pós-hackathon |
+| Física (referência Godot) | Jolt (configurado em `project.godot`) | Padrão do projeto Godot |
+| Multiplayer, protótipo web / futuro | Simulação cooperativa local com tripulação IA em `index.html` (multiplayer P2P/WebSocket opcional pós-hackathon) | Garante entrega jogável das 7 fases no prazo do desafio |
 | Ferramentas | Node ≥ 20; `three` fixado em **0.186.1** (mesma versão nos import maps do visualizador e do `index.html`) | Builds reprodutíveis |
 
 ---
@@ -83,10 +80,10 @@ package.json            dependências e scripts dos geradores (npm run models, n
   - ENet só fora da web: esconda essas opções com `OS.has_feature("web")`.
 - **Verificação:** rode headless antes de concluir (veja a seção 11).
 
-### HTML (protótipo das telas, `index.html`)
+### HTML (jogo web executável, `index.html`)
 - **Identidade visual:** siga [docs/visual-identity.md](docs/visual-identity.md) (low poly facetado, paleta, fontes, formas, arte gerada). Se mudar o visual, atualize esse arquivo no mesmo commit.
-- **Arquivo único, sem build.** O three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D e a planta 2D são o fallback).
-- **Modelos 3D na página** (Saturn V do menu, foguete montado no planejamento): vêm de `index.models.js`, **gerado** por `npm run web:models` com os GLBs que o `index.html` cita (`rocket/…glb`, `parts/…glb`). Assim a página abre direto do disco (`file://` bloqueia `fetch`). Rode de novo ao mudar modelos ou a lista de peças; `npm run models` já faz isso.
+- **Arquivo único, sem build.** O three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D, a planta 2D e os controles HUD são o fallback).
+- **Modelos 3D na página** (Saturn V do menu, foguete montado no planejamento, cockpit 1ª pessoa e avatares/pódio em Marte): vêm de `index.models.js`, **gerado** por `npm run web:models` com os GLBs que o `index.html` cita (`rocket/…glb`, `parts/…glb`, `characters/…glb`). Assim a página abre direto do disco (`file://` bloqueia `fetch`). Rode de novo ao mudar modelos ou a lista de peças; `npm run models` já faz isso.
 - **Teste** em 1440 px e 390 px de largura e com movimento reduzido.
 
 ### JavaScript (ferramentas)

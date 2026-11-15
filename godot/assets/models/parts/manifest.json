@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T04:32:42.433Z",
+  "generatedAt": "2026-11-15T05:26:32.144Z",
   "generator": "tools/modeling/build-parts.mjs",
   "conventions": {
     "units": "meters",
@@ -9,6 +9,7 @@
     "tankOrigin": "bottom interface (stands above y = 0)",
     "equipmentOrigin": "bottom mounting plate (stands on y = 0 inside cutaway stage bay)",
     "cabinOrigin": "bottom mounting deck (stands on y = 0 inside cutaway cabin bay)",
+    "cockpitOrigin": "cabin floor center (minY = 0, forward windshield toward -Z, Camera_Pilot at (0, 1.18, 0.38))",
     "fxAnchorPrefix": "FX_"
   },
   "fxPresets": {
@@ -3246,6 +3247,91 @@
         "references/parts/cabin-equipment.md",
         "docs/resources/equipamentos-cabine.md",
         "references/experiments/mars-experiments.md"
+      ]
+    },
+    {
+      "id": "cockpit-pilot",
+      "name": "1st-Person Pilot Control Panel & Flight Deck",
+      "nodeName": "CockpitPilot",
+      "category": "cockpit",
+      "tier": 2,
+      "vehicle": "NASA Space Shuttle Orbiter (Aft Flight Deck & MEDS) / Orion MPCV",
+      "role": "1st-Person Launch, Ascent, Orbit Insertion & Emergency Minigame Cockpit",
+      "file": "parts/cockpit/cockpit-pilot.glb",
+      "summary": "Painel de controle 1ª pessoa em formato U com 3 telas MFD (retículo FDAI 8-ball, barras verticais de recursos e gráfico de subida), matriz Caution & Warning de 12 luzes, monitor CCTV superior esquerdo, comandos articulados (RHC, THC, manete dupla, disjuntores e chaves com trava) e janelas panorâmicas.",
+      "originNote": "Origem (0,0,0) no centro do piso da cabine; para-brisa frontal em -Z; Camera_Pilot em (0, 1.18, 0.38)",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom",
+        "Camera_Pilot",
+        "Joystick_RHC",
+        "Controller_THC",
+        "Throttle_Lever",
+        "Breaker_Bank",
+        "Stage_Sep_Switch",
+        "EDL_Arm_Switch",
+        "Abort_Button",
+        "Alarm_Master_Red",
+        "Alarm_Caution_Amber",
+        "FX_Sparks_Left",
+        "FX_Sparks_Right"
+      ],
+      "fx": [
+        {
+          "anchor": "FX_Sparks_Left",
+          "preset": "sparks",
+          "clips": null
+        },
+        {
+          "anchor": "FX_Sparks_Right",
+          "preset": "sparks",
+          "clips": null
+        }
+      ],
+      "dimensions": {
+        "width": 2.08,
+        "height": 1.637,
+        "depth": 1.375,
+        "minY": 0,
+        "maxY": 1.637
+      },
+      "specs": {
+        "crewRole": "helena",
+        "massDryKg": 98,
+        "propellantMassKg": 0,
+        "powerW": -115,
+        "costM": 9.5,
+        "dataRateKbps": 1024,
+        "unlocksMinigames": [
+          "H-O1",
+          "H-S1",
+          "L-S4",
+          "O-O1"
+        ],
+        "mitigatesEvents": [
+          "E1",
+          "E12",
+          "CD1",
+          "P10"
+        ],
+        "sources": {
+          "massDryKg": "real/est. ⚠ (references/parts/pilot-cockpit.md: Orion 3-DU MFD console + Shuttle RHC/THC + twin seats)",
+          "powerW": "real/est. ⚠ (references/parts/pilot-cockpit.md: 3× 38 W Honeywell DU-1310 displays + C&W LED matrix)",
+          "costM": "game-balance (Tier 2 integrated 1st-person launch & orbital insertion flight deck)"
+        }
+      },
+      "budget": {
+        "triangles": 2200,
+        "meshes": 35
+      },
+      "stats": {
+        "triangles": 2176,
+        "meshes": 28,
+        "bytes": 178056
+      },
+      "references": [
+        "references/parts/pilot-cockpit.md",
+        "docs/resources/painel-piloto-1a-pessoa.md"
       ]
     }
   ]

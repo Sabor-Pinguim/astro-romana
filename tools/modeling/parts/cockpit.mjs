@@ -139,9 +139,9 @@ const cockpitPilot = {
         p: [sx * 0.68, 1.44, -0.56],
         r: [10, sx * -14, 0],
       });
-      for (let i = -2; i <= 2; i++) {
-        b.add('Root', 'HullBlack', box(0.22, 0.018, 0.02), {
-          p: [sx * 0.68, 1.44 + i * 0.026, -0.51],
+      for (let i = -1; i <= 1; i++) {
+        b.add('Root', 'HullBlack', box(0.22, 0.020, 0.02), {
+          p: [sx * 0.68, 1.44 + i * 0.038, -0.51],
           r: [10, sx * -14, 0],
         });
       }
@@ -253,12 +253,12 @@ const cockpitPilot = {
     // --- Zone A (Left): Attitude Director (FDAI 8-Ball) & Target Crosshair ---
     b.add('Root', 'Visor', box(0.30, 0.25, 0.02), { p: [-0.32, 0.90, -0.43], r: [-10, 0, 0] });
     // Outer targeting ring
-    b.add('Root', 'LedGreen', ring(0.09, 0.008, 12, 4), {
+    b.add('Root', 'LedGreen', ring(0.09, 0.008, 8, 3), {
       p: [-0.32, 0.90, -0.415],
       r: [80, 0, 0],
     });
     // 3D Low-Poly Navball (FDAI sphere) with crosshair axes
-    b.add('Root', 'Lamp', ball(0.062, 8, 6), { p: [-0.32, 0.90, -0.42] });
+    b.add('Root', 'Lamp', ball(0.062, 6, 4), { p: [-0.32, 0.90, -0.42] });
     b.add('Root', 'LedRed', box(0.11, 0.010, 0.015), { p: [-0.32, 0.90, -0.355], r: [-10, 0, 0] });
     b.add('Root', 'LedRed', box(0.010, 0.11, 0.015), { p: [-0.32, 0.90, -0.355], r: [-10, 0, 0] });
 
@@ -387,15 +387,15 @@ const cockpitPilot = {
         p: [lx, 0.68, -0.08],
         r: [-14, 0, 0],
       });
-      b.add('Throttle_Lever', 'LedRed', ball(0.034, 8, 6), {
+      b.add('Throttle_Lever', 'LedRed', ball(0.034, 6, 4), {
         p: [lx, 0.76, -0.10],
       });
     }
 
     // Pivot 2: `Joystick_RHC` at `(0, 0.78, -0.34)` — Space Shuttle Rotational Hand Controller (Image 2)
-    b.add('Joystick_RHC', 'Aluminum', cyl(0.048, 0.056, 0.03, 8), { p: [0, 0.78, -0.34] });
-    b.add('Joystick_RHC', 'HullBlack', cyl(0.036, 0.044, 0.04, 8), { p: [0, 0.80, -0.34] });
-    b.add('Joystick_RHC', 'HullBlack', cyl(0.022, 0.026, 0.14, 8), {
+    b.add('Joystick_RHC', 'Aluminum', cyl(0.048, 0.056, 0.03, 6), { p: [0, 0.78, -0.34] });
+    b.add('Joystick_RHC', 'HullBlack', cyl(0.036, 0.044, 0.04, 6), { p: [0, 0.80, -0.34] });
+    b.add('Joystick_RHC', 'HullBlack', cyl(0.022, 0.026, 0.14, 6), {
       p: [0, 0.87, -0.34],
       r: [10, 0, 0],
     });
@@ -403,23 +403,23 @@ const cockpitPilot = {
       p: [0, 0.94, -0.33],
       r: [10, 0, 0],
     });
-    b.add('Joystick_RHC', 'LedRed', cyl(0.012, 0.012, 0.015, 6), {
+    b.add('Joystick_RHC', 'LedRed', box(0.020, 0.015, 0.020), {
       p: [0, 0.955, -0.33],
       r: [10, 0, 0],
     });
 
     // Pivot 3: `Controller_THC` at `(0.15, 0.78, -0.34)` — Square Translational Hand Controller (Image 2)
     b.add('Controller_THC', 'Hull', box(0.085, 0.04, 0.085), { p: [0.15, 0.78, -0.34] });
-    b.add('Controller_THC', 'HullBlack', cyl(0.016, 0.016, 0.06, 6), { p: [0.15, 0.82, -0.34] });
+    b.add('Controller_THC', 'HullBlack', box(0.024, 0.06, 0.024), { p: [0.15, 0.82, -0.34] });
     b.add('Controller_THC', 'HullBlack', box(0.055, 0.032, 0.038), { p: [0.15, 0.85, -0.34] });
 
     // Pivot 4: `Breaker_Bank` at `(-0.56, 0.76, -0.34)` — Left Wing Bus Bar / Circuit Breakers (Lucas Minigame)
     for (let row = 0; row < 2; row++) {
-      for (let col = 0; col < 4; col++) {
-        const bx = -0.63 + col * 0.045;
+      for (let col = 0; col < 3; col++) {
+        const bx = -0.61 + col * 0.05;
         const bz = -0.37 + row * 0.05;
-        b.add('Breaker_Bank', 'Aluminum', cyl(0.010, 0.010, 0.03, 6), { p: [bx, 0.77, bz] });
-        b.add('Breaker_Bank', 'Hull', cyl(0.013, 0.013, 0.015, 6), { p: [bx, 0.79, bz] });
+        b.add('Breaker_Bank', 'Aluminum', box(0.018, 0.028, 0.018), { p: [bx, 0.77, bz] });
+        b.add('Breaker_Bank', 'Hull', box(0.024, 0.014, 0.024), { p: [bx, 0.79, bz] });
       }
     }
 
@@ -438,11 +438,11 @@ const cockpitPilot = {
     });
 
     // Pivot 7: `Abort_Button` at `(-0.22, 0.82, -0.44)` — Guarded Emergency Abort Pushbutton
-    b.add('Abort_Button', 'Aluminum', cyl(0.038, 0.042, 0.025, 8), {
+    b.add('Abort_Button', 'Aluminum', cyl(0.038, 0.042, 0.025, 6), {
       p: [-0.22, 0.82, -0.44],
       r: [70, 0, 0],
     });
-    b.add('Abort_Button', 'LedRed', cyl(0.028, 0.030, 0.032, 8), {
+    b.add('Abort_Button', 'LedRed', cyl(0.028, 0.030, 0.032, 6), {
       p: [-0.22, 0.825, -0.43],
       r: [70, 0, 0],
     });
