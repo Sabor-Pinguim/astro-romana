@@ -435,8 +435,6 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   const touch = matchMedia('(pointer: coarse)').matches, clamp = (x, a, b) => Math.min(b, Math.max(a, x));
   const s = { site: null, crew: null, emote: null, emoteCam: false, mode: 'first', yaw: 0, pitch: -.1, bodyYaw: 0, speed: 0, vy: 0, grounded: true, jump: false,
     pos: new THREE.Vector3(), keys: new Set(), stick: null, look: null, drag: null, ready: false, prompt: '' };
-  const KEYS_HELP = touch ? 'Left thumb walks, right thumb looks. Look down to see your suit.'
-    : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · mouse looks<br><kbd>E</kbd> run experiment or board · <kbd>V</kbd> camera · <kbd>Q</kbd> emotes · <kbd>1</kbd>–<kbd>4</kbd> crew · <kbd>Esc</kbd> pause<br>Look down to see your suit.';
   let world = null;
 
   const hiddenMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // still casts a shadow
@@ -701,7 +699,8 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       const first = world.blocks.find(b => b.userData.exp.crew === crew)?.position ?? world.blocks[0].position;
       s.yaw = Math.atan2(-(first.x - s.pos.x), -(first.z - s.pos.z)); s.bodyYaw = s.yaw + Math.PI;
       s.ready = true;
-      showStart('Touchdown', touch ? 'Touch to walk' : 'Click to walk', KEYS_HELP);
+      startEl.hidden = true;
+      ui.toast(touch ? 'Left side to walk · right side to look.' : 'WASD to walk · drag to look · E to interact.');
     } catch (err) {
       console.warn('Surface not shown:', err);
       fail(`Could not load the ${info?.name ?? site} terrain.`);
@@ -805,7 +804,6 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     let settle = false; // the first move after locking can carry a large jump (Chrome)
     document.addEventListener('pointerlockchange', () => {
       settle = true;
-      if (document.pointerLockElement !== canvas && live() && !touch) showStart('Paused', 'Click to keep walking', KEYS_HELP);
     });
     addEventListener('mousemove', e => {
       if (document.pointerLockElement === canvas) {
@@ -839,11 +837,6 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       if (s.look?.id === e.pointerId) s.look = null;
     };
     canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
-    startEl.addEventListener('click', () => {
-      if (!s.ready || root.classList.contains('surface-fail')) return;
-      startEl.hidden = true;
-      if (!touch) try { canvas.requestPointerLock()?.catch?.(() => {}); } catch { /* drag to look instead */ }
-    });
     $s('surface-jump').addEventListener('pointerdown', () => { s.jump = true; });
   }
   $s('surface-camera').addEventListener('click', () => { if (world?.avatar) setMode(s.mode === 'first' ? 'third' : 'first'); });
@@ -853,6 +846,13 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   promptEl.addEventListener('click', interact);
 
   // Experiments: the owner runs the minigame next to the block.
+  const COMPLETE_DELAY_MS = 2500; // game-balance: time to read the confirmation.
+  let completionTimer = null;
+  const confirmation = document.createElement('div');
+  confirmation.className = 'minigame-complete';
+  confirmation.setAttribute('role', 'status');
+  confirmation.innerHTML = '<span class="minigame-check" aria-hidden="true">✓</span><strong>Experiment complete</strong><p>Results saved. Returning to the surface…</p>';
+  dlg.querySelector('.dialog-inner').append(confirmation);
   const nearBlock = () => world.blocks.find(b => Math.hypot(b.position.x - s.pos.x, b.position.z - s.pos.z) <= REACH) ?? null;
   const nearLander = () => Math.hypot(s.pos.x, s.pos.z) <= BOARD_REACH;
   function interact() {
@@ -861,25 +861,42 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     if (!b) { if (nearLander()) { release(); sim()?.board(); } return; }
     const e = b.userData.exp;
     if (isDone(e.id)) return;
-    if (e.crew !== s.crew) return switchCrew(e.crew);
+    if (e.crew !== s.crew) return;
     const owner = ui.crew.find(c => c.id === e.crew);
     if (document.pointerLockElement) document.exitPointerLock();
     s.keys.clear();
     $s('minigame-kicker').textContent = `Experiment ${e.id} · ${owner.name}`;
     $s('minigame-title').textContent = e.title;
-    $s('minigame-brief').textContent = e.desc;
+    $s('minigame-brief').textContent = e.id === 'H-S1' ? 'Plan a continuous reconnaissance route for the helicopter, visiting each waypoint and mapping every sector.' : e.desc;
     $s('minigame-summary').innerHTML = [['Minigame', e.minigame], ['Mechanic', e.mechanic], ['Based on', e.basis]].map(([k, v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
-    dlg.dataset.exp = e.id; dlg.showModal();
+    dlg.dataset.exp = e.id;
+    const scout = e.id === 'H-S1';
+    $s('scout-game').hidden = !scout;
+    $s('minigame-summary').hidden = scout;
+    $s('minigame-placeholder').hidden = scout;
+    $s('minigame-done').hidden = scout;
+    $s('minigame-done').textContent = 'Complete experiment';
+    if (scout) window.ASTRO_SCOUT.reset();
+    dlg.showModal();
   }
   $s('minigame-close').addEventListener('click', () => dlg.close());
-  $s('minigame-done').addEventListener('click', () => {
-    const id = dlg.dataset.exp; dlg.close();
-    if (!id || isDone(id)) return;
+  function finishExperiment(id) {
+    if (!dlg.open || id !== dlg.dataset.exp || !id || isDone(id)) return;
     sim()?.completeSurfaceTask(id); s.prompt = '';
     const b = world.blocks.find(x => x.userData.exp.id === id);
-    if (isDone(id)) { b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done'); }
+    if (!isDone(id)) return;
+    if (b) { b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done'); }
+    dlg.classList.add('is-complete');
+    completionTimer = setTimeout(() => { if (dlg.open) dlg.close(); }, COMPLETE_DELAY_MS);
+  }
+  $s('minigame-done').addEventListener('click', () => finishExperiment(dlg.dataset.exp));
+  dlg.addEventListener('astro:minigame-completed', event => finishExperiment(event.detail.id));
+  dlg.addEventListener('close', () => { clearTimeout(completionTimer); completionTimer = null; dlg.classList.remove('is-complete'); });
+  dlg.addEventListener('click', event => {
+    if (event.target !== dlg) return;
+    const bounds = dlg.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dlg.close();
   });
-  dlg.addEventListener('close', () => { if (isActive('surface') && s.ready && !touch && !document.pointerLockElement) showStart('Paused', 'Click to keep walking', KEYS_HELP); });
 
   const fwd = new THREE.Vector3(), eye = new THREE.Vector3(), look = new THREE.Vector3(), tmp = new THREE.Vector3();
   function step(dt) {
@@ -955,13 +972,13 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     const state = e ? (isDone(e.id) ? 'done' : e.crew === s.crew ? 'run' : 'locked') : nearLander() ? 'board' : '';
     const key = state + (e?.id ?? '') + s.crew;
     if (key === s.prompt) return;
-    s.prompt = key; promptEl.hidden = !state;
+    s.prompt = key; promptEl.hidden = !state; promptEl.disabled = state === 'locked' || state === 'done';
     if (!state) return;
     promptEl.className = 'surface-prompt' + (state === 'run' || state === 'board' ? '' : ' ' + state);
     promptEl.textContent = state === 'board' ? `${touch ? 'Tap' : 'E'} · Board the ascent vehicle · ${surf?.completed.size ?? 0}/${tasks().length} done`
       : state === 'done' ? `${e.id} · ${e.title} · done`
       : state === 'run' ? `${touch ? 'Tap' : 'E'} · Run ${e.id} · ${e.title}`
-      : `${e.id} is ${owner.name}’s experiment · ${touch ? 'tap' : `press ${ui.crew.indexOf(owner) + 1}`} to switch`;
+      : `${e.id} · ${owner.name} only`;
   }
   const v = new THREE.Vector3();
   function placeTags(now) {

@@ -871,7 +871,7 @@
 
     function completeSurfaceTask(id) {
       const t = surf.tasks.find(item => item.id === id);
-      if (!surf.active || !t || surf.completed.has(id)) return;
+      if (!surf.active || !t || t.crew !== surf.activeCrew || surf.completed.has(id)) return;
       surf.completed.add(id);
       radAudio.tone(860, 0.14, 'triangle', 0.06);
       toast(surf.completed.size === surf.tasks.length ? 'All surface experiments done! Walk back to the lander and board the ascent vehicle.' : `${id} · ${t.title} done (${surf.completed.size}/${surf.tasks.length}).`);
@@ -880,6 +880,7 @@
 
     function boardShipAndFinish(forcedTimeout = false) {
       surf.active = false;
+      if ($('#minigame-dialog').open) $('#minigame-dialog').close();
       cancelAnimationFrame(surf.raf);
       radAudio.stopAll();
       // game-balance: on timeout, crew members more than 35 m from the lander are left behind.
