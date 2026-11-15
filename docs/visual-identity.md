@@ -1,5 +1,7 @@
 # Identidade visual: low poly facetado
 
+O minigame de reconhecimento da Helena abre em um diálogo sobre a superfície, com uma grade facetada, trajeto âmbar e controles por arrasto, toque ou teclado. A confirmação de conclusão usa um ícone quadrado chanfrado em verde-lima (`#B4DB55`).
+
 Guia para reproduzir o visual do Astro Romana em qualquer tela: web (`index.html`), cartazes e slides. A referência viva é o [index.html](../index.html). Quando este guia e o código divergirem, corrija os dois no mesmo commit.
 
 ## 1. A ideia em uma frase
