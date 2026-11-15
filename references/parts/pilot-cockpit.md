@@ -76,6 +76,6 @@ CockpitPilot                      origin: (0, 0, 0) cabin floor under pilot stat
 ## 4. Sources
 
 1. **NASA Space Shuttle Orbiter Aft Flight Deck & MEDS Glass Cockpit:** NASA NTRS / Shuttle Crew Operations Manual (panels `A6`–`A8`, `RHC`/`THC`, `CCTV`, `C&W` matrix, `MEDS` 9-LCD upgrade).
-2. **NASA Orion MPCV Cockpit:** NASA Johnson Space Center (`3` Display Units, RHC, `< 60` physical switches ⚠, `120 VDC` bus).
+2. **NASA Orion MPCV Cockpit:** NASA Johnson Space Center (`3` Display Units, RHC, `< 60` physical switches ⚠, `120 VDC` bus). Cited counts (3 display units, 7 switch interface panels, 2 rotational + 2 translational hand controllers, about 60 switches) and other capsules: [crew-cabins.md](crew-cabins.md).
 3. **NASA Apollo Command Module Main Display Console (`MDC`):** NASA Apollo Operations Handbook (FDAI 8-Ball, DSKY, C&W annunciator matrix).
 4. **SpaceX Crew Dragon Cockpit:** NASA Commercial Crew Program overview (3 central touchscreens, ascent trajectory plot, physical emergency controls).
