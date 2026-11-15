@@ -1,5 +1,7 @@
 # First-Person Pilot Control Panel (`pilot-cockpit.md`)
 
+> **Model redone on 2026-11-15** on the real Orion layout (3 display units, 7 switch panels, hand controllers). The current model spec, with sources and images, is [cockpit/cockpit-pilot/README.md](cockpit/cockpit-pilot/README.md); the archetypes below are the earlier design notes.
+
 Real spacecraft cockpit references, human-factors layout analysis, and low-poly 3D model specification for the **First-Person Pilot Control Panel** (`assets/models/rocket/cockpit_pilot.glb`) used in **Phase 5 (Launch & Orbit Insertion)** and **Phase 6 (Orbital Refueling, Transit Emergencies & Mars Landing)** — see [docs/resources/space-mission-game-transcricao-organizada.md](../../docs/resources/space-mission-game-transcricao-organizada.md) §7–§8.
 
 ---
@@ -36,13 +38,13 @@ Per [space-mission-game-transcricao-organizada.md](../../docs/resources/space-mi
 
 ### 3.1 Coordinate & Camera Conventions
 Follows [AGENTS.md](../../AGENTS.md) §5:
-- **Units:** meters (`+Y` up, `+Z` toward the rear of the cabin, **`−Z` forward out the windshield** — matching standard Godot `Camera3D` forward vector `−Z`!).
+- **Units:** meters (`+Y` up, `+Z` toward the rear of the cabin, **`−Z` forward out the windshield** — the three.js camera forward vector).
 - **Origin `(0, 0, 0)`:** cockpit floor directly underneath the **Pilot's 1st-Person Seat / Camera Rig**.
 - **Pilot Eye Point (`Camera_Pilot` anchor):** `(0, 1.18, 0.38)` looking forward/slightly down at `(0, 0.88, −0.55)` (`FOV ≈ 65°–75°`). From this exact point, the 3-wing console, the 3 main screens, the upper-left CCTV monitor, the forward/overhead windows, and the flanking seat headrests frame the screen just like References 1, 2, and 3.
 - **Envelope:** `width = 2.10 m` (`x ∈ [−1.05, +1.05]`), `height = 1.65 m` (`y ∈ [0.00, 1.65]`), `depth = 1.40 m` (`z ∈ [−0.85, +0.55]`).
 - **Budget:** `≤ 2,200 triangles`, `≤ 35 meshes`, flat-shaded palette materials only (`createPartsPalette()`), zero textures.
 
-### 3.2 Interactive Node Tree (Named Pivots for Godot Animation & Raycast Clicking)
+### 3.2 Interactive Node Tree (Named Pivots for Animation & Raycast Clicking)
 
 ```text
 CockpitPilot                      origin: (0, 0, 0) cabin floor under pilot station

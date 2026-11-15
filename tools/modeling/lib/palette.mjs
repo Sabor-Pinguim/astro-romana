@@ -20,6 +20,8 @@ const BASE = {
   Lamp: { color: '#FFF6DD', emissive: '#FFF6DD', emissiveIntensity: 2.5, roughness: 0.3 },
   LedGreen: { color: '#38E07B', emissive: '#38E07B', emissiveIntensity: 2.0, roughness: 0.3 },
   LedRed: { color: '#FF3B30', emissive: '#FF3B30', emissiveIntensity: 2.0, roughness: 0.3 },
+  LedAmber: { color: '#FFB020', emissive: '#FFB020', emissiveIntensity: 2.0, roughness: 0.3 },
+  Display: { color: '#0F2236', emissive: '#123C5A', emissiveIntensity: 0.6, roughness: 0.8 }, // a lit, matte dark screen
   // Rocket parts materials (references/parts/parts.md §3).
   Hull: { color: '#E9E9E4', roughness: 0.6 },
   HullBlack: { color: '#1E2024', roughness: 0.55 },

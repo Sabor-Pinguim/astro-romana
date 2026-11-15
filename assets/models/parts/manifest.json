@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T09:04:47.932Z",
+  "generatedAt": "2026-11-15T10:44:32.460Z",
   "generator": "tools/modeling/build-parts.mjs",
   "conventions": {
     "units": "meters",
@@ -3263,15 +3263,15 @@
     },
     {
       "id": "cockpit-pilot",
-      "name": "1st-Person Pilot Control Panel & Flight Deck",
+      "name": "Pilot Control Panel (Orion layout)",
       "nodeName": "CockpitPilot",
       "category": "cockpit",
       "tier": 2,
-      "vehicle": "NASA Space Shuttle Orbiter (Aft Flight Deck & MEDS) / Orion MPCV",
-      "role": "1st-Person Launch, Ascent, Orbit Insertion & Emergency Minigame Cockpit",
+      "vehicle": "NASA Orion crew module (layout reference)",
+      "role": "First-person cockpit for launch, ascent, orbit and landing minigames",
       "file": "parts/cockpit/cockpit-pilot.glb",
-      "summary": "U-shaped 1st-person control panel with 3 MFD screens (FDAI 8-ball reticle, vertical resource bars and ascent graph), 12-light Caution & Warning matrix, upper-left CCTV monitor, articulated controls (RHC, THC, twin throttle, circuit breakers and guarded switches) and panoramic windows.",
-      "originNote": "Origin (0,0,0) at the cabin floor center; front windshield at -Z; Camera_Pilot at (0, 1.18, 0.38)",
+      "summary": "Orion-style panel: 3 display units with bezel keys, 7 switch panels (58 switches), circuit breakers, guarded stage and landing switches, hand controllers, cursor controls, caution and warning lights, two forward windows.",
+      "originNote": "Origin on the cabin floor under the pilot; windshield toward -Z; Camera_Pilot at (0, 1.18, 0.38)",
       "requiredNodes": [
         "Attach_Top",
         "Attach_Bottom",
@@ -3279,10 +3279,10 @@
         "Joystick_RHC",
         "Controller_THC",
         "Throttle_Lever",
-        "Breaker_Bank",
         "Stage_Sep_Switch",
         "EDL_Arm_Switch",
         "Abort_Button",
+        "Breaker_Bank",
         "Alarm_Master_Red",
         "Alarm_Caution_Amber",
         "FX_Sparks_Left",
@@ -3301,11 +3301,11 @@
         }
       ],
       "dimensions": {
-        "width": 2.08,
-        "height": 1.637,
-        "depth": 1.375,
+        "width": 2.148,
+        "height": 1.591,
+        "depth": 1.43,
         "minY": 0,
-        "maxY": 1.637
+        "maxY": 1.591
       },
       "specs": {
         "crewRole": "helena",
@@ -3327,23 +3327,23 @@
           "P10"
         ],
         "sources": {
-          "massDryKg": "real/est. ⚠ (references/parts/pilot-cockpit.md: Orion 3-DU MFD console + Shuttle RHC/THC + twin seats)",
-          "powerW": "real/est. ⚠ (references/parts/pilot-cockpit.md: 3× 38 W Honeywell DU-1310 displays + C&W LED matrix)",
+          "massDryKg": "game-balance (n/f: no published mass for the Orion display and control panel; references/parts/cockpit/cockpit-pilot/README.md)",
+          "powerW": "game-balance (n/f: Orion display power not published; references/parts/cockpit/cockpit-pilot/README.md)",
           "costM": "game-balance (Tier 2 integrated 1st-person launch & orbital insertion flight deck)"
         }
       },
       "budget": {
-        "triangles": 2200,
-        "meshes": 35
+        "triangles": 5000,
+        "meshes": 48
       },
       "stats": {
-        "triangles": 2176,
-        "meshes": 28,
-        "bytes": 178056
+        "triangles": 3672,
+        "meshes": 37,
+        "bytes": 292152
       },
       "references": [
-        "references/parts/pilot-cockpit.md",
-        "docs/resources/painel-piloto-1a-pessoa.md"
+        "references/parts/cockpit/cockpit-pilot/README.md",
+        "references/parts/crew-cabins.md"
       ]
     },
     {

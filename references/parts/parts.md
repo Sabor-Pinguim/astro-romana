@@ -18,6 +18,7 @@ references/parts/
   engines/<id>/README.md   one folder per engine, with its photos
   tanks/<id>/README.md     one folder per tank, with its photos
   structures/<id>/README.md  builder hull modules (booster thrust section, middle stage), no engine or tank of their own
+  cockpit/<id>/README.md     first-person pilot panel (Orion layout)
   stage-equipment.md       middle-stage equipment modules
 ```
 

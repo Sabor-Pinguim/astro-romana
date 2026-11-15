@@ -881,8 +881,8 @@ export const PART_SPECS = {
     unlocksMinigames: ['H-O1', 'H-S1', 'L-S4', 'O-O1'],
     mitigatesEvents: ['E1', 'E12', 'CD1', 'P10'],
     sources: {
-      massDryKg: 'real/est. ⚠ (references/parts/pilot-cockpit.md: Orion 3-DU MFD console + Shuttle RHC/THC + twin seats)',
-      powerW: 'real/est. ⚠ (references/parts/pilot-cockpit.md: 3× 38 W Honeywell DU-1310 displays + C&W LED matrix)',
+      massDryKg: 'game-balance (n/f: no published mass for the Orion display and control panel; references/parts/cockpit/cockpit-pilot/README.md)',
+      powerW: 'game-balance (n/f: Orion display power not published; references/parts/cockpit/cockpit-pilot/README.md)',
       costM: 'game-balance (Tier 2 integrated 1st-person launch & orbital insertion flight deck)',
     },
   },
