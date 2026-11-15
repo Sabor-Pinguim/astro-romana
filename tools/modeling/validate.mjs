@@ -1,7 +1,8 @@
 // Validates every model listed in godot/assets/models/manifest.json:
 //   1. Khronos glTF Validator (spec errors fail the run)
 //   2. Project rules: rig pivots, required clips, FX anchors, triangle budget,
-//      no textures, size and ground placement.
+//      no textures, size and ground placement (avatars, parts); radius, relief,
+//      palette and site anchors (celestial bodies).
 //
 //   npm run models:validate
 import './lib/node-polyfills.mjs';
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import validator from 'gltf-validator';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { BODY_MATERIALS } from './lib/palette.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const MODELS_DIR = path.join(ROOT, 'godot/assets/models');
@@ -192,6 +194,72 @@ async function validatePart(entry, manifest) {
   };
 }
 
+const RADIUS_TOLERANCE = 1e-4; // body radii
+
+async function validateBody(entry) {
+  const problems = [];
+  const bytes = await readFile(path.join(MODELS_DIR, entry.file));
+
+  // 1. Khronos validator.
+  const report = await validator.validateBytes(new Uint8Array(bytes), { uri: entry.file, maxIssues: 50 });
+  for (const message of report.issues.messages) {
+    if (message.severity === 0) problems.push(`glTF error ${message.code}: ${message.message} (${message.pointer ?? ''})`);
+  }
+
+  // 2. Project rules: one root node, palette materials only, radius 1 plus exaggerated relief.
+  const gltf = await parseGlb(entry.file, bytes);
+  const scene = gltf.scene;
+  scene.updateMatrixWorld(true);
+  if (scene.children.length !== 1 || scene.children[0].name !== entry.nodeName) {
+    problems.push(`expected one root node named "${entry.nodeName}"`);
+  }
+
+  const maxRadius = 1 + (entry.reliefExaggeration * entry.maxHeightMeters) / entry.radiusMeters + RADIUS_TOLERANCE;
+  let triangles = 0;
+  let meshes = 0;
+  let textures = 0;
+  let minR = Infinity;
+  let maxR = 0;
+  const p = new THREE.Vector3();
+  scene.traverse((o) => {
+    if (!o.isMesh) return;
+    meshes++;
+    const position = o.geometry.attributes.position;
+    triangles += (o.geometry.index ? o.geometry.index.count : position.count) / 3;
+    if (!BODY_MATERIALS.includes(o.material.name)) problems.push(`material "${o.material.name}" is not in the body palette`);
+    for (const value of Object.values(o.material)) if (value?.isTexture) textures++;
+    for (let i = 0; i < position.count; i++) {
+      const r = p.fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld).length();
+      minR = Math.min(minR, r);
+      maxR = Math.max(maxR, r);
+    }
+  });
+  if (triangles > entry.budget.triangles) problems.push(`${triangles} triangles > budget ${entry.budget.triangles}`);
+  if (meshes > entry.budget.meshes) problems.push(`${meshes} meshes > budget ${entry.budget.meshes}`);
+  if (bytes.byteLength > entry.budget.bytes) {
+    problems.push(`${(bytes.byteLength / 1024).toFixed(0)} KB > ${(entry.budget.bytes / 1024).toFixed(0)} KB`);
+  }
+  if (textures > 0) problems.push(`${textures} textures found; bodies use flat palette colors only`);
+  if (minR < 1 - RADIUS_TOLERANCE) problems.push(`vertex below the surface: radius ${minR.toFixed(5)} < 1`);
+  if (maxR > maxRadius) problems.push(`vertex radius ${maxR.toFixed(5)} > ${maxRadius.toFixed(5)} (relief × max height)`);
+
+  for (const site of entry.sites ?? []) {
+    const node = scene.getObjectByName(site.node);
+    if (!node) {
+      problems.push(`site anchor "${site.node}" listed in manifest but not in the model`);
+      continue;
+    }
+    const r = node.getWorldPosition(p).length();
+    if (r < 1 - 2e-3 || r > maxRadius) problems.push(`site "${site.node}" at radius ${r.toFixed(4)}, off the surface`);
+  }
+
+  return {
+    problems,
+    summary: `${triangles} tris, ${meshes} meshes, radius ${minR.toFixed(4)}–${maxR.toFixed(4)}, ` +
+      `${(bytes.byteLength / 1024).toFixed(0)} KB, ${report.issues.numWarnings} warnings`,
+  };
+}
+
 async function main() {
   const manifest = JSON.parse(await readFile(path.join(MODELS_DIR, 'manifest.json'), 'utf8'));
   let failed = 0;
@@ -213,6 +281,16 @@ async function main() {
       for (const p of problems) console.log(`    - ${p}`);
     } else {
       console.log(`✔ [${entry.category}] ${entry.id}: ${summary}`);
+    }
+  }
+  for (const entry of manifest.bodies ?? []) {
+    const { problems, summary } = await validateBody(entry);
+    if (problems.length) {
+      failed++;
+      console.log(`✘ [body] ${entry.id}: ${summary}`);
+      for (const p of problems) console.log(`    - ${p}`);
+    } else {
+      console.log(`✔ [body] ${entry.id}: ${summary}`);
     }
   }
   if (failed) {

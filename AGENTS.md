@@ -20,6 +20,8 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 | [references/experiments/](references/experiments/) | Dados reais de missões, com fontes |
 | [references/parts/parts.md](references/parts/parts.md) | Peças reais de foguete (motores, tanques): tiers, dados, fotos e instruções low poly |
 | [references/datasets/msl-rad/](references/datasets/msl-rad/) | Radiação medida pelo detector RAD do Curiosity, com fonte |
+| [references/datasets/earth/](references/datasets/earth/) | Grades globais da Terra (cobertura do solo, relevo, gelo marinho) que geram o planeta low poly |
+| [docs/visual-identity.md](docs/visual-identity.md) | Identidade visual (low poly facetado): paleta, fontes, formas, arte gerada, como levar ao Godot |
 | [docs/audio.md](docs/audio.md) | Paisagem sonora gerada a partir desses dados de radiação |
 
 ---
@@ -35,6 +37,7 @@ godot/                  projeto Godot 4.7 (o jogo)
 tools/
   modeling/             gerador procedural dos modelos 3D (Node + three.js)
     characters/<id>.mjs um arquivo por personagem: equipamento + animação de ação
+    bodies/<id>.mjs     um arquivo por planeta/lua: dados reais → classe de cada face
     lib/                rig, formas, paleta, animações, presets de partículas
   audio/                gerador da paisagem sonora a partir de dados reais (Node, sem dependências)
   model-viewer/         visualizador HTML para validar modelos
@@ -57,7 +60,7 @@ package.json            dependências e scripts dos geradores (npm run models, n
 | Multiplayer, protótipo | P2P via **ENet**, só desktop/editor (*listen server*, host = peer 1) | No navegador, P2P exigiria WebRTC + sinalização |
 | Multiplayer, produção | Servidor **dedicado headless** + `WebSocketMultiplayerPeer`, atrás de Caddy (`wss://`) numa VM da GCP | Navegadores só falam WebSocket/WebRTC |
 | Autoridade | **O servidor manda no estado**; clientes só pedem ações | Funciona igual em P2P e dedicado |
-| Ferramentas | Node ≥ 20; `three` fixado em **0.186.1** (mesma versão no import map do visualizador) | Builds reprodutíveis |
+| Ferramentas | Node ≥ 20; `three` fixado em **0.186.1** (mesma versão nos import maps do visualizador e do `index.html`) | Builds reprodutíveis |
 
 ---
 
@@ -79,6 +82,12 @@ package.json            dependências e scripts dos geradores (npm run models, n
   - Nada de threads nem APIs exclusivas de um sistema operacional.
   - ENet só fora da web: esconda essas opções com `OS.has_feature("web")`.
 - **Verificação:** rode headless antes de concluir (veja a seção 11).
+
+### HTML (protótipo das telas, `index.html`)
+- **Identidade visual:** siga [docs/visual-identity.md](docs/visual-identity.md) (low poly facetado, paleta, fontes, formas, arte gerada). Se mudar o visual, atualize esse arquivo no mesmo commit.
+- **Arquivo único, sem build.** O three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D e a planta 2D são o fallback).
+- **Modelos 3D na página** (Saturn V do menu, foguete montado no planejamento): vêm de `index.models.js`, **gerado** por `npm run web:models` com os GLBs que o `index.html` cita (`rocket/…glb`, `parts/…glb`). Assim a página abre direto do disco (`file://` bloqueia `fetch`). Rode de novo ao mudar modelos ou a lista de peças; `npm run models` já faz isso.
+- **Teste** em 1440 px e 390 px de largura e com movimento reduzido.
 
 ### JavaScript (ferramentas)
 - Módulos ES puros (`.mjs`), sem etapa de build.
@@ -176,6 +185,12 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 3. Abra o visualizador (seção 6) e confira visualmente cada animação, as partículas e os pivôs (opção "Pivôs do rig e âncoras FX").
 4. Faça commit **junto** do código-fonte, dos GLBs, do `manifest.json` e dos arquivos `.import`.
 
+### 5.8 Planetas e luas (`bodies/`)
+- **Gerados de dados reais:** `build-bodies.mjs` lê só as grades já baixadas em `references/datasets/<corpo>/` (sem rede). Para baixar de novo: `npm run models:fetch:bodies`.
+- **Convenções:** raio médio = 1 (o jogo escala; o raio real vai no `manifest.json`); +Y = polo norte; +Z = lat. 0°/long. 0°; +X = 90° L.
+- **Relevo exagerado** (`game-balance`, valor no manifesto). Âncoras `Site_*` na superfície: +Y para cima, +X leste, −Z norte.
+- **Cores:** só as da paleta `BODY` em `lib/palette.mjs`. O orçamento fica no arquivo de cada corpo, e as mesmas regras de commit da seção 5.7 valem aqui.
+
 ---
 
 ## 6. Visualizador de modelos (`tools/model-viewer/`)
@@ -268,6 +283,8 @@ npm install                    # uma vez: three + validador glTF
 npm run models                 # gera os 4 avatares e valida
 npm run models:build -- maya   # gera só um personagem
 npm run models:validate        # só valida
+npm run web:models             # empacota os GLBs usados pelo index.html em index.models.js
+npm run models:build:bodies    # gera os planetas (ex.: -- earth)
 # visualizador: abrir tools/model-viewer/index.html no navegador e escolher godot/assets/models
 npm run audio                  # gera a paisagem sonora e valida
 npm run audio:fetch            # baixa de novo os dados do RAD (só para mudar as janelas de dados)

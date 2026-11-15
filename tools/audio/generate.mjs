@@ -248,7 +248,8 @@ async function buildStorm() {
   const START = Date.parse('2024-05-20T00:00:00Z') / 1000;
   const REAL_S = 48 * 3600;
   const DUR_S = 32;
-  const CLICKS_PER_S_AT_BASELINE = 2;
+  const CLICKS_PER_S_AT_BASELINE = 0.4; // ~31 clicks/s at the peak (79× baseline)
+  const CLICK_GAIN_DB = -5; // fixed per-click level, so fewer clicks never means louder clicks
   const ENVELOPE_STEP_S = 0.25;
   const sr = AMBIENCE_RATE;
 
@@ -280,7 +281,7 @@ async function buildStorm() {
     if (t >= DUR_S) break;
     if (random() > doseAtAudio(t) / baseline / maxRatio) continue; // thinning
     const [gl, gr] = D.panGains((random() * 2 - 1) * 0.8);
-    const amp = 0.3 + 0.7 * random();
+    const amp = (0.3 + 0.7 * random()) * D.dbToGain(CLICK_GAIN_DB);
     const len = Math.round((0.002 + 0.003 * random()) * sr);
     const at = Math.round(t * sr);
     let prev = 0;
@@ -337,7 +338,6 @@ async function buildStorm() {
     boom[1][boomStart + n] += s;
   }
 
-  scaleToRms(crackle, -28);
   scaleToRms(wash, -27);
   scaleToRms(drone, -25);
   D.normalize(boom, { peakDb: -9 });
@@ -376,7 +376,7 @@ async function buildStorm() {
         peakS: +((peakRow.t - START) / timeScale).toFixed(3),
       },
       mapping: [
-        'Detector B dose rate (linear between measurements) → click rate: Poisson, 2 clicks/s at the pre-event baseline, proportional above it',
+        `Detector B dose rate (linear between measurements) → click rate: Poisson, ${CLICKS_PER_S_AT_BASELINE} clicks/s at the pre-event baseline, proportional above it`,
         'log(dose / baseline) / log(peak / baseline) → noise-band level and centre, drone dissonance and flutter',
         'Largest jump between consecutive measurements → impact sound at the moment the dose crosses half of that log scale',
       ],
@@ -402,12 +402,12 @@ function buildGeigerClicks() {
       const t = n / sr;
       const w = random() * 2 - 1;
       out[n] = (w - prev) * Math.exp(-t / 0.0006)
-        + 0.45 * Math.sin(D.TAU * ring * t + phase) * Math.exp(-t / 0.0035) * (1 - Math.exp(-t / 0.0002));
+        + 0.3 * Math.sin(D.TAU * ring * t + phase) * Math.exp(-t / 0.002) * (1 - Math.exp(-t / 0.0002));
       prev = w;
     }
     const ch = [out];
     D.fade(ch, { inFrames: 4, outFrames: Math.round(0.005 * sr) });
-    D.normalize(ch, { peakDb: -6 });
+    D.normalize(ch, { peakDb: -12 }); // subtle by default; the game can raise it
     const file = `geiger_click_${k}.wav`;
     return { file, wav: encodeWav(ch, sr) };
   });
@@ -437,8 +437,8 @@ const manifest = {
       note: 'Median detector-B dose rate in the quiet window (see reference README)',
     },
     gameBalance: {
-      clicksPerSecondAtQuiet: 1.5,
-      maxClicksPerSecond: 120,
+      clicksPerSecondAtQuiet: 0.5,
+      maxClicksPerSecond: 30,
       note: 'Rate = clicksPerSecondAtQuiet × doseRate / quietDoseRateUgyPerDay, capped; random (Poisson) intervals',
     },
   },

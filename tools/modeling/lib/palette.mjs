@@ -33,6 +33,22 @@ const BASE = {
   FoilSilver: { color: '#C9CDD1', metalness: 1.0, roughness: 0.3 },
 };
 
+// Celestial-body surface classes (tools/modeling/bodies/). The colors are stylized
+// (game-balance); which class each face gets comes from real data (see each body file).
+const BODY = {
+  OceanDeep: { color: '#1B4E8F', roughness: 0.5 },
+  OceanShelf: { color: '#2F86C0', roughness: 0.5 },
+  SeaIce: { color: '#A9C6DA', roughness: 0.6 },
+  Ice: { color: '#F2F5F7', roughness: 0.55 },
+  Jungle: { color: '#1E5631', roughness: 0.95 },
+  Forest: { color: '#336B3E', roughness: 0.95 },
+  Savanna: { color: '#9A9A3F', roughness: 0.95 },
+  Grass: { color: '#8BA654', roughness: 0.95 },
+  Crop: { color: '#B3AE5B', roughness: 0.95 },
+  Shrub: { color: '#B89D6A', roughness: 0.95 },
+  Desert: { color: '#DDBF86', roughness: 0.95 },
+};
+
 function makeMaterial(name, def) {
   const material = new THREE.MeshStandardMaterial({
     name,
@@ -68,5 +84,15 @@ export function createPalette(accentHex) {
 export function createPartsPalette() {
   const materials = {};
   for (const [name, def] of Object.entries(BASE)) materials[name] = makeMaterial(name, def);
+  return materials;
+}
+
+/** Material names allowed on celestial bodies (used by the validator). */
+export const BODY_MATERIALS = Object.keys(BODY);
+
+/** Builds the material set for planets and moons. */
+export function createBodyPalette() {
+  const materials = {};
+  for (const [name, def] of Object.entries(BODY)) materials[name] = makeMaterial(name, def);
   return materials;
 }

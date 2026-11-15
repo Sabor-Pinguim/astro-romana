@@ -1,7 +1,7 @@
 {
   "name": "astro-romana-tools",
   "private": true,
-  "description": "Tooling for the astro-romana game: procedural low-poly avatar generator, data-driven audio generator and their validators.",
+  "description": "Tooling for the astro-romana game: procedural low-poly avatar, rocket-part and planet generators, data-driven audio generator and their validators.",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -9,8 +9,11 @@
   "scripts": {
     "models:build": "node tools/modeling/build-avatars.mjs",
     "models:build:parts": "node tools/modeling/build-parts.mjs",
+    "models:build:bodies": "node tools/modeling/build-bodies.mjs",
+    "models:fetch:bodies": "node tools/modeling/fetch-bodies.mjs",
     "models:validate": "node tools/modeling/validate.mjs",
-    "models": "npm run models:build && npm run models:build:parts && npm run models:validate",
+    "models": "npm run models:build && npm run models:build:parts && npm run models:build:bodies && npm run models:validate && npm run web:models",
+    "web:models": "node tools/web/bundle-models.mjs",
     "audio:fetch": "node tools/audio/fetch-rad.mjs",
     "audio:build": "node tools/audio/generate.mjs",
     "audio:validate": "node tools/audio/validate.mjs",

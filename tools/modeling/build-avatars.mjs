@@ -137,6 +137,7 @@ async function main() {
     references: REFERENCES,
     models,
     ...(previousManifest.parts ? { parts: previousManifest.parts } : {}),
+    ...(previousManifest.bodies ? { bodyConventions: previousManifest.bodyConventions, bodies: previousManifest.bodies } : {}),
   };
   await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`✔ manifest → ${path.relative(ROOT, MANIFEST)}`);

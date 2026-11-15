@@ -28,7 +28,7 @@ São 48 horas reais (20 e 21 de maio de 2024) em 32 s, ou seja, 1 s = 1,5 h. É 
 
 | Dado | Som |
 |---|---|
-| Dose medida (linear entre medidas) | Taxa de estalos (um contador Geiger embutido): 2 por segundo antes do evento, proporcional à dose depois |
+| Dose medida (linear entre medidas) | Taxa de estalos (um contador Geiger embutido, discreto): 0,4 por segundo antes do evento, proporcional à dose depois (~31 por segundo no pico) |
 | Dose em escala logarítmica | Volume e brilho do ruído, dissonância e tremor do drone |
 | O maior salto entre duas medidas | O impacto grave, em ~3,7 s |
 

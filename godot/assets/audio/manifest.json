@@ -62,15 +62,15 @@
         "peakS": 4.17
       },
       "mapping": [
-        "Detector B dose rate (linear between measurements) → click rate: Poisson, 2 clicks/s at the pre-event baseline, proportional above it",
+        "Detector B dose rate (linear between measurements) → click rate: Poisson, 0.4 clicks/s at the pre-event baseline, proportional above it",
         "log(dose / baseline) / log(peak / baseline) → noise-band level and centre, drone dissonance and flutter",
         "Largest jump between consecutive measurements → impact sound at the moment the dose crosses half of that log scale"
       ],
-      "clicks": 604,
+      "clicks": 123,
       "levels": {
-        "peakDb": -1.1,
+        "peakDb": -3.2,
         "rmsDb": -24,
-        "limitedFraction": 0.00058
+        "limitedFraction": 0.00004
       },
       "envelope": {
         "stepS": 0.25,
@@ -221,8 +221,8 @@
       "note": "Median detector-B dose rate in the quiet window (see reference README)"
     },
     "gameBalance": {
-      "clicksPerSecondAtQuiet": 1.5,
-      "maxClicksPerSecond": 120,
+      "clicksPerSecondAtQuiet": 0.5,
+      "maxClicksPerSecond": 30,
       "note": "Rate = clicksPerSecondAtQuiet × doseRate / quietDoseRateUgyPerDay, capped; random (Poisson) intervals"
     }
   }
