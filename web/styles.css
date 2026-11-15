@@ -26,7 +26,7 @@
     /* clip-path hides outlines, so clipped controls show focus inside */
     :is(.button,.step,.crew-card,.site-option,.part button,.rocket-stage,.remove-stage,.category-tabs button,.segmented button,.switch,.invite,.icon-button):focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--solar-amber)}
     .muted{color:var(--muted)}
-    #app{min-height:100vh;position:relative;overflow:hidden}
+    #app{min-height:100vh;position:relative;overflow:hidden;z-index:1}
     .screen{display:none;min-height:100vh;flex-direction:column}
     .screen.active{display:flex;animation:wipe .55s cubic-bezier(.7,0,.2,1) backwards}
 
@@ -94,7 +94,6 @@
     .orbit-map.slab{min-height:600px;overflow:hidden;background:linear-gradient(112deg,#1c1d48 0 28%,var(--bg-viewport) 28% 69%,#131431 69%)}
     .orbit-map::before,.blueprint::before{content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;background:repeating-linear-gradient(0deg,#c4b7e4 0 1px,transparent 1px 42px),repeating-linear-gradient(60deg,#c4b7e4 0 1px,transparent 1px 42px),repeating-linear-gradient(120deg,#c4b7e4 0 1px,transparent 1px 42px)}
     .orbit-map h3{position:absolute;top:24px;left:28px;z-index:2;max-width:60%;font-size:clamp(1.2rem,2vw,1.9rem);color:var(--starlight-cream);text-transform:uppercase}
-    .map-caption{position:absolute;left:28px;bottom:22px;z-index:2;font:600 .62rem var(--heading);letter-spacing:.14em;color:var(--muted)}
     .orbit-system{position:absolute;left:50%;top:53%;width:min(60vw,640px);aspect-ratio:1;translate:-50% -50%}
     .orbit-rings{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
     .orbit-rings polygon{fill:none;stroke:#c9a6ff;stroke-opacity:.24;stroke-width:.18}
@@ -110,6 +109,17 @@
     .planet-disc{display:block;width:100%;height:100%}
     .world-name{position:absolute;top:calc(100% + 8px);left:50%;translate:-50% 0;white-space:nowrap;font:600 .64rem var(--heading);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
     .orbit-world.selected .world-name{top:calc(140% + 10px);color:var(--solar-amber)}
+    .orbit-world.selected:not(.mars-target)::before{background:var(--muted)}
+    .orbit-world.selected:not(.mars-target) .world-name{color:var(--muted);opacity:1}
+    .orbit-world.selected:not(.mars-target) .world-name::after{content:" · unavailable"}
+    #objective-status.locked{color:var(--muted)}
+    .button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.7)}
+    /* Planning background: the orbit scene, zoomed on the chosen planet, behind the lobby and the planner */
+    .space-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .8s}
+    .space-bg.on{opacity:1}
+    .space-bg>canvas{display:block;width:100%;height:100%}
+    body.space-focus #lobby,body.space-focus #planner{background:linear-gradient(100deg,#11071fd0 0 38%,#11071f80 70%,#11071f30)}
+    body.space-focus #lobby .slab,body.space-focus #planner .slab{background:linear-gradient(112deg,#24143ab8 0 17%,#1d1128b8 17% 62%,#1a0e26b8 62%)}
     .orbit-world.selected::before{content:"";position:absolute;inset:-40%;background:var(--solar-amber);clip-path:polygon(evenodd,50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%,50% 0,50% 4%,89.5% 27%,89.5% 73%,50% 96%,10.5% 73%,10.5% 27%,50% 4%);animation:spin 14s linear infinite}
     .orbit-marker{position:absolute;left:3%;top:49%;display:flex;align-items:center;gap:.45rem;font:600 .6rem var(--heading);letter-spacing:.14em;color:var(--solar-amber)}
     /* 3D mode (three.js): the system fills the map and the buttons follow the planets */

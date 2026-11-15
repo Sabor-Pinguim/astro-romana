@@ -210,7 +210,23 @@
   const WORLD_NAMES={mercury:'Mercury',venus:'Venus',earth:'Earth',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn',uranus:'Uranus',neptune:'Neptune'};
   $('#orbit-back').addEventListener('click',()=>showScreen('menu'));
   $('#objective-next').addEventListener('click',()=>showScreen('lobby'));
-  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>{const w=button.dataset.world;toast(w==='mars'?'Mars is the destination of this mission.':w==='earth'?'Earth is the launch origin. Select Mars to plan the mission.':`${WORLD_NAMES[w]} is not available yet. This prototype only opens Mars.`);}));
+  // Every planet can be picked; only Mars opens a mission in this prototype, the others show as unavailable.
+  // The orbit map listens to astro:world (reticle, and the planet the planning background zooms into).
+  state.world = state.world || 'mars';
+  function selectWorld(w){
+    state.world=w;
+    $$('[data-world]').forEach(b=>{const on=b.dataset.world===w;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on));});
+    const open=w==='mars',name=WORLD_NAMES[w];
+    $('#objective-title').textContent=open?'Explore Mars':name;
+    $('#objective-description').textContent=open?'Land a crew, investigate ancient environments, and return discoveries to Earth.':w==='earth'?'The launch origin. Pick Mars to plan a mission.':`${name} is not open in this prototype. Mars is the only destination you can plan now.`;
+    $('#objective-profile').textContent=open?'CREWED · SURFACE':'—';
+    $('#objective-constraint').textContent=open?'MASS · POWER · DATA':'—';
+    $('#objective-status').textContent=open?'READY TO PLAN':w==='earth'?'LAUNCH ORIGIN':'UNAVAILABLE';
+    $('#objective-status').classList.toggle('locked',!open);
+    const next=$('#objective-next');next.disabled=!open;next.textContent=open?'Plan this mission →':'Unavailable';
+    window.dispatchEvent(new CustomEvent('astro:world',{detail:w}));
+  }
+  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>selectWorld(button.dataset.world)));
   $$('[data-site]').forEach(button=>button.addEventListener('click',()=>{state.site=button.dataset.site;state.detail={kind:'site',id:state.site};renderLobby();}));
   $('#play-button').addEventListener('click',()=>{const go=()=>showScreen('orbit');window.ASTRO_LAUNCH?window.ASTRO_LAUNCH().then(go):go();});
   $('#lobby-back').addEventListener('click',()=>showScreen('orbit'));

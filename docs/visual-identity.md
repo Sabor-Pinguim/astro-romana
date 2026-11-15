@@ -108,6 +108,8 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
   - Movimento: períodos orbitais reais em proporção (1 ano = 36 s) e inclinação axial real. Os raios são estilizados.
   - A órbita desacelera quando o mouse está sobre um planeta.
   - Os botões HTML seguem a projeção de cada planeta. Sem WebGL, o mapa 2D continua.
+  - Todo planeta é clicável. Os indisponíveis ganham a retícula em cinza `--muted`, o rótulo "· unavailable", o status "UNAVAILABLE" no cartão e o botão de planejar desativado (esmaecido).
+  - Fundo do planejamento (tripulação e montagem): a mesma cena vira uma camada fixa atrás da tela; a câmera faz zoom suave no planeta escolhido (lado iluminado, com terminador, à direita da tela) e o acompanha na órbita, com estrelas tênues e o cinturão passando. Nessas telas os painéis ficam translúcidos (72%) para o fundo aparecer.
 - **Foguetes 3D** (GLBs gerados, carregados de `index.models.js`):
   - Luz: chave creme de cima e da esquerda, ambiente lilás, contraluz laranja-Marte e reflexo suave de sala (`RoomEnvironment`, intensidade 0,5) para o metal não ficar preto.
   - Menu: Saturn V inclinado em voo, girando no próprio eixo, com chama de 3 cones de 7 lados (laranja, âmbar e creme, aditivos, tremulando). No Play ele acelera para longe e a tela troca depois de cerca de 1 s.
