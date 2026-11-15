@@ -907,14 +907,21 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     addEventListener('keyup', e => { s.keys.delete(e.code); if (e.code === 'KeyQ' && wheel.hold) closeWheel(true); });
     addEventListener('blur', () => s.keys.clear());
     const turn = (dx, dy, k) => { s.yaw -= dx * k; s.pitch -= dy * k; clampPitch(); };
-    let settle = false; // the first move after locking can carry a large jump (Chrome)
+    // Chrome can send a lone, huge movement right after locking and now and then while locked. Drop only that
+    // outlier: a fast turn grows over several events and is kept. (A flat 200 px cut froze the view on quick
+    // turns, more so at low frame rates, where the browser merges a whole frame of motion into one event.)
+    const SPIKE_PX = 200, SPIKE_RATIO = 4;
+    let settle = false, lastMove = 0;
     document.addEventListener('pointerlockchange', () => {
       settle = true;
       if (document.pointerLockElement === canvas) s.drag = null;
     });
     addEventListener('mousemove', e => {
       if (document.pointerLockElement === canvas) {
-        if (settle || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) { settle = false; return; }
+        const m = Math.max(Math.abs(e.movementX), Math.abs(e.movementY)), before = lastMove;
+        if (!m) return; // Chrome also sends zero moves when the page changes under the cursor (HUD, tags)
+        lastMove = m;
+        if (settle || (m > SPIKE_PX && m > before * SPIKE_RATIO + 40)) { settle = false; return; }
         if (wheel.open) return aimWheel(e.movementX, e.movementY);
         turn(e.movementX, e.movementY, .0022);
       }
