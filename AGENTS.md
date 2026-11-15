@@ -36,6 +36,7 @@ assets/
   models/               GERADO: GLBs + manifest.json (não editar à mão)
   audio/                GERADO: WAVs + manifest.json (não editar à mão)
   terrain/              GERADO: terrenos reais de Marte (GLB com textura + manifest.json)
+  sites/                GERADO: foto real (HiRISE) de cada local de pouso para o lobby (tools/web/site-photos.mjs)
 tools/
   modeling/             gerador procedural dos modelos 3D (Node + three.js)
     characters/<id>.mjs um arquivo por personagem: equipamento + animação de ação
@@ -264,6 +265,7 @@ npm run models                 # gera os 4 avatares e valida
 npm run models:build -- maya   # gera só um personagem
 npm run models:validate        # só valida
 npm run web:models             # empacota GLBs e specs usados pelo index.html em index.models.js
+npm run web:sites              # fotos HiRISE dos locais de pouso (assets/sites; rede: NODE_OPTIONS=--use-system-ca)
 npm run models:build:bodies    # gera os planetas (ex.: -- earth)
 # visualizador: abrir tools/model-viewer/index.html no navegador e escolher assets/models
 npm run audio                  # gera a paisagem sonora e valida

@@ -82,7 +82,7 @@
       const s=SITES_INFO[d.id];
       $('#detail-kind').textContent='Landing site';$('#detail-name').textContent=s.name;$('#detail-role').textContent=s.tag;$('#detail-desc').textContent=s.desc;
       $('#detail-status').textContent=state.site===d.id?'SELECTED SITE':'AVAILABLE';
-      $('#detail-extra').innerHTML='';$('#detail-site').innerHTML=siteScene(d.id);view.classList.add('site');
+      $('#detail-extra').innerHTML='';$('#detail-site').innerHTML=sitePhoto(d.id,true);view.classList.add('site');
     }
     window.dispatchEvent(new CustomEvent('astro:detail',{detail:d}));
   }
@@ -333,7 +333,10 @@
     jezero: { ramp: RAMPS.jezero, seed: 4, profile: [[0, .34], [.12, .3], [.22, .38], [.35, .44], [.5, .46], [.65, .45], [.78, .39], [.9, .31], [1, .35]] },
     gale: { ramp: RAMPS.gale, seed: 9, profile: [[0, .52], [.15, .5], [.3, .47], [.42, .36], [.5, .22], [.58, .3], [.68, .42], [.82, .49], [1, .5]] }
   };
-  const siteScene = id => `<svg class="${id}" viewBox="0 0 160 100" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><rect width="160" height="100" fill="#17183B"/>${poly([[0, 0], [160, 0], [0, 48]], '#1c1a45')}${poly([[160, 0], [160, 56], [30, 56]], '#241848')}${poly([[0, 40], [160, 30], [160, 60], [0, 60]], '#3a1f4a')}<g transform="translate(92 16) scale(4)">${facetPolys({ ramp: RAMPS.rock, seed: 3, rings: [5, 9] })}</g>${facetTerrain(SITES[id])}</svg>`;
+  // Landing site photo: the real HiRISE orthoimage around the landing point (assets/sites, tools/web/site-photos.mjs).
+  // The big view marks the 512 m walkable terrain (centre third of the 1.5 km photo) and credits the source.
+  const sitePhoto = (id, big) => `<img class="site-photo" src="assets/sites/${id}.png" alt="${big ? `HiRISE orbital photo around the ${SITES_INFO[id].name} landing point` : ''}">`
+    + (big ? `<span class="site-walk" aria-hidden="true"><small>512 m walk area</small></span><span class="site-credit">HiRISE (MRO) · 1.5 km wide · north up · NASA/JPL/UArizona, USGS (CC0)</span>` : '');
   function menuMars() {
     const tilt = -14 * Math.PI / 180, at = t => { const x = 1.45 * Math.cos(t), y = .36 * Math.sin(t); return [x * Math.cos(tilt) - y * Math.sin(tilt), x * Math.sin(tilt) + y * Math.cos(tilt)]; };
     const arc = (t0, t1) => Array.from({ length: 13 }, (_, k) => at(t0 + (t1 - t0) * k / 12).map(v => v.toFixed(3)).join(',')).join(' ');
@@ -354,7 +357,7 @@
     $('.earth .planet-disc').innerHTML = facetPlanet({ ...PLANETS.earth, seed: 2, rings: [5, 10, 15] });
     $('.mars-target .planet-disc').innerHTML = facetPlanet({ ...PLANETS.mars, seed: 8, rings: [6, 12, 17] });
     $('.jupiter .planet-disc').innerHTML = facetPlanet({ ...PLANETS.jupiter, seed: 6, rings: [6, 12, 18] });
-    $$('.site-thumb .thumb-art').forEach(el => { el.innerHTML = siteScene(el.parentElement.dataset.site); });
+    $$('.site-thumb .thumb-art').forEach(el => { el.innerHTML = sitePhoto(el.parentElement.dataset.site); });
   }
   // ===========================================================================
   // PHASES 5–7 SIMULATION ENGINE & RAD SOUNDSCAPE (Cockpit -> Mars Surface -> Results)

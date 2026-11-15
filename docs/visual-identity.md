@@ -118,6 +118,7 @@ Toda a arte é gerada por código a partir de semente fixa: o mesmo código dese
   - A pilha balança ±43° sem esconder o lado aberto, e cada rótulo acompanha seu módulo.
   - Catálogo lateral (`.catalog` / `#parts-list`): cada peça exibe uma miniatura 3D chanfrada (`.part-thumb`) do seu modelo GLB sob a mesma iluminação de estúdio (com fallback SVG low poly quando WebGL estiver indisponível).
   - Lobby: o tripulante escolhido aparece em 3D (GLB do avatar, animação `idle_loop`; `wave` ao selecionar de novo) sobre um pedestal hexagonal na cor dele.
+  - Locais de pouso (miniaturas e vista grande do lobby): foto real do HiRISE, 1,5 km em volta do ponto de pouso, norte para cima, com tinta de Marte leve (`sepia`, escolha de jogo); a vista grande marca em tracejado âmbar a área caminhável de 512 m e traz o crédito.
 - **Cockpit** (painel do piloto no layout da Orion, `assets/models/rocket/cockpit_pilot.glb`):
   - Navball na tela esquerda: bola facetada com céu azul (`Pack`) e solo laranja (`Foam`), horizonte aceso (`Lamp`) e linhas de arfagem a cada 20°, virada para os olhos do piloto. Símbolo do avião âmbar fixo e colchetes verdes fixos marcam a faixa do "manter na faixa".
   - Cartão do minigame: medidor vertical com faixa verde, marcador creme (laranja fora da faixa), tempo até o MECO, porcentagem na faixa e estrelas.
