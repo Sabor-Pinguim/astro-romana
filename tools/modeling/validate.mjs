@@ -101,6 +101,7 @@ const DEFAULT_PART_MESH_BUDGET = {
   tanks: 8,
   equipment: 12,
   cabin: 12,
+  structures: 8,
 };
 
 async function validatePart(entry, manifest) {
@@ -127,7 +128,7 @@ async function validatePart(entry, manifest) {
   });
 
   if (!names.has('Attach_Top')) problems.push('missing Attach_Top anchor');
-  if (['tanks', 'equipment', 'cabin', 'cockpit'].includes(entry.category) && !names.has('Attach_Bottom')) {
+  if (['tanks', 'equipment', 'cabin', 'cockpit', 'structures'].includes(entry.category) && !names.has('Attach_Bottom')) {
     problems.push('missing Attach_Bottom anchor');
   }
   if (entry.category === 'engines' && !names.has('FX_Exhaust')) {

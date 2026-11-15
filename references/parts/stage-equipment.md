@@ -49,6 +49,8 @@ Every module belongs to one of the four playable crew roles (**Helena**, **Lucas
 ## 3. Cutaway Stage Integration & 3D Model Conventions
 
 ### 3.1 Target Bay Geometry (`internal_stage_cutaway.glb`)
+> The rocket builder now uses the generated [`stage-module`](structures/stage-module/README.md) (`parts/structures/stage-module.glb`): same Ø 1.00 × 1.00 m bay and Ø 0.91 × 0.84 m cavity, with the mounting point `Attach_Bay` at y = 0.1 m. The dimensions below still apply.
+
 Unlike the external 1:1 propulsion parts in [parts.md](parts.md), middle-stage equipment must visibly sit **inside** the modular cutaway bay [`godot/assets/models/rocket/internal_stage_cutaway.glb`](../../godot/assets/models/rocket/internal_stage_cutaway.glb) during drag-and-drop construction:
 
 - **Bay outer dimensions (inspected from GLB):** `1.00 m` diameter (`r = 0.50 m`), `1.00 m` total stage height (`y ∈ [0.00, 1.00] m`).

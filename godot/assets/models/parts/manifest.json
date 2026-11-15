@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T04:32:42.433Z",
+  "generatedAt": "2026-11-15T05:22:01.521Z",
   "generator": "tools/modeling/build-parts.mjs",
   "conventions": {
     "units": "meters",
@@ -9,6 +9,8 @@
     "tankOrigin": "bottom interface (stands above y = 0)",
     "equipmentOrigin": "bottom mounting plate (stands on y = 0 inside cutaway stage bay)",
     "cabinOrigin": "bottom mounting deck (stands on y = 0 inside cutaway cabin bay)",
+    "cockpitOrigin": "cabin floor center (minY = 0, forward windshield toward -Z, Camera_Pilot at (0, 1.18, 0.38))",
+    "structureOrigin": "bottom interface (y = 0); Ø 1.00 m normalized builder modules with Attach_* mounting points",
     "fxAnchorPrefix": "FX_"
   },
   "fxPresets": {
@@ -275,6 +277,17 @@
     "minSafeLiftoffTwr": 1.2,
     "minBareLiftoffTwr": 1,
     "maxInternalStages": 7,
+    "cabinModuleSlots": 4,
+    "cabinHull": {
+      "massDryKg": 3000,
+      "powerW": -300,
+      "costM": 12,
+      "sources": {
+        "massDryKg": "game-balance",
+        "powerW": "game-balance (base life support)",
+        "costM": "game-balance"
+      }
+    },
     "mandatoryOrbitalRefuelingForMars": true,
     "note": "g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5."
   },
@@ -3246,6 +3259,105 @@
         "references/parts/cabin-equipment.md",
         "docs/resources/equipamentos-cabine.md",
         "references/experiments/mars-experiments.md"
+      ]
+    },
+    {
+      "id": "booster-thrust-section",
+      "name": "Seção de Empuxo do Propulsor",
+      "nodeName": "BoosterThrustSection",
+      "category": "structures",
+      "tier": 1,
+      "vehicle": "Main Booster (base obrigatória)",
+      "role": "Saia traseira com placa de empuxo: recebe o conjunto de motores embaixo e o tanque em cima",
+      "file": "parts/structures/booster-thrust-section.glb",
+      "summary": "Saia branca levemente cônica com faixa preta, quatro aletas, placa de empuxo de aço e ressalto hexagonal de fixação dos motores.",
+      "originNote": "Plano inferior da placa de empuxo; motores penduram abaixo de y = 0",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom",
+        "Attach_Tank",
+        "Attach_Engines"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 1.096,
+        "height": 0.53,
+        "depth": 1.096,
+        "minY": -0.03,
+        "maxY": 0.5
+      },
+      "specs": {
+        "massDryKg": 1200,
+        "propellantMassKg": 0,
+        "powerW": 0,
+        "costM": 6,
+        "dataRateKbps": 0,
+        "sources": {
+          "massDryKg": "game-balance (references/parts/structures/booster-thrust-section/README.md: normalized aft skirt and thrust plate)",
+          "powerW": "game-balance (passive structure)",
+          "costM": "game-balance (mandatory Main Booster hull)"
+        }
+      },
+      "budget": {
+        "triangles": 500,
+        "meshes": 6
+      },
+      "stats": {
+        "triangles": 264,
+        "meshes": 5,
+        "bytes": 23532
+      },
+      "references": [
+        "references/parts/structures/booster-thrust-section/README.md"
+      ]
+    },
+    {
+      "id": "stage-module",
+      "name": "Módulo de Estágio do Meio",
+      "nodeName": "StageModule",
+      "category": "structures",
+      "tier": 1,
+      "vehicle": "Estágios do meio (0 a 7, empilháveis)",
+      "role": "Baia aberta em cutaway com um ponto de fixação para 1 equipamento",
+      "file": "parts/structures/stage-module.glb",
+      "summary": "Meia casca branca aberta para a frente, parede interna escura, pisos de alumínio e placa hexagonal dourada de fixação no centro da baia.",
+      "originNote": "Interface inferior (y = 0); próximo módulo encaixa em y = 1",
+      "requiredNodes": [
+        "Attach_Top",
+        "Attach_Bottom",
+        "Attach_Bay"
+      ],
+      "fx": [],
+      "dimensions": {
+        "width": 1.01,
+        "height": 1,
+        "depth": 1.005,
+        "minY": 0,
+        "maxY": 1
+      },
+      "specs": {
+        "massDryKg": 450,
+        "propellantMassKg": 0,
+        "powerW": -50,
+        "costM": 4,
+        "dataRateKbps": 0,
+        "sources": {
+          "massDryKg": "game-balance (references/parts/structures/stage-module/README.md: bay structure, wiring and heaters)",
+          "powerW": "game-balance (bay heaters and data bus)",
+          "costM": "game-balance (one per middle stage, up to maxInternalStages)"
+        }
+      },
+      "budget": {
+        "triangles": 700,
+        "meshes": 8
+      },
+      "stats": {
+        "triangles": 264,
+        "meshes": 6,
+        "bytes": 24012
+      },
+      "references": [
+        "references/parts/structures/stage-module/README.md"
       ]
     }
   ]

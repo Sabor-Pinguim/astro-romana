@@ -17,7 +17,11 @@ references/parts/
   _template.md             the standard every part README follows
   engines/<id>/README.md   one folder per engine, with its photos
   tanks/<id>/README.md     one folder per tank, with its photos
+  structures/<id>/README.md  builder hull modules (booster thrust section, middle stage), no engine or tank of their own
+  stage-equipment.md       middle-stage equipment modules
 ```
+
+The numbers the game and the simulation use (mass, cost, power, thrust, Isp, propellant, each with its source) live in `tools/modeling/parts/specs.mjs` and are written to `godot/assets/models/parts/manifest.json` (`specs` of each part, plus `missionRules`).
 
 To add a part: copy `_template.md` to `<engines|tanks>/<id>/README.md`, fill every row (unknown = `n/f`), save the photos next to it, and add a row to the catalogue below.
 

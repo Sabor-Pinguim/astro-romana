@@ -1,11 +1,11 @@
-// Builds the 49 low-poly rocket parts (13 engines + 8 tanks + 16 equipment + 12 cabin) as GLB files plus
+// Builds the 52 low-poly rocket parts (13 engines + 8 tanks + 16 equipment + 12 cabin + 1 cockpit + 2 structures) as GLB files plus
 // godot/assets/models/parts/manifest.json and updates the `parts` section of
 // godot/assets/models/manifest.json.
 //
-//   npm run models:build:parts             # all 49 parts
+//   npm run models:build:parts             # all 52 parts
 //   npm run models:build:parts -- raptor   # only selected parts
 //
-// Output: godot/assets/models/parts/<engines|tanks|equipment|cabin>/<id>.glb
+// Output: godot/assets/models/parts/<engines|tanks|equipment|cabin|cockpit|structures>/<id>.glb
 import './lib/node-polyfills.mjs';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -134,7 +134,16 @@ async function main() {
   } catch {
     // first build
   }
-  const previousParts = existingManifest.parts ?? [];
+  // Parts not rebuilt keep their entry: from the main manifest, or from parts/manifest.json
+  // when another generator rewrote the main one without the `parts` key.
+  let previousParts = existingManifest.parts ?? [];
+  if (!previousParts.length) {
+    try {
+      previousParts = JSON.parse(await readFile(PARTS_MANIFEST, 'utf8')).parts ?? [];
+    } catch {
+      // first build
+    }
+  }
 
   const exporter = new GLTFExporter();
   const builtEntries = [];
@@ -169,6 +178,7 @@ async function main() {
           equipmentOrigin: 'bottom mounting plate (stands on y = 0 inside cutaway stage bay)',
           cabinOrigin: 'bottom mounting deck (stands on y = 0 inside cutaway cabin bay)',
           cockpitOrigin: 'cabin floor center (minY = 0, forward windshield toward -Z, Camera_Pilot at (0, 1.18, 0.38))',
+          structureOrigin: 'bottom interface (y = 0); Ø 1.00 m normalized builder modules with Attach_* mounting points',
           fxAnchorPrefix: 'FX_',
         },
         fxPresets: FX_PRESETS,
