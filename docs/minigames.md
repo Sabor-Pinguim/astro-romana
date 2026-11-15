@@ -80,12 +80,25 @@ As quatro etapas do cockpit têm um minigame cronometrado. Os tempos, os limites
 | 01 · Liftoff & Max-Q | Helena | manter o alvo do navball no centro em dois eixos; a duração segue o TWR de decolagem (15 s com TWR 1,5; proporcional a 1/√(TWR − 1), entre 9 e 30 s): mais empuxo por tonelada, subida mais curta | uma ascensão ruim cria um disjuntor extra na separação. Sem motor capaz de acender no estágio 1 (sem motor, sem tanque ou propelente trocado) ou com TWR abaixo de 1,0, o foguete não sai da plataforma: a missão falha, o debriefing mostra a causa e o pódio fica vazio. Se o Δv somado não chega à órbita (9.400 m/s), a tripulação aborta no MECO: a cápsula desce de paraquedas no mar e a missão falha |
 | 02 · Cabin docking | Helena | alinhar a escotilha da cabine em 3D no monitor central com `← →` (`A/D`), `↑ ↓` e `E/Q` (`W/S`), sem gastar todo o combustível | falha exibe X vermelho, custa pontos e avança para a próxima etapa |
 | 03 · Orbital docking | Oscar e Maya | manter a nave alinhada com o tanque na câmera externa do monitor central; depois, transferir propelente | aproximação ruim dificulta a injeção transmarciana; a janela vencida usa captura automática com penalidade. Se nem com o tanque cheio o foguete chega aos 4.300 m/s da transferência, a tripulação volta para a Terra: a cápsula desce de paraquedas no mar e a missão falha |
+| 04 · Mars landing | Helena | repetir o navball da decolagem durante o pouso em Marte | pouco tempo na faixa reduz a pontuação da missão |
 
 **Regras da montagem que barram a missão** (as mesmas da telemetria do planejador):
 - **Decolagem:** precisa de um motor no estágio 1 que acenda (com tanque do mesmo propelente) e de TWR de pelo menos 1,0.
 - **Estágios superiores:** precisam de TWR no vácuo de pelo menos 0,3 na ignição (`minUpperStageTwr`, `game-balance`, estimado de estágios da classe do Centaur). Um estágio mais fraco não acende: vira peso morto, como um estágio incompleto, e o catálogo mostra o TWR que cada motor e tanque daria.
 - **Δv:** precisa chegar à órbita e, reabastecido, fazer a transferência. Quando falta, a revisão de lançamento avisa ("This rocket will not reach orbit" ou "cannot reach Mars") e o botão vira "Launch anyway".
-| 04 · Mars landing | Helena | repetir o navball da decolagem durante o pouso em Marte | pouco tempo na faixa reduz a pontuação da missão |
+
+**Dificuldade** (escolhida pelo host no lobby; tabela `difficulty` em `web/app.js`, toda `game-balance`):
+
+| | Fácil | Normal | Difícil |
+|---|---|---|---|
+| Orçamento | $300M (×1,2) | $250M | $200M (×0,8) |
+| Tempo na superfície | 3:30 | 3:00 | 2:20 |
+| Tipos de propelente | ignorados | ignorados | motor e tanque precisam do mesmo |
+| Problemas de telemetria | só aviso: a missão sempre voa | podem falhar a missão | podem falhar a missão |
+| Penalidades (TWR baixo, falta de energia, orçamento estourado) | nenhuma | sim | sim |
+| Δv exigido (órbita / Marte) | — (só aviso) | 7.520 / 3.440 m/s (−20%) | 9.400 / 4.300 m/s |
+
+O selo do lobby resume o nível ("$250M · 3:00 on Mars · Δv −20%"), e cada botão explica as regras ao passar o mouse.
 
 **Telemetria do cockpit** (`updateTelemetry` em `web/app.js`), coerente com o foguete montado e com a ordem real de um voo:
 - **Subida:** a velocidade segue o Δv gasto pelo foguete montado (Tsiolkovsky, estágio a estágio) e chega a 7.670 m/s numa órbita de 400 km (`derived`: √(GM/r)). A altitude é uma curva de jogo. A etapa 01 esvazia o estágio 1. Os primeiros 6 s da etapa 02 completam a subida com o estágio de cima. A leitura de propelente é a do tanque do estágio que está queimando.

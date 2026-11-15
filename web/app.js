@@ -13,9 +13,23 @@
     jezero:{name:'Jezero Crater',mission:'Biosignature Hunters',tag:'Ancient delta · biosignatures',desc:'An ancient lake with a river delta, a target in the search for biosignatures. The Perseverance rover has explored the crater since 2021.'},
     gale:{name:'Gale Crater',mission:'Gale Climate Archive',tag:'Layered rocks · climate',desc:'The rock layers of Mount Sharp hold the history of the Martian climate. The Curiosity rover has explored the crater since 2012.'}
   };
-  // Per difficulty (game-balance): budget multiplier (the base budget comes from missionRules) and the surface
-  // window in seconds. The badge shows exactly these two effects.
-  const difficulty = {easy:{factor:1.2,surfaceS:210},normal:{factor:1,surfaceS:180},hard:{factor:.8,surfaceS:140}};
+  // Per difficulty (game-balance): budget multiplier (the base budget comes from missionRules), surface window in
+  // seconds and the engineering rules. fuelTypes: engine and tank must burn the same propellants. failures: the
+  // telemetry can end the mission (no liftoff, Δv abort); without it every problem is a warning. penalties: low TWR,
+  // a power deficit and overspending cost points and add trouble in flight. dvTolerance: share of the orbit and
+  // Mars-transfer Δv the rocket may lack and still make it. The badge and the button tooltips show all of it.
+  const difficulty = {
+    easy:{factor:1.2,surfaceS:210,fuelTypes:false,failures:false,penalties:false,dvTolerance:0,rules:'warnings only',
+      about:'Easy: every telemetry problem is only a warning and the mission always flies. Fuel types are ignored.'},
+    normal:{factor:1,surfaceS:180,fuelTypes:false,failures:true,penalties:true,dvTolerance:.2,rules:'Δv −20%',
+      about:'Normal: the telemetry can fail the mission, with 20% tolerance on the Δv to orbit and to Mars. Fuel types are ignored.'},
+    hard:{factor:.8,surfaceS:140,fuelTypes:true,failures:true,penalties:true,dvTolerance:0,rules:'every rule',
+      about:'Hard: every rule. Engine and tank must share propellants and the full Δv is needed.'},
+  };
+  const LV = () => difficulty[state.difficulty];
+  const easyNote = () => LV().failures ? '' : ' (Easy: warning only.)';
+  // Δv target text: the real target (⚠) and, on Normal, the one the game accepts.
+  const tolNote = (target,key) => LV().dvTolerance?`Target on Normal: ${number(target)} m/s (${number(rule(key,0))} m/s ⚠ less ${Math.round(LV().dvTolerance*100)}%).`:`Target ≈ ${number(target)} m/s ⚠.`;
   const EQUIPMENT_GROUPS = [['power','Power',/^power-/],['data','Data & comms',/^(comm|data)-/],['science','Science',/^(sci|drill|truss)-/],['edl','Landing',/^edl-/],['systems','Systems',/^(attitude|isru|hab)-/]];
   const CABIN_GROUPS = [['helena','Helena',['cabin-launch-seats','cabin-orion-cockpit','cabin-idss-docking']],['lucas','Lucas',['cabin-pcdu-thermal','cabin-eva-airlock','cabin-eclss-wrs']],['oscar','Oscar',['cabin-hera-dosimetry','cabin-scan-console','cabin-autonav-conjunction']],['maya','Maya',['cabin-ared-exercise','cabin-storm-shelter','cabin-msg-minion']]];
   const CREW_MODELS = { helena: 'characters/helena.glb', lucas: 'characters/lucas.glb', oscar: 'characters/oscar.glb', maya: 'characters/maya.glb' };
@@ -37,6 +51,7 @@
   // weight (TWR_BARE). Otherwise the rocket stays on the pad and the mission ends there.
   // accel: net climb acceleration relative to the reference design (the launch pad animation uses it).
   function liftoffOf(m){
+    if(!LV().failures){const fly=m.ready&&m.twr>=TWR_BARE();return {ok:true,twr:m.twr,seconds:fly?ascentSeconds(m.twr):ASCENT.refS,accel:fly?(m.twr-1)/(ASCENT.refTwr-1):1};} // Easy: it always flies
     const b=state.rocket.booster,fail=(reason,pad,status,title,detail)=>({ok:false,reason,pad,status,title,detail,twr:m.twr});
     if(!b.engine)return fail('no-engine','NO IGNITION','No ignition · no stage 1 engine','No Ignition','Stage 1 had no engine, so nothing lit at T−0.');
     if(!b.tank)return fail('no-tank','NO IGNITION','No ignition · no propellant','No Ignition','Stage 1 had no tank, so the engines had no propellant to burn.');
@@ -49,7 +64,7 @@
   // transfer even refuelled aborts after the orbital refuel. Either way the capsule splashes down and the mission fails.
   // warn: the launch review (future); detail: the debrief (past).
   function abortOf(m){
-    if(!m.ready)return null;
+    if(!m.ready||!LV().failures)return null;
     const v=number(Math.round(m.dv/m.leo*ORBIT.velMs)),base={ok:false,pad:'SPLASHDOWN'};
     if(!m.orbit)return {...base,reason:'no-orbit',status:'Abort · Δv short of orbit',title:'Orbit Not Reached',
       warn:`Its stages run dry at ${v} of the ${number(ORBIT.velMs)} m/s needed for orbit: the crew will abort and splash down.`,
@@ -147,7 +162,7 @@
   //   stages above must give the Mars transfer Δv; the refuel is the propellant it is missing for that.
   // Engine pumps draw power only during the ascent, so engines stay out of the cruise power balance.
   function metrics(){
-    const r=state.rocket,g0=rule('g0Ms2',9.80665),leo=rule('earthOrbitDeltaVMs',9400),transfer=rule('marsTransferDeltaVMs',4300);
+    const r=state.rocket,g0=rule('g0Ms2',9.80665),tol=1-LV().dvTolerance,leo=rule('earthOrbitDeltaVMs',9400)*tol,transfer=rule('marsTransferDeltaVMs',4300)*tol;
     let cost=0,draw=0,gen=0,payload=0;
     const take=s=>{if(!s)return 0;cost+=s.costM||0;if(s.powerW<0)draw-=s.powerW;else gen+=s.powerW||0;return s.massDryKg||0;};
     const engineStage=(key,m,first)=>{
@@ -156,7 +171,7 @@
       if(e){cost+=n*(e.costM||0);hw+=n*(e.massDryKg||0);}
       if(t){cost+=t.costM||0;hw+=t.massDryKg||0;}
       if(first&&m.fins)hw+=take(spec(m.fins));
-      const issue=!e||!t?'incomplete':sameFuel(m.engine,m.tank)?null:'propellant';
+      const issue=!e||!t?'incomplete':!LV().fuelTypes||sameFuel(m.engine,m.tank)?null:'propellant';
       const ispVac=e?.ispVacS||0,isp=first&&e?.ispSlS?(e.ispSlS+ispVac)/2:ispVac;
       return {key,hw,prop:t?.propellantMassKg||0,isp,ispVac,thrustSl:n*(e?.thrustSlKn||0)*1000,thrustVac:n*(e?.thrustVacKn||0)*1000,issue,ready:!issue,dv:0};
     };
@@ -198,23 +213,24 @@
     const m=metrics();
     $('#cost-value').textContent=`${money(m.cost)} / ${money(m.budget)}`;setBar('#cost-fill',m.cost/m.budget,m.cost>m.budget?'danger':'');
     $('#twr-value').textContent=m.ready?m.twr.toLocaleString('en-US',{maximumFractionDigits:2}):'—';setBar('#twr-fill',m.ready?m.twr/2:0,m.ready&&m.twr<TWR_MIN()?'danger':'');
-    $('#twr-hint').textContent=m.ready&&m.twr>=TWR_BARE()?`Ascent to MECO ≈ ${ascentSeconds(m.twr)} s: more thrust per tonne climbs faster. Below ${TWR_MIN().toFixed(1)} the stack wallows; below ${TWR_BARE().toFixed(1)} it stays on the pad.`:`Below ${TWR_BARE().toFixed(1)}, or with no working engine, the rocket stays on the pad and the mission fails.`;
+    $('#twr-hint').textContent=m.ready&&m.twr>=TWR_BARE()?`Ascent to MECO ≈ ${ascentSeconds(m.twr)} s: more thrust per tonne climbs faster. Below ${TWR_MIN().toFixed(1)} the stack wallows; below ${TWR_BARE().toFixed(1)} it stays on the pad.${easyNote()}`:`Below ${TWR_BARE().toFixed(1)}, or with no working engine, the rocket stays on the pad and the mission fails.${easyNote()}`;
     $('#power-value').textContent=`${number(m.gen)} W / ${number(m.draw)} W`;setBar('#power-fill',m.draw?m.gen/(m.draw*1.5):0,m.gen<m.draw?'danger':'');
     $('#dv-value').textContent=m.ready?`${number(m.dv)} / ${number(m.leo)} m/s`:'—';setBar('#dv-fill',m.dv/m.leo,m.ready&&!m.orbit?'short':'');
     $('#mars-value').textContent=m.orbit?`${number(m.marsDv)} / ${number(m.transfer)} m/s`:'—';setBar('#mars-fill',m.marsDv/m.transfer,m.orbit&&!m.marsOk?'short':'');
     $('#mars-hint').textContent=(!m.orbit?'Reach low Earth orbit first: the stage burning there refuels, then it and the stages above make the transfer.'
       :!m.marsOk?`Even with a full tank, ${stageName(m.refuelStage.key)} and the stages above fall short.`
-      :m.refuelKg>0?`Orbital refuel: ${Math.ceil(m.refuelPct)}% of the ${stageName(m.refuelStage.key)} tank (${tonnes(m.refuelKg)}).`:'No refuel needed: the tanks already hold enough.')+` Target ≈ ${number(m.transfer)} m/s ⚠.`;
+      :m.refuelKg>0?`Orbital refuel: ${Math.ceil(m.refuelPct)}% of the ${stageName(m.refuelStage.key)} tank (${tonnes(m.refuelKg)}).`:'No refuel needed: the tanks already hold enough.')+` ${tolNote(m.transfer,'marsTransferDeltaVMs')}`;
+    $('#dv-hint').textContent=`Sum of every stage; each one drops away when empty. ${tolNote(m.leo,'earthOrbitDeltaVMs')}`;
     $('#mass-value').textContent=tonnes(m.mass);
     const b=state.rocket.booster,dead=m.stack.slice(1).find(s=>s.issue);
-    $('#booster-alert').textContent=!b.engine?'NO MAIN ENGINE! Nothing lights at T−0: install a stage 1 engine.':!b.tank?'NO STAGE 1 TANK! The engines have no propellant and will not ignite.':`PROPELLANT MISMATCH! The stage 1 engine burns ${fuelOf(b.engine)}; the tank holds ${fuelOf(b.tank)}. It will not ignite.`;
+    $('#booster-alert').textContent=!b.engine?'NO MAIN ENGINE! Nothing lights at T−0: install a stage 1 engine.'+easyNote():!b.tank?'NO STAGE 1 TANK! The engines have no propellant and will not ignite.'+easyNote():`PROPELLANT MISMATCH! The stage 1 engine burns ${fuelOf(b.engine)}; the tank holds ${fuelOf(b.tank)}. It will not ignite.`+easyNote();
     $('#booster-alert').classList.toggle('show',!m.ready);
-    $('#stage-alert').textContent=!dead?'':dead.issue==='thrust'?`${stageName(dead.key).toUpperCase()} TOO WEAK! Thrust-to-weight ${dead.twr.toFixed(2)} at ignition (needs ${UPPER_TWR().toFixed(1)}): it cannot climb and rides along as dead weight.`
+    $('#stage-alert').textContent=!dead?'':dead.issue==='thrust'?`${stageName(dead.key).toUpperCase()} TOO WEAK! Thrust-to-weight ${dead.twr.toFixed(2)} at ignition (needs ${UPPER_TWR().toFixed(1)}): it cannot climb and rides along as dead weight.${easyNote()}`
       :`${stageName(dead.key).toUpperCase()} ${dead.issue==='propellant'?'PROPELLANT MISMATCH':'INCOMPLETE'}! It cannot fire and rides along as dead weight.`;
     $('#stage-alert').classList.toggle('show',!!dead);
-    $('#twr-alert').textContent=m.twr<TWR_BARE()?`WON'T LEAVE THE PAD! Thrust-to-weight below ${TWR_BARE().toFixed(1)}: the mission ends at liftoff.`:`LOW THRUST! Thrust-to-weight below ${TWR_MIN().toFixed(1)}: a long, rough ascent.`;
+    $('#twr-alert').textContent=m.twr<TWR_BARE()?`WON'T LEAVE THE PAD! Thrust-to-weight below ${TWR_BARE().toFixed(1)}: the mission ends at liftoff.${easyNote()}`:`LOW THRUST! Thrust-to-weight below ${TWR_MIN().toFixed(1)}: a long, rough ascent.`;
     $('#twr-alert').classList.toggle('show',m.ready&&m.twr<TWR_MIN());
-    $('#dv-alert').textContent=!m.orbit?`CAN'T REACH ORBIT! The crew would abort and splash down: add a bigger tank or an upper stage.`:`MARS OUT OF REACH! Refuelled, the rocket gives ${number(m.marsDv)} of ${number(m.transfer)} m/s: the crew would return to Earth.`;
+    $('#dv-alert').textContent=!m.orbit?`CAN'T REACH ORBIT! The crew would abort and splash down: add a bigger tank or an upper stage.${easyNote()}`:`MARS OUT OF REACH! Refuelled, the rocket gives ${number(m.marsDv)} of ${number(m.transfer)} m/s: the crew would return to Earth.${easyNote()}`;
     $('#dv-alert').classList.toggle('show',m.ready&&!m.marsOk);
     $('#budget-alert').classList.toggle('show',m.cost>m.budget);$('#power-alert').classList.toggle('show',m.gen<m.draw);
     $('#budget-remaining').textContent=money(m.budget-m.cost);$('#budget-readout').classList.toggle('negative',m.cost>m.budget);
@@ -243,7 +259,7 @@
   const installedIn = sel => isBooster(sel)?Object.values(sel.kind==='booster'?state.rocket.booster:{engine:state.rocket.stages[sel.index].engine,tank:state.rocket.stages[sel.index].tank}).filter(Boolean):sel.kind==='stage'?[state.rocket.stages[sel.index]?.item].filter(Boolean):state.rocket.cabin;
   // Flags a catalog engine or tank whose propellants differ from the partner already installed in the selected stage.
   function fuelClash(id){
-    const sel=state.sel;if(!isBooster(sel))return '';
+    const sel=state.sel;if(!isBooster(sel)||!LV().fuelTypes)return '';
     const m=sel.kind==='booster'?state.rocket.booster:state.rocket.stages[sel.index],partner=part(id)?.category==='engines'?'tank':'engine',other=m[partner];
     return other&&!sameFuel(id,other)?` <span class="warn" title="Different propellants from the installed ${partner}">≠ ${partner}</span>`:'';
   }
@@ -318,9 +334,9 @@
     if(m.ready&&!m.orbit)warnings.push(`Δv below low Earth orbit (${number(m.dv)} of ${number(m.leo)} m/s): abort and splashdown`);
     if(m.orbit&&!m.marsOk)warnings.push(`Mars out of reach even after refueling (${number(m.marsDv)} of ${number(m.transfer)} m/s): the crew returns to Earth`);
     $('#launch-title').textContent=!lift.ok?'This rocket will not leave the pad':abort?(abort.reason==='no-orbit'?'This rocket will not reach orbit':'This rocket cannot reach Mars'):warnings.length?'Review the mission risks':'Mission ready to launch';
-    $('#launch-message').textContent=!lift.ok?`${lift.detail} Launching now ends the mission on the pad.`:abort?`${abort.warn} The mission fails.`:warnings.length?'These choices will have consequences at launch or on arrival. Revise the design or launch with risks.':'The crew is ready for liftoff, orbital checklist, Mars landing, and surface operations.';
+    $('#launch-message').textContent=!lift.ok?`${lift.detail} Launching now ends the mission on the pad.`:abort?`${abort.warn} The mission fails.`:warnings.length&&!LV().failures?'Easy: these are warnings only. The mission flies anyway.':warnings.length?'These choices will have consequences at launch or on arrival. Revise the design or launch with risks.':'The crew is ready for liftoff, orbital checklist, Mars landing, and surface operations.';
     $('#launch-summary').innerHTML=[['Crew',`${state.friends.size+1} player${state.friends.size?'s':''} · ${3-state.friends.size} AI`],['Site',SITES_INFO[state.site].name],['Difficulty',{easy:'EASY',normal:'NORMAL',hard:'HARD'}[state.difficulty]],['Stages',`${state.rocket.stages.length+2}`],['Budget remaining',money(m.budget-m.cost)],['Liftoff mass',tonnes(m.mass)],['Thrust-to-weight',m.ready?`${m.twr.toLocaleString('en-US',{maximumFractionDigits:2})} · ${lift.ok?`${lift.seconds} s ascent`:'no liftoff'}`:'— · no ignition'],['Δv to orbit',m.ready?`${number(m.dv)} / ${number(m.leo)} m/s`:'—'],['Mars transfer',m.orbit?`${number(m.marsDv)} / ${number(m.transfer)} m/s`:'—'],['Orbital refuel',m.marsOk?(m.refuelKg>0?`${Math.ceil(m.refuelPct)}% · ${tonnes(m.refuelKg)}`:'Not needed'):'—'],['Power',`${number(m.gen)} / ${number(m.draw)} W`],['Risks',warnings.length?warnings.join('; '):'All clear']].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');
-    $('#launch-confirm').textContent=!lift.ok||abort?'Launch anyway →':warnings.length?'Launch with risks →':'Launch mission →';
+    $('#launch-confirm').textContent=!lift.ok||abort?'Launch anyway →':warnings.length&&!LV().failures?'Launch with warnings →':warnings.length?'Launch with risks →':'Launch mission →';
     $('#launch-dialog').showModal();
   }
   function setupStars(){const canvas=$('#stars'),ctx=canvas.getContext('2d');if(!ctx)return;let stars=[];let width=0,height=0;const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;function resize(){const ratio=Math.min(devicePixelRatio||1,2);width=canvas.clientWidth;height=canvas.clientHeight;canvas.width=width*ratio;canvas.height=height*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);stars=Array.from({length:Math.min(150,Math.floor(width*height/8500))},(_,i)=>({x:((i*2819)%1009)/1009*width,y:((i*3877)%1013)/1013*height,r:.4+(i%5)*.25,phase:i*.63,c:['#FCE8A6','#f7dfff','#c9a6ff'][i%3]}));}function draw(time){ctx.clearRect(0,0,width,height);for(const star of stars){ctx.globalAlpha=.25+.45*(.5+.5*Math.sin(time*.0008+star.phase));const r=star.r*1.7;ctx.fillStyle=star.c;ctx.beginPath();ctx.moveTo(star.x,star.y-r);ctx.lineTo(star.x+r*.6,star.y);ctx.lineTo(star.x,star.y+r);ctx.lineTo(star.x-r*.6,star.y);ctx.fill();}ctx.globalAlpha=1;if(!reduce)requestAnimationFrame(draw);}resize();window.addEventListener('resize',resize);requestAnimationFrame(draw);}
@@ -535,6 +551,7 @@
       if (f.step === 0) {
         const g = f.liftoff, k = g ? g.t / g.duration : 0;
         if (p && g) climb(p.s1.isp * p.g0 * Math.log(p.s1.m0 / (p.s1.m0 - k * p.burn1)) / d.leo);
+        else if (g) climb(0.35 * k); // Easy with no firing stage: a plain climb
         else { f.velMs = 0; f.altKm = 0; }
         f.propellant = p ? 100 - (k * p.burn1 / p.s1.prop) * 100 : 100;
       } else if (f.step === 1) {
@@ -700,10 +717,12 @@
         // Share of the refuelling stage's tank to pump in orbit (metrics); a full tank when Mars is out of reach.
         refuelTarget: m.marsOk ? Math.ceil(m.refuelPct) : 100,
         refuelTank: m.marsOk && m.refuelStage ? stageName(m.refuelStage.key) : null,
-        overweight: !m.ready || m.twr < TWR_MIN(),
+        lowTwr: !m.ready || m.twr < TWR_MIN(), // facts for the debrief; the flags below are the in-flight trouble
+        overweight: LV().penalties && (!m.ready || m.twr < TWR_MIN()),
+        budgetPenalty: LV().penalties && m.cost > m.budget,
         finsDrift: r.booster.fins ? (spec(r.booster.fins).aeroDriftFactor ?? 1) : 1, // aerodynamic minigames: gust scale
         overBudget: m.cost > m.budget,
-        powerDeficit: m.gen < m.draw,
+        powerDeficit: LV().penalties && m.gen < m.draw,
         lowDv: !m.orbit,
         hasHera: installed.has('cabin-hera-dosimetry'),
         hasShelter: installed.has('cabin-storm-shelter') || installed.has('hab-veggie-rad-astrorad'),
@@ -719,7 +738,7 @@
 
     function startFlight() {
       flight.design = captureDesign();
-      flight.liftoffSeconds = flight.design.ready ? ascentSeconds(flight.design.twr) : 0;
+      flight.liftoffSeconds = flight.design.ready && flight.design.twr >= TWR_BARE() ? ascentSeconds(flight.design.twr) : 0;
       flight.ascent = ascentPlan(flight.design);
       flight.insertT = 0;
       flight.landingShare = null;
@@ -746,7 +765,7 @@
       flight.refuelDone = 0;
       flight.stormShielded = false;
       flight.edlChuteDeployed = false;
-      flight.score = 100 - (flight.design.overBudget ? 12 : 0) - (flight.design.overweight ? 10 : 0);
+      flight.score = 100 - (flight.design.budgetPenalty ? 12 : 0) - (flight.design.overweight ? 10 : 0);
       flight.sparksUntil = flight.design.powerDeficit || flight.design.overweight ? performance.now() + 2800 : 0;
       flight.phaseElapsed = 0;
       flight.phaseTimedOut = false;
@@ -759,7 +778,7 @@
       if (flight.design.ready) logFlight(`Liftoff TWR ${flight.design.twr.toFixed(2)}: ${phaseDuration(0)} s climb to MECO.`);
       if (flight.design.overweight) logFlight(`ALERT: Low liftoff TWR (<${TWR_MIN().toFixed(1)}): slow climb and heavy aerodynamic buffet!`);
       if (flight.design.powerDeficit) logFlight('ALERT: Electrical bus deficit — inspect Breaker_Bank.');
-      if (flight.design.overBudget) logFlight('CAUTION: Mission exceeded budget — finance penalty logged.');
+      if (flight.design.budgetPenalty) logFlight('CAUTION: Mission exceeded budget — finance penalty logged.');
       showScreen('cockpit');
       renderFlightUI();
       cancelAnimationFrame(flight.raf);
@@ -817,7 +836,8 @@
       flight.score += (stars - 1) * 4;
       logFlight(`MECO. Ascent program held ${share}% of the time (${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}).`);
       toast(`Liftoff ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${share}% inside the band`);
-      if (!flight.design.orbit) { abortMission(abortOf(flight.design)); return; } // the stages ran dry short of orbit
+      const abort = flight.design.orbit ? null : abortOf(flight.design); // the stages ran dry short of orbit (not on Easy)
+      if (abort) { abortMission(abort); return; }
       setFlightStep(1);
     }
 
@@ -1446,7 +1466,7 @@
         </div>`).join('');
 
       $('#results-breakdown').innerHTML = [
-        ['Budget & TWR', `${d.overBudget ? 'Exceeded' : 'On budget'} · ${d.overweight ? 'Low TWR buffet' : 'Liftoff TWR nominal'}`],
+        ['Budget & TWR', `${d.overBudget ? (d.budgetPenalty ? 'Exceeded' : 'Exceeded (warning only)') : 'On budget'} · ${d.lowTwr ? (d.overweight ? 'Low TWR buffet' : 'Low TWR (warning only)') : 'Liftoff TWR nominal'}`],
         ['EDL Landing', `${flight.landingShare ?? 0}% in the landing corridor · ${hasEdlLabel(d)}`],
         ['Radiation (RAD)', `No solar storm this flight · ${d.hasShelter ? 'storm shelter aboard' : 'no storm shelter'}`],
         ['Surface Window', forcedTimeout ? (surf.stranded.length ? `Timeout — stranded: ${surf.stranded.join(', ')}` : 'Returned on timer') : `Cleared with ${Math.floor(surf.timerSec)}s margin`],
@@ -1517,7 +1537,8 @@
   })();
   window.ASTRO_SIM = SIM;
   // Shared with the 3D modules below.
-  function renderBadge(){const s=difficulty[state.difficulty].surfaceS;$('#modifier-badge').textContent=`${money(budgetOf(state.difficulty))} · ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} on Mars`;}
+  function renderBadge(){const lv=LV(),s=lv.surfaceS,badge=$('#modifier-badge');badge.textContent=`${money(budgetOf(state.difficulty))} · ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} on Mars · ${lv.rules}`;badge.title=lv.about;}
+  $$('#difficulty-buttons button').forEach(b=>{b.title=difficulty[b.dataset.difficulty].about;});
   window.ASTRO_ART={RAMPS,PLANETS};
   window.ASTRO={state,crew,sites:SITES_INFO,toast,show:showScreen,showScreen,land:()=>SIM.startSurface(),data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL};
   paintArt();renderLobby();renderBadge();renderPlanner();setupStars();
