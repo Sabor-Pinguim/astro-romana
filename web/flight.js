@@ -277,6 +277,29 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
     }
     const rightScreen = panelScreen(.5);
 
+    // 3D highlight border around the active monitor (0=left, 1=centre, 2=right)
+    const monitorHighlights = [-0.5, 0, 0.5].map((u, idx) => {
+      const group = new THREE.Group();
+      const mat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.95, toneMapped: false });
+      const sw = 0.34, sh = 0.235, t = 0.012, d = 0.006;
+      const top = new THREE.Mesh(new THREE.BoxGeometry(sw + t * 2, t, d), mat);
+      top.position.y = (sh + t) / 2;
+      const bottom = new THREE.Mesh(new THREE.BoxGeometry(sw + t * 2, t, d), mat);
+      bottom.position.y = -(sh + t) / 2;
+      const left = new THREE.Mesh(new THREE.BoxGeometry(t, sh, d), mat);
+      left.position.x = -(sw + t) / 2;
+      const right = new THREE.Mesh(new THREE.BoxGeometry(t, sh, d), mat);
+      right.position.x = (sw + t) / 2;
+      group.add(top, bottom, left, right);
+      group.rotation.x = panelTilt;
+      const w = idx === 0 ? 0.064 : idx === 1 ? 0.070 : 0.092;
+      group.position.set(0, 0.86, -0.7).add(new THREE.Vector3(u, 0.065, w).applyAxisAngle(new THREE.Vector3(1, 0, 0), panelTilt));
+      group.visible = idx === 0;
+      group.userData.mat = mat;
+      root.add(group);
+      return group;
+    });
+
     function drawMissionScreen(f) {
       const { ctx, canvas, texture } = rightScreen, w = canvas.width, h = canvas.height;
       ctx.fillStyle = '#071423'; ctx.fillRect(0, 0, w, h);
@@ -411,6 +434,12 @@ const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironm
       const f = window.ASTRO_SIM?.flight;
 
       if (f) {
+        const activeMonitor = f.step === 1 ? 1 : f.step === 2 ? 2 : 0;
+        const pulse = reducedMotion ? 0.95 : 0.72 + 0.28 * Math.sin(now * 0.006);
+        monitorHighlights.forEach((hl, idx) => {
+          hl.visible = idx === activeMonitor;
+          if (hl.visible) hl.userData.mat.opacity = pulse;
+        });
         if (f.step === 0 || (f.step === 1 && f.portDock)) {
           const d = f.step === 1 ? f.portDock : { x: 0.45, y: -0.3, z: 5 };
           dockingCamera.position.set(d.x, d.y, d.z); dockingCamera.lookAt(d.x, d.y, 0);

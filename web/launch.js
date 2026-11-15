@@ -16,22 +16,99 @@ try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch { rendere
 const flat = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: .85, flatShading: true, ...extra });
 let view = null;
 
+// Stylized Sorocaba technology park, reconstructed from the supplied photographs.
+// Dimensions and placement are game-scale approximations, not a surveyed site plan.
+function addTechnologyPark(scene) {
+  const park = new THREE.Group(); scene.add(park);
+  const concrete = flat(0xbcb9ae), seam = flat(0x8b8982), glass = flat(0x26665d, { metalness: .12, roughness: .35 });
+  const pavement = flat(0xafa99d), road = flat(0x777a76), trunk = flat(0x74644b);
+  const greens = [flat(0x466f38), flat(0x5c833e), flat(0x78954b), flat(0x345d38)];
+  const white = flat(0xe3e8e5), greyCloud = flat(0xc5d0d3);
+  const box = (parent, w, h, d, mat, x, y, z, ry = 0) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    mesh.position.set(x, y, z); mesh.rotation.y = ry; parent.add(mesh); return mesh;
+  };
+
+  // The photographed building is a broad, curved concrete facade over a band of green glazing.
+  // Short tangent panels make the horseshoe recognisable while keeping a faceted low-poly silhouette.
+  const building = new THREE.Group(); building.position.set(0, 0, -55); park.add(building);
+  const radius = 28, segments = 14, start = -1.12, span = 2.24;
+  for (let i = 0; i < segments; i++) {
+    const a = start + (i + .5) * span / segments, width = 2 * radius * Math.tan(span / segments / 2) + .03;
+    const x = Math.sin(a) * radius, z = Math.cos(a) * radius - radius;
+    box(building, width, 2.7, .35, glass, x, 1.55, z, a);
+    box(building, width, 5.1, .7, concrete, x, 5.45, z, a);
+    for (const y of [3.02, 5.25, 7.72]) box(building, width, .045, .74, seam, x, y, z, a);
+    box(building, .14, 2.7, .46, concrete, x - Math.cos(a) * width * .48, 1.55, z + Math.sin(a) * width * .48, a);
+  }
+  // Recessed wings and entrance beyond the curved facade, as seen in the oblique photographs.
+  box(building, 19, 7.7, 12, concrete, -19, 3.85, -9, -.17);
+  box(building, 19, 7.7, 12, concrete, 19, 3.85, -9, .17);
+  box(building, 14, 6.4, 10, concrete, 0, 3.2, -14);
+  box(building, 11, 3, .2, glass, 0, 2, -8.9);
+  box(building, 13, .25, 3, concrete, 0, 3.6, -7.8);
+
+  // Concrete paths, perimeter road and lights, with the launch pad kept clear.
+  box(park, 76, .06, 7, pavement, 0, .04, -27);
+  box(park, 5, .07, 21, pavement, 0, .05, -17);
+  box(park, 180, .05, 5, road, 0, .035, -96);
+  box(park, 140, .05, 3, pavement, 0, .04, 42);
+  function lamp(x, z) {
+    const g = new THREE.Group(); g.position.set(x, 0, z); park.add(g);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.09, .14, 9, 6), seam); pole.position.y = 4.5; g.add(pole);
+    for (const s of [-1, 1]) box(g, 1.4, .1, .16, seam, s * .62, 8.9, 0, 0);
+    for (const s of [-1, 1]) box(g, .55, .1, .27, white, s * 1.15, 8.83, 0);
+  }
+  for (const x of [-60, -40, -20, 20, 40, 60]) { lamp(x, -35); lamp(x, 40); }
+
+  function palm(x, z, scale, tall = false) {
+    const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(scale); park.add(g);
+    const h = tall ? 3.3 : 1.05;
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(.10, .2, h, 6), trunk); stem.position.y = h / 2; g.add(stem);
+    for (let i = 0; i < 8; i++) {
+      const leaf = new THREE.Mesh(new THREE.ConeGeometry(.32, 2.2, 4), greens[i % greens.length]);
+      const a = i * Math.PI / 4; leaf.position.set(Math.sin(a) * .7, h + .25, Math.cos(a) * .7);
+      leaf.rotation.set(Math.cos(a) * .95, 0, -Math.sin(a) * .95); g.add(leaf);
+    }
+  }
+  [[-21,-25,1],[-13,-24,.8],[14,-24,1],[25,-23,.85],[-26,15,1.1],[24,19,1],[-42,0,.8],[42,-2,1]].forEach(([x,z,s]) => palm(x,z,s));
+  [[-60,-48],[60,-48],[-50,28],[52,30],[-35,50],[35,52]].forEach(([x,z]) => palm(x,z,1.15,true));
+  // Distant treeline provides the wooded horizon seen in the panorama.
+  const treeGeo = new THREE.IcosahedronGeometry(1, 0);
+  for (let i = 0; i < 64; i++) {
+    const a = i / 64 * Math.PI * 2, r = 125 + (i % 5) * 4, h = 4 + (i % 4);
+    const tree = new THREE.Mesh(treeGeo, greens[i % greens.length]);
+    tree.position.set(Math.sin(a) * r, h * .65, Math.cos(a) * r); tree.scale.set(3.2, h, 3.2); park.add(tree);
+  }
+  // Cumulus: clusters of flat-shaded polyhedra rather than photo textures.
+  const cloudGeo = new THREE.IcosahedronGeometry(1, 1);
+  for (let i = 0; i < 18; i++) {
+    const a = i * 2.4, r = 100 + (i % 4) * 24, cloud = new THREE.Group();
+    cloud.position.set(Math.sin(a) * r, 55 + (i % 5) * 8, Math.cos(a) * r); park.add(cloud);
+    for (let j = 0; j < 5; j++) {
+      const puff = new THREE.Mesh(cloudGeo, j === 0 ? greyCloud : white);
+      puff.position.set((j - 2) * 5, (j % 3) * 1.6, (j % 2) * 2); puff.scale.set(6, 3.2 + (j % 2), 3.8); cloud.add(puff);
+    }
+  }
+}
+
 function initScene() {
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   host.prepend(renderer.domElement);
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(45, 1, .1, 2000);
-  // Dawn sky (palette): coral at the horizon, indigo overhead; faceted dome.
+  // Faceted daytime sky inspired by the supplied park photographs.
   const sky = new THREE.IcosahedronGeometry(900, 2), sp = sky.attributes.position, c = [];
-  const low = new THREE.Color(0xee7b57), high = new THREE.Color(0x281147);
+  const low = new THREE.Color(0xc2d8e2), high = new THREE.Color(0x3976b6);
   for (let k = 0; k < sp.count; k++) { const col = low.clone().lerp(high, Math.pow(Math.max(0, sp.getY(k) / 900), .45)); c.push(col.r, col.g, col.b); }
   sky.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
   scene.add(new THREE.Mesh(sky, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false })));
-  scene.fog = new THREE.Fog(0xb8664f, 60, 420);
-  scene.add(new THREE.HemisphereLight(0xfce8a6, 0x281147, 1.3));
-  const sun = new THREE.DirectionalLight(0xffd2a6, 2.2); sun.position.set(-40, 18, 30); scene.add(sun);
+  scene.fog = new THREE.Fog(0xb9d0d8, 160, 520);
+  scene.add(new THREE.HemisphereLight(0xe8f5ff, 0x536b44, 1.3));
+  const sun = new THREE.DirectionalLight(0xfff4df, 2.2); sun.position.set(-40, 48, 30); scene.add(sun);
   const glow = new THREE.PointLight(0xf59e0b, 0, 40, 1.6); scene.add(glow);
   // Ground, pad, flame trench and a crimson service tower with a swing arm to the cabin.
-  scene.add(new THREE.Mesh(new THREE.CircleGeometry(600, 9).rotateX(-Math.PI / 2), flat(0x3a2f52)));
+  scene.add(new THREE.Mesh(new THREE.CircleGeometry(600, 9).rotateX(-Math.PI / 2), flat(0x668e49)));
+  addTechnologyPark(scene);
   const pad = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.9, .6, 6), flat(0x8f86ab)); pad.position.y = .3; scene.add(pad);
   const trench = new THREE.Mesh(new THREE.BoxGeometry(1.1, .05, 4.6), flat(0x1d1128)); trench.position.y = .61; scene.add(trench);
   const tower = new THREE.Group(), red = flat(0x8f241e), arm = new THREE.Group();
