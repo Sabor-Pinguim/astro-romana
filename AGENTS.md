@@ -42,6 +42,7 @@ tools/
   audio/                gerador da paisagem sonora a partir de dados reais (Node, sem dependências)
   model-viewer/         visualizador HTML para validar modelos
   godot/                scripts de verificação headless do Godot
+  web/                  empacota modelos e specs usados pelo index.html (index.models.js)
 package.json            dependências e scripts dos geradores (npm run models, npm run audio)
 ```
 
@@ -82,8 +83,8 @@ package.json            dependências e scripts dos geradores (npm run models, n
 
 ### HTML (jogo web executável, `index.html`)
 - **Identidade visual:** siga [docs/visual-identity.md](docs/visual-identity.md) (low poly facetado, paleta, fontes, formas, arte gerada). Se mudar o visual, atualize esse arquivo no mesmo commit.
-- **Arquivo único, sem build.** O three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D, a planta 2D e os controles HUD são o fallback).
-- **Modelos 3D na página** (Saturn V do menu, foguete montado no planejamento, cockpit 1ª pessoa e avatares/pódio em Marte): vêm de `index.models.js`, **gerado** por `npm run web:models` com os GLBs que o `index.html` cita (`rocket/…glb`, `parts/…glb`, `characters/…glb`). Assim a página abre direto do disco (`file://` bloqueia `fetch`). Rode de novo ao mudar modelos ou a lista de peças; `npm run models` já faz isso.
+- **Arquivo único, sem build.** O three.js vem do CDN, na mesma versão fixada do visualizador. A tela tem que funcionar sem WebGL (o mapa 2D e a planta 2D são o fallback).
+- **3D e dados na página:** vêm de `index.models.js`, gerado por `npm run web:models` (o `file://` bloqueia `fetch`); `npm run models` já o roda.
 - **Teste** em 1440 px e 390 px de largura e com movimento reduzido.
 
 ### JavaScript (ferramentas)
@@ -192,9 +193,9 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ## 6. Visualizador de modelos (`tools/model-viewer/`)
 
-- **É um HTML puro:** abra `tools/model-viewer/index.html` direto no navegador (duplo clique) e escolha a pasta `godot/assets/models`. Também aceita a raiz do repositório, ou a pasta arrastada para a tela. Precisa de internet para baixar o three.js do CDN.
-- **Chrome/Edge:** o navegador lembra a pasta e **recarrega sozinho** quando o `manifest.json` muda, ou seja, depois de `npm run models:build`. No Firefox a pasta é uma cópia do momento: use "Trocar pasta…" para recarregar.
-- **Página hospedada:** se o repositório for publicado em algum servidor (GitHub Pages, por exemplo), a página carrega `godot/assets/models/manifest.json` sem perguntar. Para outro arquivo, passe `?manifest=<url relativa>`.
+- **É um HTML puro:** abra `tools/model-viewer/index.html` (duplo clique) e escolha `godot/assets/models` (ou a raiz do repositório, ou arraste a pasta). Precisa de internet para o three.js do CDN.
+- **Chrome/Edge:** lembra a pasta e **recarrega sozinho** quando o `manifest.json` muda (depois de `npm run models:build`). No Firefox, use "Trocar pasta…" para recarregar.
+- **Página hospedada:** num servidor (GitHub Pages, por exemplo) carrega `godot/assets/models/manifest.json` sozinha; para outro arquivo, use `?manifest=<url relativa>`.
 - **Recursos:** animações, partículas por âncora, cenário de Marte ou estúdio, wireframe, pivôs/âncoras e validação por modelo. Dá para arrastar um `.glb` avulso para a tela.
 - **Escopo:** é ferramenta de **validação**. Não coloque lógica de jogo nele.
 
@@ -202,8 +203,8 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 ## 7. Pipeline de áudio (paisagem sonora da radiação)
 
-- **O código é a fonte da verdade:** `tools/audio/` gera o som offline a partir dos dados reais do RAD (`references/datasets/msl-rad/`). Os WAVs em `godot/assets/audio/` são **gerados**: não edite à mão. Para mudar, edite o código e rode `npm run audio`.
-- **Nada de síntese em tempo real no jogo:** a exportação web sem threads usa o modo de reprodução "Sample", que não tem efeitos de áudio e pode picotar com `AudioStreamGenerator`. O jogo só toca arquivos prontos e ajusta volume.
+- **O código é a fonte da verdade:** `tools/audio/` gera o som offline dos dados reais do RAD (`references/datasets/msl-rad/`). Os WAVs em `godot/assets/audio/` são **gerados**: edite o código e rode `npm run audio`.
+- **Nada de síntese em tempo real:** a exportação web sem threads toca no modo "Sample" (sem efeitos; `AudioStreamGenerator` pode picotar). O jogo só toca arquivos prontos e ajusta volume.
 - **Sem dependências:** JavaScript puro. O gerador é determinístico: os mesmos dados e o mesmo código geram os mesmos bytes.
 - **Arquivos gerados:**
 
@@ -231,7 +232,7 @@ O glTF não transporta partículas, então o projeto usa âncoras:
   - **⚠** = fontes divergem: confira antes de usar como fato.
   - **n/f** = não encontrado: use um valor de jogo e marque como fictício.
 - **Marcas extras:** `derived` = calculado a partir de outros valores (com a fórmula); `est.` = estimado por nós (diz como).
-- **Peças de foguete:** cada peça tem uma pasta em `references/parts/<engines|tanks>/<id>/` com um `README.md` que segue `references/parts/_template.md` (mesmas seções e chaves) e as fotos.
+- **Peças de foguete:** pasta `references/parts/<engines|tanks|structures>/<id>/` com `README.md` no formato de `_template.md` (mesmas seções e chaves) e fotos. Os números de jogo e de simulação de cada peça (com a fonte de cada um) ficam em `tools/modeling/parts/specs.mjs` e saem no `manifest.json` das peças.
 - **Fotos de referência:** só com licença livre (domínio público, CC0, CC BY, CC BY-SA), com fonte, autor e licença na tabela do README. As demais entram só como link.
 - **Cards "Fato real":** nunca invente fatos.
 - **Datas:** o "hoje" do projeto segue a data real. Status de missões (operando, perdida, cancelada) devem ser conferidos quando forem usados.
@@ -242,7 +243,8 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 | O quê | Idioma |
 |---|---|
-| Docs de design do time (`docs/`) e textos vistos pelo jogador | PT-BR |
+| Docs de design do time (`docs/`) | PT-BR |
+| Textos vistos pelo jogador (telas, nomes e descrições das peças) | Inglês |
 | Enunciado do desafio e `references/` | Inglês |
 | Código, identificadores, nomes de nós, arquivos e commits | Inglês |
 
@@ -280,7 +282,7 @@ npm install                    # uma vez: three + validador glTF
 npm run models                 # gera os 4 avatares e valida
 npm run models:build -- maya   # gera só um personagem
 npm run models:validate        # só valida
-npm run web:models             # empacota os GLBs usados pelo index.html em index.models.js
+npm run web:models             # empacota GLBs e specs usados pelo index.html em index.models.js
 npm run models:build:bodies    # gera os planetas (ex.: -- earth)
 # visualizador: abrir tools/model-viewer/index.html no navegador e escolher godot/assets/models
 npm run audio                  # gera a paisagem sonora e valida

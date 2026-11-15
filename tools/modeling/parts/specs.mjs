@@ -16,6 +16,14 @@ export const MISSION_RULES = {
   minSafeLiftoffTwr: 1.2,
   minBareLiftoffTwr: 1.0,
   maxInternalStages: 7,
+  cabinModuleSlots: 4,
+  // Crew cabin hull (rocket/cabin_cutaway.glb) for the builder totals; it is not a generated part.
+  cabinHull: {
+    massDryKg: 3000,
+    powerW: -300,
+    costM: 12.0,
+    sources: { massDryKg: 'game-balance', powerW: 'game-balance (base life support)', costM: 'game-balance' },
+  },
   mandatoryOrbitalRefuelingForMars: true,
   note: 'g0 and Mars gravity are real (NIST / NSSDCA); budget and TWR thresholds are game-balance for Phase 3–5.',
 };
@@ -876,6 +884,33 @@ export const PART_SPECS = {
       massDryKg: 'real/est. ⚠ (references/parts/pilot-cockpit.md: Orion 3-DU MFD console + Shuttle RHC/THC + twin seats)',
       powerW: 'real/est. ⚠ (references/parts/pilot-cockpit.md: 3× 38 W Honeywell DU-1310 displays + C&W LED matrix)',
       costM: 'game-balance (Tier 2 integrated 1st-person launch & orbital insertion flight deck)',
+    },
+  },
+  // =========================================================================
+  // 6. BUILDER STRUCTURES (2) — hull modules with Attach_* mounting points, no engine or tank of their own
+  // =========================================================================
+  'booster-thrust-section': {
+    massDryKg: 1200,
+    propellantMassKg: 0,
+    powerW: 0,
+    costM: 6.0,
+    dataRateKbps: 0,
+    sources: {
+      massDryKg: 'game-balance (references/parts/structures/booster-thrust-section/README.md: normalized aft skirt and thrust plate)',
+      powerW: 'game-balance (passive structure)',
+      costM: 'game-balance (mandatory Main Booster hull)',
+    },
+  },
+  'stage-module': {
+    massDryKg: 450,
+    propellantMassKg: 0,
+    powerW: -50,
+    costM: 4.0,
+    dataRateKbps: 0,
+    sources: {
+      massDryKg: 'game-balance (references/parts/structures/stage-module/README.md: bay structure, wiring and heaters)',
+      powerW: 'game-balance (bay heaters and data bus)',
+      costM: 'game-balance (one per middle stage, up to maxInternalStages)',
     },
   },
 };

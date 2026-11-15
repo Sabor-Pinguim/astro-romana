@@ -129,7 +129,7 @@
     .orbit-system.is-3d .planet-disc{visibility:hidden}
     .orbit-system.is-3d .orbit-world{aspect-ratio:auto;transition:none}
     .orbit-system.is-3d .orbit-world:hover{scale:none}
-    .orbit-system.is-3d .orbit-marker{translate:-50% -100%;white-space:nowrap}
+    .orbit-system.is-3d .orbit-marker{display:none}
     .orbit-sidebar{display:flex;flex-direction:column;gap:16px}
     .objective-card{display:flex;flex-direction:column;gap:.9rem;padding:26px 24px}
     .objective-card h3{font-size:2rem;color:var(--starlight-cream);text-transform:uppercase}
@@ -144,7 +144,84 @@
     .route-steps span:first-child{margin-left:0;padding-left:.7rem;clip-path:polygon(0 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,0 100%)}
     .route-steps span.current{color:var(--bg-void);background:var(--mars-orange)}
 
-    /* Lobby: crew and landing site */
+    /* Lobby: mission dossier (crew on the left, selected crew member or site on the right) */
+    .lobby-main{flex:1;display:flex;width:100%;max-width:1400px;margin:0 auto;padding:24px clamp(16px,3vw,44px) 22px}
+    .dossier{flex:1;display:flex;flex-direction:column;gap:18px;padding:24px clamp(18px,2.4vw,34px) 28px}
+    .dossier-title-wrap{display:flex;flex-direction:column;align-items:center;gap:.45rem;text-align:center}
+    .dossier-title{font-size:clamp(1.4rem,2.4vw,2.2rem);color:var(--starlight-cream);text-transform:uppercase}
+    .dossier-grid{flex:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px}
+    .dossier-left,.dossier-right{display:flex;flex-direction:column;gap:16px;min-width:0}
+    .dossier-row{display:flex;align-items:baseline;gap:.8rem}
+    .dossier-row strong{font:700 1.15rem var(--heading);letter-spacing:.08em;text-transform:uppercase}
+    .block-label{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-bottom:8px}
+    .site-thumbs{display:flex;gap:10px}
+    .site-thumb{position:relative;width:140px;height:96px;padding:0;border:0;overflow:hidden;background:var(--f1);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+    .thumb-art{position:absolute;inset:0}
+    .thumb-art svg{display:block;width:100%;height:100%}
+    .thumb-name{position:absolute;left:0;right:0;bottom:0;padding:.3rem .55rem;text-align:left;font:700 .62rem var(--heading);letter-spacing:.12em;text-transform:uppercase;color:var(--starlight-cream);background:#11071Fcc}
+    .site-thumb:hover .thumb-name{color:var(--solar-amber)}
+    .site-thumb[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--solar-amber)}
+    .crew-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .crew-card{position:relative;display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px 10px;padding:10px;background:linear-gradient(158deg,color-mix(in srgb,var(--crew) 15%,var(--f2)) 0 36%,var(--f1) 36%);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+    .crew-card::before{content:"";position:absolute;top:0;left:0;width:48%;height:4px;background:var(--crew)}
+    .crew-card.selected{box-shadow:inset 0 0 0 2px var(--crew)}
+    .crew-card .crew-stage{grid-row:1/3;height:104px}
+    .crew-card .astronaut{width:68px;height:98px}
+    .crew-info{display:flex;flex-direction:column;gap:3px;min-width:0}
+    .crew-name{font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase}
+    .crew-role{font:600 .56rem/1.25 var(--heading);letter-spacing:.1em;text-transform:uppercase;color:var(--crew)}
+    .status{display:flex;align-items:center;gap:.45rem;font:600 .56rem var(--heading);letter-spacing:.1em;color:var(--muted)}
+    .status .dot{width:7px;height:7px}
+    .status.player{color:var(--safe)}
+    .crew-actions{display:flex;gap:5px;align-self:end}
+    .invite,.pick{flex:1;min-width:0;padding:.45rem .3rem;border:0;font:700 .56rem var(--heading);letter-spacing:.08em;text-transform:uppercase;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+    .invite{color:var(--crew);background:color-mix(in srgb,var(--crew) 12%,var(--f1))}
+    .invite:hover:not(:disabled){color:var(--bg-void);background:var(--crew)}
+    .invite:disabled{opacity:.5}
+    .pick{color:var(--bg-void);background:var(--crew)}
+    .pick:hover,.pick[aria-pressed="true"]{background:var(--starlight-cream)}
+    .detail-head{display:grid;gap:.35rem}
+    .detail-head h4{font-size:2rem;color:var(--starlight-cream);text-transform:uppercase}
+    #detail-role{font:600 .7rem var(--heading);letter-spacing:.14em;text-transform:uppercase;color:var(--amethyst)}
+    #detail-desc{max-width:36rem;padding-left:.9rem;font-size:.95rem;font-style:italic;color:#e7dbee;box-shadow:inset 3px 0 0 var(--mars-orange)}
+    .detail-status{display:flex;align-items:baseline;gap:.7rem}
+    .detail-status strong{font:700 .72rem var(--heading);letter-spacing:.12em;color:var(--safe)}
+    .detail-view{--crew:var(--amethyst);position:relative;flex:1;min-height:300px;overflow:hidden;background:linear-gradient(170deg,#1c1d48 0 40%,var(--bg-viewport) 40% 72%,#131431 72%);clip-path:var(--chamfer)}
+    .detail-view::after{content:"";position:absolute;left:50%;bottom:7%;width:min(46%,220px);height:34px;translate:-50% 0;background:color-mix(in srgb,var(--crew) 34%,var(--f2));clip-path:polygon(18% 0,82% 0,100% 50%,82% 100%,18% 100%,0 50%)}
+    .detail-view>canvas{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%}
+    .detail-site{position:absolute;inset:0}
+    .detail-site svg{display:block;width:100%;height:100%}
+    .detail-view.site>canvas,.detail-view.site::after,.detail-view:not(.site) .detail-site{display:none}
+    .detail-extra{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+    .detail-extra .perk{flex-basis:100%;padding:.8rem 1rem;background:var(--f1)}
+    .perk strong{font-family:var(--heading);letter-spacing:.06em;color:var(--solar-amber)}
+    .perk p{margin-top:.2rem;font-size:.86rem;color:var(--muted)}
+
+    /* Planner: modular rocket */
+    .assembly-grid{display:grid;grid-template-columns:minmax(220px,.95fr) minmax(300px,1.3fr) minmax(260px,1.05fr);gap:14px;height:clamp(620px,calc(100vh - 190px),900px)}
+    .mass-row{display:flex;justify-content:space-between;align-items:baseline;padding-top:.6rem;border-top:1px solid #ffffff14}
+    .meter-fill.short{background:var(--solar-amber)}
+    .telemetry-note code{font-size:.95em;color:var(--starlight-cream)}
+    .stack-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
+    .stack-overlay>*{pointer-events:auto}
+    .blueprint.is-3d .stack-overlay>*:not(.placed){visibility:hidden}
+    .blueprint.is-3d .rocket-stage{position:absolute;max-width:min(40%,200px)}
+    .blueprint.is-3d .rocket-stage.left{left:14px}
+    .blueprint.is-3d .rocket-stage.right{right:14px}
+    .rocket-stage small{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .add-stage{position:absolute;width:30px;height:26px;padding:0;border:0;font:700 1.05rem/1 var(--heading);color:var(--bg-void);background:var(--solar-amber);clip-path:var(--hex);translate:-50% -50%;transition:background .15s}
+    .add-stage:hover{background:var(--starlight-cream)}
+    .add-stage:focus-visible{outline:none;background:var(--starlight-cream)}
+    /* without WebGL the stack becomes a plain list, bottom stage last */
+    .blueprint:not(.is-3d) .stack-overlay{position:static;display:flex;flex-direction:column-reverse;gap:6px;padding:72px 18px 90px}
+    .blueprint:not(.is-3d) .rocket-stage,.blueprint:not(.is-3d) .add-stage{position:relative;translate:none}
+    .part-metrics .warn{color:var(--solar-amber)}
+    .remove-stage{align-self:flex-start;margin-top:4px}
+    .blueprint.is-3d>canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+    .orbit-system:not(.is-3d) .orbit-world.extra{display:none}
+    .orbit-world:not(.mars-target) .world-name{opacity:.75}
+    @media (max-width:1100px){.dossier-grid{grid-template-columns:1fr}.detail-view{min-height:340px}}
+    @media (max-width:640px){.crew-grid{grid-template-columns:1fr}.site-thumb{flex:1}}
     .lobby-header-controls{display:flex;align-items:center;flex-wrap:wrap;gap:1rem}
     .difficulty{display:flex;align-items:center;gap:.7rem}
     .difficulty legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -152,32 +229,6 @@
     .segmented button{padding:.55rem .95rem;border:0;font:600 .66rem var(--heading);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--f3);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
     .segmented button:hover{color:var(--starlight-cream);background:var(--f4)}
     .segmented button[aria-pressed="true"]{color:var(--bg-void);background:var(--solar-amber)}
-    .lobby-main{flex:1;display:flex;flex-direction:column;width:100%;max-width:1600px;margin:0 auto;padding:28px clamp(16px,3vw,44px) 22px}
-    .section-intro{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin-bottom:1.3rem}
-    .section-intro h3{margin-top:.5rem;font-size:clamp(1.6rem,2.6vw,2.7rem);color:var(--starlight-cream);text-transform:uppercase}
-    .section-intro p{margin-top:.45rem;color:var(--muted)}
-    .mission-dossier{flex:1;display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,2.28fr);gap:16px}
-    .mission-sites{display:flex;flex-direction:column;gap:.9rem;padding:24px}
-    .mission-sites h3,.crew-manifest h3{margin-top:-.2rem;font-size:1.5rem;color:var(--starlight-cream);text-transform:uppercase}
-    .mission-sites>p{font-size:.88rem;color:var(--muted)}
-    .site-options{display:grid;gap:8px}
-    .site-option{display:flex;align-items:center;gap:.9rem;padding:.8rem .9rem;border:0;text-align:left;background:var(--f1);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);transition:background .15s}
-    .site-option:hover{background:var(--f4)}
-    .site-option[aria-pressed="true"]{background:linear-gradient(112deg,#3b1730 0 42%,#2c1226 42%);box-shadow:inset 3px 0 0 var(--mars-orange)}
-    .site-option strong{display:block;font:700 .92rem var(--heading);letter-spacing:.04em;color:var(--text-white)}
-    .site-option small{display:block;font-size:.78rem;color:var(--muted)}
-    .site-icon{flex:none;width:38px;height:36px;clip-path:var(--hex);background:conic-gradient(from 30deg,#c4552f 0deg 60deg,#8F241E 60deg 120deg,#5a1f2c 120deg 180deg,#7a2f2c 180deg 240deg,#E04F26 240deg 300deg,#EE7B57 300deg)}
-    [data-site="gale"] .site-icon{background:conic-gradient(from 30deg,#c27a3a 0deg 60deg,#7a4027 60deg 120deg,#4a2722 120deg 180deg,#6e3324 180deg 240deg,#9c5129 240deg 300deg,#e0a35a 300deg)}
-    .lobby-note{padding-left:.8rem;font-size:.8rem;color:var(--muted);box-shadow:inset 2px 0 0 var(--amethyst)}
-    .mission-right{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(220px,.75fr);gap:16px}
-    .crew-manifest{display:flex;flex-direction:column;gap:.6rem;padding:22px}
-    .crew-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:.5rem 0}
-    .crew-card{position:relative;display:flex;flex-direction:column;padding:12px;cursor:pointer;background:linear-gradient(158deg,color-mix(in srgb,var(--crew) 15%,var(--f2)) 0 36%,var(--f1) 36%);clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));transition:translate .18s}
-    .crew-card::before{content:"";position:absolute;top:0;left:0;width:48%;height:4px;background:var(--crew)}
-    .crew-card:hover{translate:0 -4px}
-    .crew-top{display:flex;flex-direction:column;gap:.25rem;min-height:4.1em;font:600 .56rem/1.25 var(--heading);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-    .crew-role{color:var(--crew)}
-    .crew-name{margin-top:.5rem;font-size:1.15rem;letter-spacing:.06em}
     .crew-stage{position:relative;display:grid;place-items:end center;height:196px}
     /* hexagonal pedestal: top face over a darker front face */
     .crew-stage::before,.crew-stage::after{content:"";position:absolute;left:50%;translate:-50% 0;width:80%}
@@ -187,63 +238,14 @@
     .astronaut .s1{fill:#efe4d6}.astronaut .s2{fill:#c8c0d6}.astronaut .s3{fill:#8f86ab}.astronaut .d1{fill:#3a2f52}
     .astronaut .c1{fill:var(--crew)}.astronaut .c2{fill:color-mix(in srgb,var(--crew) 60%,#11071F)}
     .astronaut .v1{fill:#17183B}.astronaut .v2{fill:color-mix(in srgb,var(--crew) 42%,#17183B)}.astronaut .v3{fill:#fff;opacity:.55}
-    .crew-bottom{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-    .status{display:flex;align-items:center;gap:.45rem;font:600 .56rem var(--heading);letter-spacing:.1em;color:var(--muted)}
-    .status .dot{width:7px;height:7px}
-    .status.player{color:var(--safe)}
-    .invite{width:100%;padding:.5rem;border:0;font:700 .58rem var(--heading);letter-spacing:.12em;color:var(--crew);background:color-mix(in srgb,var(--crew) 12%,var(--f1));clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
-    .invite:hover:not(:disabled){color:var(--bg-void);background:var(--crew)}
-    .invite:disabled{opacity:.5}
-    .mission-preview.slab{min-height:330px;overflow:hidden;background:var(--bg-viewport)}
-    .preview-base{position:absolute;inset:0}
-    .preview-base svg{display:block;width:100%;height:100%}
-    .preview-base .gale,.mission-preview.gale .preview-base .jezero{display:none}
-    .mission-preview.gale .preview-base .gale{display:block}
-    .preview-label{position:absolute;top:16px;left:18px;right:18px;z-index:2;font:600 .62rem var(--heading);letter-spacing:.14em;text-transform:uppercase;color:var(--starlight-cream)}
-    .preview-copy{position:absolute;left:14px;bottom:14px;z-index:2;padding:.45rem .75rem;font:700 .64rem var(--heading);letter-spacing:.14em;color:var(--starlight-cream);background:#11071Fd9;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
 
-    /* Crew drawer */
-    .drawer-shade{position:fixed;inset:0;z-index:20;background:#0a0414b8;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
-    .drawer-shade.open{opacity:1;visibility:visible}
-    .drawer{position:fixed;top:0;right:0;bottom:0;z-index:21;width:min(430px,92vw);padding:1.6rem 1.6rem 2rem 2.6rem;overflow-y:auto;background:linear-gradient(152deg,var(--f4) 0 26%,var(--f2) 26% 70%,var(--f1) 70%);clip-path:polygon(26px 0,100% 0,100% 100%,0 100%);transform:translateX(105%);visibility:hidden;transition:transform .32s cubic-bezier(.7,0,.2,1),visibility .32s}
-    .drawer.open{transform:none;visibility:visible}
-    .drawer-head{display:flex;justify-content:space-between;align-items:center}
-    .icon-button{width:40px;height:36px;border:0;font-size:1.3rem;line-height:1;color:var(--starlight-cream);background:var(--f3);clip-path:var(--hex)}
-    .icon-button:hover{color:var(--bg-void);background:var(--mars-orange)}
-    .drawer-avatar{position:relative;display:grid;place-items:end center;height:240px;margin:1rem 0}
-    .drawer-avatar::before{content:"";position:absolute;inset:6% 18% 0;background:#ffffff08;clip-path:var(--hex)}
-    .drawer-avatar .astronaut{width:160px;height:228px}
-    .drawer h3{margin:.4rem 0 .9rem;font-size:2.6rem;color:var(--starlight-cream);text-transform:uppercase}
-    .drawer-quote{padding-left:1rem;font-size:1rem;font-style:italic;color:#e7dbee;box-shadow:inset 3px 0 0 var(--mars-orange)}
-    .drawer h4{margin:1.6rem 0 .7rem;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amethyst)}
-    .tag-list{display:flex;flex-wrap:wrap;gap:6px}
-    .perk{padding:1rem 1.1rem}
-    .perk strong{font-family:var(--heading);letter-spacing:.06em;color:var(--solar-amber)}
-    .perk p{margin-top:.3rem;font-size:.88rem;color:var(--muted)}
 
     /* Planner */
     .header-side{display:flex;align-items:center;gap:1.2rem}
     .budget-readout{text-align:right}
     .budget-readout strong{display:block;margin-top:.2rem;font:700 1.7rem/1 var(--heading);font-variant-numeric:tabular-nums;color:var(--solar-amber)}
     .budget-readout.negative strong{color:var(--coral-hover);animation:blink 1s steps(2,end) infinite}
-    .stepper{display:flex;width:100%;max-width:1600px;margin:20px auto 0;padding:0 clamp(16px,3vw,44px)}
-    .step-connector{display:none}
-    .step{flex:1;display:flex;align-items:center;gap:.8rem;min-width:0;margin-left:-10px;padding:.7rem 1.4rem .7rem 1.9rem;border:0;text-align:left;color:var(--muted);background:var(--f2);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%)}
-    .step:first-child{margin-left:0;padding-left:1.1rem;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%)}
-    .step:hover{background:var(--f3)}
-    .step-number{flex:none;display:grid;place-items:center;width:32px;height:30px;font:700 .85rem var(--heading);color:var(--starlight-cream);background:var(--f4);clip-path:var(--hex)}
-    .step strong{display:block;font:700 .78rem var(--heading);letter-spacing:.1em;text-transform:uppercase;color:var(--text-white)}
-    .step small{display:block;font-size:.74rem;color:var(--muted)}
-    .step.done{background:var(--f4)}
-    .step.done .step-number{font-size:0;color:var(--bg-void);background:var(--safe)}
-    .step.done .step-number::after{content:"✓";font-size:.9rem}
-    .step.active{background:linear-gradient(165deg,var(--coral-hover) 0 50%,var(--mars-orange) 50%)}
-    .step.active strong,.step.active small{color:var(--bg-void)}
-    .step.active .step-number{color:var(--coral-hover);background:var(--bg-void)}
     .planner-content{flex:1;display:flex;flex-direction:column;width:100%;max-width:1600px;margin:0 auto;padding:16px clamp(16px,3vw,44px) 22px}
-    .planner-panel:not(.active){display:none}
-    .assembly-grid.active{display:grid;grid-template-columns:minmax(220px,.95fr) minmax(300px,1.3fr) minmax(260px,1.05fr);gap:14px;height:clamp(600px,calc(100vh - 250px),860px)}
-    .brief-layout.active{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;align-content:start}
     .panel{display:flex;flex-direction:column;gap:14px;min-height:0;padding:20px}
     .panel-heading{display:flex;justify-content:space-between;align-items:center;gap:.6rem}
     .panel-heading h3{font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;color:var(--starlight-cream)}
@@ -265,10 +267,6 @@
     .viewport-label{position:absolute;top:18px;left:20px;z-index:2}
     .viewport-label strong{display:block;font:700 .72rem var(--heading);letter-spacing:.16em;color:var(--starlight-cream)}
     .viewport-label span{font-size:.74rem;color:var(--muted)}
-    .rocket-svg{position:absolute;inset:6% 0 3%;width:100%;height:91%}
-    .rocket-svg .section{transition:opacity .25s}
-    .rocket-svg .section.off{opacity:.16}
-    .rocket-svg .section.selected>path:first-child{stroke:var(--solar-amber);stroke-width:3}
     .rocket-stage{position:absolute;z-index:2;min-width:120px;max-width:40%;padding:.55rem .85rem .55rem 1rem;border:0;text-align:left;color:var(--text-white);background:#11071Fe0;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);box-shadow:inset 3px 0 0 var(--amethyst);transition:background .15s}
     .rocket-stage:hover{background:var(--f4)}
     .rocket-stage strong{display:block;font:700 .68rem var(--heading);letter-spacing:.1em;text-transform:uppercase}
@@ -276,10 +274,7 @@
     .rocket-stage.selected{color:var(--bg-void);background:var(--solar-amber);box-shadow:none}
     .rocket-stage.selected small{color:#3b2306}
     .rocket-stage.off{opacity:.62}
-    .rocket-stage.cabin{top:15%;left:5%}.rocket-stage.stage3{top:36%;right:4%}.rocket-stage.stage2{top:57%;left:4%}.rocket-stage.stage1{top:78%;right:4%}
     /* 3D mode: the stack is rendered from the part GLBs; labels follow their stage */
-    .blueprint.is-3d .rocket-svg{display:none}
-    .blueprint.is-3d>canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
     .rocket-status{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;display:flex;flex-wrap:wrap;gap:5px}
     .rocket-status .tag{background:#11071Fe6}
     .category-tabs{display:flex;flex-wrap:wrap;gap:4px}
@@ -290,6 +285,12 @@
     .parts-list{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--f4) transparent}
     .part{flex:none;padding:14px 14px 14px 16px;background:var(--f1);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
     .part.equipped{background:linear-gradient(112deg,color-mix(in srgb,var(--safe) 16%,var(--f1)) 0 34%,color-mix(in srgb,var(--safe) 9%,var(--f1)) 34%);box-shadow:inset 3px 0 0 var(--safe)}
+    .part-head{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:center;margin-bottom:.55rem}
+    .part-thumb{position:relative;width:72px;height:72px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#1c1d48 0 38%,var(--bg-viewport) 38% 74%,#131431 74%);clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);box-shadow:inset 0 0 0 1px #ffffff18}
+    .part.equipped .part-thumb{box-shadow:inset 0 0 0 2px var(--safe)}
+    .part-thumb img,.part-thumb svg{display:block;width:100%;height:100%;object-fit:contain}
+    .part-body{min-width:0}
+    .part-body p{margin:.25rem 0 0;font-size:.8rem;color:var(--muted)}
     .part-top{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
     .part-name{font:700 .88rem var(--heading);letter-spacing:.04em;color:var(--starlight-cream)}
     .part-slot{font:600 .56rem var(--heading);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;color:var(--muted)}
@@ -300,47 +301,6 @@
     .part.equipped button{color:var(--starlight-cream);background:var(--f4)}
     .part button:disabled{opacity:.4}
     .empty-state{padding:1.2rem;font-size:.84rem;color:var(--muted);background:repeating-linear-gradient(-45deg,var(--f1) 0 10px,var(--f2) 10px 20px)}
-    .brief-card{display:flex;flex-direction:column;gap:1rem;padding:clamp(22px,3vw,40px)}
-    .brief-card h3{font-size:clamp(1.7rem,3vw,2.8rem);color:var(--starlight-cream);text-transform:uppercase}
-    .brief-card>p{max-width:44rem;color:var(--muted)}
-    .brief-list,.readiness{display:grid;gap:5px;margin-top:.3rem}
-    .brief-row{display:grid;grid-template-columns:130px 1fr;align-items:baseline;gap:1rem;padding:.8rem 1rem;background:var(--f1);clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
-    .brief-row b{font:700 .68rem var(--heading);letter-spacing:.14em;color:var(--solar-amber)}
-    .brief-row span{font-size:.9rem;color:var(--muted)}
-    .fuel-card{display:flex;flex-direction:column;gap:.7rem;padding:26px}
-    .fuel-card h4{font-size:1.4rem;color:var(--starlight-cream);text-transform:uppercase}
-    .fuel-orbit{position:relative;width:200px;aspect-ratio:1;margin:0 auto .8rem}
-    .fuel-orbit::before{content:"";position:absolute;inset:31%;clip-path:var(--hex);background:conic-gradient(from 30deg,#5fb8dc 0deg 60deg,#1d5f9a 60deg 120deg,#123a6b 120deg 180deg,#1d5f9a 180deg 240deg,#2c86ba 240deg 300deg,#a8e6f0 300deg)}
-    .fuel-orbit::after{content:"";position:absolute;inset:0;background:var(--amethyst);opacity:.45;clip-path:polygon(evenodd,30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%,30% 0,30.4% 1%,69.6% 1%,99% 30.4%,99% 69.6%,69.6% 99%,30.4% 99%,1% 69.6%,1% 30.4%,30.4% 1%)}
-    .fuel-ship{position:absolute;inset:0;z-index:1;display:flex;justify-content:center;font-size:0;animation:spin 10s linear infinite}
-    .fuel-ship::before{content:"";width:16px;height:14px;margin-top:-6px;background:var(--solar-amber);clip-path:polygon(0 0,100% 50%,0 100%,25% 50%)}
-    input[type=range]{width:100%;height:28px;margin:0;background:transparent;-webkit-appearance:none;appearance:none}
-    input[type=range]::-webkit-slider-runnable-track{height:10px;background:repeating-linear-gradient(90deg,var(--f4) 0 9px,transparent 9px 12px)}
-    input[type=range]::-moz-range-track{height:10px;background:repeating-linear-gradient(90deg,var(--f4) 0 9px,transparent 9px 12px)}
-    input[type=range]::-webkit-slider-thumb{width:22px;height:26px;margin-top:-8px;border:0;background:linear-gradient(90deg,var(--coral-hover) 0 50%,var(--mars-orange) 50%);clip-path:var(--hex);-webkit-appearance:none}
-    input[type=range]::-moz-range-thumb{width:22px;height:26px;border:0;border-radius:0;background:linear-gradient(90deg,var(--coral-hover) 0 50%,var(--mars-orange) 50%);clip-path:var(--hex)}
-    .fuel-values{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
-    .fuel-values div{padding:.7rem .8rem;background:var(--f1)}
-    .fuel-values strong{display:block;font:700 1.3rem/1.1 var(--heading);font-variant-numeric:tabular-nums;color:var(--solar-amber)}
-    .fuel-values small{font:600 .6rem var(--heading);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-    .fuel-note{font-size:.74rem;color:var(--muted)}
-    .prep-option{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 1.1rem;background:var(--f1);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
-    .prep-option strong{font:700 .96rem var(--heading);letter-spacing:.04em;color:var(--starlight-cream)}
-    .prep-option p{margin:.2rem 0 .35rem;font-size:.84rem;color:var(--muted)}
-    .switch{position:relative;flex:none;width:64px;height:28px;border:0;background:var(--f4);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
-    .switch::after{content:"";position:absolute;top:4px;left:9px;width:22px;height:20px;background:var(--muted);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);transition:left .18s,background .18s}
-    .switch[aria-pressed="true"]{background:color-mix(in srgb,var(--safe) 28%,var(--f2))}
-    .switch[aria-pressed="true"]::after{left:33px;background:var(--safe)}
-    .readiness-row{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .9rem;font:600 .7rem var(--heading);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--f1)}
-    .readiness-row .good{color:var(--safe)}
-    .readiness-row .bad{color:var(--coral-hover)}
-    .landing-art.slab{min-height:440px;overflow:hidden;background:linear-gradient(170deg,#17183B 0 38%,#1f1a4a 38% 62%,#2d1a45 62%)}
-    .landing-art .ground{position:absolute;left:0;right:0;bottom:0;height:42%}
-    .landing-art .ground svg{display:block;width:100%;height:100%}
-    .trajectory{position:absolute;left:18%;top:12%;width:62%;height:46%;background:linear-gradient(to top right,transparent calc(50% - 1px),var(--solar-amber) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px));-webkit-mask:repeating-linear-gradient(90deg,#000 0 8px,transparent 8px 14px);mask:repeating-linear-gradient(90deg,#000 0 8px,transparent 8px 14px)}
-    .craft{position:absolute;left:calc(80% - 17px);top:calc(58% - 30px);width:34px;height:30px;font-size:0;background:linear-gradient(90deg,var(--starlight-cream) 0 50%,#c9b98a 50% 100%);clip-path:polygon(30% 0,70% 0,100% 78%,100% 100%,0 100%,0 78%);animation:descend 5s ease-in-out infinite alternate}
-    .craft::after{content:"";position:absolute;left:0;right:0;bottom:0;height:24%;background:var(--mars-orange)}
-    .landing-caption{position:absolute;top:18px;left:20px;font:600 .66rem var(--heading);letter-spacing:.16em;color:var(--starlight-cream)}
 
     /* Phase 5 & 6: 1st-Person Cockpit Flight & Minigames */
     .flight-stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:min(1600px,100%);margin:14px auto 0;padding:0 clamp(16px,3vw,44px)}
@@ -445,9 +405,7 @@
     @keyframes descend{from{translate:-46px -40px}to{translate:0 0}}
 
     @media (max-width:1200px){
-      .mission-dossier,.mission-right{grid-template-columns:1fr}
-      .mission-preview.slab{min-height:260px}
-      .assembly-grid.active{grid-template-columns:1fr 1fr;height:auto}
+      .assembly-grid{grid-template-columns:1fr 1fr;height:auto}
       .blueprint.slab{min-height:560px}
       .catalog{grid-column:1/-1}
       .parts-list{max-height:520px}
@@ -457,9 +415,7 @@
       .orbit-map.slab{min-height:470px}
       .orbit-system{width:min(86vw,460px)}
       .crew-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .brief-layout.active{grid-template-columns:1fr}
       .cockpit-layout,.surface-grid,.surface-dock,.results-grid{grid-template-columns:1fr}
-      .step small{display:none}
     }
     @media (max-width:640px){
       .menu-shell{align-items:flex-end;padding-bottom:96px}
@@ -469,25 +425,18 @@
       .header-title{gap:.5rem}
       .lobby-header-controls{width:100%;justify-content:space-between}
       .difficulty .micro{display:none}
-      .section-intro{flex-direction:column;align-items:start}
       .crew-stage{height:166px}
       .astronaut{width:112px;height:160px}
-      .assembly-grid.active{grid-template-columns:1fr}
+      .assembly-grid{grid-template-columns:1fr}
       .blueprint.slab{min-height:500px}
       .flight-stepper{grid-template-columns:repeat(2,1fr)}
       .cockpit-viewport.slab,.surface-viewport.slab,.podium-viewport.slab{min-height:360px}
       .compass-bar.slab{grid-template-columns:1fr;gap:8px}
-      .step{padding:.6rem .7rem .6rem 1.5rem}
-      .step:first-child{padding-left:.8rem}
-      .step strong{font-size:.62rem}
-      .step-number{display:none}
-      .brief-row{grid-template-columns:1fr;gap:.2rem}
       .app-foot{flex-wrap:wrap}
       .app-foot .hint{order:2;width:100%}
       .orbit-map.slab{min-height:380px}
       .orbit-map h3{top:18px;left:20px;font-size:1.15rem}
       .orbit-marker{display:none}
-      .fuel-values strong{font-size:1.05rem}
       .rocket-stage{min-width:0;padding:.4rem .6rem .4rem .75rem}
       .rocket-stage small{display:none}
     }
@@ -503,29 +452,48 @@
 
   <section id="orbit" class="screen" aria-labelledby="orbit-title">
     <header class="app-header"><div class="header-title"><button class="button quiet" id="orbit-back" type="button">← Menu</button><div><div class="eyebrow">Mission objective / 01</div><h2 id="orbit-title">Choose your destination</h2></div></div><span class="badge">SOLAR SYSTEM MAP</span></header>
-    <div class="orbit-layout"><div class="orbit-map slab"><h3>Where will your crew go?</h3><div class="orbit-system" aria-label="Stylized solar system map"><div class="orbit-sun"></div><span class="orbit-marker">LAUNCH / EARTH</span><button class="orbit-world earth" type="button" data-world="earth" aria-label="Earth, launch origin"><span class="planet-disc"></span><span class="world-name">Earth</span></button><button class="orbit-world mars-target selected" type="button" data-world="mars" aria-label="Mars, mission destination" aria-pressed="true"><span class="planet-disc"></span><span class="world-name">Mars</span></button><button class="orbit-world jupiter" type="button" data-world="jupiter" aria-label="Jupiter, future mission"><span class="planet-disc"></span><span class="world-name">Jupiter</span></button></div><div class="map-caption">ORBITAL VIEW / STYLIZED, NOT TO SCALE</div></div><div class="orbit-sidebar"><section class="objective-card slab"><span class="eyebrow">Selected objective</span><h3 id="objective-title">Explore Mars</h3><p id="objective-description">Land a crew, investigate ancient environments, and return discoveries to Earth.</p><div class="objective-stat"><span>Mission profile</span><strong id="objective-profile">CREWED · SURFACE</strong></div><div class="objective-stat"><span>Key constraint</span><strong id="objective-constraint">MASS · POWER · DATA</strong></div><div class="objective-stat"><span>Status</span><strong id="objective-status">READY TO PLAN</strong></div><button class="button primary" id="objective-next" type="button">Plan this mission →</button></section><section class="route-card slab"><h4>Mission route</h4><div class="route-steps"><span class="current">01<br>OBJECTIVE</span><span>02<br>CREW &amp; SITE</span><span>03<br>BUILD</span></div></section></div></div>
+    <div class="orbit-layout"><div class="orbit-map slab"><h3>Where will your crew go?</h3><div class="orbit-system" aria-label="Stylized solar system map"><div class="orbit-sun"></div><span class="orbit-marker">LAUNCH / EARTH</span><button class="orbit-world mercury extra" type="button" data-world="mercury" aria-label="Mercury, unavailable"><span class="planet-disc"></span><span class="world-name">Mercury</span></button><button class="orbit-world venus extra" type="button" data-world="venus" aria-label="Venus, unavailable"><span class="planet-disc"></span><span class="world-name">Venus</span></button><button class="orbit-world earth" type="button" data-world="earth" aria-label="Earth, launch origin"><span class="planet-disc"></span><span class="world-name">Earth</span></button><button class="orbit-world mars-target selected" type="button" data-world="mars" aria-label="Mars, mission destination" aria-pressed="true"><span class="planet-disc"></span><span class="world-name">Mars</span></button><button class="orbit-world jupiter" type="button" data-world="jupiter" aria-label="Jupiter, unavailable"><span class="planet-disc"></span><span class="world-name">Jupiter</span></button><button class="orbit-world saturn extra" type="button" data-world="saturn" aria-label="Saturn, unavailable"><span class="planet-disc"></span><span class="world-name">Saturn</span></button><button class="orbit-world uranus extra" type="button" data-world="uranus" aria-label="Uranus, unavailable"><span class="planet-disc"></span><span class="world-name">Uranus</span></button><button class="orbit-world neptune extra" type="button" data-world="neptune" aria-label="Neptune, unavailable"><span class="planet-disc"></span><span class="world-name">Neptune</span></button></div><div class="map-caption">ORBITAL VIEW / NOT TO SCALE · REAL PERIODS AND TILTS</div></div><div class="orbit-sidebar"><section class="objective-card slab"><span class="eyebrow">Selected objective</span><h3 id="objective-title">Explore Mars</h3><p id="objective-description">Land a crew, investigate ancient environments, and return discoveries to Earth.</p><div class="objective-stat"><span>Mission profile</span><strong id="objective-profile">CREWED · SURFACE</strong></div><div class="objective-stat"><span>Key constraint</span><strong id="objective-constraint">MASS · POWER · DATA</strong></div><div class="objective-stat"><span>Status</span><strong id="objective-status">READY TO PLAN</strong></div><button class="button primary" id="objective-next" type="button">Plan this mission →</button></section><section class="route-card slab"><h4>Mission route</h4><div class="route-steps"><span class="current">01<br>OBJECTIVE</span><span>02<br>CREW &amp; SITE</span><span>03<br>BUILD</span></div></section></div></div>
   </section>
 
   <section id="lobby" class="screen" aria-labelledby="lobby-title">
-    <header class="app-header"><div class="header-title"><button class="button quiet" id="lobby-back" type="button">← Objectives</button><div><div class="eyebrow">Mission dossier / 02</div><h2 id="lobby-title">Mars · Biosignature Hunters</h2></div></div><div class="lobby-header-controls"><div class="difficulty"><span class="micro" style="color:var(--solar-amber)">Host control</span><fieldset><legend>Mission difficulty</legend><div class="segmented" id="difficulty-buttons" aria-label="Mission difficulty"><button type="button" data-difficulty="easy" aria-pressed="false">Easy</button><button type="button" data-difficulty="normal" aria-pressed="true">Normal</button><button type="button" data-difficulty="hard" aria-pressed="false">Hard</button></div></fieldset></div><span class="badge" id="modifier-badge" aria-live="polite">$500M BUDGET · STANDARD RISK</span></div></header>
-    <div class="lobby-main"><div class="section-intro"><div><div class="eyebrow">Mission briefing</div><h3>Find the traces. Bring the data home.</h3><p>Choose a landing region and assign four specialists before building the spacecraft.</p></div><span class="tag">01 / 04 HUMAN CREW</span></div><div class="mission-dossier"><section class="mission-sites slab"><span class="eyebrow">Planet / Mars</span><h3>Landing site</h3><p>These regions were explored by robotic missions. Site selection here previews a future science route; it does not change launch balance yet.</p><div class="site-options"><button class="site-option" type="button" data-site="jezero" aria-pressed="true"><span class="site-icon"></span><span><strong>Jezero Crater</strong><small>Ancient delta · biosignature search</small></span></button><button class="site-option" type="button" data-site="gale" aria-pressed="false"><span class="site-icon"></span><span><strong>Gale Crater</strong><small>Layered rocks · climate history</small></span></button></div><p class="lobby-note" id="site-note">Selected: Jezero Crater. A former lake and delta make it a compelling target for sampling.</p></section><div class="mission-right"><section class="crew-manifest slab"><span class="eyebrow">Crew / 4 specialists</span><h3>Assemble the team</h3><div class="crew-grid" id="crew-grid"></div><p class="lobby-note">Select a portrait to inspect a specialist. Invite friends or use AI crew; Helena hosts this local preview.</p></section><section class="mission-preview slab"><div class="preview-label">Surface approach / destination preview</div><div class="preview-base"></div><div class="preview-copy" id="preview-copy">JEZERO CRATER · ANCIENT DELTA</div></section></div></div></div>
+    <header class="app-header"><div class="header-title"><button class="button quiet" id="lobby-back" type="button">← Objective</button><div><div class="eyebrow">Mission dossier / 02</div><h2 id="lobby-title">Crew and landing site</h2></div></div><div class="lobby-header-controls"><div class="difficulty"><span class="micro" style="color:var(--solar-amber)">Host control</span><fieldset><legend>Mission difficulty</legend><div class="segmented" id="difficulty-buttons" aria-label="Mission difficulty"><button type="button" data-difficulty="easy" aria-pressed="false">Easy</button><button type="button" data-difficulty="normal" aria-pressed="true">Normal</button><button type="button" data-difficulty="hard" aria-pressed="false">Hard</button></div></fieldset></div><span class="badge" id="modifier-badge" aria-live="polite">$250M · STANDARD RISK</span></div></header>
+    <div class="lobby-main"><div class="dossier slab">
+      <div class="dossier-title-wrap"><span class="micro">Mission name</span><h3 class="dossier-title" id="mission-name">Biosignature Hunters</h3></div>
+      <div class="dossier-grid">
+        <div class="dossier-left">
+          <div class="dossier-row"><span class="micro">Planet</span><strong>Mars</strong></div>
+          <div class="dossier-block"><div class="block-label"><span class="micro">Landing site</span></div><div class="site-thumbs"><button class="site-thumb" type="button" data-site="jezero" aria-pressed="true"><span class="thumb-art"></span><span class="thumb-name">Jezero</span></button><button class="site-thumb" type="button" data-site="gale" aria-pressed="false"><span class="thumb-art"></span><span class="thumb-name">Gale</span></button></div></div>
+          <div class="dossier-block"><div class="block-label"><span class="micro">Crew</span><span class="tag" id="crew-count">1/4 PLAYERS</span></div><div class="crew-grid" id="crew-grid"></div></div>
+        </div>
+        <div class="dossier-right">
+          <div class="detail-head"><span class="eyebrow" id="detail-kind">Crew member</span><h4 id="detail-name">Helena</h4><span id="detail-role"></span><p id="detail-desc"></p><div class="detail-status"><span class="micro">Status</span><strong id="detail-status"></strong></div></div>
+          <div class="detail-view" id="detail-view"><div class="detail-site" id="detail-site"></div></div>
+          <div class="detail-extra" id="detail-extra"></div>
+        </div>
+      </div>
+    </div></div>
     <footer class="app-foot"><div class="hint">Mission design works best when every specialty has a voice.</div><div class="foot-actions"><button class="button primary" id="to-assembly" type="button">Proceed to rocket assembly <span aria-hidden="true">→</span></button></div></footer>
   </section>
-  <div class="drawer-shade" id="drawer-shade"></div><aside class="drawer" id="crew-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true"><div class="drawer-head"><span class="eyebrow">Crew file / classified</span><button class="icon-button" id="drawer-close" type="button" aria-label="Close details">×</button></div><div class="drawer-avatar" id="drawer-avatar"></div><span class="eyebrow" id="drawer-role"></span><h3 id="drawer-title"></h3><p class="drawer-quote" id="drawer-quote"></p><h4>Strengths &amp; specialties</h4><div class="tag-list" id="drawer-tags"></div><h4>Passive perk</h4><div class="perk slab"><strong id="drawer-perk-name"></strong><p id="drawer-perk-description"></p></div></aside>
 
   <section id="planner" class="screen" aria-labelledby="planner-title">
-    <header class="app-header"><div class="header-title"><button class="button quiet" id="planner-menu" type="button">← Crew lobby</button><div><div class="eyebrow">Mission planning / 02</div><h2 id="planner-title">Mission: Mars Exploration</h2></div></div><div class="header-side"><span class="tag">Design simulation</span><div class="budget-readout" id="budget-readout"><div class="micro">Budget remaining</div><strong id="budget-remaining">$500M</strong></div></div></header>
-    <nav class="stepper" aria-label="Mission planning steps"><button class="step active" data-step="0" type="button" aria-current="step"><span class="step-number">1</span><span><strong>Rocket Assembly</strong><small>Build your vehicle</small></span></button><span class="step-connector"></span><button class="step" data-step="1" type="button"><span class="step-number">2</span><span><strong>Orbital Refueling</strong><small>Plan your transfer</small></span></button><span class="step-connector"></span><button class="step" data-step="2" type="button"><span class="step-number">3</span><span><strong>Mars Landing Prep</strong><small>Survive arrival</small></span></button></nav>
-    <div class="planner-content">
-      <div id="assembly" class="planner-panel assembly-grid active" aria-label="Rocket assembly">
-        <section class="panel slab telemetry" aria-labelledby="telemetry-heading"><div class="panel-heading"><h3 id="telemetry-heading">Engineering telemetry</h3><span class="dot" style="color:var(--safe)" aria-hidden="true"></span></div><div class="meter"><div class="meter-head"><span class="meter-label">Total cost</span><strong class="meter-value" id="cost-value">$0M / $500M</strong></div><div class="meter-track"><div class="meter-fill amber" id="cost-fill"></div></div><p class="meter-hint">Every system draws from one budget.</p></div><div class="meter"><div class="meter-head"><span class="meter-label">Rocket mass</span><strong class="meter-value" id="mass-value">0 / 42,000 kg</strong></div><div class="meter-track"><div class="meter-fill orange" id="mass-fill"></div></div><p class="meter-hint">Launch stack limit: 42,000 kg.</p></div><div class="meter"><div class="meter-head"><span class="meter-label">Power balance</span><strong class="meter-value" id="power-value">0 W / 0 W</strong></div><div class="meter-track"><div class="meter-fill" id="power-fill"></div></div><p class="meter-hint">Generated versus active demand.</p></div><div class="meter"><div class="meter-head"><span class="meter-label">Delta-V</span><strong class="meter-value" id="dv-value">0 m/s</strong></div><div class="meter-track"><div class="meter-fill" id="dv-fill"></div></div><p class="meter-hint">Prototype transfer target: 10,500 m/s.</p></div><div class="alert" id="mass-alert" role="alert">OVERWEIGHT FAILURE RISK! Reduce mass before launch.</div><div class="alert" id="budget-alert" role="alert">BUDGET EXCEEDED! Remove or exchange parts.</div><div class="alert" id="power-alert" role="alert">POWER DEFICIT! Add generation or reduce demand.</div><div class="telemetry-note">All numbers shown here are illustrative game-balance values, not NASA vehicle specifications.</div></section>
-        <section class="panel slab blueprint" aria-labelledby="blueprint-heading"><div class="viewport-label"><strong id="blueprint-heading">MODULAR ROCKET BLUEPRINT</strong><span>Choose a stage to inspect compatible parts</span></div><svg class="rocket-svg" viewBox="0 0 300 580" role="img" aria-label="Modular rocket with cabin, optional orbital module, optional mid booster, and mandatory main booster"><defs><linearGradient id="hull" x1="0" x2="1"><stop offset=".3" stop-color="#8f86ab"/><stop offset=".3" stop-color="#efe4d6"/><stop offset=".64" stop-color="#efe4d6"/><stop offset=".64" stop-color="#c8c0d6"/></linearGradient><linearGradient id="engine" x1="0" x2="1"><stop offset=".5" stop-color="#9B5DE5"/><stop offset=".5" stop-color="#4a2a7a"/></linearGradient></defs><g fill="none" stroke="#9b5de5" opacity=".23"><path d="M150 20V550M18 520H282M38 140H262M38 300H262M38 460H262" stroke-dasharray="4 7"/></g><g id="svg-cabin" class="section selected"><path d="M150 34L176 76L190 128V165H110V128L124 76Z" fill="url(#hull)" stroke="#e6d7e7" stroke-width="2"/><path d="M150 69L169 111H131Z" fill="#1e3156" stroke="#9b5de5"/><path d="M110 149H190" stroke="#782a61" stroke-width="11"/></g><g id="svg-stage3" class="section off"><path d="M105 166H195V254H105Z" fill="url(#hull)" stroke="#e6d7e7" stroke-width="2"/><path d="M105 185H195M105 237H195" stroke="#80325d" stroke-width="8"/><rect x="124" y="196" width="52" height="32" rx="5" fill="#231e4c" stroke="#9b5de5"/><path d="M105 215L75 232V240L105 230M195 215L225 232V240L195 230" fill="url(#engine)"/></g><g id="svg-stage2" class="section off"><path d="M98 255H202V354H98Z" fill="url(#hull)" stroke="#e6d7e7" stroke-width="2"/><path d="M98 277H202M98 335H202" stroke="#80325d" stroke-width="9"/><rect x="121" y="289" width="58" height="34" rx="5" fill="#201b49" stroke="#9b5de5"/><path d="M98 310L70 340V347L98 327M202 310L230 340V347L202 327" fill="url(#engine)"/></g><g id="svg-stage1" class="section"><path d="M90 355H210V479H90Z" fill="url(#hull)" stroke="#e6d7e7" stroke-width="2"/><path d="M90 382H210M90 453H210" stroke="#80325d" stroke-width="10"/><path d="M90 410L58 448V470L90 450M210 410L242 448V470L210 450" fill="url(#engine)"/><path d="M112 480L101 516H135L139 480M161 480L165 516H199L188 480" fill="#594671" stroke="#bf9ce8" stroke-width="2"/><path d="M130 516L145 554L150 520L155 554L170 516" fill="#e04f26" opacity=".8"/></g></svg><button class="rocket-stage cabin selected" data-stage="cabin" type="button"><strong>Crew cabin</strong><small id="stage-label-cabin">Mandatory · select parts</small></button><button class="rocket-stage stage3 off" data-stage="stage3" type="button"><strong>Orbital module</strong><small id="stage-label-stage3">Optional · click to add</small></button><button class="rocket-stage stage2 off" data-stage="stage2" type="button"><strong>Mid booster</strong><small id="stage-label-stage2">Optional · click to add</small></button><button class="rocket-stage stage1" data-stage="stage1" type="button"><strong>Main booster</strong><small id="stage-label-stage1">Mandatory · select parts</small></button><div class="rocket-status" id="rocket-tags"></div></section>
-        <section class="panel slab catalog" aria-labelledby="catalog-heading"><div class="panel-heading"><h3 id="catalog-heading">Upgrades &amp; parts</h3><span class="tag" id="selected-stage-tag">CREW CABIN</span></div><div class="category-tabs" id="category-tabs" role="tablist" aria-label="Part categories"><button type="button" data-category="Engines" role="tab" aria-selected="false">Engines</button><button type="button" data-category="Reactors" role="tab" aria-selected="true">Reactors</button><button type="button" data-category="Telecom" role="tab" aria-selected="false">Telecom</button><button type="button" data-category="Science" role="tab" aria-selected="false">Science</button><button type="button" data-category="Landing" role="tab" aria-selected="false">Landing</button></div><p class="catalog-summary" id="catalog-summary"></p><div class="parts-list" id="parts-list"></div></section>
-      </div>
-      <div id="refueling" class="planner-panel brief-layout" aria-label="Orbital refueling"><section class="brief-card slab"><span class="eyebrow">Engineering briefing / step 02</span><h3>Refuel in Earth orbit.<br>Then commit to Mars.</h3><p>Your main booster gets the crew off Earth. After orbital insertion, this Mars scenario includes a refueling stop before the interplanetary transfer. A lunar scenario could follow different rules.</p><div class="brief-list"><div class="brief-row"><b>01 / LAUNCH</b><span>Stage 1 spends most of its propellant reaching Earth orbit.</span></div><div class="brief-row"><b>02 / REFUEL</b><span>Set a transfer-fuel reserve. More fuel improves your margin but adds cost and mass to the mission plan.</span></div><div class="brief-row"><b>03 / TRANSFER</b><span>Your crew can perform onboard tasks before beginning landing preparation.</span></div></div></section><section class="fuel-card slab"><div class="fuel-orbit" aria-hidden="true"><span class="fuel-ship">✦</span></div><span class="micro">Orbital transfer reserve</span><h4>Fuel load preview</h4><label for="fuel-slider" class="muted" style="font-size:.77rem">Adjust the planned refueling amount</label><input id="fuel-slider" type="range" min="30" max="100" step="5" value="60"><div class="fuel-values"><div><strong id="fuel-percent">60%</strong><small>Tank load</small></div><div><strong id="fuel-cost">$0M</strong><small>Added cost</small></div><div><strong id="fuel-dv">0 m/s</strong><small>Transfer margin</small></div></div><p class="fuel-note">This is a game-balance planning preview, not a physical orbital transfer calculation.</p></section></div>
-      <div id="landing" class="planner-panel brief-layout" aria-label="Mars landing preparation"><section class="brief-card slab"><span class="eyebrow">Arrival systems / step 03</span><h3>Prepare for a thin-air landing.</h3><p>Equip arrival systems before launch. They consume your shared mission budget and add mass, but improve the landing sequence shown in the mission preview.</p><div class="prep-option"><div><strong>Aerobraking package</strong><p>Heat-shield and braking support for arrival.</p><span class="micro">+$38M · +1,200 kg · 80 W</span></div><button class="switch" id="aerobraking-toggle" type="button" role="switch" aria-label="Aerobraking package" aria-pressed="false"></button></div><div class="prep-option"><div><strong>Supersonic parachute</strong><p>Add a descent system for the final approach.</p><span class="micro">+$26M · +420 kg · 0 W</span></div><button class="switch" id="parachute-toggle" type="button" role="switch" aria-label="Supersonic parachute" aria-pressed="false"></button></div><div class="readiness" id="readiness"></div></section><div class="landing-art slab" aria-hidden="true"><div class="craft">⌁</div><div class="trajectory"></div><div class="ground"></div><div class="landing-caption">MARS / ENTRY · DESCENT · LANDING</div></div></div>
-    </div>
-    <footer class="app-foot"><div class="hint" id="step-hint">Select a rocket section, then equip parts to shape the mission.</div><div class="foot-actions"><button class="button quiet" id="step-back" type="button">Back</button><button class="button primary" id="step-next" type="button">Next step <span aria-hidden="true">→</span></button></div></footer>
+    <header class="app-header"><div class="header-title"><button class="button quiet" id="planner-back" type="button">← Crew</button><div><div class="eyebrow">Rocket assembly / 03</div><h2 id="planner-title">Mission: Biosignature Hunters</h2></div></div><div class="header-side"><span class="tag">Simulation</span><div class="budget-readout" id="budget-readout"><div class="micro">Budget remaining</div><strong id="budget-remaining">$250M</strong></div></div></header>
+    <div class="planner-content"><div class="assembly-grid" aria-label="Rocket assembly">
+      <section class="panel slab telemetry" aria-labelledby="telemetry-heading"><div class="panel-heading"><h3 id="telemetry-heading">Engineering telemetry</h3><span class="dot" style="color:var(--safe)" aria-hidden="true"></span></div>
+        <div class="meter"><div class="meter-head"><span class="meter-label">Total cost</span><strong class="meter-value" id="cost-value">—</strong></div><div class="meter-track"><div class="meter-fill amber" id="cost-fill"></div></div><p class="meter-hint">Every system draws from one budget (game balance).</p></div>
+        <div class="meter"><div class="meter-head"><span class="meter-label">Liftoff thrust-to-weight</span><strong class="meter-value" id="twr-value">—</strong></div><div class="meter-track"><div class="meter-fill orange" id="twr-fill"></div></div><p class="meter-hint">Needs at least 1.2 to clear the pad.</p></div>
+        <div class="meter"><div class="meter-head"><span class="meter-label">Cruise power</span><strong class="meter-value" id="power-value">—</strong></div><div class="meter-track"><div class="meter-fill" id="power-fill"></div></div><p class="meter-hint">Generation / draw. Engine pumps only draw power during the ascent and are left out.</p></div>
+        <div class="meter"><div class="meter-head"><span class="meter-label">Booster Δv</span><strong class="meter-value" id="dv-value">—</strong></div><div class="meter-track"><div class="meter-fill" id="dv-fill"></div></div><p class="meter-hint">Target: low Earth orbit ≈ 9,400 m/s ⚠. Orbital refueling covers the rest of the trip.</p></div>
+        <div class="mass-row"><span class="meter-label">Liftoff mass</span><strong class="meter-value" id="mass-value">—</strong></div>
+        <div class="alert" id="booster-alert" role="alert">BOOSTER INCOMPLETE! Install an engine and a tank.</div>
+        <div class="alert" id="twr-alert" role="alert">NOT ENOUGH THRUST! Thrust-to-weight below 1.2.</div>
+        <div class="alert" id="budget-alert" role="alert">OVER BUDGET! Remove or swap parts.</div>
+        <div class="alert" id="power-alert" role="alert">POWER DEFICIT! Add generation or cut the draw.</div>
+        <div class="telemetry-note">Mass, thrust, Isp and power come from the part specs (<code>tools/modeling/parts/specs.mjs</code>, sources in <code>references/parts</code>; ⚠ = sources disagree). Costs and budget are game balance. Δv uses the Tsiolkovsky equation with Isp averaged between sea level and vacuum, without gravity or drag losses.</div>
+      </section>
+      <section class="panel slab blueprint" aria-labelledby="blueprint-heading"><div class="viewport-label"><strong id="blueprint-heading">MODULAR ROCKET BLUEPRINT</strong><span>Click a module or an amber mounting point. + inserts a stage.</span></div><div class="stack-overlay" id="stack-overlay"></div><div class="rocket-status" id="rocket-tags"></div></section>
+      <section class="panel slab catalog" aria-labelledby="catalog-heading"><div class="panel-heading"><h3 id="catalog-heading">Compatible parts</h3><span class="tag" id="selected-stage-tag">BOOSTER</span></div><div class="category-tabs" id="category-tabs" role="tablist" aria-label="Part categories"></div><p class="catalog-summary" id="catalog-summary"></p><div class="parts-list" id="parts-list"></div></section>
+    </div></div>
+    <footer class="app-foot"><div class="hint">Build the booster (engine + tank), fill the bays and the cabin, then launch.</div><div class="foot-actions"><button class="button primary" id="launch-button" type="button">Launch mission <span aria-hidden="true">↗</span></button></div></footer>
   </section>
 
   <section id="cockpit" class="screen" aria-labelledby="cockpit-title">
@@ -691,56 +659,49 @@
     </div>
   </section>
 
-  <dialog id="quit-dialog" aria-labelledby="quit-title"><div class="dialog-inner"><span class="eyebrow">Exit mission</span><h3 id="quit-title">Leave the mission?</h3><p>This is a local prototype. You can close this tab whenever you are ready.</p><div class="dialog-actions"><button class="button quiet" id="quit-cancel" type="button">Stay here</button><button class="button secondary" id="quit-confirm" type="button">Close message</button></div></div></dialog>
-  <dialog id="launch-dialog" aria-labelledby="launch-title"><div class="dialog-inner"><span class="eyebrow">Mission launch review</span><h3 id="launch-title">Your mission is ready for review</h3><p id="launch-message">The crew's choices will shape launch, transit, landing and the science mission.</p><div class="summary-list" id="launch-summary"></div><div class="dialog-actions"><button class="button quiet" id="launch-close" type="button">Keep editing</button><button class="button primary" id="launch-confirm" type="button">Launch mission →</button></div></div></dialog>
+  <dialog id="quit-dialog" aria-labelledby="quit-title"><div class="dialog-inner"><span class="eyebrow">Quit mission</span><h3 id="quit-title">Leave the mission?</h3><p>This is a local prototype. You can close the tab at any time.</p><div class="dialog-actions"><button class="button quiet" id="quit-cancel" type="button">Stay</button><button class="button secondary" id="quit-confirm" type="button">Close notice</button></div></div></dialog>
+  <dialog id="launch-dialog" aria-labelledby="launch-title"><div class="dialog-inner"><span class="eyebrow">Launch review</span><h3 id="launch-title">Mission ready for review</h3><p id="launch-message"></p><div class="summary-list" id="launch-summary"></div><div class="dialog-actions"><button class="button quiet" id="launch-close" type="button">Keep editing</button><button class="button primary" id="launch-confirm" type="button">Launch mission →</button></div></div></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </main>
+<script src="index.models.js"></script>
 <script>
 (() => {
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const crew = [
-    {id:'helena',name:'Helena',role:'Commander & Pilot',color:'#EAA668',quote:'A mission only succeeds when every choice has a way home.',tags:['Aerospace Engineering','Test Pilot','Trajectory'],perk:'Precision Piloting',perkText:'Improves the crew’s margin during orbital maneuvers in the full game.'},
-    {id:'lucas',name:'Lucas',role:'Systems Engineer',color:'#7EDAC2',quote:'A reliable spacecraft is built from a thousand careful decisions.',tags:['Electrical Power','Structures','Repairs'],perk:'Redundant Engineering',perkText:'Reduces the impact of component failures in the full game.'},
-    {id:'oscar',name:'Oscar',role:'Data & Telecom Specialist',color:'#95B8F6',quote:'A discovery that never reaches Earth is a story left untold.',tags:['Data Systems','Communications','Signal Planning'],perk:'Smart Compression',perkText:'Helps the crew move more science data through a limited connection.'},
-    {id:'maya',name:'Maya',role:'Mission Scientist & Medical Officer',color:'#D5A5EE',quote:'Every rock on Mars holds a secret waiting to be decoded.',tags:['Planetary Geology','Astrobiology','Crew Health'],perk:'Experimental Synergy',perkText:'Rewards a well-matched set of scientific instruments in the full game.'}
+    {id:'helena',name:'Helena',role:'Commander & Pilot',color:'#EAA668',quote:'A mission only succeeds when every choice has a way home.',tags:['Aerospace Engineering','Test Pilot','Trajectory'],perk:'Precision Piloting',perkText:'Improves the crew’s margin during orbital maneuvers (full game).'},
+    {id:'lucas',name:'Lucas',role:'Systems Engineer',color:'#7EDAC2',quote:'A reliable spacecraft is built from a thousand careful decisions.',tags:['Electrical Power','Structures','Repairs'],perk:'Redundant Engineering',perkText:'Reduces the impact of component failures (full game).'},
+    {id:'oscar',name:'Oscar',role:'Data & Telecom Specialist',color:'#95B8F6',quote:'A discovery that never reaches Earth is a story left untold.',tags:['Data Systems','Communications','Signal Planning'],perk:'Smart Compression',perkText:'Moves more science data through a limited connection (full game).'},
+    {id:'maya',name:'Maya',role:'Mission Scientist & Medical Officer',color:'#D5A5EE',quote:'Every rock on Mars holds a secret waiting to be decoded.',tags:['Planetary Geology','Astrobiology','Crew Health'],perk:'Experimental Synergy',perkText:'Rewards a well-matched set of science instruments (full game).'}
   ];
-  const difficulty = {easy:{budget:600,risk:'−10% FAILURE'},normal:{budget:500,risk:'STANDARD RISK'},hard:{budget:400,risk:'+15% FAILURE'}};
-  const stages = {cabin:{name:'Crew Cabin',required:true,mass:5600,cost:72,power:0,draw:160},stage3:{name:'Orbital Module',required:false,mass:4200,cost:36,power:0,draw:80},stage2:{name:'Mid Booster',required:false,mass:8800,cost:58,power:0,draw:0},stage1:{name:'Main Booster',required:true,mass:15500,cost:115,power:0,draw:250}};
-  // Each part points at a generated GLB (godot/assets/models). Cost, mass, power and Δv are game balance.
-  const parts = [
-    {id:'f1',name:'Merlin 1D ×3',category:'Engines',stage:'stage1',model:'parts/engines/merlin-1d.glb',count:3,cost:52,mass:3500,watts:180,dv:2300,description:'Three sea-level kerolox engines push the stack off the pad.'},
-    {id:'raptor',name:'Raptor ×3',category:'Engines',stage:'stage1',model:'parts/engines/raptor.glb',count:3,cost:76,mass:4890,watts:220,dv:2950,description:'High-chamber-pressure methalox engines for heavy Mars stacks.'},
-    {id:'rs25',name:'RS-25 Cryo Core',category:'Engines',stage:'stage1',model:'parts/engines/rs-25.glb',count:1,cost:105,mass:3526,watts:260,dv:3200,description:'Liquid hydrolox core engine with high specific impulse and gimbal authority.'},
-    {id:'vacuum',name:'AJ10-190 Transfer Engine',category:'Engines',stage:'stage3',model:'parts/engines/aj10-190.glb',cost:39,mass:950,watts:90,dv:1850,description:'Restartable storable-propellant engine for the transfer burns.'},
-    {id:'mid',name:'RL10 Upper Engine',category:'Engines',stage:'stage2',model:'parts/engines/rl10.glb',cost:33,mass:1400,watts:70,dv:1500,description:'Efficient hydrolox engine that keeps accelerating after separation.'},
-    {id:'compact',name:'MMRTG / Kilopower',category:'Reactors',stage:'cabin',model:'parts/equipment/power-mmrtg-kilopower.glb',cost:48,mass:980,watts:0,generate:1600,dv:0,description:'Nuclear power that keeps working through dust storms and nights.'},
-    {id:'solar',name:'ROSA Solar Arrays',category:'Reactors',stage:'stage3',model:'parts/equipment/power-rosa-solar.glb',cost:25,mass:650,watts:0,generate:900,dv:0,description:'Roll-out arrays: lightweight generation for the cruise.'},
-    {id:'eclss',name:'ECLSS 98% Water Recovery',category:'Reactors',stage:'cabin',model:'parts/cabin/cabin-eclss-wrs.glb',cost:24,mass:195,watts:180,dv:0,description:'Closed-loop crew water and air recovery rack.'},
-    {id:'battery',name:'Backup Battery Rack',category:'Reactors',stage:'cabin',cost:21,mass:540,watts:0,generate:500,dv:0,description:'Reserve electrical bank for Max-Q and peak transmitter loads.'},
-    {id:'dish',name:'DSOC Laser Terminal',category:'Telecom',stage:'stage3',model:'parts/equipment/comm-dsoc-laser.glb',cost:29,mass:390,watts:220,dv:0,description:'Optical link: send larger science packages to Earth.'},
-    {id:'relay',name:'Electra UHF Relay',category:'Telecom',stage:'cabin',model:'parts/equipment/comm-electra-marco.glb',cost:19,mass:260,watts:130,dv:0,description:'Keeps the crew connected through orbiters during transit and landing.'},
-    {id:'drill',name:'Subsurface Drill',category:'Science',stage:'cabin',model:'parts/equipment/drill-corer-cryo.glb',cost:42,mass:1100,watts:460,dv:0,description:'Improves the science options after landing.'},
-    {id:'spectrometer',name:'PIXL · SHERLOC · SuperCam',category:'Science',stage:'cabin',model:'parts/equipment/sci-pixl-sherloc-supercam.glb',cost:35,mass:520,watts:350,dv:0,description:'Analyze Martian samples and minerals for biosignatures.'},
-    {id:'hera',name:'HERA Radiation Dosimeter',category:'Science',stage:'cabin',model:'parts/cabin/cabin-hera-dosimetry.glb',cost:12,mass:18,watts:25,dv:0,description:'Active Timepix solar storm early-warning sensor matrix.'},
-    {id:'msg_dna',name:'MSG Glovebox & MinION DNA',category:'Science',stage:'cabin',model:'parts/cabin/cabin-msg-minion.glb',cost:26,mass:85,watts:95,dv:0,description:'Sealed cabin glovebox and nanopore sequencer for core samples.'},
-    {id:'camera',name:'HiRISE · SHARAD Package',category:'Science',stage:'stage3',model:'parts/equipment/sci-hirise-sharad.glb',cost:24,mass:290,watts:190,dv:0,description:'Survey candidate regions before landing.'},
-    {id:'orion_cockpit',name:'Orion 3-DU Glass Cockpit',category:'Landing',stage:'cabin',model:'parts/cabin/cabin-orion-cockpit.glb',cost:18,mass:75,watts:115,dv:0,description:'Flight deck displays that sharpen manual attitude alignment.'},
-    {id:'shelter',name:'Orion Storm Shelter & SANS',category:'Landing',stage:'cabin',model:'parts/cabin/cabin-storm-shelter.glb',cost:22,mass:55,watts:40,dv:0,description:'Shielded crew refuge and medical bay against solar particle events.'},
-    {id:'shield',name:'LOFTID Shield & ASPIRE Chute',category:'Landing',stage:'cabin',model:'parts/equipment/edl-aspire-loftid.glb',cost:28,mass:870,watts:0,dv:0,description:'Protect the crew during atmospheric entry.'},
-    {id:'legs',name:'TRN Precision Landing',category:'Landing',stage:'cabin',model:'parts/equipment/edl-trn-medli2.glb',cost:18,mass:580,watts:0,dv:0,description:'Terrain-relative navigation for a safe touchdown.'}
-  ];
-  const CREW_MODELS = {
-    helena: 'characters/helena.glb',
-    lucas: 'characters/lucas.glb',
-    oscar: 'characters/oscar.glb',
-    maya: 'characters/maya.glb',
+  const SITES_INFO = {
+    jezero:{name:'Jezero Crater',mission:'Biosignature Hunters',tag:'Ancient delta · biosignatures',desc:'An ancient lake with a river delta, a target in the search for biosignatures. The Perseverance rover has explored the crater since 2021.'},
+    gale:{name:'Gale Crater',mission:'Gale Climate Archive',tag:'Layered rocks · climate',desc:'The rock layers of Mount Sharp hold the history of the Martian climate. The Curiosity rover has explored the crater since 2012.'}
   };
+  // Budget multipliers per difficulty (game-balance); the base budget comes from missionRules.
+  const difficulty = {easy:{factor:1.2,risk:'−10% FAILURE'},normal:{factor:1,risk:'STANDARD RISK'},hard:{factor:.8,risk:'+15% FAILURE'}};
+  const EQUIPMENT_GROUPS = [['power','Power',/^power-/],['data','Data & comms',/^(comm|data)-/],['science','Science',/^(sci|drill|truss)-/],['edl','Landing',/^edl-/],['systems','Systems',/^(attitude|isru|hab)-/]];
+  const CABIN_GROUPS = [['helena','Helena',['cabin-launch-seats','cabin-orion-cockpit','cabin-idss-docking']],['lucas','Lucas',['cabin-pcdu-thermal','cabin-eva-airlock','cabin-eclss-wrs']],['oscar','Oscar',['cabin-hera-dosimetry','cabin-scan-console','cabin-autonav-conjunction']],['maya','Maya',['cabin-ared-exercise','cabin-storm-shelter','cabin-msg-minion']]];
+  const CREW_MODELS = { helena: 'characters/helena.glb', lucas: 'characters/lucas.glb', oscar: 'characters/oscar.glb', maya: 'characters/maya.glb' };
   const COCKPIT_MODEL = 'rocket/cockpit_pilot.glb';
-  const state={screen:'menu',difficulty:'normal',friends:new Set(),selectedCrew:null,site:'jezero',stage:'cabin',category:'Reactors',enabledStages:new Set(['cabin','stage1']),equipped:new Set(),step:0,fuel:60,aerobraking:false,parachute:false};
-  const money = n => '$'+Math.round(n).toLocaleString('en-US')+'M';
-  const number = n => Math.round(n).toLocaleString('en-US');
+  const THUMB_CACHE = new Map();
+  window.ASTRO_THUMBS = THUMB_CACHE;
+  // Specs of every part and the mission rules (tools/modeling/parts/specs.mjs → parts/manifest.json).
+  let DATA = null;
+  const useData = manifest => { DATA = {rules:manifest.missionRules,parts:Object.fromEntries(manifest.parts.map(p=>[p.id,p]))}; };
+  if (window.ASTRO_FILES?.['parts/manifest.json']) useData(window.ASTRO_FILES['parts/manifest.json']);
+  const rule = (key,fallback) => DATA?.rules?.[key] ?? fallback;
+  const MAX_STAGES = () => rule('maxInternalStages',7), CABIN_SLOTS = () => rule('cabinModuleSlots',4), TWR_MIN = () => rule('minSafeLiftoffTwr',1.2);
+  const budgetOf = level => rule('defaultBudgetM',250)*difficulty[level].factor;
+  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:{booster:{engine:null,tank:null},stages:[{item:null},{item:null}],cabin:[]},sel:{kind:'booster'},tab:'engine'};
+  const money = n => (n<0?'−$':'$')+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<10?1:0})+'M';
+  const number = n => n==null?'n/f':Math.round(n).toLocaleString('en-US');
+  const tonnes = kg => kg==null?'n/f':(kg/1000).toLocaleString('en-US',{maximumFractionDigits:kg<10000?2:1})+' t';
+  const part = id => DATA?.parts[id];
+  const spec = id => part(id)?.specs || {};
+  const warn = (id,key) => String(spec(id).sources?.[key]||'').includes('⚠')?' <span class="warn" title="sources disagree">⚠</span>':'';
+  const shortName = id => (part(id)?.name||id).replace(/\s*\(.*\)\s*$/,'');
   // Low-poly astronaut: flat polygons; s* = suit tones, c* = crew colour, v* = visor, d1 = dark gear.
   const astronaut = (person) => `<svg class="astronaut" style="--crew:${person.color}" viewBox="0 0 150 215" aria-hidden="true">${[
     ['d1','40,62 110,62 114,120 36,120'],
@@ -762,26 +723,172 @@
   const showScreen = id => {state.screen=id;$$('.screen').forEach(screen=>screen.classList.toggle('active',screen.id===id));window.scrollTo(0,0);if(id==='planner')renderPlanner();};
   let toastTimer;
   const toast = message => {const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3500);};
-  function renderCrew(){const grid=$('#crew-grid');grid.innerHTML=crew.map((person,index)=>`<article class="crew-card" style="--crew:${person.color}" data-crew="${person.id}" tabindex="0" role="button" aria-label="View ${person.name} details"><div class="crew-top"><span class="crew-index">0${index+1} / CREW</span><span class="crew-role">${person.role}</span></div><h4 class="crew-name">${person.name.toUpperCase()}</h4><div class="crew-stage">${astronaut(person)}</div><div class="crew-bottom"><span class="status ${index===0||state.friends.has(person.id)?'player':''}"><span class="dot"></span>${index===0?'HOST (PLAYER)':state.friends.has(person.id)?'FRIEND JOINED (PLAYER)':'FILLED BY AI NPC'}</span>${index===0?'<button class="invite" type="button" disabled>HOST SLOT</button>':`<button class="invite" type="button" data-invite="${person.id}">${state.friends.has(person.id)?'− REMOVE FRIEND':'+ INVITE FRIEND'}</button>`}</div></article>`).join('');$('.section-intro .tag').textContent=`0${state.friends.size+1} / 04 HUMAN CREW`;$$('[data-crew]',grid).forEach(card=>{card.addEventListener('click',()=>openDrawer(card.dataset.crew));card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openDrawer(card.dataset.crew);}})});$$('[data-invite]',grid).forEach(button=>button.addEventListener('click',e=>{e.stopPropagation();const id=button.dataset.invite;if(state.friends.has(id)){state.friends.delete(id);toast('Friend slot returned to AI crew.')}else{state.friends.add(id);toast('Friend joined this local lobby preview.')}renderCrew();}));}
-  function openDrawer(id){const person=crew.find(item=>item.id===id);state.selectedCrew=id;$('#drawer-avatar').innerHTML=astronaut(person);$('#drawer-role').textContent=person.role;$('#drawer-title').textContent=person.name;$('#drawer-quote').textContent='“'+person.quote+'”';$('#drawer-tags').innerHTML=person.tags.map(tag=>`<span class="tag">${tag}</span>`).join('');$('#drawer-perk-name').textContent=person.perk;$('#drawer-perk-description').textContent=person.perkText;$('#crew-drawer').classList.add('open');$('#drawer-shade').classList.add('open');$('#crew-drawer').setAttribute('aria-hidden','false');$('#drawer-close').focus();}
-  function closeDrawer(){const previous=state.selectedCrew;$('#crew-drawer').classList.remove('open');$('#drawer-shade').classList.remove('open');$('#crew-drawer').setAttribute('aria-hidden','true');state.selectedCrew=null;const card=previous?document.querySelector(`[data-crew="${previous}"]`):null;if(card)card.focus();}
-  function metrics(){const selected=parts.filter(part=>state.equipped.has(part.id));let cost=0,mass=0,powerDraw=0,powerGeneration=0,dv=0;for(const id of state.enabledStages){const stage=stages[id];cost+=stage.cost;mass+=stage.mass;powerDraw+=stage.draw;}for(const part of selected){cost+=part.cost;mass+=part.mass;powerDraw+=part.watts;powerGeneration+=part.generate||0;dv+=part.dv||0;}if(state.aerobraking){cost+=38;mass+=1200;powerDraw+=80;}if(state.parachute){cost+=26;mass+=420;}const fuelCost=Math.round(state.fuel*.4);cost+=fuelCost;const launchDv=7200+dv-Math.max(0,mass-35000)*.1;const transferMargin=state.fuel*34;return{cost,mass,powerDraw,powerGeneration,dv:Math.round(launchDv+transferMargin),fuelCost,transferMargin,budget:difficulty[state.difficulty].budget};}
-  function setWidth(id,value,limit,bad=false){const el=$(id);el.style.width=Math.min(100,Math.max(0,value/limit*100))+'%';el.classList.toggle('danger',bad);}
-  function renderTelemetry(){const m=metrics();$('#cost-value').textContent=`${money(m.cost)} / ${money(m.budget)}`;$('#mass-value').textContent=`${number(m.mass)} / 42,000 kg`;$('#power-value').textContent=`${number(m.powerGeneration)} W / ${number(m.powerDraw)} W`;$('#dv-value').textContent=`${number(m.dv)} m/s`;setWidth('#cost-fill',m.cost,m.budget,m.cost>m.budget);setWidth('#mass-fill',m.mass,42000,m.mass>42000);setWidth('#power-fill',m.powerGeneration,Math.max(1600,m.powerDraw),m.powerGeneration<m.powerDraw);setWidth('#dv-fill',m.dv,10500,m.dv<10500);$('#mass-alert').classList.toggle('show',m.mass>42000);$('#budget-alert').classList.toggle('show',m.cost>m.budget);$('#power-alert').classList.toggle('show',m.powerGeneration<m.powerDraw);$('#budget-remaining').textContent=money(m.budget-m.cost);$('#budget-readout').classList.toggle('negative',m.cost>m.budget);$('#fuel-percent').textContent=state.fuel+'%';$('#fuel-cost').textContent=money(m.fuelCost);$('#fuel-dv').textContent=number(m.transferMargin)+' m/s';return m;}
-  function renderRocket(){for(const id of Object.keys(stages)){const enabled=state.enabledStages.has(id);const button=$(`.rocket-stage[data-stage="${id}"]`);button.classList.toggle('off',!enabled);button.classList.toggle('selected',state.stage===id);button.setAttribute('aria-pressed',String(state.stage===id));$(`#svg-${id}`).classList.toggle('off',!enabled);$(`#svg-${id}`).classList.toggle('selected',state.stage===id);$(`#stage-label-${id}`).textContent=`${stages[id].required?'Mandatory':enabled?'Optional · installed':'Optional · click to add'} · ${parts.filter(part=>state.equipped.has(part.id)&&part.stage===id).length} parts`;}$('#selected-stage-tag').textContent=stages[state.stage].name.toUpperCase();const selected=parts.filter(part=>state.equipped.has(part.id));$('#rocket-tags').innerHTML=selected.length?selected.slice(0,4).map(part=>`<span class="tag">${part.name}</span>`).join('')+(selected.length>4?`<span class="tag">+${selected.length-4} MORE</span>`:''):'<span class="tag">SELECT STAGES & EQUIP SYSTEMS</span>';window.dispatchEvent(new Event('astro:rocket'));}
-  function renderCatalog(){for(const button of $$('#category-tabs button'))button.setAttribute('aria-selected',String(button.dataset.category===state.category));const list=parts.filter(part=>part.category===state.category&&part.stage===state.stage);$('#catalog-summary').textContent=`${stages[state.stage].name} · ${state.category} · ${list.length} compatible ${list.length===1?'part':'parts'}`;$('#parts-list').innerHTML=list.length?list.map(part=>`<article class="part ${state.equipped.has(part.id)?'equipped':''}"><div class="part-top"><span class="part-name">${part.name}</span><span class="part-slot">${stages[part.stage].name}</span></div><p>${part.description}</p><div class="part-metrics"><span>${money(part.cost)}</span><span>${number(part.mass)} kg</span><span>${part.generate?'+'+number(part.generate)+' W':number(part.watts)+' W'}</span></div><button type="button" data-part="${part.id}" ${state.enabledStages.has(part.stage)?'':'disabled'}>${state.equipped.has(part.id)?'REMOVE PART':'EQUIP PART'}</button></article>`).join(''):'<div class="empty-state">No compatible parts in this category. Choose another tab or rocket section.</div>';$$('#parts-list [data-part]').forEach(button=>button.addEventListener('click',()=>{const id=button.dataset.part;if(state.equipped.has(id))state.equipped.delete(id);else state.equipped.add(id);renderPlanner();}));}
-  function renderLanding(){for(const [id,key] of [['aerobraking-toggle','aerobraking'],['parachute-toggle','parachute']])$('#'+id).setAttribute('aria-pressed',String(state[key]));const m=metrics();const status=[['Launch mass',m.mass<=42000,`${number(m.mass)} / 42,000 kg`],['Power supply',m.powerGeneration>=m.powerDraw,`${number(m.powerGeneration)} / ${number(m.powerDraw)} W`],['Mission budget',m.cost<=m.budget,`${money(m.budget-m.cost)} remaining`],['Mars arrival',state.aerobraking&&state.parachute,state.aerobraking&&state.parachute?'Two systems prepared':'Add both arrival systems']];$('#readiness').innerHTML=status.map(([label,good,value])=>`<div class="readiness-row"><span>${label}</span><span class="${good?'good':'bad'}">${good?'✓':'!'} ${value}</span></div>`).join('');}
-  function renderSteps(){$$('.step').forEach((button,index)=>{button.classList.toggle('active',index===state.step);button.classList.toggle('done',index<state.step);button.removeAttribute('aria-current');if(index===state.step)button.setAttribute('aria-current','step');});$$('.planner-panel').forEach((panel,index)=>panel.classList.toggle('active',index===state.step));$('#step-back').textContent=state.step===0?'Back to crew':'Back';$('#step-next').innerHTML=state.step===2?'Launch mission <span aria-hidden="true">↗</span>':'Next step <span aria-hidden="true">→</span>';$('#step-hint').textContent=['Select a rocket section, then equip parts to shape the mission.','Mars transfer planning includes an orbital refueling stop.','Your landing systems change the mission readiness review.'][state.step];}
-  function renderPlanner(){renderTelemetry();renderRocket();renderCatalog();renderLanding();renderSteps();}
-  function selectStage(id){if(!stages[id].required&&!state.enabledStages.has(id)){state.enabledStages.add(id);toast(`${stages[id].name} added to the rocket.`);}state.stage=id;const first=parts.find(part=>part.stage===id);if(!parts.some(part=>part.stage===id&&part.category===state.category))state.category=first.category;renderPlanner();}
-  function showLaunch(){const m=metrics();const warnings=[];if(m.mass>42000)warnings.push('Overweight launch stack');if(m.cost>m.budget)warnings.push('Budget exceeded');if(m.powerGeneration<m.powerDraw)warnings.push('Power deficit');if(m.dv<10500)warnings.push('Delta-V below prototype target');if(!state.aerobraking||!state.parachute)warnings.push('Incomplete landing preparation');$('#launch-title').textContent=warnings.length?'Review mission risks':'Your mission is ready for launch';$('#launch-message').textContent=warnings.length?'These choices will create consequences during launch or arrival. Revise your design, or preview a risky launch.':'The crew is ready. This concept prototype ends at mission launch.';$('#launch-summary').innerHTML=[['Crew',`${state.friends.size+1} player${state.friends.size?'s':''} · ${3-state.friends.size} AI`],['Difficulty',state.difficulty.toUpperCase()],['Budget remaining',money(m.budget-m.cost)],['Rocket mass',`${number(m.mass)} kg`],['Power',`${number(m.powerGeneration)} / ${number(m.powerDraw)} W`],['Delta-V',`${number(m.dv)} m/s`],['Fuel reserve',`${state.fuel}%`],['Arrival systems',`${state.aerobraking?'Aerobraking':'No aerobraking'} · ${state.parachute?'Parachute':'No parachute'}`],['Risk review',warnings.length?warnings.join(', '):'All checks clear']].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');$('#launch-confirm').textContent=warnings.length?'Preview risky launch →':'Launch mission →';$('#launch-dialog').showModal();}
+
+  // Lobby: crew cards on the left, the selected crew member or landing site on the right.
+  function renderLobby(){
+    const site=SITES_INFO[state.site];
+    $('#mission-name').textContent=site.mission;
+    $('#planner-title').textContent='Mission: '+site.mission;
+    $$('[data-site]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.site===state.site)));
+    $('#crew-count').textContent=`${state.friends.size+1}/4 PLAYERS`;
+    $('#crew-grid').innerHTML=crew.map((p,i)=>{const host=i===0,friend=state.friends.has(p.id),picked=state.detail.kind==='crew'&&state.detail.id===p.id;
+      return `<article class="crew-card ${picked?'selected':''}" style="--crew:${p.color}"><div class="crew-stage">${astronaut(p)}</div><div class="crew-info"><h4 class="crew-name">${p.name}</h4><span class="crew-role">${p.role}</span><span class="status ${host||friend?'player':''}"><span class="dot"></span>${host?'HOST (PLAYER)':friend?'FRIEND (PLAYER)':'AI (NPC)'}</span></div><div class="crew-actions"><button class="invite" type="button" data-invite="${p.id}" ${host?'disabled':''}>${host?'Host':friend?'Remove':'Invite player'}</button><button class="pick" type="button" data-pick="${p.id}" aria-pressed="${picked}">Select</button></div></article>`;}).join('');
+    $$('#crew-grid [data-pick]').forEach(b=>b.addEventListener('click',()=>{state.detail={kind:'crew',id:b.dataset.pick};renderLobby();}));
+    $$('#crew-grid [data-invite]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.invite;if(state.friends.has(id)){state.friends.delete(id);toast('The seat went back to the AI crew.');}else{state.friends.add(id);toast('A friend joined this local lobby preview.');}renderLobby();}));
+    renderDetail();
+  }
+  function renderDetail(){
+    const d=state.detail,view=$('#detail-view');
+    if(d.kind==='crew'){
+      const p=crew.find(c=>c.id===d.id),i=crew.indexOf(p);
+      $('#detail-kind').textContent='Crew member';$('#detail-name').textContent=p.name;$('#detail-role').textContent=p.role;$('#detail-desc').textContent='“'+p.quote+'”';
+      $('#detail-status').textContent=i===0?'HOST (PLAYER)':state.friends.has(p.id)?'FRIEND (PLAYER)':'AI (NPC)';
+      $('#detail-extra').innerHTML=p.tags.map(t=>`<span class="tag">${t}</span>`).join('')+`<div class="perk"><strong>${p.perk}</strong><p>${p.perkText}</p></div>`;
+      view.classList.remove('site');view.style.setProperty('--crew',p.color);
+    }else{
+      const s=SITES_INFO[d.id];
+      $('#detail-kind').textContent='Landing site';$('#detail-name').textContent=s.name;$('#detail-role').textContent=s.tag;$('#detail-desc').textContent=s.desc;
+      $('#detail-status').textContent=state.site===d.id?'SELECTED SITE':'AVAILABLE';
+      $('#detail-extra').innerHTML='';$('#detail-site').innerHTML=siteScene(d.id);view.classList.add('site');
+    }
+    window.dispatchEvent(new CustomEvent('astro:detail',{detail:d}));
+  }
+
+  // Planner: Main Booster (engine cluster + tank) → 0 to 7 middle stages (1 module each) → cabin (4 modules).
+  const moduleKey = sel => sel.kind==='stage'?`stage-${sel.index}`:sel.kind;
+  const parseKey = key => key.startsWith('stage-')?{kind:'stage',index:+key.slice(6)}:{kind:key};
+  function moduleLabel(key){
+    const r=state.rocket;
+    if(key==='booster'){const {engine:e,tank:t}=r.booster;return ['Stage 1 · booster',e&&t?`${shortName(e)} + ${shortName(t)}`:e?'tank missing':t?'engine missing':'engine + tank empty'];}
+    if(key==='cabin')return ['Cabin',`${r.cabin.length}/${CABIN_SLOTS()} modules`];
+    const i=+key.slice(6),item=r.stages[i]?.item;return [`Stage ${i+2}`,item?shortName(item):'empty bay'];
+  }
+  // Totals: cost, mass and cruise power of every module; thrust, Isp and Δv (Tsiolkovsky) of the booster.
+  // Engine pumps draw power only during the ascent, so engines stay out of the cruise power balance.
+  function metrics(){
+    const r=state.rocket,g0=rule('g0Ms2',9.80665);let cost=0,mass=0,draw=0,gen=0,thrust=0,isp=0,prop=0;
+    const add=s=>{if(!s)return;cost+=s.costM||0;mass+=s.massDryKg||0;if(s.powerW<0)draw-=s.powerW;else gen+=s.powerW||0;};
+    add(spec('booster-thrust-section'));r.stages.forEach(s=>{add(spec('stage-module'));if(s.item)add(spec(s.item));});add(rule('cabinHull'));r.cabin.forEach(id=>add(spec(id)));
+    if(r.booster.engine){const s=spec(r.booster.engine),n=s.defaultClusterCount||1;cost+=n*s.costM;mass+=n*s.massDryKg;thrust=n*(s.thrustSlKn||0)*1000;isp=s.ispSlS&&s.ispVacS?(s.ispSlS+s.ispVacS)/2:(s.ispSlS||s.ispVacS||0);}
+    if(r.booster.tank){const s=spec(r.booster.tank);cost+=s.costM;prop=s.propellantMassKg||0;mass+=s.massDryKg+prop;}
+    const ready=!!(r.booster.engine&&r.booster.tank);
+    return {cost,mass,draw,gen,thrust,isp,prop,ready,twr:mass?thrust/(mass*g0):0,dv:ready&&mass>prop?isp*g0*Math.log(mass/(mass-prop)):0,budget:budgetOf(state.difficulty),leo:rule('earthOrbitDeltaVMs',9400)};
+  }
+  function setBar(id,frac,mode){const el=$(id);el.style.width=Math.min(100,Math.max(0,frac*100))+'%';el.classList.toggle('danger',mode==='danger');el.classList.toggle('short',mode==='short');}
+  function renderTelemetry(){
+    if(!DATA)return null;
+    const m=metrics();
+    $('#cost-value').textContent=`${money(m.cost)} / ${money(m.budget)}`;setBar('#cost-fill',m.cost/m.budget,m.cost>m.budget?'danger':'');
+    $('#twr-value').textContent=m.ready?m.twr.toLocaleString('en-US',{maximumFractionDigits:2}):'—';setBar('#twr-fill',m.ready?m.twr/2:0,m.ready&&m.twr<TWR_MIN()?'danger':'');
+    $('#power-value').textContent=`${number(m.gen)} W / ${number(m.draw)} W`;setBar('#power-fill',m.draw?m.gen/(m.draw*1.5):0,m.gen<m.draw?'danger':'');
+    $('#dv-value').textContent=m.ready?`${number(m.dv)} m/s`:'—';setBar('#dv-fill',m.dv/m.leo,m.ready&&m.dv<m.leo?'short':'');
+    $('#mass-value').textContent=tonnes(m.mass);
+    $('#booster-alert').classList.toggle('show',!m.ready);$('#twr-alert').classList.toggle('show',m.ready&&m.twr<TWR_MIN());
+    $('#budget-alert').classList.toggle('show',m.cost>m.budget);$('#power-alert').classList.toggle('show',m.gen<m.draw);
+    $('#budget-remaining').textContent=money(m.budget-m.cost);$('#budget-readout').classList.toggle('negative',m.cost>m.budget);
+    return m;
+  }
+  function renderRocket(){
+    const r=state.rocket,keys=['booster',...r.stages.map((_,i)=>`stage-${i}`),'cabin'],cur=moduleKey(state.sel);
+    $('#stack-overlay').innerHTML=keys.map((k,i)=>{const [title,sub]=moduleLabel(k);return `<button class="rocket-stage ${i%2?'right':'left'} ${k===cur?'selected':''}" type="button" data-module="${k}" aria-pressed="${k===cur}"><strong>${title}</strong><small>${sub}</small></button>`;}).join('')
+      +(r.stages.length<MAX_STAGES()?Array.from({length:r.stages.length+1},(_,i)=>`<button class="add-stage" type="button" data-insert="${i}" title="Add stage" aria-label="Add a stage at position ${i+2}">+</button>`).join(''):'');
+    $$('#stack-overlay [data-module]').forEach(b=>b.addEventListener('click',()=>selectModule(b.dataset.module)));
+    $$('#stack-overlay [data-insert]').forEach(b=>b.addEventListener('click',()=>addStage(+b.dataset.insert)));
+    const installed=[r.booster.engine,r.booster.tank,...r.stages.map(s=>s.item),...r.cabin].filter(Boolean).length;
+    $('#rocket-tags').innerHTML=`<span class="tag">${r.stages.length+2} STAGES</span><span class="tag">${installed} PARTS INSTALLED</span>`;
+    window.dispatchEvent(new Event('astro:rocket'));
+  }
+  const tabsFor = sel => sel.kind==='booster'?[['engine','Engines'],['tank','Tanks']]:sel.kind==='stage'?EQUIPMENT_GROUPS.map(([k,l])=>[k,l]):CABIN_GROUPS.map(([k,l])=>[k,l]);
+  function partsFor(sel,tab){
+    const all=Object.entries(DATA.parts);
+    if(sel.kind==='booster')return all.filter(([,p])=>tab==='engine'?p.specs?.engineRole==='booster':p.category==='tanks'&&p.specs?.tankRole==='stage').map(([id])=>id);
+    if(sel.kind==='stage'){const g=EQUIPMENT_GROUPS.find(x=>x[0]===tab);return all.filter(([id,p])=>p.category==='equipment'&&g[2].test(id)).map(([id])=>id);}
+    return CABIN_GROUPS.find(x=>x[0]===tab)[2];
+  }
+  const installedIn = sel => sel.kind==='booster'?[state.rocket.booster.engine,state.rocket.booster.tank].filter(Boolean):sel.kind==='stage'?[state.rocket.stages[sel.index]?.item].filter(Boolean):state.rocket.cabin;
+  function partMetrics(id){
+    const s=spec(id),p=part(id);
+    if(p.category==='engines'){const n=s.defaultClusterCount||1;return [`${n}×`,`${number(s.thrustSlKn)} kN${warn(id,'thrustSlKn')}`,`Isp ${number(s.ispSlS)}${s.ispVacS&&s.ispVacS!==s.ispSlS?'–'+number(s.ispVacS):''} s${warn(id,'ispSlS')}`,`${number(s.massDryKg)} kg each${warn(id,'massDryKg')}`,money(n*s.costM)];}
+    if(p.category==='tanks')return [`propellant ${tonnes(s.propellantMassKg)}${warn(id,'propellantMassKg')}`,`dry ${tonnes(s.massDryKg)}${warn(id,'massDryKg')}`,money(s.costM)];
+    return [`${number(s.massDryKg)} kg${warn(id,'massDryKg')}`,s.powerW>0?`+${number(s.powerW)} W`:`${number(Math.abs(s.powerW||0))} W`,money(s.costM)];
+  }
+  function partThumbFallback(id, p) {
+    const cached = THUMB_CACHE.get(id);
+    if (cached) return `<img src="${cached}" alt="">`;
+    let polys = '';
+    if (p?.category === 'engines') {
+      polys = '<polygon points="22,8 42,8 42,18 22,18" fill="#B9B0CE"/><polygon points="20,18 44,18 39,26 25,26" fill="#F59E0B"/><polygon points="25,26 39,26 48,54 16,54" fill="#3a2f52"/><polygon points="25,26 32,26 24,54 16,54" fill="#8f86ab"/>';
+    } else if (p?.category === 'tanks') {
+      polys = '<polygon points="22,12 32,6 42,12 42,52 32,58 22,52" fill="#e9dccb"/><polygon points="22,12 32,6 32,58 22,52" fill="#FFFFFF"/><polygon points="22,22 42,22 42,27 22,27" fill="#E04F26"/>';
+    } else if (id.startsWith('power-')) {
+      polys = '<polygon points="6,24 24,18 24,46 6,40" fill="#1d5f9a"/><polygon points="40,18 58,24 58,40 40,46" fill="#2c86ba"/><polygon points="25,16 39,16 39,48 25,48" fill="#F59E0B"/><polygon points="28,22 36,22 36,42 28,42" fill="#FCE8A6"/>';
+    } else if (/^(comm|data)-/.test(id)) {
+      polys = '<polygon points="14,22 32,10 50,22 42,38 22,38" fill="#FCE8A6"/><polygon points="14,22 32,10 32,38 22,38" fill="#FFFFFF"/><polygon points="30,22 34,12 34,26" fill="#E04F26"/><polygon points="26,38 38,38 42,54 22,54" fill="#3a2f52"/>';
+    } else if (/^(sci|drill|truss)-/.test(id)) {
+      polys = '<polygon points="16,14 48,14 48,36 16,36" fill="#7EDAC2"/><polygon points="20,18 44,18 44,32 20,32" fill="#17183B"/><polygon points="29,36 35,36 32,56" fill="#F59E0B"/>';
+    } else if (id.startsWith('edl-')) {
+      polys = '<polygon points="12,34 32,14 52,34" fill="#E04F26"/><polygon points="12,34 32,14 32,34" fill="#EE7B57"/><polygon points="18,34 46,34 38,50 26,50" fill="#F59E0B"/>';
+    } else {
+      polys = '<polygon points="14,14 50,14 54,24 54,50 10,50 10,24" fill="#9B5DE5"/><polygon points="16,18 48,18 48,32 16,32" fill="#17183B"/><polygon points="18,36 46,36 46,44 18,44" fill="#7EDAC2"/>';
+    }
+    return `<svg viewBox="0 0 64 64" aria-hidden="true">${polys}</svg>`;
+  }
+  function renderCatalog(){
+    if(!DATA){$('#parts-list').innerHTML='<div class="empty-state">Loading part data…</div>';return;}
+    const sel=state.sel,tabs=tabsFor(sel);if(!tabs.some(t=>t[0]===state.tab))state.tab=tabs[0][0];
+    $('#category-tabs').innerHTML=tabs.map(([k,l])=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${k===state.tab}">${l}</button>`).join('');
+    $$('#category-tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;renderCatalog();}));
+    $('#selected-stage-tag').textContent=moduleLabel(moduleKey(sel))[0].toUpperCase();
+    $('#catalog-summary').textContent=sel.kind==='booster'?'Stage 1 engine and tank, with real data for each part.':sel.kind==='stage'?'One equipment module per stage, fixed to the bay mounting point.':`${state.rocket.cabin.length}/${CABIN_SLOTS()} cabin slots filled. Three modules per specialist.`;
+    const inst=installedIn(sel),current=sel.kind==='booster'?state.rocket.booster[state.tab]:sel.kind==='stage'?inst[0]:null;
+    $('#parts-list').innerHTML=partsFor(sel,state.tab).map(id=>{const p=part(id),on=inst.includes(id);
+      return `<article class="part ${on?'equipped':''}"><div class="part-head"><div class="part-thumb" data-part-thumb="${id}">${partThumbFallback(id,p)}</div><div class="part-body"><div class="part-top"><span class="part-name">${p.name}</span><span class="part-slot">Tier ${p.tier}</span></div><p>${(p.role||'').replace(/`/g,'')}</p></div></div><div class="part-metrics">${partMetrics(id).map(x=>`<span>${x}</span>`).join('')}</div><button type="button" data-part="${id}">${on?'REMOVE':current?'SWAP':'INSTALL'}</button></article>`;}).join('')
+      +(sel.kind==='stage'?`<button class="button quiet remove-stage" type="button" data-remove="${sel.index}">Remove this stage</button>`:'');
+    $$('#parts-list [data-part]').forEach(b=>b.addEventListener('click',()=>togglePart(b.dataset.part)));
+    $$('#parts-list [data-remove]').forEach(b=>b.addEventListener('click',()=>removeStage(+b.dataset.remove)));
+    window.dispatchEvent(new Event('astro:catalog'));
+  }
+  function renderPlanner(){renderTelemetry();renderRocket();renderCatalog();}
+  function selectModule(key,tab){state.sel=parseKey(key);const r=state.rocket;state.tab=tab||(state.sel.kind==='booster'?(r.booster.engine&&!r.booster.tank?'tank':'engine'):state.sel.kind==='cabin'?'helena':'power');renderPlanner();}
+  function addStage(index){const r=state.rocket;if(r.stages.length>=MAX_STAGES())return;r.stages.splice(index,0,{item:null});toast(`Stage ${index+2} added.`);selectModule(`stage-${index}`);}
+  function removeStage(index){state.rocket.stages.splice(index,1);toast('Stage removed.');selectModule(index>0?`stage-${index-1}`:'booster');}
+  function togglePart(id){
+    const r=state.rocket,sel=state.sel;
+    if(sel.kind==='booster'){const k=state.tab;r.booster[k]=r.booster[k]===id?null:id;}
+    else if(sel.kind==='stage'){const s=r.stages[sel.index];s.item=s.item===id?null:id;}
+    else{const i=r.cabin.indexOf(id);if(i>=0)r.cabin.splice(i,1);else if(r.cabin.length>=CABIN_SLOTS()){toast(`The cabin is full: ${CABIN_SLOTS()} modules at most.`);return;}else r.cabin.push(id);}
+    renderPlanner();
+  }
+  function showLaunch(){
+    const m=metrics(),warnings=[];
+    if(!m.ready)warnings.push('Booster without an engine or a tank');
+    if(m.ready&&m.twr<TWR_MIN())warnings.push('Thrust-to-weight below 1.2');
+    if(m.cost>m.budget)warnings.push('Over budget');
+    if(m.gen<m.draw)warnings.push('Power deficit');
+    if(m.ready&&m.dv<m.leo)warnings.push('Δv below low Earth orbit (orbital refueling is not simulated yet)');
+    $('#launch-title').textContent=warnings.length?'Review the mission risks':'Mission ready to launch';
+    $('#launch-message').textContent=warnings.length?'These choices will have consequences at launch or on arrival. Revise the design or launch with risks.':'The crew is ready for liftoff, orbital checklist, Mars landing, and surface operations.';
+    $('#launch-summary').innerHTML=[['Crew',`${state.friends.size+1} player${state.friends.size?'s':''} · ${3-state.friends.size} AI`],['Site',SITES_INFO[state.site].name],['Difficulty',{easy:'EASY',normal:'NORMAL',hard:'HARD'}[state.difficulty]],['Stages',`${state.rocket.stages.length+2}`],['Budget remaining',money(m.budget-m.cost)],['Liftoff mass',tonnes(m.mass)],['Thrust-to-weight',m.ready?m.twr.toLocaleString('en-US',{maximumFractionDigits:2}):'—'],['Booster Δv',m.ready?`${number(m.dv)} m/s`:'—'],['Power',`${number(m.gen)} / ${number(m.draw)} W`],['Risks',warnings.length?warnings.join('; '):'All clear']].map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');
+    $('#launch-confirm').textContent=warnings.length?'Launch with risks →':'Launch mission →';
+    $('#launch-dialog').showModal();
+  }
   function setupStars(){const canvas=$('#stars'),ctx=canvas.getContext('2d');if(!ctx)return;let stars=[];let width=0,height=0;const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;function resize(){const ratio=Math.min(devicePixelRatio||1,2);width=canvas.clientWidth;height=canvas.clientHeight;canvas.width=width*ratio;canvas.height=height*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);stars=Array.from({length:Math.min(150,Math.floor(width*height/8500))},(_,i)=>({x:((i*2819)%1009)/1009*width,y:((i*3877)%1013)/1013*height,r:.4+(i%5)*.25,phase:i*.63,c:['#FCE8A6','#f7dfff','#c9a6ff'][i%3]}));}function draw(time){ctx.clearRect(0,0,width,height);for(const star of stars){ctx.globalAlpha=.25+.45*(.5+.5*Math.sin(time*.0008+star.phase));const r=star.r*1.7;ctx.fillStyle=star.c;ctx.beginPath();ctx.moveTo(star.x,star.y-r);ctx.lineTo(star.x+r*.6,star.y);ctx.lineTo(star.x,star.y+r);ctx.lineTo(star.x-r*.6,star.y);ctx.fill();}ctx.globalAlpha=1;if(!reduce)requestAnimationFrame(draw);}resize();window.addEventListener('resize',resize);requestAnimationFrame(draw);}
+  const WORLD_NAMES={mercury:'Mercury',venus:'Venus',earth:'Earth',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn',uranus:'Uranus',neptune:'Neptune'};
   $('#orbit-back').addEventListener('click',()=>showScreen('menu'));
   $('#objective-next').addEventListener('click',()=>showScreen('lobby'));
-  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>{if(button.dataset.world==='mars'){toast('Mars is selected as this prototype mission destination.');return;}toast(button.dataset.world==='earth'?'Earth is your launch origin. Select Mars to plan the mission.':'Jupiter is planned for a future mission. This prototype explores Mars.');}));
-  $$('[data-site]').forEach(button=>button.addEventListener('click',()=>{state.site=button.dataset.site;$$('[data-site]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));const jezero=state.site==='jezero';$('#site-note').textContent=jezero?'Selected: Jezero Crater. A former lake and delta make it a compelling target for sampling.':'Selected: Gale Crater. Layered sedimentary rocks reveal chapters of Martian climate history.';$('#preview-copy').textContent=jezero?'JEZERO CRATER - ANCIENT DELTA':'GALE CRATER - LAYERED ROCKS';$('#planner-title').textContent='Mission: '+(jezero?'Jezero':'Gale')+' Exploration';}));
-  $('#play-button').addEventListener('click',()=>{const go=()=>showScreen('orbit');window.ASTRO_LAUNCH?window.ASTRO_LAUNCH().then(go):go();});$('#lobby-back').addEventListener('click',()=>showScreen('orbit'));$('#to-assembly').addEventListener('click',()=>{state.step=0;showScreen('planner');});$('#planner-menu').addEventListener('click',()=>showScreen('lobby'));$('#quit-button').addEventListener('click',()=>$('#quit-dialog').showModal());$('#quit-cancel').addEventListener('click',()=>$('#quit-dialog').close());$('#quit-confirm').addEventListener('click',()=>$('#quit-dialog').close());$('#drawer-close').addEventListener('click',closeDrawer);$('#drawer-shade').addEventListener('click',closeDrawer);document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('#crew-drawer').classList.contains('open'))closeDrawer();});$$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));const mode=difficulty[state.difficulty];$('#modifier-badge').textContent=`${money(mode.budget)} BUDGET · ${mode.risk}`;renderTelemetry();renderLanding();}));$$('.rocket-stage').forEach(button=>button.addEventListener('click',()=>selectStage(button.dataset.stage)));$$('#category-tabs button').forEach(button=>button.addEventListener('click',()=>{state.category=button.dataset.category;renderCatalog();}));$$('.step').forEach(button=>button.addEventListener('click',()=>{state.step=Number(button.dataset.step);renderSteps();}));$('#fuel-slider').addEventListener('input',event=>{state.fuel=Number(event.target.value);renderTelemetry();renderLanding();});$('#aerobraking-toggle').addEventListener('click',()=>{state.aerobraking=!state.aerobraking;renderTelemetry();renderLanding();});$('#parachute-toggle').addEventListener('click',()=>{state.parachute=!state.parachute;renderTelemetry();renderLanding();});$('#step-back').addEventListener('click',()=>{if(state.step===0)showScreen('lobby');else{state.step--;renderSteps();}});$('#step-next').addEventListener('click',()=>{if(state.step<2){state.step++;renderSteps();}else showLaunch();});$('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());$('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();window.ASTRO_SIM?.startFlight();});
-  $$('[data-site]').forEach(button=>button.addEventListener('click',()=>$('.mission-preview').classList.toggle('gale',button.dataset.site==='gale')));
+  $$('[data-world]').forEach(button=>button.addEventListener('click',()=>{const w=button.dataset.world;toast(w==='mars'?'Mars is the destination of this mission.':w==='earth'?'Earth is the launch origin. Select Mars to plan the mission.':`${WORLD_NAMES[w]} is not available yet. This prototype only opens Mars.`);}));
+  $$('[data-site]').forEach(button=>button.addEventListener('click',()=>{state.site=button.dataset.site;state.detail={kind:'site',id:state.site};renderLobby();}));
+  $('#play-button').addEventListener('click',()=>{const go=()=>showScreen('orbit');window.ASTRO_LAUNCH?window.ASTRO_LAUNCH().then(go):go();});
+  $('#lobby-back').addEventListener('click',()=>showScreen('orbit'));
+  $('#to-assembly').addEventListener('click',()=>showScreen('planner'));
+  $('#planner-back').addEventListener('click',()=>showScreen('lobby'));
+  $('#quit-button').addEventListener('click',()=>$('#quit-dialog').showModal());
+  $('#quit-cancel').addEventListener('click',()=>$('#quit-dialog').close());
+  $('#quit-confirm').addEventListener('click',()=>$('#quit-dialog').close());
+  $$('#difficulty-buttons button').forEach(button=>button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;$$('#difficulty-buttons button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));renderBadge();renderTelemetry();}));
+  $('#launch-button').addEventListener('click',showLaunch);
+  $('#launch-close').addEventListener('click',()=>$('#launch-dialog').close());
+  $('#launch-confirm').addEventListener('click',()=>{$('#launch-dialog').close();window.ASTRO_SIM?.startFlight();});
   // Low-poly art: planets and terrain are flat-shaded triangles, like the 3D models.
   const RAMPS = {
     mars:['#3a0f1c','#8F241E','#b8391f','#E04F26','#EE7B57','#f6a07f'],
@@ -795,7 +902,13 @@
     rock:['#1a1022','#33263a','#4d3d4c','#6b5a62','#8e7c7c','#b3a196'],
     jezero:['#2a0f22','#4a1420','#8F241E','#b8391f','#E04F26','#EE7B57'],
     gale:['#24101f','#3f1d24','#6e3324','#9c5129','#c27a3a','#e0a35a'],
-    ground:['#1D1128','#3a1424','#5e1d22','#8F241E','#b8391f','#E04F26']
+    ground:['#1D1128','#3a1424','#5e1d22','#8F241E','#b8391f','#E04F26'],
+    mercury:['#2a2428','#4a4246','#6e6468','#948a88','#b8aea6','#d8d0c6'],
+    venus:['#5a4a2a','#8c7442','#bfa065','#dcc288','#efdcab','#fbf0d0'],
+    saturn:['#4a3b25','#7d6542','#b09460','#d4ba82','#ead6a6','#f8ecc9'],
+    saturnBand:['#3e2f1e','#6b5236','#957650','#b89a6a','#d2b88a','#e8d6ae'],
+    uranus:['#1c3d48','#2f6573','#4f97a5','#7cc2cc','#aee0e3','#dff5f5'],
+    neptune:['#0d1a4a','#1a2f7a','#2b4fb0','#4672d4','#7c9fe8','#b9cdf6']
   };
   const random = seed => { let s = (seed * 9973) % 2147483647 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; };
   const unit = v => { const l = Math.hypot(...v) || 1; return v.map(x => x / l); };
@@ -842,7 +955,12 @@
   const PLANETS = {
     mars: { ramp: RAMPS.mars, regions: [{ test: (x, y) => y < -.8, ramp: RAMPS.ice }, { test: (x, y) => Math.sin(x * 4.2 + 1.3) * Math.cos(y * 3.1 - .4) > .42, ramp: RAMPS.marsDark }] },
     earth: { ramp: RAMPS.ocean, regions: [{ test: (x, y) => Math.abs(y) > .82, ramp: RAMPS.ice }, { test: (x, y) => Math.sin(x * 3.3 + .6) + Math.cos(y * 4.1 + x * 1.7) > .9, ramp: RAMPS.land }] },
-    jupiter: { ramp: RAMPS.jupiter, regions: [{ test: (x, y) => Math.floor((y + 1) * 3.2) % 2 === 1, ramp: RAMPS.jupiterBand }] }
+    jupiter: { ramp: RAMPS.jupiter, regions: [{ test: (x, y) => Math.floor((y + 1) * 3.2) % 2 === 1, ramp: RAMPS.jupiterBand }] },
+    mercury: { ramp: RAMPS.mercury },
+    venus: { ramp: RAMPS.venus },
+    saturn: { ramp: RAMPS.saturn, regions: [{ test: (x, y) => Math.floor((y + 1) * 3.6) % 2 === 1, ramp: RAMPS.saturnBand }] },
+    uranus: { ramp: RAMPS.uranus },
+    neptune: { ramp: RAMPS.neptune, regions: [{ test: (x, y) => Math.hypot(x + .3, y + .25) < .22, ramp: RAMPS.ocean }] }
   };
   // Landscape: rows of jittered vertices from a silhouette profile down to the bottom edge.
   function facetTerrain({ profile, ramp, seed = 1, w = 160, h = 100, cols = 12, rows = 5 }) {
@@ -886,16 +1004,13 @@
     $('.earth .planet-disc').innerHTML = facetPlanet({ ...PLANETS.earth, seed: 2, rings: [5, 10, 15] });
     $('.mars-target .planet-disc').innerHTML = facetPlanet({ ...PLANETS.mars, seed: 8, rings: [6, 12, 17] });
     $('.jupiter .planet-disc').innerHTML = facetPlanet({ ...PLANETS.jupiter, seed: 6, rings: [6, 12, 18] });
-    $('.preview-base').innerHTML = siteScene('jezero') + siteScene('gale');
-    $('.landing-art .ground').innerHTML = `<svg viewBox="0 0 160 60" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${facetTerrain({ ramp: RAMPS.ground, seed: 12, w: 160, h: 60, cols: 14, rows: 4, profile: [[0, .25], [.2, .12], [.35, .3], [.55, .18], [.7, .32], [.85, .15], [1, .28]] })}</svg>`;
+    $$('.site-thumb .thumb-art').forEach(el => { el.innerHTML = siteScene(el.parentElement.dataset.site); });
   }
-  window.ASTRO_ART={RAMPS,PLANETS};window.ASTRO={state,parts,stages,crew,metrics,CREW_MODELS,COCKPIT_MODEL,showScreen,toast};
-  paintArt();renderCrew();renderPlanner();setupStars();
-
   // ===========================================================================
   // PHASES 5–7 SIMULATION ENGINE & RAD SOUNDSCAPE (Cockpit -> Mars Surface -> Results)
   // ===========================================================================
   const SIM = (() => {
+    const TARGET_FUEL = 100;
     const radAudio = {
       muted: false,
       bed: null,
@@ -1024,22 +1139,24 @@
     }
 
     function startFlight() {
-      const m = metrics();
+      const r = state.rocket;
+      const installed = new Set([r.booster.engine, r.booster.tank, ...r.stages.map(s => s.item), ...r.cabin].filter(Boolean));
+      const m = DATA ? metrics() : { cost: 0, mass: 0, draw: 0, gen: 0, dv: 0, budget: budgetOf(state.difficulty), leo: 9400, twr: 0, ready: false };
       flight.design = {
         ...m,
-        overweight: m.mass > 42000,
+        overweight: !m.ready || m.twr < TWR_MIN(),
         overBudget: m.cost > m.budget,
-        powerDeficit: m.powerGeneration < m.powerDraw,
-        lowDv: m.dv < 10500,
-        hasHera: state.equipped.has('hera'),
-        hasShelter: state.equipped.has('shelter'),
-        hasCockpitUpgrade: state.equipped.has('orion_cockpit'),
-        hasLoftid: state.equipped.has('shield'),
-        hasTrn: state.equipped.has('legs'),
-        hasDrill: state.equipped.has('drill'),
-        hasSpec: state.equipped.has('spectrometer'),
-        hasDna: state.equipped.has('msg_dna'),
-        hasDish: state.equipped.has('dish'),
+        powerDeficit: m.gen < m.draw,
+        lowDv: !m.ready || m.dv < m.leo,
+        hasHera: installed.has('cabin-hera-dosimetry'),
+        hasShelter: installed.has('cabin-storm-shelter') || installed.has('hab-veggie-rad-astrorad'),
+        hasCockpitUpgrade: installed.has('cabin-orion-cockpit') || installed.has('cabin-autonav-conjunction'),
+        hasLoftid: installed.has('edl-aspire-loftid'),
+        hasTrn: installed.has('edl-trn-medli2'),
+        hasDrill: installed.has('drill-corer-cryo') || installed.has('sci-seis-caching'),
+        hasSpec: installed.has('sci-pixl-sherloc-supercam') || installed.has('sci-hirise-sharad') || installed.has('truss-ingenuity'),
+        hasDna: installed.has('cabin-msg-minion'),
+        hasDish: installed.has('comm-dsoc-laser') || installed.has('comm-electra-marco') || installed.has('comm-rise-xband') || installed.has('cabin-scan-console'),
       };
       flight.active = true;
       flight.step = 0;
@@ -1067,7 +1184,7 @@
 
       $('#flight-log').innerHTML = '';
       logFlight('T-00:00 Flight Deck online. Camera_Pilot locked.');
-      if (flight.design.overweight) logFlight('ALERT: Overweight launch stack (>42,000 kg) — high aerodynamic buffet!');
+      if (flight.design.overweight) logFlight('ALERT: Low liftoff TWR (<1.2) or incomplete booster — high aerodynamic buffet!');
       if (flight.design.powerDeficit) logFlight('ALERT: Electrical bus deficit — inspect Breaker_Bank.');
       if (flight.design.overBudget) logFlight('CAUTION: Mission exceeded budget — finance penalty logged.');
       showScreen('cockpit');
@@ -1087,7 +1204,7 @@
         radAudio.tone(320, 0.14, 'sawtooth', 0.06);
       } else if (nextStep === 2) {
         flight.radRate = 810;
-        logFlight(`ORBIT ACHIEVED. Target refueling reserve: ${state.fuel}%. MSL RAD warns of 810 µGy/h solar particle event!`);
+        logFlight(`ORBIT ACHIEVED. Target refueling reserve: ${TARGET_FUEL}%. MSL RAD warns of 810 µGy/h solar particle event!`);
         radAudio.tone(660, 0.12, 'triangle', 0.05);
       } else if (nextStep === 3) {
         flight.altKm = 125;
@@ -1134,9 +1251,9 @@
         toast('Reset all tripped Breaker_Bank switches before stage separation.');
       } else if (actionId === 'pump_fuel') {
         if (flight.step === 2) {
-          flight.refuelDone = Math.min(state.fuel, flight.refuelDone + 25);
-          flight.progress = Math.min(100, (flight.refuelDone / state.fuel) * 100);
-          logFlight(`Orbital propellant transfer: ${flight.refuelDone}% / ${state.fuel}%.`);
+          flight.refuelDone = Math.min(TARGET_FUEL, flight.refuelDone + 25);
+          flight.progress = Math.min(100, (flight.refuelDone / TARGET_FUEL) * 100);
+          logFlight(`Orbital propellant transfer: ${flight.refuelDone}% / ${TARGET_FUEL}%.`);
           radAudio.tone(500, 0.06, 'sine', 0.04);
         }
       } else if (actionId === 'shield_storm') {
@@ -1147,13 +1264,13 @@
       } else if (actionId === 'edl_arm') {
         if (flight.step === 3 && !flight.edlChuteDeployed) {
           flight.edlChuteDeployed = true;
-          const bonus = (state.parachute || flight.design.hasLoftid) ? 18 : 6;
+          const bonus = (flight.design.hasTrn || flight.design.hasLoftid) ? 18 : 6;
           flight.stability = Math.min(100, flight.stability + bonus);
-          logFlight(`EDL_Arm_Switch ON! ${state.parachute || flight.design.hasLoftid ? 'Supersonic parachute & LOFTID shield inflated.' : 'Backup drogue chute deployed!'}`);
+          logFlight(`EDL_Arm_Switch ON! ${flight.design.hasTrn || flight.design.hasLoftid ? 'Supersonic parachute & LOFTID shield inflated.' : 'Backup drogue chute deployed!'}`);
           radAudio.tone(820, 0.12, 'triangle', 0.06);
         }
       } else if (actionId === 'complete_step') {
-        if (flight.step === 2 && flight.refuelDone >= state.fuel) {
+        if (flight.step === 2 && flight.refuelDone >= TARGET_FUEL) {
           if (!flight.stormShielded && !flight.design.hasHera) {
             flight.score -= 10;
             logFlight('Radiation dose absorbed during unshielded solar storm (-10 pts).');
@@ -1171,7 +1288,7 @@
     function finishFlightAndLand() {
       flight.active = false;
       cancelAnimationFrame(flight.raf);
-      const hasEdlHardware = state.aerobraking || state.parachute || flight.design.hasLoftid || flight.design.hasTrn;
+      const hasEdlHardware = flight.design.hasLoftid || flight.design.hasTrn;
       if (!flight.edlChuteDeployed || !hasEdlHardware) {
         flight.hull = Math.max(45, flight.hull - 20);
         flight.score -= 12;
@@ -1220,7 +1337,7 @@
         const descentRate = flight.edlChuteDeployed ? 18 : 11;
         flight.progress = Math.min(100, flight.progress + dt * descentRate);
         flight.altKm = Math.max(0, 125 * (1 - flight.progress / 100));
-        const brakeFactor = (flight.edlChuteDeployed ? 0.55 : 0.92) * (state.aerobraking || flight.design.hasLoftid ? 0.8 : 1);
+        const brakeFactor = (flight.edlChuteDeployed ? 0.55 : 0.92) * (flight.design.hasLoftid ? 0.8 : 1);
         flight.velMs = Math.max(2, Math.round(5400 * (1 - flight.progress / 100) * brakeFactor));
         flight.pitchX += Math.sin(now * 0.0031) * (flight.design.hasTrn ? 0.14 : 0.35) * dt;
         if (flight.progress >= 100) {
@@ -1241,7 +1358,7 @@
       $('#flight-vel-val').textContent = number(flight.velMs) + ' m/s';
       $('#flight-hull-val').textContent = `${Math.round(flight.propellant)}% / ${Math.round(flight.hull)}%`;
       $('#flight-goal-val').textContent = Math.round(flight.stability) + '%';
-      setWidth('#flight-goal-fill', flight.stability, 100, flight.stability < 55);
+      setBar('#flight-goal-fill', flight.stability / 100, flight.stability < 55 ? 'danger' : '');
 
       const pip = $('#cockpit-pip');
       if (pip) {
@@ -1253,7 +1370,7 @@
       $('#cockpit-alert-tag').textContent = hasAlert ? 'C&W MATRIX ALERT ACTIVE' : 'ALL SYSTEMS NOMINAL';
       $('#cockpit-rad-tag').textContent = `MSL RAD: ${flight.radRate} µGy/h`;
       const actionBtn = $('#cockpit-complete-btn');
-      if (actionBtn && flight.step === 2) actionBtn.disabled = flight.refuelDone < state.fuel;
+      if (actionBtn && flight.step === 2) actionBtn.disabled = flight.refuelDone < TARGET_FUEL;
     }
 
     function renderFlightUI() {
@@ -1275,7 +1392,7 @@
         box.innerHTML = `
           <span class="eyebrow">Helena · Minigame H-O1</span>
           <h4>Throttle &amp; Attitude Corridor</h4>
-          <p>Push <b>Throttle_Lever</b> above 70% and keep the amber diamond centered inside the reticle with <b>Joystick_RHC</b> or WASD.${flight.design.overweight ? ' <b>(Overweight buffet active!)</b>' : ''}</p>
+          <p>Push <b>Throttle_Lever</b> above 70% and keep the amber diamond centered inside the reticle with <b>Joystick_RHC</b> or WASD.${flight.design.overweight ? ' <b>(Low TWR buffet active!)</b>' : ''}</p>
           <div class="control-grid">
             <button class="button primary" type="button" data-act="throttle_up">Push Throttle (${Math.round(flight.throttle * 100)}%)</button>
             <button class="button secondary" type="button" data-act="stabilize">Center RHC Attitude</button>
@@ -1290,18 +1407,18 @@
       } else if (flight.step === 2) {
         box.innerHTML = `
           <span class="eyebrow">Oscar &amp; Maya · Phase 06A</span>
-          <h4>Refuel (${state.fuel}%) &amp; Shield Solar Storm</h4>
+          <h4>Refuel (${TARGET_FUEL}%) &amp; Shield Solar Storm</h4>
           <p>Cryogenic tanker docked. Pump fuel to your planned reserve and shield the crew from the 810 µGy/h storm (2024-05-20 RAD dataset).</p>
           <div class="control-grid">
-            <button class="button secondary" type="button" data-act="pump_fuel">Pump Fuel (${flight.refuelDone}/${state.fuel}%)</button>
+            <button class="button secondary" type="button" data-act="pump_fuel">Pump Fuel (${flight.refuelDone}/${TARGET_FUEL}%)</button>
             <button class="button secondary" type="button" data-act="shield_storm" ${flight.stormShielded ? 'disabled' : ''}>${flight.stormShielded ? 'Shelter Sealed ✓' : flight.design.hasShelter ? 'Seal Storm Shelter' : 'Deploy Water Wall'}</button>
           </div>
-          <button class="button primary" id="cockpit-complete-btn" type="button" data-act="complete_step" ${flight.refuelDone < state.fuel ? 'disabled' : ''}>Commit to Mars EDL →</button>`;
+          <button class="button primary" id="cockpit-complete-btn" type="button" data-act="complete_step" ${flight.refuelDone < TARGET_FUEL ? 'disabled' : ''}>Commit to Mars EDL →</button>`;
       } else {
         box.innerHTML = `
           <span class="eyebrow">Helena · Minigame H-S1/S2</span>
           <h4>Mars Thin-Air EDL Approach</h4>
-          <p>Arm <b>EDL_Arm_Switch</b> to deploy parachute/heat-shield (${state.aerobraking || flight.design.hasLoftid ? 'LOFTID + ASPIRE armed' : 'No extra heat-shield!'}) and stabilize for touchdown.</p>
+          <p>Arm <b>EDL_Arm_Switch</b> to deploy parachute/heat-shield (${flight.design.hasLoftid ? 'LOFTID + ASPIRE armed' : 'No extra heat-shield!'}) and stabilize for touchdown.</p>
           <div class="control-grid">
             <button class="button primary" type="button" data-act="edl_arm" ${flight.edlChuteDeployed ? 'disabled' : ''}>${flight.edlChuteDeployed ? 'Chute Deployed ✓' : 'Flip EDL_Arm_Switch'}</button>
             <button class="button secondary" type="button" data-act="stabilize">${flight.design.hasTrn ? 'TRN Hazard Avoid' : 'Manual THC Flare'}</button>
@@ -1573,7 +1690,7 @@
       const tasksDone = surf.completed.size;
       const scienceBonus = (d.hasDrill ? 6 : 0) + (d.hasSpec ? 6 : 0) + (d.hasDna ? 6 : 0) + (d.hasDish ? 5 : 0);
       const returnBonus = forcedTimeout ? (surf.stranded.length ? -18 : 4) : 18;
-      const edlBonus = (state.aerobraking && state.parachute) || (d.hasLoftid && d.hasTrn) ? 14 : 4;
+      const edlBonus = (d.hasLoftid && d.hasTrn) ? 14 : (d.hasLoftid || d.hasTrn) ? 9 : 4;
       const timeBonus = Math.round(surf.timerSec * 0.08);
       const total = Math.max(150, Math.round((flight.score * 6.5) + tasksDone * 140 + scienceBonus * 5 + edlBonus * 6 + returnBonus * 6 + timeBonus));
       const grade = total >= 1150 ? 'S+' : total >= 950 ? 'A' : total >= 740 ? 'B' : 'C';
@@ -1608,7 +1725,7 @@
         </div>`).join('');
 
       $('#results-breakdown').innerHTML = [
-        ['Budget & Mass', `${d.overBudget ? 'Exceeded' : 'On budget'} · ${d.overweight ? 'Overweight buffet' : 'Within 42 t limit'}`],
+        ['Budget & TWR', `${d.overBudget ? 'Exceeded' : 'On budget'} · ${d.overweight ? 'Low TWR buffet' : 'Liftoff TWR nominal'}`],
         ['EDL Landing', `${flight.edlChuteDeployed ? 'Chute deployed' : 'Hard burn'} · ${hasEdlLabel(d)}`],
         ['Solar Storm (RAD)', flight.stormShielded || d.hasShelter ? 'Shielded (low dose)' : 'Unshielded exposure'],
         ['Surface Window', forcedTimeout ? (surf.stranded.length ? `Timeout — stranded: ${surf.stranded.join(', ')}` : 'Returned on timer') : `Cleared with ${Math.floor(surf.timerSec)}s margin`],
@@ -1625,7 +1742,7 @@
     }
 
     function hasEdlLabel(d) {
-      if (state.aerobraking && state.parachute) return 'Full EDL suite';
+      if (d.hasLoftid && d.hasTrn) return 'Full EDL suite';
       if (d.hasLoftid || d.hasTrn) return 'Cabin EDL gear';
       return 'Minimal EDL gear';
     }
@@ -1643,34 +1760,40 @@
     }, flight, surf };
   })();
   window.ASTRO_SIM = SIM;
+  // Shared with the 3D modules below.
+  function renderBadge(){$('#modifier-badge').textContent=`${money(budgetOf(state.difficulty))} · ${difficulty[state.difficulty].risk}`;}
+  window.ASTRO_ART={RAMPS,PLANETS};
+  window.ASTRO={state,crew,data:()=>DATA,selectedKey:()=>moduleKey(state.sel),select:(key,tab)=>selectModule(key,tab),CREW_MODELS,COCKPIT_MODEL,showScreen,toast};
+  paintArt();renderLobby();renderBadge();renderPlanner();setupStars();
+  if(!DATA)fetch('godot/assets/models/parts/manifest.json').then(r=>r.json()).then(m=>{useData(m);renderBadge();renderPlanner();}).catch(()=>toast('Could not load the part specs.'));
 })();
 </script>
-<script src="index.models.js"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
 <script type="module">
-// 3D orbit map: flat-shaded icospheres orbit the Sun. The HTML buttons follow each planet,
-// so clicks, labels and the selection reticle stay accessible. Without WebGL the 2D map stays.
+// 3D solar system: flat-shaded icospheres orbit the Sun. Orbital periods (sidereal, years) and axial
+// tilts (degrees) are real, from the NASA NSSDC Planetary Fact Sheet; distances and sizes are stylized.
+// Only Mars is open in this prototype, so it gets a faceted aura and a highlighted orbit.
+// The HTML buttons follow each planet, so clicks and labels stay accessible. Without WebGL the 2D map stays.
 import * as THREE from 'three';
 const art = window.ASTRO_ART, system = document.querySelector('.orbit-system'), screen = document.getElementById('orbit');
 let renderer;
 try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); } catch { renderer = null; }
 if (art && system && renderer) {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(32, 1, .1, 100);
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(32, 1, .1, 120);
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   system.prepend(renderer.domElement);
   system.classList.add('is-3d');
   scene.add(new THREE.AmbientLight(0xb48cf0, 1.1));
-  const sunLight = new THREE.PointLight(0xfce8a6, 5, 0, 0);
-  scene.add(sunLight);
+  scene.add(new THREE.PointLight(0xfce8a6, 5, 0, 0));
 
-  // One flat colour per face, picked from the same ramps as the 2D art (index 2–4 = lit tones).
+  // One flat colour per face, from the same ramps as the 2D art (indices 2–4 = lit tones).
   function faceted(radius, detail, { ramp, regions = [] }, seed, basic = false) {
     const geo = new THREE.IcosahedronGeometry(radius, detail), pos = geo.attributes.position, colors = [];
     let s = seed; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
-    const c = new THREE.Color(), v = new THREE.Vector3();
+    const c = new THREE.Color(), v = new THREE.Vector3(), w = new THREE.Vector3();
     for (let i = 0; i < pos.count; i += 3) {
-      v.set(0, 0, 0); for (let k = 0; k < 3; k++) v.add(new THREE.Vector3().fromBufferAttribute(pos, i + k));
+      v.set(0, 0, 0); for (let k = 0; k < 3; k++) v.add(w.fromBufferAttribute(pos, i + k));
       v.normalize();
       const region = regions.find(r => r.test(v.x, -v.y)), r = region ? region.ramp : ramp;
       c.set(r[2 + Math.floor(rnd() * 3)]);
@@ -1680,32 +1803,55 @@ if (art && system && renderer) {
     const mat = basic ? new THREE.MeshBasicMaterial({ vertexColors: true }) : new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
     return new THREE.Mesh(geo, mat);
   }
-  const sun = faceted(.62, 1, { ramp: art.RAMPS.sun }, 7, true);
+  const sun = faceted(.55, 1, { ramp: art.RAMPS.sun }, 7, true);
   scene.add(sun);
 
-  // Radii are stylized; orbital periods (years) and axial tilts (degrees) are real.
+  const YEAR = 36; // seconds per Earth year on screen
   const worlds = [
-    { id: 'earth', radius: 2.6, size: .3, period: 1, tilt: 23.4, angle: 200, detail: 2, look: art.PLANETS.earth, seed: 2 },
-    { id: 'mars', radius: 3.85, size: .26, period: 1.881, tilt: 25.2, angle: 20, detail: 2, look: art.PLANETS.mars, seed: 8 },
-    { id: 'jupiter', radius: 5.6, size: .5, period: 11.86, tilt: 3.1, angle: -50, detail: 2, look: art.PLANETS.jupiter, seed: 6 }
+    { id: 'mercury', radius: 1.2, size: .11, period: .2408, tilt: .03, angle: 120, seed: 3 },
+    { id: 'venus', radius: 1.7, size: .19, period: .6152, tilt: 177.4, angle: 300, seed: 4 },
+    { id: 'earth', radius: 2.3, size: .2, period: 1, tilt: 23.4, angle: 200, seed: 2 },
+    { id: 'mars', radius: 2.95, size: .17, period: 1.8808, tilt: 25.2, angle: 20, seed: 8 },
+    { id: 'jupiter', radius: 4.65, size: .42, period: 11.862, tilt: 3.1, angle: -50, seed: 6 },
+    { id: 'saturn', radius: 5.6, size: .34, period: 29.457, tilt: 26.7, angle: 140, seed: 9, rings: true },
+    { id: 'uranus', radius: 6.45, size: .26, period: 84.011, tilt: 97.8, angle: 250, seed: 10 },
+    { id: 'neptune', radius: 7.2, size: .25, period: 164.79, tilt: 28.3, angle: 70, seed: 11 }
   ].map(w => {
-    const pivot = new THREE.Group(), mesh = faceted(w.size, w.detail, w.look, w.seed);
+    const pivot = new THREE.Group(), mesh = faceted(w.size, 2, art.PLANETS[w.id], w.seed);
     pivot.rotation.z = THREE.MathUtils.degToRad(w.tilt);
     pivot.add(mesh); scene.add(pivot);
+    if (w.rings) [[1.35, 1.8, 0xb89a62], [1.9, 2.3, 0xe2cf9c]].forEach(([a, b, color]) => {
+      const ring = new THREE.Mesh(new THREE.RingGeometry(w.size * a, w.size * b, 18, 1).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color, side: THREE.DoubleSide, flatShading: true }));
+      pivot.add(ring);
+    });
     const button = system.querySelector(`[data-world="${w.id}"]`);
     const world = { ...w, pivot, mesh, button, hover: 0 };
-    button.addEventListener('pointerenter', () => { world.hovered = true; });
-    button.addEventListener('pointerleave', () => { world.hovered = false; });
+    button?.addEventListener('pointerenter', () => { world.hovered = true; });
+    button?.addEventListener('pointerleave', () => { world.hovered = false; });
     return world;
   });
+  const mars = worlds.find(w => w.id === 'mars');
+  // Aura: two faceted shells seen from inside, additive, pulsing.
+  const aura = new THREE.Group();
+  [[1.9, 0xe04f26, .3], [2.7, 0xf59e0b, .12]].forEach(([k, color, opacity]) => aura.add(new THREE.Mesh(new THREE.IcosahedronGeometry(mars.size * k, 1), new THREE.MeshBasicMaterial({ color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide }))));
+  mars.pivot.add(aura);
 
-  const ringMat = new THREE.LineDashedMaterial({ color: 0xc9a6ff, transparent: true, opacity: .32, dashSize: .12, gapSize: .08 });
-  const loop = (r, n) => new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: n }, (_, k) => new THREE.Vector3(r * Math.cos(k / n * Math.PI * 2), 0, -r * Math.sin(k / n * Math.PI * 2)))), ringMat).computeLineDistances();
-  [1.35, 2.6, 3.85, 5.6].forEach(r => scene.add(loop(r, 40)));
+  // Orbits: dashed 48-gons; Mars' orbit solid orange.
+  const dashed = new THREE.LineDashedMaterial({ color: 0xc9a6ff, transparent: true, opacity: .28, dashSize: .12, gapSize: .09 });
+  const marsLine = new THREE.LineBasicMaterial({ color: 0xe04f26, transparent: true, opacity: .75 });
+  for (const w of worlds) {
+    const loop = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 48 }, (_, k) => new THREE.Vector3(w.radius * Math.cos(k / 48 * Math.PI * 2), 0, -w.radius * Math.sin(k / 48 * Math.PI * 2)))), w === mars ? marsLine : dashed);
+    loop.computeLineDistances(); scene.add(loop);
+  }
+  // Main asteroid belt between Mars and Jupiter (Ceres takes ~4.6 years per orbit).
+  const belt = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.032, 0), new THREE.MeshLambertMaterial({ color: 0x8e7c7c, flatShading: true }), 170);
+  { let s = 21; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647, m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
+    for (let i = 0; i < belt.count; i++) { const a = rnd() * Math.PI * 2, r = 3.45 + rnd() * .75, k = .6 + rnd(); belt.setMatrixAt(i, m.compose(new THREE.Vector3(r * Math.cos(a), (rnd() - .5) * .14, r * Math.sin(a)), q.setFromEuler(e.set(rnd() * 6, rnd() * 6, 0)), new THREE.Vector3(k, k, k))); } }
+  scene.add(belt);
   // Hohmann-style transfer: always starts at Earth and ends half an orbit later on Mars' orbit.
   const transfer = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineDashedMaterial({ color: 0xf59e0b, dashSize: .14, gapSize: .1 }));
   scene.add(transfer);
-  const r1 = 2.6, r2 = 3.85, e = (r2 - r1) / (r2 + r1), p = (r1 + r2) / 2 * (1 - e * e);
+  const r1 = 2.3, r2 = 2.95, ecc = (r2 - r1) / (r2 + r1), p = (r1 + r2) / 2 * (1 - ecc * ecc);
 
   const marker = system.querySelector('.orbit-marker'), v = new THREE.Vector3(), edge = new THREE.Vector3();
   let width = 0, height = 0, time = 0, speed = 1, last = performance.now();
@@ -1715,9 +1861,9 @@ if (art && system && renderer) {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     const vHalf = THREE.MathUtils.degToRad(camera.fov / 2), hHalf = Math.atan(Math.tan(vHalf) * camera.aspect);
-    const d = Math.max(6.4 / Math.tan(hHalf), 4.4 / Math.tan(vHalf)), tilt = THREE.MathUtils.degToRad(30);
+    const d = Math.max(7.7 / Math.tan(hHalf), 4.9 / Math.tan(vHalf)), tilt = THREE.MathUtils.degToRad(30);
     camera.position.set(0, d * Math.sin(tilt), d * Math.cos(tilt));
-    camera.lookAt(0, -.35, 0);
+    camera.lookAt(0, -.4, 0);
     camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(system);
@@ -1730,26 +1876,29 @@ if (art && system && renderer) {
     // Slow down while a planet is hovered, so it is easy to click.
     speed += ((worlds.some(w => w.hovered) ? .12 : 1) - speed) * .1;
     if (!reduce) time += dt * speed;
-    const yearSeconds = 36;
     sun.rotation.y = time * .15;
+    belt.rotation.y = -time * Math.PI * 2 / (4.6 * YEAR);
+    aura.rotation.y = time * .4;
+    aura.scale.setScalar(1 + Math.sin(time * 2.4) * .1);
     for (const w of worlds) {
-      const a = THREE.MathUtils.degToRad(w.angle) + time * Math.PI * 2 / (w.period * yearSeconds);
+      const a = THREE.MathUtils.degToRad(w.angle) + time * Math.PI * 2 / (w.period * YEAR);
+      w.theta = a;
       w.pivot.position.set(w.radius * Math.cos(a), 0, -w.radius * Math.sin(a));
       w.mesh.rotation.y = time * .9 / Math.sqrt(w.size);
       w.hover += ((w.hovered ? 1 : 0) - w.hover) * .2;
-      w.pivot.scale.setScalar(1 + w.hover * .18);
-      w.theta = a;
+      w.pivot.scale.setScalar(1 + w.hover * .2);
+      if (!w.button) continue;
       // Keep the button centred on the planet and as big as its projection.
       const [x, y] = toScreen(v.copy(w.pivot.position));
       edge.copy(camera.up).cross(v.copy(camera.position).sub(w.pivot.position)).normalize().multiplyScalar(w.size).add(w.pivot.position);
-      const [ex, ey] = toScreen(edge), size = Math.max(26, 2 * Math.hypot(ex - x, ey - y));
+      const [ex, ey] = toScreen(edge), size = Math.max(22, 2 * Math.hypot(ex - x, ey - y));
       Object.assign(w.button.style, { left: x + 'px', top: y + 'px', width: size + 'px', height: size + 'px' });
       if (w.id === 'earth' && marker) Object.assign(marker.style, { left: x + 'px', top: (y - size / 2 - 8) + 'px' });
     }
-    const t0 = worlds[0].theta;
+    const earth = worlds.find(w => w.id === 'earth').theta;
     transfer.geometry.setFromPoints(Array.from({ length: 25 }, (_, k) => {
-      const t = k / 24 * Math.PI, r = p / (1 + e * Math.cos(t));
-      return new THREE.Vector3(r * Math.cos(t0 + t), 0, -r * Math.sin(t0 + t));
+      const t = k / 24 * Math.PI, r = p / (1 + ecc * Math.cos(t));
+      return new THREE.Vector3(r * Math.cos(earth + t), 0, -r * Math.sin(earth + t));
     }));
     transfer.computeLineDistances();
     renderer.render(scene, camera);
@@ -1759,8 +1908,8 @@ if (art && system && renderer) {
 }
 </script>
 <script type="module">
-// 3D rockets built from the generated GLBs (godot/assets/models):
-// the Saturn V flying on the menu, and the planner's stack assembled from the equipped parts.
+// 3D views built from the generated GLBs (godot/assets/models): the Saturn V flying on the menu,
+// the selected crew member in the lobby and the rocket the crew is building in the planner.
 // Models come from index.models.js (works from file://) or, when served, straight from the folder.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -1768,16 +1917,17 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const loader = new GLTFLoader(), cache = new Map();
-function loadGLB(path) {
+function loadGLTF(path) {
   if (!cache.has(path)) cache.set(path, (async () => {
     const b64 = window.ASTRO_GLB?.[path];
     let data;
     if (b64) { const bin = atob(b64); data = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) data[i] = bin.charCodeAt(i); data = data.buffer; }
     else data = await (await fetch('godot/assets/models/' + path)).arrayBuffer();
-    return (await loader.parseAsync(data, '')).scene;
+    return loader.parseAsync(data, '');
   })());
-  return cache.get(path).then(scene => scene.clone(true));
+  return cache.get(path);
 }
+const loadGLB = path => loadGLTF(path).then(gltf => gltf.scene.clone(true));
 // One renderer per view, lit like the rest of the identity: cream key light, purple fill, Mars-orange rim.
 function makeView(container, { fov = 30, append = false } = {}) {
   let renderer;
@@ -1862,100 +2012,275 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   requestAnimationFrame(frame);
 })().catch(err => console.warn('Saturn V not shown:', err));
 
-// Planner: exploded stack. Shells are the cutaway stages; engines hang below each stage,
-// equipment stands inside the open bay. Disabled stages are drawn as ghosts.
+// Lobby: the selected crew member (avatar GLB): idle loop, a wave when picked again.
+(async () => {
+  const box = document.getElementById('detail-view'), view = box && makeView(box, { fov: 24 });
+  if (!view) return;
+  const AVATARS = { helena: 'characters/helena.glb', lucas: 'characters/lucas.glb', oscar: 'characters/oscar.glb', maya: 'characters/maya.glb' };
+  const { scene, camera } = view, holder = new THREE.Group();
+  scene.add(holder);
+  let mixer = null, idle = null, wave = null, current = null, last = performance.now(), token = 0;
+  view.onResize = () => { const d = 1.3 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / Math.min(1, camera.aspect * 1.1); camera.position.set(0, 1.15, d); camera.lookAt(0, .95, 0); };
+  async function show(id) {
+    if (!AVATARS[id]) return;
+    if (id === current) { if (wave && idle) { wave.reset().play(); wave.crossFadeFrom(idle, .2, false); } return; }
+    current = id;
+    const mine = ++token, gltf = await loadGLTF(AVATARS[id]);
+    if (mine !== token) return;
+    const model = gltf.scene.clone(true);
+    holder.clear(); holder.add(model);
+    mixer = new THREE.AnimationMixer(model);
+    const clip = name => THREE.AnimationClip.findByName(gltf.animations, name);
+    idle = clip('idle_loop') && mixer.clipAction(clip('idle_loop'));
+    wave = clip('wave') && mixer.clipAction(clip('wave'));
+    if (wave) { wave.setLoop(THREE.LoopOnce, 1); wave.clampWhenFinished = false; }
+    mixer.addEventListener('finished', () => idle?.reset().fadeIn(.2).play());
+    idle?.play();
+  }
+  window.addEventListener('astro:detail', e => { if (e.detail.kind === 'crew') show(e.detail.id); });
+  if (window.ASTRO?.state.detail.kind === 'crew') show(window.ASTRO.state.detail.id);
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    if (!isActive('lobby') || !view.width || box.classList.contains('site')) return;
+    if (!reduce) { mixer?.update(dt); holder.rotation.y = Math.sin(now / 2500) * .45; }
+    view.renderer.render(scene, camera);
+  }
+  view.onResize();
+  requestAnimationFrame(frame);
+})().catch(err => console.warn('Avatar not shown:', err));
+
+// Planner: the rocket the crew is building. Hull modules carry Attach_* nodes (the mounting points);
+// engines hang from Attach_Engines in the real cluster pattern, the tank stands on Attach_Tank,
+// one equipment module stands on each stage's Attach_Bay and up to 4 cabin modules sit on the cabin deck.
+// Empty mounting points glow amber and can be clicked; "+" buttons in the gaps insert a stage.
 (async () => {
   const blueprint = document.querySelector('.blueprint'), ui = window.ASTRO;
   const view = blueprint && ui && makeView(blueprint, { fov: 26 });
   if (!view) return;
   blueprint.classList.add('is-3d');
-  const { scene, camera, renderer } = view, { state, parts } = ui;
-  const ORDER = ['stage1', 'stage2', 'stage3', 'cabin'];
-  const SHELLS = { stage1: 'rocket/main_booster_cutaway.glb', stage2: 'rocket/internal_stage_cutaway.glb', stage3: 'rocket/internal_stage_cutaway.glb', cabin: 'rocket/cabin_cutaway.glb' };
-  const BAY = { stage1: .9, stage2: .84, stage3: .84, cabin: .95 };
+  const { scene, camera, renderer } = view, overlay = blueprint.querySelector('#stack-overlay');
+  const HULL = { booster: 'parts/structures/booster-thrust-section.glb', stage: 'parts/structures/stage-module.glb', cabin: 'rocket/cabin_cutaway.glb' };
+  const CABIN_SLOTS = [[-.2, .03], [.2, .03], [-.2, .5], [.2, .5]]; // x, y on the cabin deck; modules at half scale
+  const GAP = .36, TANK_CAP = 3.2;
   const stack = new THREE.Group(); scene.add(stack);
-  const ringMat = new THREE.LineBasicMaterial({ color: 0xf59e0b });
-  const ring = r => new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 12 }, (_, k) => new THREE.Vector3(r * Math.cos(k * Math.PI / 6), 0, r * Math.sin(k * Math.PI / 6)))), ringMat);
-  const fit = (obj, width) => { const s = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3()); obj.scale.setScalar(width / Math.max(s.x, s.z)); };
-  const ghost = obj => obj.traverse(o => { if (o.isMesh) o.material = (Array.isArray(o.material) ? o.material : [o.material]).map(m => Object.assign(m.clone(), { transparent: true, opacity: .14, depthWrite: false })); });
-  let layout = [], build = 0, key = '', center = new THREE.Vector3(), distance = 10;
-
-  async function stageGroup(id) {
-    const group = new THREE.Group(), equipped = parts.filter(p => p.stage === id && p.model && state.equipped.has(p.id));
-    group.add(await loadGLB(SHELLS[id]));
-    for (const p of equipped.filter(p => p.category === 'Engines')) {
-      const n = p.count || 1;
-      for (let k = 0; k < n; k++) {
-        const engine = await loadGLB(p.model); fit(engine, n > 1 ? .34 : .56);
-        if (n > 1) engine.position.set(.21 * Math.cos(k * 2 * Math.PI / n + Math.PI / 2), 0, .21 * Math.sin(k * 2 * Math.PI / n + Math.PI / 2));
-        group.add(engine);
-      }
-    }
-    const items = equipped.filter(p => p.category !== 'Engines'), perRow = Math.min(3, items.length), rows = Math.ceil(items.length / 3);
-    for (const [i, p] of items.entries()) {
-      const item = await loadGLB(p.model), row = Math.floor(i / 3), col = i % 3, inRow = Math.min(perRow, items.length - row * 3);
-      fit(item, Math.min(.6, .84 / perRow, BAY[id] / rows / 1.15));
-      item.position.set((col - (inRow - 1) / 2) * .84 / perRow, row * BAY[id] / rows, 0);
-      group.add(item);
-    }
-    if (!state.enabledStages.has(id)) ghost(group);
-    group.userData.stage = id;
-    return group;
+  const padMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: .8, depthWrite: false });
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xfce8a6 }), selMat = new THREE.LineBasicMaterial({ color: 0xf59e0b });
+  const polygon = (r, n, mat) => new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: n }, (_, k) => new THREE.Vector3(r * Math.cos(k * 2 * Math.PI / n), 0, r * Math.sin(k * 2 * Math.PI / n)))), mat);
+  function mountPoint(r, info) {
+    const g = new THREE.Group(), pad = new THREE.Mesh(new THREE.CylinderGeometry(r, r, .014, 6), padMat);
+    pad.userData.mount = info; g.add(pad, polygon(r * 1.4, 6, lineMat));
+    g.userData.pulse = true;
+    return g;
   }
+  const attach = (hull, name, fallback) => hull.getObjectByName(name)?.position.y ?? fallback;
+  const fitWidth = (obj, width) => { const s = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3()); obj.scale.setScalar(width / Math.max(s.x, s.z)); };
+  const ring = (n, r, off = 0) => Array.from({ length: n }, (_, k) => [r * Math.cos(off + k * 2 * Math.PI / n), r * Math.sin(off + k * 2 * Math.PI / n)]);
+  // Engine positions (x, z) and engine width inside the Ø 0.96 thrust plate, by cluster size (specs.defaultClusterCount).
+  function cluster(n) {
+    if (n === 1) return { w: .5, at: [[0, 0]] };
+    if (n === 3) return { w: .32, at: ring(3, .22, Math.PI / 2) };
+    if (n === 4) return { w: .3, at: ring(4, .22, Math.PI / 4) };
+    if (n === 9) return { w: .22, at: [[0, 0], ...ring(8, .32)] };
+    if (n === 33) return { w: .11, at: [...ring(3, .08), ...ring(10, .22), ...ring(20, .4)] };
+    return { w: .8 / Math.sqrt(n), at: ring(n, .3) };
+  }
+  // Long tanks are squeezed so the whole stack fits the view (soft cap on the scaled height).
+  const softCap = h => TANK_CAP * (1 - Math.exp(-h / TANK_CAP));
+
+  async function booster(r, parts) {
+    const g = new THREE.Group(), hull = await loadGLB(HULL.booster);
+    g.userData.module = 'booster'; g.add(hull);
+    const engineY = attach(hull, 'Attach_Engines', 0), tankY = attach(hull, 'Attach_Tank', .5);
+    let top = tankY;
+    if (r.booster.engine) {
+      const { w, at } = cluster(parts[r.booster.engine].specs.defaultClusterCount || 1);
+      for (const [x, z] of at) { const e = await loadGLB(parts[r.booster.engine].file); fitWidth(e, w); e.position.set(x, engineY, z); g.add(e); }
+    } else { const m = mountPoint(.24, { module: 'booster', tab: 'engine' }); m.position.y = engineY - .03; g.add(m); }
+    if (r.booster.tank) {
+      const t = await loadGLB(parts[r.booster.tank].file), size = new THREE.Box3().setFromObject(t).getSize(new THREE.Vector3());
+      const s = .96 / Math.max(size.x, size.z), h = size.y * s, capped = softCap(h);
+      t.scale.set(s, s * capped / h, s); t.position.y = tankY; g.add(t);
+      top = tankY + capped;
+    } else { const m = mountPoint(.32, { module: 'booster', tab: 'tank' }); m.position.y = tankY + .02; g.add(m); }
+    g.userData.top = top;
+    return g;
+  }
+  async function stage(r, i, parts) {
+    const g = new THREE.Group(), hull = await loadGLB(HULL.stage), key = `stage-${i}`, item = r.stages[i].item;
+    g.userData.module = key; g.add(hull);
+    const bay = attach(hull, 'Attach_Bay', .1);
+    if (item) { const e = await loadGLB(parts[item].file); e.position.y = bay; g.add(e); }
+    else { const m = mountPoint(.16, { module: key }); m.position.y = bay + .01; g.add(m); }
+    g.userData.top = attach(hull, 'Attach_Top', 1);
+    return g;
+  }
+  async function cabin(r, parts) {
+    const g = new THREE.Group();
+    g.userData.module = 'cabin'; g.add(await loadGLB(HULL.cabin));
+    for (let k = 0; k < CABIN_SLOTS.length; k++) {
+      const [x, y] = CABIN_SLOTS[k], id = r.cabin[k];
+      if (id) { const e = await loadGLB(parts[id].file); e.scale.setScalar(.5); e.position.set(x, y, 0); g.add(e); }
+      else { const m = mountPoint(.08, { module: 'cabin' }); m.position.set(x, y + .01, 0); g.add(m); }
+    }
+    g.userData.top = new THREE.Box3().setFromObject(g).max.y;
+    return g;
+  }
+
+  let key = '', build = 0, layout = [], gaps = [];
+  const center = new THREE.Vector3();
+  let distance = 10;
   async function rebuild() {
-    const next = JSON.stringify([[...state.enabledStages].sort(), [...state.equipped].sort(), state.stage]);
+    const data = ui.data();
+    if (!data) return;
+    const r = ui.state.rocket, selected = ui.selectedKey(), next = JSON.stringify([r, selected]);
     if (next === key) return;
     key = next;
-    const id = ++build, groups = await Promise.all(ORDER.map(stageGroup));
+    const id = ++build;
+    const groups = await Promise.all([booster(r, data.parts), ...r.stages.map((_, i) => stage(r, i, data.parts)), cabin(r, data.parts)]);
     if (id !== build) return;
-    stack.clear(); layout = [];
-    let top = 0;
+    stack.clear(); layout = []; gaps = [];
+    let y = 0;
     groups.forEach((g, i) => {
-      const box = new THREE.Box3().setFromObject(g), y0 = i === 0 ? 0 : top + .14 + Math.max(0, -box.min.y);
-      g.position.y = y0; stack.add(g);
-      layout.push({ id: g.userData.stage, mid: y0 + box.max.y / 2, group: g });
-      if (g.userData.stage === state.stage) [0, box.max.y].forEach(y => { const r = ring(.66); r.position.y = y0 + y; stack.add(r); });
-      top = y0 + box.max.y;
+      if (i > 0) { gaps.push({ insert: i - 1, y: y + GAP / 2 }); y += GAP; }
+      g.position.y = y; stack.add(g);
+      const top = g.userData.top;
+      layout.push({ key: g.userData.module, mid: y + top / 2 });
+      if (g.userData.module === selected) [0, top].forEach(h => { const p = polygon(.66, 12, selMat); p.position.y = y + h; stack.add(p); });
+      y += top;
     });
     const box = new THREE.Box3().setFromObject(stack), size = box.getSize(new THREE.Vector3());
     box.getCenter(center);
-    distance = (size.y * .6) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    center.y -= size.y * .07; // leave room for the part tags under the rocket
+    distance = (size.y * .66) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    center.y -= size.y * .02; // room for the label above and the tags below
   }
   window.addEventListener('astro:rocket', rebuild);
   rebuild();
 
-  // Click a stage in 3D = click its button (same logic, same accessibility).
+  // Clicks: a mounting point selects its module and catalog tab; anything else selects its module.
   const ray = new THREE.Raycaster(), pointer = new THREE.Vector2();
-  const stageAt = event => {
-    const r = renderer.domElement.getBoundingClientRect();
-    pointer.set((event.clientX - r.left) / r.width * 2 - 1, -(event.clientY - r.top) / r.height * 2 + 1);
+  function pick(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
     ray.setFromCamera(pointer, camera);
-    for (const hit of ray.intersectObjects(stack.children, true)) { let o = hit.object; while (o && !o.userData.stage) o = o.parent; if (o) return o.userData.stage; }
+    for (const hit of ray.intersectObjects(stack.children, true)) {
+      if (hit.object.userData.mount) return hit.object.userData.mount;
+      let o = hit.object; while (o && !o.userData.module) o = o.parent;
+      if (o) return { module: o.userData.module };
+    }
     return null;
-  };
-  renderer.domElement.addEventListener('click', e => { const id = stageAt(e); if (id) blueprint.querySelector(`.rocket-stage[data-stage="${id}"]`)?.click(); });
-  renderer.domElement.addEventListener('pointermove', e => { renderer.domElement.style.cursor = stageAt(e) ? 'pointer' : ''; });
+  }
+  renderer.domElement.addEventListener('click', e => { const hit = pick(e); if (hit) ui.select(hit.module, hit.tab); });
+  renderer.domElement.addEventListener('pointermove', e => { renderer.domElement.style.cursor = pick(e) ? 'pointer' : ''; });
 
-  const buttons = Object.fromEntries(ORDER.map(id => [id, blueprint.querySelector(`.rocket-stage[data-stage="${id}"]`)]));
   const v = new THREE.Vector3();
+  const toY = y => { v.set(0, y, 0).project(camera); return (1 - v.y) / 2 * view.height; };
   function frame(now) {
     requestAnimationFrame(frame);
     if (!isActive('planner') || !view.width || !layout.length) return;
     const t = reduce ? 0 : now / 1000;
     stack.rotation.y = Math.sin(t * .35) * .75; // swing, but keep the open side of the cutaways in view
+    stack.traverse(o => { if (o.userData.pulse) o.scale.setScalar(1 + Math.sin(t * 4) * .12); });
     camera.position.set(0, center.y + distance * .2, distance);
     camera.lookAt(center);
-    // Each label sits beside its stage.
-    for (const { id, mid } of layout) {
-      v.set(0, mid, 0).project(camera);
-      const button = buttons[id];
-      if (button) button.style.top = Math.max(56, Math.min(view.height - 90, (1 - v.y) / 2 * view.height - button.offsetHeight / 2)) + 'px';
+    // Labels sit beside their module; "+" buttons sit in the gaps on the rocket axis.
+    for (const { key: k, mid } of layout) {
+      const el = overlay.querySelector(`[data-module="${k}"]`);
+      if (!el) continue;
+      el.style.top = Math.max(52, Math.min(view.height - 96, toY(mid) - el.offsetHeight / 2)) + 'px';
+      el.classList.add('placed');
+    }
+    v.set(0, 0, 0).project(camera);
+    const axisX = (v.x + 1) / 2 * view.width;
+    for (const { insert, y } of gaps) {
+      const el = overlay.querySelector(`[data-insert="${insert}"]`);
+      if (!el) continue;
+      el.style.left = axisX + 'px'; el.style.top = toY(y) + 'px';
+      el.classList.add('placed');
     }
     renderer.render(scene, camera);
   }
   requestAnimationFrame(frame);
 })().catch(err => console.warn('3D rocket not shown:', err));
+
+// Planner catalog: render each part's 3D GLB once into an offscreen studio view (cached in window.ASTRO_THUMBS).
+(async () => {
+  const thumbs = window.ASTRO_THUMBS;
+  if (!thumbs) return;
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); } catch { return; }
+  renderer.setPixelRatio(1);
+  renderer.setSize(144, 144, false);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(28, 1, 0.05, 100);
+  scene.add(new THREE.AmbientLight(0xb48cf0, 0.95));
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.55;
+  const key = new THREE.DirectionalLight(0xfce8a6, 2.4); key.position.set(-4, 6, 5); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xe04f26, 1.8); rim.position.set(5, 1, -4); scene.add(rim);
+  const holder = new THREE.Group();
+  scene.add(holder);
+
+  const box = new THREE.Box3(), size = new THREE.Vector3(), center = new THREE.Vector3();
+  async function renderPartThumb(p) {
+    const obj = await loadGLB(p.file);
+    holder.clear();
+    holder.rotation.set(0, 0, 0);
+    box.setFromObject(obj);
+    box.getSize(size);
+    const maxXZ = Math.max(size.x, size.z, 0.01);
+    if (p.category === 'tanks' && size.y > maxXZ * 2.2) {
+      obj.scale.y *= (maxXZ * 2.2) / size.y;
+      obj.updateMatrixWorld(true);
+      box.setFromObject(obj);
+    }
+    box.getCenter(center);
+    obj.position.sub(center);
+    holder.add(obj);
+    holder.rotation.set(0.24, -0.58, p.category === 'tanks' ? 0.32 : 0.06);
+    holder.updateMatrixWorld(true);
+    box.setFromObject(holder).getSize(size);
+    const half = Math.max(size.x, size.y, 0.1) * 0.56;
+    const dist = half / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) + size.z * 0.55;
+    camera.position.set(0, 0, dist);
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+    return renderer.domElement.toDataURL('image/png');
+  }
+
+  let running = false, again = false;
+  async function syncCatalogThumbs() {
+    if (running) { again = true; return; }
+    running = true;
+    try {
+      do {
+        again = false;
+        const data = window.ASTRO?.data?.();
+        if (!data) break;
+        const slots = [...document.querySelectorAll('#parts-list [data-part-thumb]')];
+        for (const slot of slots) {
+          const id = slot.dataset.partThumb, p = data.parts?.[id];
+          if (!p?.file) continue;
+          let url = thumbs.get(id);
+          if (!url) {
+            url = await renderPartThumb(p);
+            thumbs.set(id, url);
+          }
+          document.querySelectorAll(`#parts-list [data-part-thumb="${CSS.escape(id)}"]`).forEach(el => {
+            if (!el.querySelector('img')) el.innerHTML = `<img src="${url}" alt="">`;
+          });
+        }
+      } while (again);
+    } finally {
+      running = false;
+    }
+  }
+  window.addEventListener('astro:catalog', syncCatalogThumbs);
+  syncCatalogThumbs();
+})().catch(err => console.warn('Catalog 3D thumbnails disabled:', err));
 </script>
 
 <script type="module">
