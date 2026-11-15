@@ -43,6 +43,8 @@
     .button:active{translate:0 2px}
     .button.primary{--a:var(--coral-hover);--b:var(--mars-orange);--fg:var(--bg-void)}
     .button.primary:hover{--a:#f6a07f;--b:var(--coral-hover);filter:none}
+    .button.amber{--a:#fbbf24;--b:var(--solar-amber);--fg:var(--bg-void)}
+    .button.amber:hover{--a:#fde68a;--b:#fbbf24;filter:none}
     .button.quiet{--a:transparent;--b:transparent;--fg:var(--muted);min-height:38px;padding:.6rem 1.1rem}
     .button.quiet:hover{--a:var(--f3);--b:var(--f2);--fg:var(--starlight-cream);filter:none}
 
@@ -455,6 +457,8 @@
     .podium-step{width:100%;padding:10px 6px;text-align:center;font:700 .76rem var(--heading);color:var(--bg-void);background:var(--solar-amber);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
     .podium-step.is-empty{color:var(--muted);background:var(--f3)}
     /* Launch failure debrief (failLaunch): crimson badge and rank, empty podium. */
+    #results .header-side{flex-wrap:wrap}
+    #results:not(.is-failed) #results-retry{display:none}
     #results.is-failed .badge{color:var(--starlight-cream);background:var(--crimson-alert)}
     #results.is-failed .rank-letter{color:var(--starlight-cream);background:linear-gradient(155deg,var(--mars-orange) 0 42%,var(--crimson-alert) 42%)}
     .results-card{display:flex;flex-direction:column;gap:14px;padding:24px}

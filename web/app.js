@@ -45,7 +45,8 @@
     return {ok:true,twr:m.twr,seconds:ascentSeconds(m.twr),accel:(m.twr-1)/(ASCENT.refTwr-1)};
   }
   const budgetOf = level => rule('defaultBudgetM',250)*difficulty[level].factor;
-  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:{booster:{engine:'merlin-1d',fins:'fins-small',tank:'falcon-9-stage-1-tank'},stages:[{item:'power-rosa-solar'},{item:null}],cabin:[]},sel:{kind:'booster'},tab:'engine'};
+  const defaultRocket=()=>({booster:{engine:'merlin-1d',fins:'fins-small',tank:'falcon-9-stage-1-tank'},stages:[{item:'power-rosa-solar'},{item:null}],cabin:[]});
+  const state={screen:'menu',difficulty:'normal',friends:new Set(),site:'jezero',detail:{kind:'crew',id:'helena'},rocket:defaultRocket(),sel:{kind:'booster'},tab:'engine'};
   const money = n => (n<0?'−$':'$')+Math.abs(n).toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<10?1:0})+'M';
   const number = n => n==null?'n/f':Math.round(n).toLocaleString('en-US');
   const tonnes = kg => kg==null?'n/f':(kg/1000).toLocaleString('en-US',{maximumFractionDigits:kg<10000?2:1})+' t';
@@ -1351,6 +1352,7 @@
     // The debrief screen serves both endings: the mission flown (showResults) or a rocket stuck on the pad (failLaunch).
     function setResultsMode(failed) {
       $('#results').classList.toggle('is-failed', failed);
+      $('#results-retry').hidden = !failed;
       $('#results-eyebrow').textContent = failed ? 'Mission Debrief / Launch Pad' : 'Mission Debrief / Phase 07 Complete';
       $('#results-title').textContent = failed ? 'Launch Failure' : 'Mars Return & Final Ranking';
     }
@@ -1447,7 +1449,13 @@
       return 'Minimal EDL gear';
     }
 
-    $('#results-replay').addEventListener('click', () => showScreen('lobby'));
+    $('#results-retry').addEventListener('click', () => showScreen('planner'));
+    $('#results-replay').addEventListener('click', () => {
+      state.rocket = defaultRocket();
+      state.sel = { kind: 'booster' };
+      state.tab = 'engine';
+      showScreen('lobby');
+    });
 
     return { startFlight, failLaunch, handleCockpitAction, startSurface, completeSurfaceTask, board: () => boardShipAndFinish(false), flight, surf };
   })();
