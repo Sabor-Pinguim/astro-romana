@@ -12,12 +12,12 @@ const trussIngenuity = {
   category: 'equipment',
   tier: 2,
   name: 'TrussIngenuity',
-  displayName: 'Baia do Helicóptero Batedor (Ingenuity / SkyFall)',
-  vehicle: 'Helena · Estágio do Meio (Batedor Aéreo)',
-  role: 'Reconhecimento aéreo em Marte (`H-S1`), revelando alvos e gelo',
+  displayName: 'Scout Helicopter Bay (Ingenuity / SkyFall)',
+  vehicle: 'Helena · Middle Stage (Aerial Scout)',
+  role: 'Aerial reconnaissance on Mars (`H-S1`), revealing targets and ice',
   summary:
-    'Berço treliçado de alumínio abrigando o helicóptero coaxial com fuselagem dourada, painel solar superior, rotores duplos contrarrotativos e pernas de pouso abertas.',
-  originNote: 'Centro da base inferior de fixação (y = 0, encaixe no deck do estágio cutaway)',
+    'Aluminum truss cradle housing the coaxial helicopter with a gold fuselage, top solar panel, twin counter-rotating rotors and splayed landing legs.',
+  originNote: 'Center of the bottom mounting base (y = 0, fits the cutaway stage deck)',
   references: [...HELENA_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -89,12 +89,12 @@ const edlTrnMedli2 = {
   category: 'equipment',
   tier: 2,
   name: 'EdlTrnMedli2',
-  displayName: 'Módulo TRN, Sensores MEDLI2 & Relógio Atômico DSAC',
-  vehicle: 'Helena · Estágio do Meio (Navegação & EDL)',
-  role: 'Pouso de precisão (`H-S2`), aerofrenagem (`H-O1`) e proteção contra falhas de sensor',
+  displayName: 'TRN Module, MEDLI2 Sensors & DSAC Atomic Clock',
+  vehicle: 'Helena · Middle Stage (Navigation & EDL)',
+  role: 'Precision landing (`H-S2`), aerobraking (`H-O1`) and protection against sensor failures',
   summary:
-    'Plataforma de aviônicos com cubo dourado do Relógio Atômico DSAC, câmera ótica angular LCAM do sistema TRN e coletor de sensores térmicos MEDLI2.',
-  originNote: 'Base da bandeja de amortecimento (y = 0)',
+    'Avionics platform with the gold DSAC Atomic Clock cube, the angled LCAM optical camera of the TRN system and the MEDLI2 thermal sensor manifold.',
+  originNote: 'Base of the damping tray (y = 0)',
   references: [...HELENA_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -156,12 +156,12 @@ const edlAspireLoftid = {
   category: 'equipment',
   tier: 3,
   name: 'EdlAspireLoftid',
-  displayName: 'Morteiro Supersônico ASPIRE & Escudo Inflável LOFTID',
-  vehicle: 'Helena · Estágio do Meio (EDL Pesada)',
-  role: 'Eleva o limite máximo de massa sobrevivente ao pouso em Marte',
+  displayName: 'ASPIRE Supersonic Mortar & LOFTID Inflatable Shield',
+  vehicle: 'Helena · Middle Stage (Heavy EDL)',
+  role: 'Raises the maximum mass that can survive a Mars landing',
   summary:
-    'Tubo central do morteiro do paraquedas supersônico de 21,5 m cercado pelo anel laranja dobrado do escudo inflável HIAD e duas garrafas COPV de nitrogênio.',
-  originNote: 'Anel inferior da base estrutural (y = 0)',
+    'Central mortar tube for the 21.5 m supersonic parachute, ringed by the folded orange HIAD inflatable shield and two nitrogen COPV bottles.',
+  originNote: 'Bottom ring of the structural base (y = 0)',
   references: [...HELENA_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -213,12 +213,12 @@ const attitudeReactionWheels = {
   category: 'equipment',
   tier: 1,
   name: 'AttitudeReactionWheels',
-  displayName: 'Conjunto de 4 Rodas de Reação & Star Trackers',
-  vehicle: 'Helena · Estágio do Meio (Controle de Atitude)',
-  role: 'Rolagem orbital (`H-O2`) e redundância contra falha mecânica',
+  displayName: '4 Reaction Wheels & Star Trackers',
+  vehicle: 'Helena · Middle Stage (Attitude Control)',
+  role: 'Orbital roll (`H-O2`) and redundancy against mechanical failure',
   summary:
-    'Estrutura tetraédrica com quatro volantes de inércia inclinados (3 ativos + 1 reserva) e dois defletores óticos de sensores de estrelas.',
-  originNote: 'Placa circular inferior de montagem (y = 0)',
+    'Tetrahedral frame with four tilted flywheels (3 active + 1 spare) and two star-tracker optical baffles.',
+  originNote: 'Bottom circular mounting plate (y = 0)',
   references: [...HELENA_COMMON_REF, 'references/experiments/experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -287,12 +287,12 @@ const powerRosaSolar = {
   category: 'equipment',
   tier: 2,
   name: 'PowerRosaSolar',
-  displayName: 'Casulos de Painéis Solares Enroláveis (ROSA / iROSA)',
-  vehicle: 'Lucas · Estágio do Meio (Geração Solar)',
-  role: 'Geração elétrica leve em órbita e superfície (`L-O1`)',
+  displayName: 'Roll-Out Solar Array Pods (ROSA / iROSA)',
+  vehicle: 'Lucas · Middle Stage (Solar Power)',
+  role: 'Lightweight power generation in orbit and on the surface (`L-O1`)',
   summary:
-    'Longarina central de acionamento flanqueada por dois cilindros retráteis de manta fotovoltaica flexível com hastes tensoras compostas e terminais dourados.',
-  originNote: 'Base da longarina estrutural (y = 0)',
+    'Central drive spar flanked by two retractable rolls of flexible photovoltaic blanket with composite tension booms and gold end caps.',
+  originNote: 'Base of the structural spar (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -336,12 +336,12 @@ const powerMmrtgKilopower = {
   category: 'equipment',
   tier: 3,
   name: 'PowerMmrtgKilopower',
-  displayName: 'Gerador Nuclear MMRTG / Kilopower & Banco Li-ion',
-  vehicle: 'Lucas · Estágio do Meio (Energia Contínua)',
-  role: 'Energia contínua dia/noite imune a tempestades de poeira + picos de 900 W',
+  displayName: 'MMRTG / Kilopower Nuclear Generator & Li-ion Bank',
+  vehicle: 'Lucas · Middle Stage (Continuous Power)',
+  role: 'Continuous day/night power immune to dust storms + 900 W peaks',
   summary:
-    'Cilindro branco de MMRTG com 8 aletas radiadoras radiais montado ao lado do cofre térmico dourado de baterias Li-ion para sustentar picos do MOXIE.',
-  originNote: 'Base da plataforma térmica inferior (y = 0)',
+    'White MMRTG cylinder with 8 radial radiator fins, mounted beside a gold thermal vault of Li-ion batteries that covers MOXIE peaks.',
+  originNote: 'Base of the lower thermal platform (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -387,12 +387,12 @@ const isruMoxieRodwell = {
   category: 'equipment',
   tier: 2,
   name: 'IsruMoxieRodwell',
-  displayName: 'Reator ISRU de Oxigênio MOXIE & Extrator Rodwell',
-  vehicle: 'Lucas · Estágio do Meio (Produção de O₂ e Água)',
-  role: 'Produz oxigênio do ar marciano (`L-S1`, 300 W) e extrai água do gelo',
+  displayName: 'MOXIE ISRU Oxygen Reactor & Rodwell Extractor',
+  vehicle: 'Lucas · Middle Stage (O₂ & Water Production)',
+  role: 'Makes oxygen from Martian air (`L-S1`, 300 W) and extracts water from ice',
   summary:
-    'Caixa dourada isolada do reator MOXIE a 800 °C com compressor HEPA superior e brilho térmico, acoplada a tanques esféricos de O₂ e haste aquecedora Rodwell.',
-  originNote: 'Placa de suporte inferior (y = 0)',
+    'Insulated gold box of the 800 °C MOXIE reactor with a top HEPA compressor and thermal glow, coupled to spherical O₂ tanks and a Rodwell heater probe.',
+  originNote: 'Bottom support plate (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -434,12 +434,12 @@ const drillCorerCryo = {
   category: 'equipment',
   tier: 2,
   name: 'DrillCorerCryo',
-  displayName: 'Torre de Perfuração Subsuperficial & Criocooler Ativo',
-  vehicle: 'Lucas · Estágio do Meio (Perfuração & Criogenia)',
-  role: 'Coleta núcleos de rocha (`L-S2`), mantém detectores frios (`L-O2`) e reparo EVA',
+  displayName: 'Subsurface Drill Tower & Active Cryocooler',
+  vehicle: 'Lucas · Middle Stage (Drilling & Cryogenics)',
+  role: 'Collects rock cores (`L-S2`), keeps detectors cold (`L-O2`) and supports EVA repair',
   summary:
-    'Trilhos verticais da broca rotativo-percussiva de 2 m com duas brocas reserva, emparelhados ao circuito criogênico de serpentina de cobre e âncora FX_Sparks.',
-  originNote: 'Placa de base estrutural (y = 0)',
+    'Vertical rails of the 2 m rotary-percussive drill with two spare bits, paired with the copper-coil cryogenic loop and the FX_Sparks anchor.',
+  originNote: 'Structural base plate (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -493,12 +493,12 @@ const commDsocLaser = {
   category: 'equipment',
   tier: 3,
   name: 'CommDsocLaser',
-  displayName: 'Transceptor Óptico a Laser DSOC (Psyche)',
-  vehicle: 'Oscar · Estágio do Meio (Telecom Óptica de Alta Banda)',
-  role: 'Transmissão a laser de 8–267 Mbps (`O-O1`), escoando imagens HiRISE/SHARAD',
+  displayName: 'DSOC Laser Optical Transceiver (Psyche)',
+  vehicle: 'Oscar · Middle Stage (High-Bandwidth Optical Comms)',
+  role: 'Laser downlink at 8–267 Mbps (`O-O1`), offloading HiRISE/SHARAD images',
   summary:
-    'Telescópio ótico de 22 cm envolto em ouro sobre gimbal de dois eixos e amortecedores vibracionais acoplados à caixa de eletrônica de fótons.',
-  originNote: 'Base dos amortecedores de isolamento (y = 0)',
+    'Gold-wrapped 22 cm optical telescope on a two-axis gimbal with vibration dampers, attached to the photon electronics box.',
+  originNote: 'Base of the isolation dampers (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -548,12 +548,12 @@ const commElectraMarco = {
   category: 'equipment',
   tier: 2,
   name: 'CommElectraMarco',
-  displayName: 'Rádio Relay UHF Electra & Par de CubeSats MarCO',
-  vehicle: 'Oscar · Estágio do Meio (Rede de Relay & EDL)',
-  role: 'Gerencia janelas UHF (`O-S1`) e protege contra perda de orbitador (MAVEN)',
+  displayName: 'Electra UHF Relay Radio & MarCO CubeSat Pair',
+  vehicle: 'Oscar · Middle Stage (Relay Network & EDL)',
+  role: 'Manages UHF windows (`O-S1`) and guards against orbiter loss (MAVEN)',
   summary:
-    'Rádio modular Electra de 4 camadas com antena helicoidal central (FX_Antenna) flanqueado por dois dispensadores verticais de CubeSats 6U MarCO.',
-  originNote: 'Placa de suporte inferior (y = 0)',
+    'Modular 4-slice Electra radio with a central helical antenna (FX_Antenna), flanked by two vertical 6U MarCO CubeSat dispensers.',
+  originNote: 'Bottom support plate (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -598,12 +598,12 @@ const commRiseXband = {
   category: 'equipment',
   tier: 1,
   name: 'CommRiseXband',
-  displayName: 'Transponder Banda X de Rádio-Geodésia RISE',
-  vehicle: 'Oscar · Estágio do Meio (Rádio-Geodésia)',
-  role: 'Mede o núcleo líquido de Marte por efeito Doppler (`O-S2`) via link direto DSN',
+  displayName: 'RISE X-Band Radio Geodesy Transponder',
+  vehicle: 'Oscar · Middle Stage (Radio Geodesy)',
+  role: 'Measures the liquid core of Mars via Doppler (`O-S2`) over a direct DSN link',
   summary:
-    'Bloco dourado do transponder Banda X com guias de onda em cobre alimentando duas antenas corneta cônicas inclinadas para leste e oeste.',
-  originNote: 'Bandeja inferior de aviônicos (y = 0)',
+    'Gold X-band transponder block with copper waveguides feeding two conical horn antennas canted east and west.',
+  originNote: 'Bottom avionics tray (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -642,12 +642,12 @@ const dataRad750Ssr = {
   category: 'equipment',
   tier: 2,
   name: 'DataRad750Ssr',
-  displayName: 'Computador de Voo RAD750 & Gravador Solid-State (SSR)',
-  vehicle: 'Oscar · Estágio do Meio (Processamento & Memória)',
-  role: 'Compressão/recorte de imagens (`O-O2`) e armazenamento durante conjunção solar',
+  displayName: 'RAD750 Flight Computer & Solid-State Recorder (SSR)',
+  vehicle: 'Oscar · Middle Stage (Processing & Memory)',
+  role: 'Image compression/cropping (`O-O2`) and storage during solar conjunction',
   summary:
-    'Cofre blindado preto-anodizado contra radiação com aletas superiores de dissipação, 6 lâminas modulares de memória, LEDs de telemetria e chicote SpaceWire.',
-  originNote: 'Quadro inferior de amortecimento (y = 0)',
+    'Black-anodized radiation-shielded vault with top cooling fins, 6 modular memory blades, telemetry LEDs and a SpaceWire harness.',
+  originNote: 'Bottom damping frame (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -699,12 +699,12 @@ const sciHiriseSharad = {
   category: 'equipment',
   tier: 3,
   name: 'SciHiriseSharad',
-  displayName: 'Pacote Orbital HiRISE, Radar SHARAD & Espectrômetro NOMAD',
-  vehicle: 'Maya · Estágio do Meio (Sensoreamento Orbital)',
-  role: 'Fotos de 30 cm (`M-O1`), radar de gelo (`M-O2`) e gases-traço (`M-O3`)',
+  displayName: 'HiRISE Orbital Package, SHARAD Radar & NOMAD Spectrometer',
+  vehicle: 'Maya · Middle Stage (Orbital Remote Sensing)',
+  role: '30 cm-resolution photos (`M-O1`), ice radar (`M-O2`) and trace gases (`M-O3`)',
   summary:
-    'Tubo telescópico de fibra de carbono classe 0,5 m com colar térmico prateado e aranha dourada, acoplado ao espectrômetro NOMAD e aos dipolos do radar SHARAD.',
-  originNote: 'Bancada ótica inferior (y = 0)',
+    '0.5 m-class carbon-fiber telescope tube with a silver thermal collar and gold spider, coupled to the NOMAD spectrometer and the SHARAD radar dipoles.',
+  originNote: 'Bottom optical bench (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -750,12 +750,12 @@ const sciPixlSherlocSupercam = {
   category: 'equipment',
   tier: 3,
   name: 'SciPixlSherlocSupercam',
-  displayName: 'Bancada de Astrobiologia PIXL, SHERLOC & Laser SuperCam',
-  vehicle: 'Maya · Estágio do Meio (Astrobiologia & Bioassinaturas)',
-  role: 'Detecta manchas de bioassinatura (`M-S1`) e dispara laser a >7 m (`M-S2`)',
+  displayName: 'PIXL, SHERLOC & SuperCam Laser Astrobiology Bench',
+  vehicle: 'Maya · Middle Stage (Astrobiology & Biosignatures)',
+  role: 'Detects biosignature spots (`M-S1`) and fires a laser at >7 m (`M-S2`)',
   summary:
-    'Mastro branco do SuperCam com grande lente ciclópica e laser (FX_Sparks) junto ao braço robótico dobrado com a torre hexagonal PIXL e o sensor UV SHERLOC.',
-  originNote: 'Deck de calibração inferior (y = 0)',
+    'White SuperCam mast with a large cyclops lens and laser (FX_Sparks) beside the folded robotic arm with the hexagonal PIXL turret and the SHERLOC UV sensor.',
+  originNote: 'Bottom calibration deck (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -803,12 +803,12 @@ const sciSeisCaching = {
   category: 'equipment',
   tier: 2,
   name: 'SciSeisCaching',
-  displayName: 'Sismômetro SEIS (Escudo de Vento) & Carrossel de 43 Tubos',
-  vehicle: 'Maya · Estágio do Meio (Sismologia & Amostragem)',
-  role: 'Escuta terremotos marcianos (`M-S3`) e sela os núcleos de amostra (`M-S4`)',
+  displayName: 'SEIS Seismometer (Wind Shield) & 43-Tube Carousel',
+  vehicle: 'Maya · Middle Stage (Seismology & Sampling)',
+  role: 'Listens for marsquakes (`M-S3`) and seals the sample cores (`M-S4`)',
   summary:
-    'Domo hexagonal branco de proteção térmica/eólica do sismômetro SEIS com saia dourada ao lado do carrossel rotativo com tubos de titânio do Perseverance.',
-  originNote: 'Palete inferior de instrumentos (y = 0)',
+    'White hexagonal wind/thermal shield dome of the SEIS seismometer with a gold skirt, next to the rotating carousel of Perseverance titanium tubes.',
+  originNote: 'Bottom instrument pallet (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({
@@ -857,12 +857,12 @@ const habVeggieRadAstroRad = {
   category: 'equipment',
   tier: 2,
   name: 'HabVeggieRadAstroRad',
-  displayName: 'Estufa Hidropônica Veggie, Dosímetro RAD & Coletes AstroRad',
-  vehicle: 'Maya · Estágio do Meio (Missão Tripulada)',
-  role: 'Alerta de tempestade solar (`M-S5`), estufa marciana (`M-S6`) e proteção da equipe',
+  displayName: 'Veggie Hydroponic Greenhouse, RAD Dosimeter & AstroRad Vests',
+  vehicle: 'Maya · Middle Stage (Crewed Mission)',
+  role: 'Solar storm alert (`M-S5`), Martian greenhouse (`M-S6`) and crew protection',
   summary:
-    'Câmara branca Veggie/APH iluminada com bandejas verdes de mudas, blocos de blindagem AstroRad dobrados à direita e detector cilíndrico RAD montado no topo.',
-  originNote: 'Piso inferior do rack de habitat (y = 0)',
+    'Lit white Veggie/APH chamber with green seedling trays, folded AstroRad shielding blocks on the right and a cylindrical RAD detector on top.',
+  originNote: 'Bottom floor of the habitat rack (y = 0)',
   references: ['references/parts/stage-equipment.md', 'docs/resources/equipamentos-estagios.md'],
   build() {
     const p = createPartBuilder({

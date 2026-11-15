@@ -246,7 +246,8 @@ O glTF não transporta partículas, então o projeto usa âncoras:
 
 | O quê | Idioma |
 |---|---|
-| Docs de design do time (`docs/`) e textos vistos pelo jogador | PT-BR |
+| Docs de design do time (`docs/`) | PT-BR |
+| Textos vistos pelo jogador (telas, nomes e descrições das peças) | Inglês |
 | Enunciado do desafio e `references/` | Inglês |
 | Código, identificadores, nomes de nós, arquivos e commits | Inglês |
 

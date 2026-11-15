@@ -27,8 +27,8 @@ const cockpitPilot = {
   vehicle: 'NASA Space Shuttle Orbiter (Aft Flight Deck & MEDS) / Orion MPCV',
   role: '1st-Person Launch, Ascent, Orbit Insertion & Emergency Minigame Cockpit',
   summary:
-    'Painel de controle 1ª pessoa em formato U com 3 telas MFD (retículo FDAI 8-ball, barras verticais de recursos e gráfico de subida), matriz Caution & Warning de 12 luzes, monitor CCTV superior esquerdo, comandos articulados (RHC, THC, manete dupla, disjuntores e chaves com trava) e janelas panorâmicas.',
-  originNote: 'Origem (0,0,0) no centro do piso da cabine; para-brisa frontal em -Z; Camera_Pilot em (0, 1.18, 0.38)',
+    'U-shaped 1st-person control panel with 3 MFD screens (FDAI 8-ball reticle, vertical resource bars and ascent graph), 12-light Caution & Warning matrix, upper-left CCTV monitor, articulated controls (RHC, THC, twin throttle, circuit breakers and guarded switches) and panoramic windows.',
+  originNote: 'Origin (0,0,0) at the cabin floor center; front windshield at -Z; Camera_Pilot at (0, 1.18, 0.38)',
   references: [
     'references/parts/pilot-cockpit.md',
     'docs/resources/painel-piloto-1a-pessoa.md',

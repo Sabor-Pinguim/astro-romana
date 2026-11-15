@@ -26,11 +26,11 @@ const boosterThrustSection = {
   category: 'structures',
   tier: 1,
   name: 'BoosterThrustSection',
-  displayName: 'Seção de Empuxo do Propulsor',
-  vehicle: 'Main Booster (base obrigatória)',
-  role: 'Saia traseira com placa de empuxo: recebe o conjunto de motores embaixo e o tanque em cima',
-  summary: 'Saia branca levemente cônica com faixa preta, quatro aletas, placa de empuxo de aço e ressalto hexagonal de fixação dos motores.',
-  originNote: 'Plano inferior da placa de empuxo; motores penduram abaixo de y = 0',
+  displayName: 'Booster Thrust Section',
+  vehicle: 'Main Booster (required base)',
+  role: 'Aft skirt with thrust plate: takes the engine cluster below and the tank above',
+  summary: 'Slightly conical white skirt with a black band, four fins, a steel thrust plate and a hexagonal engine mounting boss.',
+  originNote: 'Bottom plane of the thrust plate; engines hang below y = 0',
   references: ['references/parts/structures/booster-thrust-section/README.md'],
   build() {
     const p = createPartBuilder({
@@ -74,11 +74,11 @@ const stageModule = {
   category: 'structures',
   tier: 1,
   name: 'StageModule',
-  displayName: 'Módulo de Estágio do Meio',
-  vehicle: 'Estágios do meio (0 a 7, empilháveis)',
-  role: 'Baia aberta em cutaway com um ponto de fixação para 1 equipamento',
-  summary: 'Meia casca branca aberta para a frente, parede interna escura, pisos de alumínio e placa hexagonal dourada de fixação no centro da baia.',
-  originNote: 'Interface inferior (y = 0); próximo módulo encaixa em y = 1',
+  displayName: 'Middle Stage Module',
+  vehicle: 'Middle stages (0 to 7, stackable)',
+  role: 'Open cutaway bay with a mounting point for 1 equipment item',
+  summary: 'White half shell open to the front, dark inner wall, aluminum decks and a gold hexagonal mounting plate at the bay center.',
+  originNote: 'Bottom interface (y = 0); next module fits at y = 1',
   references: ['references/parts/structures/stage-module/README.md'],
   build() {
     const p = createPartBuilder({

@@ -12,12 +12,12 @@ const cabinLaunchSeats = {
   category: 'cabin',
   tier: 1,
   name: 'CabinLaunchSeats',
-  displayName: 'Assentos Reclinados de Lançamento (4 Tripulantes)',
-  vehicle: 'Helena · Cabine da Tripulação (Lançamento & EDL)',
-  role: 'Amortecimento de g em subida orbital (Fase 5) e pouso em Marte (Fase 6/7)',
+  displayName: 'Reclined Launch Seats (4 Crew)',
+  vehicle: 'Helena · Crew Cabin (Launch & EDL)',
+  role: 'g-load damping during orbital ascent (Phase 5) and Mars landing (Phase 6/7)',
   summary:
-    'Plataforma em dois níveis com quatro assentos espaciais reclinados a -35° estilo Orion/Crew Dragon, amortecedores hidráulicos e cintos laranja.',
-  originNote: 'Centro do piso de montagem da cabine (y = 0, abertura cutaway em +Z)',
+    'Two-tier platform with four Orion/Crew Dragon-style space seats reclined at -35°, hydraulic dampers and orange harnesses.',
+  originNote: 'Center of the cabin mounting floor (y = 0, cutaway opening at +Z)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -80,12 +80,12 @@ const cabinOrionCockpit = {
   category: 'cabin',
   tier: 2,
   name: 'CabinOrionCockpit',
-  displayName: 'Painel Glass Cockpit Orion (3 DUs)',
-  vehicle: 'Helena · Cabine da Tripulação (Lançamento & Navegação)',
-  role: 'HUD de lançamento em 1ª pessoa (`§7.1`) e controle manual (`H-O1` / `H-S2`)',
+  displayName: 'Orion Glass Cockpit Panel (3 DUs)',
+  vehicle: 'Helena · Crew Cabin (Launch & Navigation)',
+  role: '1st-person launch HUD (`§7.1`) and manual control (`H-O1` / `H-S2`)',
   summary:
-    'Console frontal com 3 Display Units iluminados, chaves de proteção, punho translacional T-bar à esquerda e joystick rotacional à direita.',
-  originNote: 'Centro do piso da cabine (y = 0), mostradores voltados para +Z',
+    'Front console with 3 lit Display Units, guard switches, a T-bar translational grip on the left and a rotational joystick on the right.',
+  originNote: 'Cabin floor center (y = 0), displays facing +Z',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -145,12 +145,12 @@ const cabinIdssDocking = {
   category: 'cabin',
   tier: 3,
   name: 'CabinIdssDocking',
-  displayName: 'Anel de Acoplamento IDSS/NDS & Reabastecimento Crio',
-  vehicle: 'Helena · Cabine da Tripulação (Órbita de Marte)',
-  role: 'Reabastecimento orbital obrigatório (`§6.1`, `§8.1`) e acoplamento seguro',
+  displayName: 'IDSS/NDS Docking Ring & Cryo Refueling',
+  vehicle: 'Helena · Crew Cabin (Mars Orbit)',
+  role: 'Mandatory orbital refueling (`§6.1`, `§8.1`) and safe docking',
   summary:
-    'Túnel pressurizado circular IDSS/NDS com escotilha de vigia central, 3 pétalas de captura em cobre, ganchos de trava e umbilicais criogênicos.',
-  originNote: 'Centro da base inferior de adaptação na cabine (y = 0)',
+    'Circular pressurized IDSS/NDS tunnel with a central viewport hatch, 3 copper capture petals, latch hooks and cryogenic umbilicals.',
+  originNote: 'Center of the bottom cabin adapter base (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -226,12 +226,12 @@ const cabinPcduThermal = {
   category: 'cabin',
   tier: 1,
   name: 'CabinPcduThermal',
-  displayName: 'Barramento 120 VDC & Trocador Térmico da Cabine',
-  vehicle: 'Lucas · Cabine da Tripulação (Energia & Resfriamento)',
-  role: 'Previne sobrecargas elétricas e permite reparar bomba térmica (`P8`)',
+  displayName: '120 VDC Bus & Cabin Heat Exchanger',
+  vehicle: 'Lucas · Crew Cabin (Power & Cooling)',
+  role: 'Prevents electrical overloads and allows thermal pump repair (`P8`)',
   summary:
-    'Rack duplo compacto com painel PCDU de 120 VDC e disjuntores à esquerda, núcleo condensador aletado, bomba de fluido e acumulador dourado à direita (`FX_Sparks`).',
-  originNote: 'Centro do piso da cabine (y = 0)',
+    'Compact double rack with a 120 VDC PCDU panel and breakers on the left; finned condenser core, fluid pump and gold accumulator on the right (`FX_Sparks`).',
+  originNote: 'Cabin floor center (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -291,12 +291,12 @@ const cabinEvaAirlock = {
   category: 'cabin',
   tier: 2,
   name: 'CabinEvaAirlock',
-  displayName: 'Escotilha de Eclusa & Suitports Duplos (AxEMU)',
-  vehicle: 'Lucas · Cabine da Tripulação (EVA & Controle de Poeira)',
-  role: 'Habilita reparos orbitais seguros (`E5` / `P8`) e saída limpa em Marte (`EN15`)',
+  displayName: 'Airlock Hatch & Twin Suitports (AxEMU)',
+  vehicle: 'Lucas · Crew Cabin (EVA & Dust Control)',
+  role: 'Enables safe orbital repairs (`E5` / `P8`) and clean egress on Mars (`EN15`)',
   summary:
-    'Antepara pressurizada com escotilha circular de trava em cobre e vigia, flanqueada por dois trajes AxEMU acoplados em suitports laterais.',
-  originNote: 'Centro do piso da cabine (y = 0), lado frontal em +Z',
+    'Pressurized bulkhead with a circular hatch, copper latch and viewport, flanked by two AxEMU suits docked in side suitports.',
+  originNote: 'Cabin floor center (y = 0), front side at +Z',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -350,12 +350,12 @@ const cabinEclssWrs = {
   category: 'cabin',
   tier: 3,
   name: 'CabinEclssWrs',
-  displayName: 'Rack ECLSS Fechado (98% Água) & UWMS',
-  vehicle: 'Lucas · Cabine da Tripulação (Suporte de Vida)',
-  role: 'Recupera 98% da água (`EN2`) e neutraliza falhas de suporte (`E3`)',
+  displayName: 'Closed-Loop ECLSS Rack (98% Water) & UWMS',
+  vehicle: 'Lucas · Crew Cabin (Life Support)',
+  role: 'Recovers 98% of water (`EN2`) and counters life-support failures (`E3`)',
   summary:
-    'Rack ISPR branco com tambor de destilação a vácuo, filtros e serpentina de salmoura à esquerda, mais unidade sanitária compacta UWMS à direita.',
-  originNote: 'Centro do piso da cabine (y = 0)',
+    'White ISPR rack with a vacuum distillation drum, filters and brine coil on the left, plus a compact UWMS toilet on the right.',
+  originNote: 'Cabin floor center (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -414,12 +414,12 @@ const cabinHeraDosimetry = {
   category: 'cabin',
   tier: 1,
   name: 'CabinHeraDosimetry',
-  displayName: 'Monitor de Radiação HERA & Sirene SPE',
-  vehicle: 'Oscar · Cabine da Tripulação (Alerta Solar)',
-  role: 'Detecta tempestades solares (`PH1` / `P10`) e dá tempo extra para `M-S5`',
+  displayName: 'HERA Radiation Monitor & SPE Siren',
+  vehicle: 'Oscar · Crew Cabin (Solar Alert)',
+  role: 'Detects solar storms (`PH1` / `P10`) and buys extra time for `M-S5`',
   summary:
-    'Ponte compacta com duas unidades Timepix HERA douradas em ângulos ortogonais ligadas por cabos coaxiais a um painel com strobes âmbar e vermelho.',
-  originNote: 'Centro do piso da cabine (y = 0)',
+    'Compact bridge with two gold HERA Timepix units at orthogonal angles, wired by coax cables to a panel with amber and red strobes.',
+  originNote: 'Cabin floor center (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -468,12 +468,12 @@ const cabinScanConsole = {
   category: 'cabin',
   tier: 2,
   name: 'CabinScanConsole',
-  displayName: 'Estação de Telecomunicações DTN & Atraso Terra-Marte',
-  vehicle: 'Oscar · Cabine da Tripulação (Comunicações)',
-  role: 'Gerencia atraso de 3–22 min (`O-O1` / `O-S1`) com terminal DTN interno',
+  displayName: 'DTN Telecom Station & Earth-Mars Delay',
+  vehicle: 'Oscar · Crew Cabin (Communications)',
+  role: 'Manages the 3–22 min delay (`O-O1` / `O-S1`) with an onboard DTN terminal',
   summary:
-    'Mesa L com modem DTN inferior, duas telas largas inclinadas com barras de sincronia, console de áudio e antena interna helicoidal (`FX_Antenna`).',
-  originNote: 'Centro do piso da cabine (y = 0)',
+    'L-shaped desk with a lower DTN modem, two angled widescreens with sync bars, an audio console and an internal helical antenna (`FX_Antenna`).',
+  originNote: 'Cabin floor center (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -529,12 +529,12 @@ const cabinAutonavConjunction = {
   category: 'cabin',
   tier: 3,
   name: 'CabinAutonavConjunction',
-  displayName: 'Coprocessador AutoNav & Conjunção Solar IA',
-  vehicle: 'Oscar · Cabine da Tripulação (Autonomia em Blecaute)',
-  role: 'Opera em blecaute de 2–3 semanas (`§1`) e acelera navegação (`EN8`)',
+  displayName: 'AutoNav Coprocessor & Solar Conjunction AI',
+  vehicle: 'Oscar · Crew Cabin (Blackout Autonomy)',
+  role: 'Operates through 2–3 week blackouts (`§1`) and speeds up navigation (`EN8`)',
   summary:
-    'Monólito computacional anti-radiação com lâminas redundantes douradas de blindagem EMI, tubos de cobre de refrigeração e dissipador aletado no topo.',
-  originNote: 'Centro do piso da cabine (y = 0)',
+    'Radiation-hardened compute monolith with redundant gold EMI-shielding blades, copper cooling pipes and a finned heatsink on top.',
+  originNote: 'Cabin floor center (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -586,12 +586,12 @@ const cabinAredExercise = {
   category: 'cabin',
   tier: 2,
   name: 'CabinAredExercise',
-  displayName: 'Estação de Exercício Resistivo ARED (203+ dias)',
-  vehicle: 'Maya · Cabine da Tripulação (Contramedida Óssea)',
-  role: 'Previne perda óssea de 1–1,5%/mês (`BI8`) na travessia até Marte',
+  displayName: 'ARED Resistive Exercise Station (203+ days)',
+  vehicle: 'Maya · Crew Cabin (Bone Countermeasure)',
+  role: 'Prevents 1–1.5%/month bone loss (`BI8`) during the transit to Mars',
   summary:
-    'Plataforma de isolamento VIS com cilindros gêmeos de vácuo em alumínio, discos inerciais traseiros e braço de levantamento com ombreira laranja.',
-  originNote: 'Centro da plataforma isoladora na cabine (y = 0)',
+    'VIS isolation platform with twin aluminum vacuum cylinders, rear flywheels and a lifting arm with orange shoulder pads.',
+  originNote: 'Center of the cabin isolation platform (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -638,12 +638,12 @@ const cabinStormShelter = {
   category: 'cabin',
   tier: 2,
   name: 'CabinStormShelter',
-  displayName: 'Abrigo Solar de Parede d’Água & Baia Médica ISO 7010',
-  vehicle: 'Maya · Cabine da Tripulação (Proteção SPE & SANS)',
-  role: 'Refúgio em tempestades solares (`M-S5`) e exame SANS (`BI8` / `BI11`)',
+  displayName: 'Water-Wall Solar Shelter & ISO 7010 Medical Bay',
+  vehicle: 'Maya · Crew Cabin (SPE & SANS Protection)',
+  role: 'Refuge during solar storms (`M-S5`) and SANS exams (`BI8` / `BI11`)',
   summary:
-    'Bunker em C revestido com blocos de água contra radiação, assento médico, ultrassom portátil e sinalização de primeiros socorros ISO 7010 (cruz branca em fundo verde).',
-  originNote: 'Centro do piso da cabine (y = 0)',
+    'C-shaped bunker lined with radiation-shielding water blocks, a medical seat, portable ultrasound and ISO 7010 first-aid signage (white cross on green background).',
+  originNote: 'Cabin floor center (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
@@ -693,12 +693,12 @@ const cabinMsgMinion = {
   category: 'cabin',
   tier: 3,
   name: 'CabinMsgMinion',
-  displayName: 'Glovebox Microgravidade MSG & Sequenciador MinION',
-  vehicle: 'Maya · Cabine da Tripulação (Biologia & Biomining)',
-  role: 'Sequencia 4–20 Gb/run em órbita (`BI9` / `BI10`) mantendo biocontenção',
+  displayName: 'MSG Microgravity Glovebox & MinION Sequencer',
+  vehicle: 'Maya · Crew Cabin (Biology & Biomining)',
+  role: 'Sequences 4–20 Gb/run in orbit (`BI9` / `BI10`) while keeping biocontainment',
   summary:
-    'Cabine fechada MSG iluminada com janela angulada, dois portos circulares com luvas navais, centrífuga interna e sequenciador MinION dourado.',
-  originNote: 'Centro do piso da cabine (y = 0)',
+    'Lit, enclosed MSG cabinet with an angled window, two circular ports with navy-blue gloves, an internal centrifuge and a gold MinION sequencer.',
+  originNote: 'Cabin floor center (y = 0)',
   references: [...CABIN_COMMON_REF, 'references/experiments/mars-experiments.md'],
   build() {
     const p = createPartBuilder({
