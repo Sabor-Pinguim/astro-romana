@@ -81,7 +81,7 @@ export async function startServer(config = loadConfig(), { log = console.log } =
   }, config.PING_INTERVAL_MS);
   const sweep = setInterval(() => hub.sweep(), config.SWEEP_INTERVAL_MS);
 
-  await new Promise(resolve => http.listen(config.PORT, resolve));
+  await new Promise(resolve => http.listen(config.PORT, config.HOST || undefined, resolve));
   const { port } = http.address();
 
   async function close(reason = 'server') {
@@ -107,7 +107,7 @@ function reply(res, status, type, body) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const config = loadConfig();
   const server = await startServer(config);
-  console.log(`room server on :${server.port} · test page ${server.http}/ · origins ${config.ALLOWED_ORIGINS.join(', ') || 'any'}`);
+  console.log(`room server on ${config.HOST || '*'}:${server.port} · test page ${server.http}/ · origins ${config.ALLOWED_ORIGINS.join(', ') || 'any'}`);
   for (const signal of ['SIGTERM', 'SIGINT']) {
     process.once(signal, async () => { await server.close('server'); process.exit(0); }); // Cloud Run sends SIGTERM
   }

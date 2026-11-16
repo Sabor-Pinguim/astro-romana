@@ -1,0 +1,36 @@
+# Room server (multiplayer/server.mjs) on the VM. Installed by setup.sh as /etc/systemd/system/astro-rooms.service.
+# Logs: journalctl -u astro-rooms -f
+[Unit]
+Description=Astro Romana room server (multiplayer)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=astro
+Group=astro
+WorkingDirectory=/srv/astro-romana/multiplayer
+# PORT, HOST and ALLOWED_ORIGINS (written by setup.sh)
+EnvironmentFile=/etc/astro-romana/rooms.env
+ExecStart=/usr/bin/node server.mjs
+# SIGTERM closes every room with reason "server" before exiting.
+KillSignal=SIGTERM
+TimeoutStopSec=10
+Restart=always
+RestartSec=2
+
+# Hardening: the server only reads its own files and talks over the network.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

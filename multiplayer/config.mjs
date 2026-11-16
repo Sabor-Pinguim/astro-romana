@@ -3,6 +3,8 @@
 
 const DEFAULTS = {
   PORT: 8787, // Cloud Run sets PORT=8080
+  // Interface to listen on. Empty = all (Cloud Run, local tests); 127.0.0.1 behind a proxy on the same machine (Caddy on the VM).
+  HOST: '',
   // Origins allowed to open a WebSocket. Empty = any origin (local development). "null" = pages opened from file://.
   ALLOWED_ORIGINS: [],
 

@@ -1,0 +1,24 @@
+# Body of the site block on the VM. setup.sh writes /etc/caddy/Caddyfile with the domain and imports this file, so
+# the live config follows the repository. Caddy gets and renews the HTTPS certificate on its own (Let's Encrypt).
+encode zstd gzip
+
+# Room server (multiplayer/server.mjs, listening on localhost only): WebSocket and health check.
+handle /ws {
+	reverse_proxy 127.0.0.1:8787 {
+		# A Caddy reload keeps open games for up to 10 min instead of cutting every WebSocket at once.
+		stream_close_delay 10m
+	}
+}
+handle /health {
+	reverse_proxy 127.0.0.1:8787
+}
+
+# Everything else: the game as static files, straight from the repository checkout. The rooms test page is at
+# /multiplayer/demo/ and finds the server at wss://<this host>/ws on its own.
+handle {
+	root * {$SITE_ROOT:/srv/astro-romana}
+	file_server {
+		# Dotfiles and folders (.git!) and installed packages never leave the server.
+		hide .* node_modules
+	}
+}

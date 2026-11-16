@@ -15,6 +15,7 @@ rooms.mjs              lógica das salas, sem rede (testável com relógio falso
 server.mjs             HTTP (/health, página de teste) + WebSocket em /ws
 client/room-client.js  window.RoomClient para o navegador (script clássico, funciona em file://)
 demo/index.html        página de teste
+deploy/                VM no GCP: criar a VM, instalar e atualizar (setup.sh), Caddy e systemd
 test/                  node:test: unidade (rooms) e integração (servidor + RoomClient)
 ```
 
@@ -84,6 +85,7 @@ Os valores padrão estão em [config.mjs](config.mjs). Os principais:
 | Variável | Padrão | Uso |
 |---|---|---|
 | `PORT` | 8787 | O Cloud Run define 8080 sozinho |
+| `HOST` | vazia (todas as interfaces) | `127.0.0.1` atrás de um proxy na mesma máquina (o Caddy da VM) |
 | `ALLOWED_ORIGINS` | vazia (aceita tudo) | Origens que podem abrir o WebSocket, separadas por vírgula. `null` = páginas abertas em `file://` |
 | `DEFAULT_SEATS` | `helena,lucas,oscar,maya` | Vagas quando o host não manda as suas. A primeira é a do host |
 | `DEFAULT_JOINABLE` | `menu,orbit,lobby,planner` | Fases em que dá para entrar; depois do lançamento, só `resume` |
@@ -110,9 +112,57 @@ room.pose({ x, z, yaw });                    // qualquer um
 - O `sessionStorage` guarda a sessão: depois de recarregar a página, `room.rejoin()` volta para a mesma vaga, e `room.join(code)` tenta retomar antes de entrar como novo.
 - Enquanto está reconectando, os envios voltam `false` e não são guardados.
 
-## Deploy (GCP, Cloud Run)
+## Deploy (GCP, VM com Caddy)
 
-Pelo [Cloud Shell](https://shell.cloud.google.com/) ou por uma máquina com `gcloud`, na raiz do repositório:
+Uma VM serve tudo no mesmo domínio:
+- **o jogo:** os arquivos estáticos do repositório;
+- **o servidor de salas:** em `/ws`, atrás do Caddy;
+- **o HTTPS:** o Caddy pede e renova o certificado do Let's Encrypt sozinho.
+
+```text
+navegador ──https/wss──> Caddy (:443) ──/ws, /health──> node server.mjs (127.0.0.1:8787, systemd)
+                                     └─ o resto ──────> /srv/astro-romana (checkout do repositório)
+```
+
+| Arquivo em `deploy/` | O que faz |
+|---|---|
+| `gcp-create-vm.sh` | Cria o IP fixo, a regra de firewall (80, 443) e a VM Debian em São Paulo. Roda no Cloud Shell |
+| `setup.sh` | Na VM, instala e atualiza tudo: Node 22, Caddy, usuário `astro`, checkout em `/srv/astro-romana`, serviço e Caddyfile |
+| `astro-rooms.service` | Serviço do systemd do servidor de salas (reinicia sozinho, só escuta em `127.0.0.1`) |
+| `Caddyfile.site` | O site: `/ws` e `/health` para o servidor, o resto estático. Esconde `.git` e `node_modules` |
+
+**Primeira vez:**
+1. **Criar a VM.** No [Cloud Shell](https://shell.cloud.google.com/), com o projeto selecionado (`gcloud config set project <id>`), rode `bash gcp-create-vm.sh` (envie o arquivo pelo menu ⋮ → Upload, ou cole o conteúdo).
+   - Ele mostra o IP externo.
+   - Com domínio próprio, crie um registro A apontando para esse IP antes do passo 3.
+   - Sem domínio, o site fica em `https://<ip-com-hífens>.sslip.io`.
+2. **Entrar na VM:** botão SSH na página da VM, ou `gcloud compute ssh astro-romana --zone southamerica-east1-a`. Envie o `setup.sh` pelo botão de upload da janela SSH.
+3. **Instalar:** `sudo bash setup.sh [domínio] [email]`. Os dois argumentos são opcionais: sem domínio, usa o sslip.io; o email serve para avisos do Let's Encrypt.
+   - Na primeira vez o script para e mostra uma **deploy key**, porque o repositório é privado.
+   - Adicione a chave em GitHub → Settings → Deploy keys, **sem** "Allow write access".
+   - Rode o mesmo comando de novo.
+4. **Conferir:**
+   - o jogo em `https://<domínio>/`;
+   - a página de teste das salas em `https://<domínio>/multiplayer/demo/`;
+   - `https://<domínio>/health`, que responde `{"ok":true,…}`.
+
+**Atualizar** (depois de um push na `main`): `sudo bash /srv/astro-romana/multiplayer/deploy/setup.sh`.
+- Os arquivos do jogo mudam na hora.
+- O servidor de salas só reinicia se algo em `multiplayer/` mudou, e aí as salas abertas fecham. Evite atualizar no meio de uma partida.
+- O domínio e o email ficam guardados em `/etc/astro-romana/site.env`. Para trocar o domínio, passe o novo como argumento.
+
+**No dia a dia:**
+- **Logs:** `journalctl -u astro-rooms -f` e `journalctl -u caddy -f`.
+- **Reiniciar:** `sudo systemctl restart astro-rooms`.
+- **Origens permitidas:** `https://<domínio>` e `null` (páginas em `file://`), em `/etc/astro-romana/rooms.env`. O `setup.sh` reescreve esse arquivo.
+  - Para o jogo no GitHub Pages usar esta VM (`…github.io/…?server=wss://<domínio>/ws`), rode `sudo EXTRA_ORIGINS=https://<usuário>.github.io bash /srv/astro-romana/multiplayer/deploy/setup.sh`.
+  - O valor fica guardado como o domínio.
+- **Custo:** a VM fica ligada o tempo todo. O padrão é `e2-small`, e `MACHINE=e2-micro bash gcp-create-vm.sh` usa uma menor. Pare a VM quando não precisar dela; o IP fixo continua reservado.
+- **Se o certificado falhar com sslip.io** (limite de emissões do Let's Encrypt), use um domínio próprio.
+
+### Alternativa: Cloud Run (sem VM)
+
+Só o servidor de salas, com HTTPS automático em `*.run.app`. O jogo fica hospedado em outro lugar, como o Firebase Hosting. Pelo [Cloud Shell](https://shell.cloud.google.com/) ou por uma máquina com `gcloud`, na raiz do repositório:
 
 ```bash
 gcloud run deploy astro-romana-rooms --source multiplayer --region southamerica-east1 \

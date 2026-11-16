@@ -1,6 +1,6 @@
 # Multiplayer
 
-Partida cooperativa online de 1 a 4 jogadores. O **servidor de salas** já está pronto em [multiplayer/](../multiplayer/README.md) (protocolo, testes e deploy no Cloud Run). Este documento é o **plano do que muda no cliente** (`index.html` e `web/`) para ligar o jogo a ele. Os itens marcados com ✅ já estão no jogo; os outros ainda são plano.
+Partida cooperativa online de 1 a 4 jogadores. O **servidor de salas** já está pronto em [multiplayer/](../multiplayer/README.md) (protocolo, testes e deploy numa VM do GCP com Caddy). Este documento é o **plano do que muda no cliente** (`index.html` e `web/`) para ligar o jogo a ele. Os itens marcados com ✅ já estão no jogo; os outros ainda são plano.
 
 ## Princípios
 
@@ -38,6 +38,7 @@ Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só vol
   - em `localhost`, usa `ws://localhost:8787/ws`;
   - em `file://`, usa a constante `NET_SERVER` (`wss://<domínio>/ws`, preenchida depois do deploy) ou, enquanto ela está vazia, o servidor local;
   - qualquer página aceita `?server=`.
+- **GitHub Pages (`*.github.io`):** o multiplayer fica desligado, porque lá não há servidor de salas, e o painel de sala some do lobby. Com `?server=wss://<domínio da VM>/ws` ele liga, desde que a origem do Pages esteja nas origens permitidas da VM (`EXTRA_ORIGINS` no [setup.sh](../multiplayer/deploy/setup.sh)).
 - **Sem servidor,** "Create room" mostra um toast, e o jogo continua no solo.
 - **Ao abrir a página:** com sessão salva, volta para a sala (`rejoin`); com `?room=CODE`, entra nela; sem nenhum dos dois, fica no solo.
 
