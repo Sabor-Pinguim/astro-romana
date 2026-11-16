@@ -36,9 +36,9 @@ Players can only **join** the room up to the `planner`. After the launch, only s
 - **Server address:**
   - a page served by the site (the VM with Caddy) uses the page's own address, `wss://<host>/ws`;
   - on `localhost`, it uses `ws://localhost:8787/ws`;
-  - on `file://`, it uses the `NET_SERVER` constant (`wss://<domain>/ws`, filled in after the deploy) or, while it is empty, the local server;
+  - on GitHub Pages and on `file://`, it uses the `NET_SERVER` constant in `web/net.js`: today the VM, `wss://136-64-13-163.sslip.io/ws` (static IP; the address `setup.sh` prints). Empty, `file://` falls back to the local server;
   - any page accepts `?server=`.
-- **GitHub Pages (`*.github.io`):** multiplayer is off, because there is no room server there, and the room panel disappears from the lobby. With `?server=wss://<VM domain>/ws` it turns on, as long as the Pages origin is among the VM's allowed origins (`EXTRA_ORIGINS` in [setup.sh](../multiplayer/deploy/setup.sh)).
+- **GitHub Pages (`*.github.io`):** multiplayer turns on once `NET_SERVER` is filled in (or with `?server=wss://<VM domain>/ws`); while it is empty, multiplayer is off and the room panel disappears from the lobby. The VM must allow the Pages origin: `sudo EXTRA_ORIGINS=https://<user>.github.io bash setup.sh` ([setup.sh](../multiplayer/deploy/setup.sh)). Give the VM a static IP, or the `sslip.io` name in `NET_SERVER` changes when the VM restarts.
 - **Without a server,** "Create room" shows a toast, and the game stays solo.
 - **On opening the page:** with a saved session, it returns to the room (`rejoin`); with `?room=CODE`, it joins that room; with neither, it stays solo.
 
@@ -172,8 +172,8 @@ The `surf.control` map (character → peer id, or `null` for the AI) comes from 
 
 1. Items 1 and 2: join the room and see the seats. 3 and 4: shared planner. 5: cockpit. 6 in two parts (first astronauts, poses and AI on the host; then experiments, minigames and boarding). 7: results. Each one in its own commit, playable.
 2. At each step, test with the local server (`cd multiplayer && npm start`) and two windows:
-   - the host on `index.html`;
-   - the guest on `index.html?room=CODE&server=ws://localhost:8787/ws`.
+   - the host on `index.html?server=ws://localhost:8787/ws` (from disk, without `?server=` the game uses the VM);
+   - the guest on the invite link, which keeps `?server=`.
 3. At the end, a Playwright script with two contexts:
    - the guest takes Lucas;
    - the planner is the same in both;
