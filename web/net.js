@@ -3,20 +3,22 @@
 // the game stays solo, as before. The host runs the rules; guests send actions (act) and draw the state they get.
 (() => {
   'use strict';
-  // Room server (multiplayer/README.md). A page served by the site (the VM's Caddy, multiplayer/deploy) talks to its
-  // own host at /ws. Pages on localhost use the local server (cd multiplayer && npm start); pages opened from disk use
-  // NET_SERVER (the site, once deployed) or else the local one. ?server=ws(s)://…/ws overrides all of it.
-  const NET_SERVER = ''; // 'wss://<site domain>/ws'
+  // Room server (multiplayer/README.md). Static copies of the game (GitHub Pages, pages opened from disk) cannot find
+  // it on their own: they use NET_SERVER, the VM's address (multiplayer/deploy; its setup.sh prints it, and needs
+  // EXTRA_ORIGINS=https://<user>.github.io for Pages). A page the VM serves talks to its own host at /ws; localhost uses
+  // the local server (cd multiplayer && npm start). ?server=ws(s)://…/ws overrides all of it.
+  const NET_SERVER = ''; // 'wss://<VM domain>/ws'
   const LOCAL_SERVER = 'ws://localhost:8787/ws';
   // Screens a guest can join in (the server's DEFAULT_JOINABLE); after the launch only a dropped player comes back.
   const JOINABLE = ['menu', 'orbit', 'lobby', 'planner'];
   const params = new URLSearchParams(location.search);
-  // Multiplayer switch: off on static hosts without a room server (GitHub Pages, *.github.io), on everywhere else (the
-  // VM in multiplayer/deploy, localhost, pages opened from disk). ?server=wss://…/ws turns it on anywhere, even there.
+  // Multiplayer switch: on static hosts (GitHub Pages, *.github.io) only with NET_SERVER set; on everywhere else (the
+  // VM in multiplayer/deploy, localhost, pages opened from disk). ?server=wss://…/ws turns it on anywhere.
   const STATIC_HOSTS = /(^|\.)github\.io$/i;
-  const MULTIPLAYER_ENABLED = params.has('server') || !STATIC_HOSTS.test(location.hostname);
+  const staticHost = STATIC_HOSTS.test(location.hostname);
+  const MULTIPLAYER_ENABLED = params.has('server') || !!NET_SERVER || !staticHost;
   const localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-  const site = location.protocol.startsWith('http') && !localhost ? `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws` : '';
+  const site = location.protocol.startsWith('http') && !localhost && !staticHost ? `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws` : '';
   const url = params.get('server') || (localhost ? LOCAL_SERVER : site || NET_SERVER || LOCAL_SERVER);
   const ERRORS = {
     'room-not-found': 'Room not found.', 'room-full': 'This crew is full.', 'in-progress': 'The mission already launched.',

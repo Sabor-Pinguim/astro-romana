@@ -155,7 +155,7 @@ browser ──https/wss──> Caddy (:443) ──/ws, /health──> node serve
 - **Logs:** `journalctl -u astro-rooms -f` and `journalctl -u caddy -f`.
 - **Restart:** `sudo systemctl restart astro-rooms`.
 - **Allowed origins:** `https://<domain>` and `null` (pages on `file://`), in `/etc/astro-romana/rooms.env`. `setup.sh` rewrites that file.
-  - For the game on GitHub Pages to use this VM (`…github.io/…?server=wss://<domain>/ws`), run `sudo EXTRA_ORIGINS=https://<user>.github.io bash /srv/astro-romana/multiplayer/deploy/setup.sh`.
+  - For the game on GitHub Pages to use this VM, set `NET_SERVER = 'wss://<domain>/ws'` in `web/net.js` (or open it with `?server=wss://<domain>/ws`) and run `sudo EXTRA_ORIGINS=https://<user>.github.io bash /srv/astro-romana/multiplayer/deploy/setup.sh`.
   - The value is stored like the domain.
 - **Cost:** the VM stays on all the time. The default is `e2-small`, and `MACHINE=e2-micro bash gcp-create-vm.sh` uses a smaller one. Stop the VM when you do not need it; the static IP stays reserved.
 - **If the certificate fails with sslip.io** (Let's Encrypt issuance limit), use your own domain.

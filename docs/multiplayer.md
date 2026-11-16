@@ -36,9 +36,9 @@ Players can only **join** the room up to the `planner`. After the launch, only s
 - **Server address:**
   - a page served by the site (the VM with Caddy) uses the page's own address, `wss://<host>/ws`;
   - on `localhost`, it uses `ws://localhost:8787/ws`;
-  - on `file://`, it uses the `NET_SERVER` constant (`wss://<domain>/ws`, filled in after the deploy) or, while it is empty, the local server;
+  - on GitHub Pages and on `file://`, it uses the `NET_SERVER` constant in `web/net.js` (`wss://<VM domain>/ws`, the address `setup.sh` prints); on `file://`, while it is empty, the local server;
   - any page accepts `?server=`.
-- **GitHub Pages (`*.github.io`):** multiplayer is off, because there is no room server there, and the room panel disappears from the lobby. With `?server=wss://<VM domain>/ws` it turns on, as long as the Pages origin is among the VM's allowed origins (`EXTRA_ORIGINS` in [setup.sh](../multiplayer/deploy/setup.sh)).
+- **GitHub Pages (`*.github.io`):** multiplayer turns on once `NET_SERVER` is filled in (or with `?server=wss://<VM domain>/ws`); while it is empty, multiplayer is off and the room panel disappears from the lobby. The VM must allow the Pages origin: `sudo EXTRA_ORIGINS=https://<user>.github.io bash setup.sh` ([setup.sh](../multiplayer/deploy/setup.sh)). Give the VM a static IP, or the `sslip.io` name in `NET_SERVER` changes when the VM restarts.
 - **Without a server,** "Create room" shows a toast, and the game stays solo.
 - **On opening the page:** with a saved session, it returns to the room (`rejoin`); with `?room=CODE`, it joins that room; with neither, it stays solo.
 
