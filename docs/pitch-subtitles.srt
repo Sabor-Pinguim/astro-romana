@@ -1,0 +1,35 @@
+1
+00:00:00,000 --> 00:00:03,000
+Can your team make it to Mars?
+
+2
+00:00:03,000 --> 00:00:07,000
+Every mission is a balance of mass, power, and budget.
+
+3
+00:00:07,000 --> 00:00:13,172
+In Astro Romana, build your spacecraft and make the decisions that shape its journey.
+
+4
+00:00:13,172 --> 00:00:19,172
+Pilot your mission and explore Mars, inspired by real NASA missions and data.
+
+5
+00:00:19,172 --> 00:00:23,281
+Learn how every choice can change the outcome.
+
+6
+00:00:23,281 --> 00:00:25,281
+Astro Romana.
+
+7
+00:00:25,281 --> 00:00:26,281
+Design.
+
+8
+00:00:26,281 --> 00:00:27,281
+Explore.
+
+9
+00:00:27,281 --> 00:00:29,535
+Discover.
