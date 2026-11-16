@@ -175,6 +175,7 @@
     .crew-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     /* Multiplayer room (web/net.js): create or join under the crew, then the code and the invite link. */
     .room-panel{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .6rem;margin-top:10px;padding:.65rem .75rem;background:var(--f1);clip-path:var(--chamfer)}
+    .room-panel[hidden]{display:none}
     .room-panel .button{min-height:38px;padding:.55rem 1.05rem;font-size:.68rem}
     .room-panel input{width:6.4em;min-height:38px;padding:.4rem .6rem;border:1px solid var(--amethyst);border-radius:0;color:var(--starlight-cream);background:var(--bg-void);font:700 .9rem var(--heading);letter-spacing:.22em;text-transform:uppercase}
     .room-panel input:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--solar-amber)}

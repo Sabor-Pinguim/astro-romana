@@ -3,6 +3,8 @@
 // the game stays solo, as before. The host runs the rules; guests send actions (act) and draw the state they get.
 (() => {
   'use strict';
+  // Multiplayer switch: set to false for static deployments without a room server (e.g. GitHub Pages).
+  const MULTIPLAYER_ENABLED = false;
   // Room server (multiplayer/README.md). A page served by the site (the VM's Caddy, multiplayer/deploy) talks to its
   // own host at /ws. Pages on localhost use the local server (cd multiplayer && npm start); pages opened from disk use
   // NET_SERVER (the site, once deployed) or else the local one. ?server=ws(s)://…/ws overrides all of it.
@@ -24,14 +26,16 @@
   const fire = (type, ...args) => (listeners.get(type) || []).forEach(fn => { try { fn(...args); } catch (err) { console.error('ASTRO_NET listener failed:', err); } });
   let room = null;
   function client() {
+    if (!MULTIPLAYER_ENABLED) return null;
     if (room) return room;
     if (!window.RoomClient || !url) return null;
     room = new RoomClient({ url });
     for (const type of ['welcome', 'peers', 'phase', 'state', 'event', 'act', 'pose', 'msg', 'status', 'closed', 'error']) room.on(type, (...args) => fire(type, ...args));
     return room;
   }
-  const inRoom = () => !!room?.inRoom;
+  const inRoom = () => MULTIPLAYER_ENABLED && !!room?.inRoom;
   const net = {
+    enabled: MULTIPLAYER_ENABLED,
     url, JOINABLE,
     get mode() { return inRoom() ? (room.isHost ? 'host' : 'guest') : 'solo'; },
     get isHost() { return inRoom() && room.isHost; },
@@ -46,14 +50,14 @@
     get status() { return room?.status || 'idle'; },
     get joinable() { return inRoom() && JOINABLE.includes(room.phase); },
     get link() { return inRoom() ? RoomClient.linkFor(room.code) : ''; },
-    available: () => !!(window.RoomClient && url),
+    available: () => MULTIPLAYER_ENABLED && !!(window.RoomClient && url),
     message: err => ERRORS[err?.code || err] || `Room error: ${err?.code || err?.message || err}.`,
     on(type, fn) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(fn); return () => listeners.get(type).delete(fn); },
     peerOf: seat => (inRoom() ? room.peers.find(p => p.seat === seat) : null) || null,
     // My crew member, or an AI one while I am the host (solo counts as host).
     owns: seat => !inRoom() ? true : room.you.seat === seat || (room.isHost && !room.peers.some(p => p.seat === seat)),
-    create: phase => client().create({ phase }),
-    join: code => client().join(code),
+    create: phase => client()?.create({ phase }),
+    join: code => client()?.join(code),
     leave() { room?.leave(); },
     setPhase: phase => inRoom() && room.isHost && room.setPhase(phase),
     setState: (key, data) => inRoom() && room.isHost && room.setState(key, data),
@@ -67,6 +71,7 @@
   // Back into the room after a reload, or into the room of an invite link (?room=CODE). app.js listens to
   // 'welcome' and 'error'; a failed link join is reported there.
   net.start = async () => {
+    if (!MULTIPLAYER_ENABLED) return;
     const c = client();
     if (!c) return;
     if (await c.rejoin().catch(() => null)) return;

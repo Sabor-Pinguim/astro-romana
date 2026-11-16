@@ -103,7 +103,7 @@
     ['v1','50,30 62,22 88,22 100,30 98,52 75,60 52,52'],['v2','50,30 62,22 88,22 52,52'],['v3','55,31 63,26 77,26 59,37']
   ].map(([c,p])=>`<polygon class="${c}" points="${p}"/>`).join('')}</svg>`;
   // Multiplayer (web/net.js, docs/multiplayer.md). Solo when the script or the server is missing.
-  const net = window.ASTRO_NET || {mode:'solo',isHost:false,isGuest:false,peers:[],cached:{},available:()=>false,owns:()=>true,peerOf:()=>null,on:()=>()=>{},setPhase(){},setState(){},emit(){},act(){},start(){}};
+  const net = window.ASTRO_NET || {enabled:false,mode:'solo',isHost:false,isGuest:false,peers:[],cached:{},available:()=>false,owns:()=>true,peerOf:()=>null,on:()=>()=>{},setPhase(){},setState(){},emit(){},act(){},start(){}};
   // The host tells the room which screen it is on; a guest follows (guestScreen) and never changes it alone.
   const showScreen = id => {state.screen=id;$$('.screen').forEach(screen=>screen.classList.toggle('active',screen.id===id));window.scrollTo(0,0);if(id==='planner')renderPlanner();net.setPhase(id);lockGuest();};
   let toastTimer;
@@ -134,6 +134,8 @@
   // Room panel under the crew: create a room (host) or join one with its code; in a room, its code and invite link.
   function renderRoom(){
     const panel=$('#room-panel');if(!panel)return;
+    if(!net.enabled){panel.hidden=true;panel.innerHTML='';return;}
+    panel.hidden=false;
     if(net.mode==='solo'){
       const off=!net.available();
       panel.innerHTML=`<span class="micro">Co-op</span><button class="button" type="button" id="room-create" ${off?'disabled':''}>Create room</button><span class="room-or">or</span><input id="room-code" maxlength="4" placeholder="CODE" aria-label="Room code" autocomplete="off" ${off?'disabled':''}><button class="button quiet" type="button" id="room-join" ${off?'disabled':''}>Join</button>${off?'<span class="room-note">No room server configured (?server=wss://…/ws).</span>':''}`;
