@@ -40,6 +40,7 @@
     get peers() { return inRoom() ? room.peers : []; },
     get phase() { return inRoom() ? room.phase : null; },
     get cached() { return inRoom() ? room.state : {}; },
+    get poses() { return inRoom() ? [...room.poses.values()] : []; }, // the last pose of each peer: [{ from, data }]
     get status() { return room?.status || 'idle'; },
     get joinable() { return inRoom() && JOINABLE.includes(room.phase); },
     get link() { return inRoom() ? RoomClient.linkFor(room.code) : ''; },

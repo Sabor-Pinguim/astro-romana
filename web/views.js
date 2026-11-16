@@ -712,6 +712,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     a.emoteAction = null; a.emoteW = 0; a.actW = 0;
     for (const p of a.props) p.visible = false;
     a.ai.state = 'idle';
+    for (const o of [prev, a]) if (o) { o.net = null; o.wasRemote = false; } // poses from before the switch are stale
     world.avatar = a;
     s.pos.copy(a.pos); s.bodyYaw = a.bodyYaw; s.yaw = a.bodyYaw - Math.PI; s.vy = 0; s.grounded = true;
     if (sim()) sim().surf.activeCrew = id;
@@ -740,14 +741,16 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     world.camera.far = t.ring ? reach * 1.05 : NO_RING_FAR; world.camera.updateProjectionMatrix();
   }
 
-  function placeBlocks() {
-    const { hf, scene } = world, tags = $s('surface-tags'), spots = [], lim = hf.half - 24;
+  // The spots come from a seed (the host's, in a room), so every screen puts the blocks in the same places.
+  const seeded = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  function placeBlocks(seed) {
+    const { hf, scene } = world, tags = $s('surface-tags'), spots = [], lim = hf.half - 24, rand = seeded(seed ?? Math.floor(Math.random() * 2 ** 31));
     for (const b of world.blocks) scene.remove(b);
     tags.innerHTML = ''; world.blocks = []; world.colliders = [{ x: 0, z: 0, r: 2.9 }];
     for (const exp of tasks()) {
       let spot = null;
       for (let t = 0; t < 300 && !spot; t++) {
-        const r = SPOT_MIN + Math.random() * (SPOT_MAX - SPOT_MIN), a = Math.random() * Math.PI * 2, x = Math.sin(a) * r, z = Math.cos(a) * r;
+        const r = SPOT_MIN + rand() * (SPOT_MAX - SPOT_MIN), a = rand() * Math.PI * 2, x = Math.sin(a) * r, z = Math.cos(a) * r;
         const ok = Math.abs(x) < lim && Math.abs(z) < lim && hf.slope(x, z) < .2 && spots.every(p => Math.hypot(p.x - x, p.z - z) > SPOT_GAP);
         if (ok || t === 299) spot = { x, z };
       }
@@ -763,11 +766,24 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       return `<li data-goal="${e.id}" style="--crew:${o.color}"><span class="goal-chip"></span><span class="goal-name"><strong>${e.id} · ${e.title}</strong><small>${o.name}</small></span><span class="goal-dist"></span><span class="goal-arrow"></span></li>`; }).join('');
   }
 
+  // In a room, an astronaut another player moves cannot be taken.
   function renderCrewBar() {
-    $s('surface-crew').innerHTML = ui.crew.map((c, i) => `<button type="button" data-crew="${c.id}" style="--crew:${c.color}" aria-pressed="${c.id === s.crew}">${c.name}<small>${touch ? '' : `key ${i + 1}`}</small></button>`).join('');
+    const control = sim()?.surf.control || {};
+    $s('surface-crew').innerHTML = ui.crew.map((c, i) => { const other = mp() && c.id !== s.crew && !!control[c.id] && control[c.id] !== net().you.id;
+      return `<button type="button" data-crew="${c.id}" style="--crew:${c.color}" aria-pressed="${c.id === s.crew}" ${other ? 'disabled' : ''}>${c.name}<small>${other ? 'player' : touch ? '' : `key ${i + 1}`}</small></button>`; }).join('');
   }
   $s('surface-crew').addEventListener('click', e => { const b = e.target.closest('[data-crew]'); if (b && world) switchCrew(b.dataset.crew); });
-  function switchCrew(id) { if (id === s.crew) return; useCrew(id).then(() => ui.toast(`You are now ${ui.crew.find(c => c.id === id).name}.`)); }
+  function switchCrew(id) {
+    if (id === s.crew) return;
+    if (mp()) { sim()?.requestCrew(id); return; } // the host hands out the AI astronauts (astro:control below)
+    useCrew(id).then(() => ui.toast(`You are now ${ui.crew.find(c => c.id === id).name}.`));
+  }
+  window.addEventListener('astro:control', () => {
+    if (!world || !s.ready || !mp()) return;
+    const mine = sim()?.myCrew();
+    if (mine && mine !== s.crew) useCrew(mine).then(() => ui.toast(`You are now ${ui.crew.find(c => c.id === mine).name}.`));
+    else renderCrewBar();
+  });
 
   function showStart(kicker, title, keys) {
     $s('surface-start-kicker').textContent = kicker; $s('surface-start-title').textContent = title;
@@ -775,7 +791,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   }
   function fail(message) { root.classList.add('surface-fail'); showStart('Surface', message, 'Use “Board & depart” to end the mission.'); }
 
-  async function land({ site, crew }) {
+  async function land({ site, crew, seed }) {
     root.classList.remove('surface-fail');
     if (!world) world = initWorld();
     const info = ui.sites[site];
@@ -787,7 +803,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       if (s.site !== site) return;
       setTerrain(t);
       world.lander.position.set(0, t.hf.at(0, 0), 0);
-      placeBlocks(); buildCompass();
+      placeBlocks(seed); buildCompass();
       await Promise.all(ui.crew.map(c => loadCrew(c.id)));
       let idx = 0;
       for (const [id, [x, z]] of Object.entries(CREW_START)) {
@@ -804,6 +820,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
       s.ready = true;
       startEl.hidden = true;
       ui.toast(touch ? 'Left side to walk · right side to look.' : 'Click to look · WASD to walk · E to interact.');
+      if (mp()) { for (const p of net().poses) takePose(p.data); sim()?.surfaceLoaded?.(); renderCrewBar(); }
     } catch (err) {
       console.warn('Surface not shown:', err);
       fail(`Could not load the ${info?.name ?? site} terrain.`);
@@ -999,12 +1016,13 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     dlg.showModal();
   }
   $s('minigame-close').addEventListener('click', () => dlg.close());
+  function markDone(b) { b.userData.done = true; b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done'); }
   function finishExperiment(id) {
     if (!dlg.open || id !== dlg.dataset.exp || !id || isDone(id)) return;
     sim()?.completeSurfaceTask(id); s.prompt = '';
     const b = world.blocks.find(x => x.userData.exp.id === id);
     if (!isDone(id)) return;
-    if (b) { b.userData.beam.visible = false; b.userData.gem.material.color.set(0x7edac2); b.userData.tag.classList.add('done'); }
+    if (b) markDone(b);
     $s('minigame-fact').textContent = b?.userData.exp.fact || '';
     dlg.classList.add('is-complete');
     completionTimer = setTimeout(() => { if (dlg.open) dlg.close(); }, COMPLETE_DELAY_MS);
@@ -1046,11 +1064,13 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     }
     return [o.pos.x, o.pos.z];
   }
-  function step(dt) {
-    const k = s.keys, a = world.avatar, hf = world.hf;
+  const NO_KEYS = new Set();
+  // input false: my minigame is open in a room; my astronaut stands still while the others keep moving.
+  function step(dt, input = true) {
+    const k = input ? s.keys : NO_KEYS, a = world.avatar, hf = world.hf;
     let ix = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
     let iy = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
-    if (s.stick) { ix += s.stick.x; iy += s.stick.y; }
+    if (s.stick && input) { ix += s.stick.x; iy += s.stick.y; }
     const len = Math.min(1, Math.hypot(ix, iy)), run = k.has('ShiftLeft') || k.has('ShiftRight') || (s.stick && len > .92);
     const speed = len > .08 ? len * (run ? RUN : WALK) : 0, sin = Math.sin(s.yaw), cos = Math.cos(s.yaw);
     let mx = 0, mz = 0;
@@ -1064,7 +1084,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     }
     s.speed = speed;
     const ground = hf.at(s.pos.x, s.pos.z);
-    if (s.grounded && s.jump) { s.vy = JUMP; s.grounded = false; }
+    if (s.grounded && s.jump && input) { s.vy = JUMP; s.grounded = false; }
     s.jump = false;
     if (s.grounded) s.pos.y = ground;
     else { s.vy -= MARS_G * dt; s.pos.y += s.vy * dt; if (s.pos.y <= ground) { s.pos.y = ground; s.vy = 0; s.grounded = true; } }
@@ -1087,6 +1107,8 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     world.camera.getWorldDirection(camDir);
     for (const o of world.avatars.values()) { // teammates wander, work in role animations, and wave back when looked at while stopped
       if (o === a) continue;
+      if (driverOf(o.id) !== 'ai') { followRemote(o, dt); poseAvatar(o, dt); continue; } // another screen moves it
+      if (o.wasRemote) { o.wasRemote = false; o.ai = { state: 'idle', last: 'idle', timer: 1.5, tx: o.pos.x, tz: o.pos.z, waveCd: 3 }; o.wave.stop(); }
       o.ai.waveCd = Math.max(0, o.ai.waveCd - dt);
       if (!reduce && (o.ai.state === 'idle' || o.ai.state === 'action') && o.ai.waveCd <= 0) {
         const pdist = Math.hypot(o.pos.x - s.pos.x, o.pos.z - s.pos.z);
@@ -1160,11 +1182,72 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
         o.action.setEffectiveWeight(o.actW);
         o.walk.timeScale = WALK * 0.68 / STRIDE;
       }
-      const showProps = o.ai.state === 'action';
-      for (const p of o.props) p.visible = showProps;
-      o.body.position.copy(o.pos); o.body.rotation.y = o.bodyYaw;
-      o.mixer.update(reduce ? 0 : dt);
+      poseAvatar(o, dt);
     }
+  }
+  function poseAvatar(o, dt) {
+    const showProps = o.ai.state === 'action';
+    for (const p of o.props) p.visible = showProps;
+    o.body.position.copy(o.pos); o.body.rotation.y = o.bodyYaw;
+    o.mixer.update(reduce ? 0 : dt);
+  }
+
+  // ---- Multiplayer (docs/multiplayer.md, item 6) ------------------------------------------------------------
+  // Each screen moves its own astronaut; the host also moves the AI ones. Everyone sends the astronauts it moves
+  // as poses (~10 Hz) and draws the others from theirs.
+  const net = () => window.ASTRO_NET, mp = () => !!net() && net().mode !== 'solo';
+  const POSE_MS = 100, POSE_IDLE_MS = 1000, SNAP_M = 5, FOLLOW_RATE = 10; // game-balance
+  // 'me', 'ai' (solo, or the host for crew no player moves) or 'player' (drawn from the poses of another screen).
+  function driverOf(id) {
+    if (world?.avatar?.id === id) return 'me';
+    if (!mp()) return 'ai';
+    if (net().isGuest) return 'player';
+    const peer = sim()?.surf.control?.[id];
+    return peer && peer !== net().you.id ? 'player' : 'ai';
+  }
+  function takePose(data) {
+    for (const [id, p] of Object.entries(data?.av || {})) {
+      const o = world?.avatars.get(id);
+      if (o && driverOf(id) === 'player' && [p.x, p.y, p.z, p.yaw].every(Number.isFinite)) o.net = p;
+    }
+  }
+  window.ASTRO_NET?.on('pose', data => { if (s.ready) takePose(data); });
+  // Glide toward the last pose; a jump of more than SNAP_M (a teleport) lands at once.
+  function followRemote(o, dt) {
+    if (!o.wasRemote) { o.wasRemote = true; o.net = null; } // just handed to another screen: wait for its poses
+    const t = o.net;
+    if (t) {
+      const far = Math.hypot(t.x - o.pos.x, t.z - o.pos.z) > SNAP_M, f = far ? 1 : 1 - Math.exp(-dt * FOLLOW_RATE);
+      o.pos.x += (t.x - o.pos.x) * f; o.pos.y += (t.y - o.pos.y) * f; o.pos.z += (t.z - o.pos.z) * f;
+      o.bodyYaw = far ? t.yaw : stepYaw(o.bodyYaw, t.yaw, dt * 10);
+      const anim = ['idle', 'walk', 'wave', 'action'].includes(t.anim) ? t.anim : 'idle';
+      if (anim !== o.ai.state) {
+        if (anim === 'wave') { o.action.stop(); o.wave.reset().play(); } else o.wave.stop();
+        if (anim === 'action') o.action.reset().play();
+        o.ai.state = anim;
+      }
+    }
+    const waveW = o.ai.state === 'wave' ? 1 : 0, rest = 1 - waveW;
+    o.walkW += ((o.ai.state === 'walk' ? 1 : 0) - o.walkW) * Math.min(1, dt * 8);
+    o.actW += ((o.ai.state === 'action' ? 1 : 0) - o.actW) * Math.min(1, dt * 8);
+    if (o.ai.state !== 'action' && o.actW < .02) { o.action.stop(); o.actW = 0; }
+    o.walk.setEffectiveWeight(o.walkW * (1 - o.actW) * rest); o.idle.setEffectiveWeight((1 - o.walkW) * (1 - o.actW) * rest);
+    o.action.setEffectiveWeight(o.actW * rest); o.wave.setEffectiveWeight(waveW);
+    o.walk.timeScale = clamp((t?.spd || STRIDE) / STRIDE, .6, 2.6);
+  }
+  const r2 = v => Math.round(v * 100) / 100;
+  let poseClock = 0, poseText = '', poseSentAt = 0;
+  function sendPoses(now) {
+    const a = world.avatar, av = {}, kind = s.emote?.kind;
+    av[a.id] = { x: r2(s.pos.x), y: r2(s.pos.y), z: r2(s.pos.z), yaw: r2(s.bodyYaw),
+      anim: kind === 'wave' || kind === 'action' ? kind : kind === 'walk' || s.speed > 0 ? 'walk' : 'idle', spd: r2(kind === 'walk' ? STRIDE : s.speed) };
+    if (net().isHost) for (const o of world.avatars.values()) {
+      if (o !== a && driverOf(o.id) === 'ai') av[o.id] = { x: r2(o.pos.x), y: r2(o.pos.y), z: r2(o.pos.z), yaw: r2(o.bodyYaw), anim: o.ai.state, spd: o.ai.state === 'walk' ? r2(WALK * .68) : 0 };
+    }
+    const text = JSON.stringify(av);
+    if (text === poseText && now - poseSentAt < POSE_IDLE_MS) return;
+    poseText = text; poseSentAt = now;
+    net().pose({ av });
   }
   function placeCamera() {
     const { camera, avatar: a } = world;
@@ -1187,6 +1270,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     for (const b of world.blocks) {
       const e = b.userData.exp, li = document.querySelector(`[data-goal="${e.id}"]`), dx = b.position.x - s.pos.x, dz = b.position.z - s.pos.z, dist = Math.hypot(dx, dz);
       li.classList.toggle('done', isDone(e.id)); li.classList.toggle('here', dist <= REACH);
+      if (isDone(e.id) && !b.userData.done) markDone(b); // also when another player finished it
       li.querySelector('.goal-dist').textContent = isDone(e.id) ? 'DONE' : `${Math.round(dist)} m`;
       li.querySelector('.goal-arrow').style.rotate = `${Math.atan2(dx, -dz) + s.yaw}rad`; // bearing from north, relative to the view
     }
@@ -1226,7 +1310,8 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
     // Leaving the surface (timer, results) must give the mouse back.
     if (world && document.pointerLockElement === world.renderer.domElement && !isActive('surface')) document.exitPointerLock();
     if (!world || !s.ready || !world.avatar || !isActive('surface') || !world.width) return;
-    if (!dlg.open) step(dt);
+    if (!dlg.open) step(dt); else if (mp()) step(dt, false);
+    if (mp() && (poseClock += dt * 1000) >= POSE_MS) { poseClock = 0; sendPoses(now); }
     placeCamera();
     world.sky.position.copy(world.camera.position);
     world.sun.target.position.copy(s.pos); world.sun.position.copy(s.pos).addScaledVector(world.sunDir, 90);
@@ -1237,7 +1322,7 @@ const isActive = id => document.getElementById(id)?.classList.contains('active')
   requestAnimationFrame(frame);
   // Test and debug hook (Playwright, console): state, and a teleport next to a block.
   window.ASTRO_SURFACE = { state: s, world: () => world, emote: kind => playEmote(kind), wheel: open => (open ? openWheel(false) : closeWheel(false)),
-    running: () => !!(s.ready && startEl.hidden && !dlg.open),
+    running: () => !!(s.ready && startEl.hidden && !dlg.open), loaded: () => !!(s.ready && startEl.hidden), boardReach: BOARD_REACH,
     distanceToLander(id) { const a = world?.avatars.get(id); if (!a) return 0; const p = a === world.avatar ? s.pos : a.pos; return Math.hypot(p.x, p.z); },
     goTo(id) { const b = world?.blocks.find(x => x.userData.exp.id === id); if (b) { s.pos.x = b.position.x + 2.2; s.pos.z = b.position.z + 1.2; s.yaw = Math.atan2(-(b.position.x - s.pos.x), -(b.position.z - s.pos.z)); s.grounded = false; } } };
   // index.html#surface or #surface-gale opens the surface directly (quick testing).

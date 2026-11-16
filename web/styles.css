@@ -181,6 +181,7 @@
     .room-or{color:var(--muted);font-size:.8rem}
     .room-code{font:700 1.3rem var(--heading);letter-spacing:.22em;color:var(--solar-amber)}
     .room-note{flex-basis:100%;color:var(--muted);font-size:.8rem}
+    .mp-watch{margin:.7rem 0 0;color:var(--solar-amber);font:700 .72rem var(--heading);letter-spacing:.08em;text-transform:uppercase}
     [aria-disabled]:is(#difficulty-buttons button,[data-world]){opacity:.55;cursor:not-allowed}
     .crew-card{position:relative;display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px 10px;padding:10px;background:linear-gradient(158deg,color-mix(in srgb,var(--crew) 15%,var(--f2)) 0 36%,var(--f1) 36%);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
     .crew-card::before{content:"";position:absolute;top:0;left:0;width:48%;height:4px;background:var(--crew)}
