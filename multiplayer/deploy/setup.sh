@@ -28,6 +28,8 @@ arg_extra=${EXTRA_ORIGINS:-}
 DOMAIN='' ACME_EMAIL='' EXTRA_ORIGINS=''
 # shellcheck disable=SC1091
 [ -f "$CONF_DIR/site.env" ] && . "$CONF_DIR/site.env"
+# An sslip.io name comes from the IP: work it out again, since an ephemeral IP changes when the VM is stopped and started.
+[[ $DOMAIN == *.sslip.io ]] && DOMAIN=''
 DOMAIN=${1:-$DOMAIN}
 ACME_EMAIL=${2:-$ACME_EMAIL}
 EXTRA_ORIGINS=${arg_extra:-$EXTRA_ORIGINS}
