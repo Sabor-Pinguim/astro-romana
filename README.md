@@ -1,5 +1,7 @@
 # Astro Romana
 
+https://sabor-pinguim.github.io/astro-romana/
+
 A cooperative browser game about designing and flying a science mission to Mars, made for the
 **NASA Space Apps Challenge 2026**, challenge ["Space Mission Design Game"](docs/description.md).
 
