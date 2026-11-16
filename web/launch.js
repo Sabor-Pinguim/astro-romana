@@ -46,6 +46,37 @@ function addTechnologyPark(scene) {
     for (const y of [3.02, 5.25, 7.72]) box(building, width, .045, .74, seam, x, y, z, a);
     box(building, .14, 2.7, .46, concrete, x - Math.cos(a) * width * .48, 1.55, z + Math.sin(a) * width * .48, a);
   }
+  // Dark lettering follows the facade; layered, offset silhouettes give it visible depth.
+  const signCanvas = document.createElement('canvas');
+  signCanvas.width = 2048; signCanvas.height = 128;
+  const signContext = signCanvas.getContext('2d');
+  signContext.textAlign = 'center'; signContext.textBaseline = 'middle';
+  signContext.font = '700 78px sans-serif';
+  signContext.fillStyle = '#34413f'; signContext.fillText('PARQUE TECNOLÓGICO DE SOROCABA', 1024, 64, 1990);
+  const signTexture = new THREE.CanvasTexture(signCanvas); signTexture.colorSpace = THREE.SRGBColorSpace;
+  const signPositions = [], signUVs = [], signIndices = [], signSegments = 12;
+  // Centre the lettering on the junction of the two facade halves and the rocket's x=0 axis.
+  // Keep it in the upper concrete band, above the horizontal seam.
+  const signCenterX = -building.position.x, signSpan = .55, signRadius = radius + .46, signY = 6.35, signHeight = 1.1;
+  for (let i = 0; i <= signSegments; i++) {
+    const u = i / signSegments, a = (u - .5) * signSpan;
+    const x = signCenterX + Math.sin(a) * signRadius, z = Math.cos(a) * signRadius - radius;
+    signPositions.push(x, signY - signHeight / 2, z, x, signY + signHeight / 2, z);
+    signUVs.push(u, 0, u, 1);
+    if (i < signSegments) { const n = i * 2; signIndices.push(n, n + 2, n + 1, n + 2, n + 3, n + 1); }
+  }
+  const signGeometry = new THREE.BufferGeometry();
+  signGeometry.setAttribute('position', new THREE.Float32BufferAttribute(signPositions, 3));
+  signGeometry.setAttribute('uv', new THREE.Float32BufferAttribute(signUVs, 2));
+  signGeometry.setIndex(signIndices); signGeometry.computeVertexNormals();
+  const sign = new THREE.Group(); sign.name = 'TechnologyParkSign';
+  // Each offset silhouette is physical geometry, so the lettering stands off the wall in oblique views.
+  for (let layer = 0; layer < 5; layer++) {
+    const face = new THREE.Mesh(signGeometry, new THREE.MeshBasicMaterial({ map: signTexture, color: layer === 4 ? 0xffffff : 0x59605d, transparent: true, alphaTest: .1, side: THREE.DoubleSide }));
+    face.position.z = layer * .025;
+    sign.add(face);
+  }
+  building.add(sign);
   // Recessed wings and entrance beyond the curved facade, as seen in the oblique photographs.
   box(building, 19, 7.7, 12, concrete, -19, 3.85, -9, -.17);
   box(building, 19, 7.7, 12, concrete, 19, 3.85, -9, .17);
