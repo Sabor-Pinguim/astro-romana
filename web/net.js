@@ -3,15 +3,17 @@
 // the game stays solo, as before. The host runs the rules; guests send actions (act) and draw the state they get.
 (() => {
   'use strict';
-  // Room server (multiplayer/README.md, Cloud Run). Empty until it is deployed: then pages served from the web
-  // need ?server=wss://…/ws. Pages opened from disk or localhost use the local server (cd multiplayer && npm start).
-  const NET_SERVER = '';
+  // Room server (multiplayer/README.md). A page served by the site (the VM's Caddy, multiplayer/deploy) talks to its
+  // own host at /ws. Pages on localhost use the local server (cd multiplayer && npm start); pages opened from disk use
+  // NET_SERVER (the site, once deployed) or else the local one. ?server=ws(s)://…/ws overrides all of it.
+  const NET_SERVER = ''; // 'wss://<site domain>/ws'
   const LOCAL_SERVER = 'ws://localhost:8787/ws';
   // Screens a guest can join in (the server's DEFAULT_JOINABLE); after the launch only a dropped player comes back.
   const JOINABLE = ['menu', 'orbit', 'lobby', 'planner'];
   const params = new URLSearchParams(location.search);
-  const local = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-  const url = params.get('server') || (local ? LOCAL_SERVER : NET_SERVER);
+  const localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  const site = location.protocol.startsWith('http') && !localhost ? `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws` : '';
+  const url = params.get('server') || (localhost ? LOCAL_SERVER : site || NET_SERVER || LOCAL_SERVER);
   const ERRORS = {
     'room-not-found': 'Room not found.', 'room-full': 'This crew is full.', 'in-progress': 'The mission already launched.',
     'seat-taken': 'That crew member already has a player.', unreachable: 'Could not reach the room server.', 'connection-lost': 'Lost the connection to the room server.',

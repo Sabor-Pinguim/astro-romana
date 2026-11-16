@@ -33,7 +33,12 @@ Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só vol
   - `act(name, ...args)`, `setPhase`, `setState`, `emit`, `pose`, `send` e `setSeat`; cada um só envia no papel certo (host ou convidado);
   - `owns(seat)`: a vaga é minha, ou é da IA e eu sou o host;
   - `on(tipo, fn)` repassa os eventos da sala para o jogo.
-- **Servidor:** a constante `NET_SERVER` fica vazia até o deploy. Páginas abertas do disco ou em `localhost` usam `ws://localhost:8787/ws`, e qualquer página aceita `?server=`. Sem servidor, "Create room" fica desativado ou mostra um toast, e o jogo continua no solo.
+- **Endereço do servidor:**
+  - uma página servida pelo site (a VM com Caddy) usa o mesmo endereço da página, `wss://<host>/ws`;
+  - em `localhost`, usa `ws://localhost:8787/ws`;
+  - em `file://`, usa a constante `NET_SERVER` (`wss://<domínio>/ws`, preenchida depois do deploy) ou, enquanto ela está vazia, o servidor local;
+  - qualquer página aceita `?server=`.
+- **Sem servidor,** "Create room" mostra um toast, e o jogo continua no solo.
 - **Ao abrir a página:** com sessão salva, volta para a sala (`rejoin`); com `?room=CODE`, entra nela; sem nenhum dos dois, fica no solo.
 
 ### 2. Lobby: `web/app.js` (`renderLobby`, `renderRoom`) ✅
