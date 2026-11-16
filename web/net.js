@@ -11,10 +11,8 @@
   // Screens a guest can join in (the server's DEFAULT_JOINABLE); after the launch only a dropped player comes back.
   const JOINABLE = ['menu', 'orbit', 'lobby', 'planner'];
   const params = new URLSearchParams(location.search);
-  // Multiplayer switch: off on static hosts without a room server (GitHub Pages, *.github.io), on everywhere else (the
-  // VM in multiplayer/deploy, localhost, pages opened from disk). ?server=wss://…/ws turns it on anywhere, even there.
-  const STATIC_HOSTS = /(^|\.)github\.io$/i;
-  const MULTIPLAYER_ENABLED = params.has('server') || !STATIC_HOSTS.test(location.hostname);
+  // Multiplayer switch: true enables multiplayer everywhere (including static hosts).
+  const MULTIPLAYER_ENABLED = true;
   const localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const site = location.protocol.startsWith('http') && !localhost ? `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws` : '';
   const url = params.get('server') || (localhost ? LOCAL_SERVER : site || NET_SERVER || LOCAL_SERVER);
