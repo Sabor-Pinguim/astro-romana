@@ -1,97 +1,97 @@
-# Personagens e Classes da Tripulação
+# Crew Characters and Classes
 
-Este documento define os **4 personagens jogáveis** (classes) para o modo solo ou cooperativo (até 4 jogadores).  
-A estrutura adota **personagens nomeados com dupla especialização**, combinando identidade narrativa com cobertura completa dos sistemas e restrições descritos em [description.md](description.md).
+This document defines the **4 playable characters** (classes) for solo or cooperative play (up to 4 players).  
+The structure uses **named characters with a dual specialization**, combining a narrative identity with full coverage of the systems and constraints described in [description.md](../docs/description.md).
 
 ---
 
-## Visão Geral da Equipe
+## Team Overview
 
-| # | Personagem | Classe / Cargo | Dupla Especialização | Recursos Principais |
+| # | Character | Class / Position | Dual Specialization | Main Resources |
 | :- | :--- | :--- | :--- | :--- |
-| 1 | **Helena** *(sugestão)* | Comandante e Piloto | Eng. Aeroespacial & Pilotagem de Testes | **Massa**, **Órbita/Foguete** e **Orçamento** |
-| 2 | **Lucas** *(sugestão)* | Engenheiro de Sistemas | Eng. Elétrica (Potência) & Eng. Mecânica | **Energia (Power)** e **Tempo de Vida (Time)** |
-| 3 | **Oscar** | Especialista de Dados e Telecom | Eng. da Computação & Telecomunicações | **Dados (Data)** e **Comunicação** |
-| 4 | **Maya** | Cientista de Missão e Oficial Médica | Geologia Planetária & Astrobiologia / Medicina | **Valor Científico** e **Suporte à Tripulação** |
+| 1 | **Helena** *(suggestion)* | Commander and Pilot | Aerospace Eng. & Test Piloting | **Mass**, **Orbit/Rocket** and **Budget** |
+| 2 | **Lucas** *(suggestion)* | Systems Engineer | Electrical Eng. (Power) & Mechanical Eng. | **Power** and **Lifetime (Time)** |
+| 3 | **Oscar** | Data and Telecom Specialist | Computer Eng. & Telecommunications | **Data** and **Communications** |
+| 4 | **Maya** | Mission Scientist and Medical Officer | Planetary Geology & Astrobiology / Medicine | **Science Value** and **Crew Support** |
 
 ---
 
-## Fichas Detalhadas
+## Detailed Sheets
 
-### 1. Helena *(sugestão)* — Comandante e Piloto
-* **Dupla Especialização:** Engenharia Aeroespacial & Pilotagem de Testes
-* **Perfil:** Pragmática e focada em viabilidade física. É quem garante que a missão saia do chão e chegue à órbita certa sem estourar o limite do foguete.
-* **Sistemas sob sua responsabilidade:**
-  * Seleção do veículo lançador (foguete)
-  * Propulsão e delta-v (capacidade de manobra)
-  * Controle de atitude (apontamento da nave)
-  * Definição da órbita e trajetória da missão
-* **Recursos que controla e defende:** **Massa Total**, **Órbita** e gestão compartilhada do **Orçamento (Budget)**.
-* **Papel e tensão na equipe:**
-  * Mantém a nave **leve e enxuta**, freando o ímpeto da equipe quando o peso total ameaça exigir um foguete muito mais caro (ou inviabilizar o lançamento).
-  * Negocia diretamente com **Maya** (peso dos instrumentos) e **Lucas** (peso de baterias/estrutura).
-* **Sugestão de Habilidade Passiva (Perk):**
-  * *Pilotagem de Precisão:* Reduz em uma pequena porcentagem o consumo de combustível nas manobras orbitais ou aumenta ligeiramente a margem de massa útil do lançador selecionado.
-
----
-
-### 2. Lucas *(sugestão)* — Engenheiro de Sistemas
-* **Dupla Especialização:** Engenharia Elétrica (Potência) & Engenharia Mecânica / Estrutural
-* **Perfil:** Metódico e preventivo. Pensa em durabilidade, redundância e balanço energético para a nave sobreviver a eclipses, radiação e longos períodos de operação.
-* **Sistemas sob sua responsabilidade:**
-  * Estrutura / chassi e proteção térmica
-  * Painéis solares ou fontes de energia
-  * Baterias e distribuição elétrica
-  * Manutenção e reparo de falhas em voo
-* **Recursos que controla e defende:** **Energia (Power)** e **Tempo de Vida / Integridade (Time)**.
-* **Papel e tensão na equipe:**
-  * É o **"guardião dos Watts"**: calcula se a energia gerada e armazenada aguenta os picos de consumo quando os instrumentos científicos e as antenas operam ao mesmo tempo.
-  * Precisa dizer "não" ou exigir melhorias estruturais quando **Oscar** e **Maya** querem operar tudo em potência máxima.
-* **Sugestão de Habilidade Passiva (Perk):**
-  * *Engenharia Redundante:* Diminui a chance de degradação de componentes por eventos aleatórios ou melhora a eficiência de geração/armazenamento energético em períodos de sombra orbital.
+### 1. Helena *(suggestion)*: Commander and Pilot
+* **Dual Specialization:** Aerospace Engineering & Test Piloting
+* **Profile:** Pragmatic and focused on physical feasibility. She makes sure the mission gets off the ground and reaches the right orbit without going over the rocket's limit.
+* **Systems she is responsible for:**
+  * Launch vehicle (rocket) selection
+  * Propulsion and delta-v (maneuvering capability)
+  * Attitude control (spacecraft pointing)
+  * Mission orbit and trajectory
+* **Resources she controls and defends:** **Total Mass**, **Orbit** and shared management of the **Budget**.
+* **Role and tension in the team:**
+  * Keeps the spacecraft **light and lean**, holding the team back when the total mass threatens to require a much more expensive rocket (or makes the launch impossible).
+  * Negotiates directly with **Maya** (instrument mass) and **Lucas** (battery and structure mass).
+* **Suggested Passive Ability (Perk):**
+  * *Precision Piloting:* Reduces fuel use in orbital maneuvers by a small percentage, or slightly increases the payload margin of the selected launch vehicle.
 
 ---
 
-### 3. Oscar — Especialista de Dados e Telecom
-* **Dupla Especialização:** Engenharia da Computação & Telecomunicações
-* **Perfil:** Analítico e estratégico. Sabe que ciência não transmitida para a Terra é ciência perdida, e que a banda de comunicação é um gargalo constante.
-* **Sistemas sob sua responsabilidade:**
-  * Computador de bordo e processamento
-  * Memória / armazenamento de dados
-  * Antenas (ganho, banda e apontamento)
-  * Janelas de contato com estações em terra
-* **Recursos que controla e defende:** **Dados (Data)** e **Comunicação (Communications)**.
-* **Papel e tensão na equipe:**
-  * Equilibra o volume de dados gerado pelos experimentos com a capacidade da memória a bordo e a taxa de transmissão disponível na órbita escolhida por **Helena**.
-  * Negocia prioridade de banda e janelas de transmissão com **Maya** e exige orçamento/energia de **Lucas** para antenas mais potentes.
-* **Sugestão de Habilidade Passiva (Perk):**
-  * *Compressão Inteligente:* Aumenta a taxa efetiva de transmissão ou reduz o espaço em disco ocupado pelos pacotes de dados científicos.
+### 2. Lucas *(suggestion)*: Systems Engineer
+* **Dual Specialization:** Electrical Engineering (Power) & Mechanical / Structural Engineering
+* **Profile:** Methodical and preventive. Thinks about durability, redundancy and the power balance so the spacecraft survives eclipses, radiation and long periods of operation.
+* **Systems he is responsible for:**
+  * Structure / chassis and thermal protection
+  * Solar panels or other power sources
+  * Batteries and power distribution
+  * Maintenance and repair of in-flight failures
+* **Resources he controls and defends:** **Power** and **Lifetime / Integrity (Time)**.
+* **Role and tension in the team:**
+  * He is the **"guardian of the Watts"**: he works out whether the power generated and stored can handle the consumption peaks when the science instruments and the antennas run at the same time.
+  * He has to say "no", or demand structural improvements, when **Oscar** and **Maya** want to run everything at full power.
+* **Suggested Passive Ability (Perk):**
+  * *Redundant Engineering:* Lowers the chance of components degrading in random events, or improves power generation and storage efficiency during orbital shadow.
 
 ---
 
-### 4. Maya — Cientista de Missão e Oficial Médica
-* **Dupla Especialização:** Geologia Planetária & Astrobiologia / Medicina Espacial
-* **Perfil:** Curiosa e ambiciosa. Busca extrair o máximo retorno científico da missão enquanto garante a integridade da tripulação (quando aplicável ao cenário).
-* **Sistemas sob sua responsabilidade:**
-  * Seleção e operação de instrumentos científicos (câmeras, espectrômetros, radares, sensores biológicos)
-  * Definição dos alvos de observação/coleta
-  * Suporte à vida e saúde da tripulação (em missões tripuladas)
-* **Recursos que controla e defende:** **Valor Científico (Pontuação da Missão)** e **Segurança da Tripulação**.
-* **Papel e tensão na equipe:**
-  * Os melhores instrumentos são **pesados, caros, consomem muita energia e geram muitos dados** — o que coloca **Maya** em negociação direta com **Helena**, **Lucas** e **Oscar** em praticamente toda decisão.
-* **Sugestão de Habilidade Passiva (Perk):**
-  * *Sinergia Experimental:* Instrumentos científicos combinados na órbita ideal geram um bônus de valor científico, ou reduzem o impacto de eventos médicos/biológicos na tripulação.
+### 3. Oscar: Data and Telecom Specialist
+* **Dual Specialization:** Computer Engineering & Telecommunications
+* **Profile:** Analytical and strategic. He knows that science not sent back to Earth is science lost, and that communication bandwidth is a constant bottleneck.
+* **Systems he is responsible for:**
+  * Onboard computer and processing
+  * Memory / data storage
+  * Antennas (gain, band and pointing)
+  * Contact windows with ground stations
+* **Resources he controls and defends:** **Data** and **Communications**.
+* **Role and tension in the team:**
+  * Balances the data volume the experiments generate against onboard memory and the transmission rate available in the orbit **Helena** chose.
+  * Negotiates bandwidth priority and transmission windows with **Maya**, and asks **Lucas** for budget and power for stronger antennas.
+* **Suggested Passive Ability (Perk):**
+  * *Smart Compression:* Increases the effective transmission rate or reduces the storage space taken by science data packets.
 
 ---
 
-## Matriz de Trade-offs e Negociação
+### 4. Maya: Mission Scientist and Medical Officer
+* **Dual Specialization:** Planetary Geology & Astrobiology / Space Medicine
+* **Profile:** Curious and ambitious. Seeks the highest science return from the mission while keeping the crew safe (when the scenario has a crew).
+* **Systems she is responsible for:**
+  * Selection and operation of science instruments (cameras, spectrometers, radars, biological sensors)
+  * Choice of observation and sampling targets
+  * Life support and crew health (on crewed missions)
+* **Resources she controls and defends:** **Science Value (Mission Score)** and **Crew Safety**.
+* **Role and tension in the team:**
+  * The best instruments are **heavy, expensive, power-hungry and generate a lot of data**, which puts **Maya** in direct negotiation with **Helena**, **Lucas** and **Oscar** in almost every decision.
+* **Suggested Passive Ability (Perk):**
+  * *Experimental Synergy:* Science instruments combined in the ideal orbit give a science value bonus, or reduce the impact of medical or biological events on the crew.
 
-Esta matriz ilustra como as decisões de um personagem afetam diretamente os recursos de outro, incentivando a colaboração no modo equipe:
+---
 
-| Decisão | Quem propõe | Quem sente o impacto | Conflito / Negociação |
+## Trade-off and Negotiation Matrix
+
+This matrix shows how one character's decisions directly affect another character's resources, which encourages collaboration in team mode:
+
+| Decision | Who proposes it | Who feels the impact | Conflict / Negotiation |
 | :--- | :--- | :--- | :--- |
-| Adicionar instrumento avançado | **Maya** | **Helena**, **Lucas**, **Oscar** | Aumenta **Massa**, **Energia**, **Custo** e **Dados** gerados. |
-| Escolher órbita mais alta / distante | **Helena** ou **Maya** | **Oscar**, **Lucas** | Exige antena mais forte (**Comunicação**) e altera ciclos de luz/sombra (**Energia**). |
-| Trocar para foguete menor (economizar) | **Helena** | **Todos** | Reduz drasticamente o limite de **Massa**, forçando cortes no payload ou nas baterias. |
-| Reduzir tamanho das baterias / painéis | **Lucas** ou **Helena** | **Maya**, **Oscar** | Impede ligar ciência e transmissão simultaneamente; exige escalonamento de uso. |
-| Priorizar antena de alta capacidade | **Oscar** | **Helena**, **Lucas** | Consome mais **Massa**, **Energia** e **Orçamento** para evitar gargalo de **Dados**. |
+| Add an advanced instrument | **Maya** | **Helena**, **Lucas**, **Oscar** | Increases **Mass**, **Power**, **Cost** and the **Data** generated. |
+| Choose a higher / more distant orbit | **Helena** or **Maya** | **Oscar**, **Lucas** | Needs a stronger antenna (**Communications**) and changes the light/shadow cycles (**Power**). |
+| Switch to a smaller rocket (to save money) | **Helena** | **Everyone** | Sharply lowers the **Mass** limit, forcing cuts in the payload or the batteries. |
+| Shrink the batteries / panels | **Lucas** or **Helena** | **Maya**, **Oscar** | Science and transmission can no longer run at the same time; use has to be scheduled. |
+| Prioritize a high-capacity antenna | **Oscar** | **Helena**, **Lucas** | Uses more **Mass**, **Power** and **Budget** to avoid a **Data** bottleneck. |

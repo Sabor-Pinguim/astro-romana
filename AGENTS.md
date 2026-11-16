@@ -17,6 +17,7 @@ Jogo cooperativo (1 a 4 jogadores) para o **NASA Space Apps Challenge 2026**, de
 | [docs/description.md](docs/description.md) | Enunciado oficial do desafio (em inglês) |
 | [docs/characters.md](docs/characters.md) | Os 4 personagens jogáveis e os recursos de cada um |
 | [docs/minigames.md](docs/minigames.md) | Experimentos e minigames por personagem |
+| [references/README.md](references/README.md) | Catálogo de tudo o que o projeto usa (dados, imagens, código, fontes, serviços), com link, uso e licença; base do formulário do Space Apps. Fonte nova entra aqui também |
 | [references/experiments/](references/experiments/) | Dados reais de missões, com fontes |
 | [references/parts/parts.md](references/parts/parts.md) | Peças reais de foguete (motores, tanques): tiers, dados, fotos e instruções low poly |
 | [references/datasets/msl-rad/](references/datasets/msl-rad/) | Radiação medida pelo detector RAD do Curiosity, com fonte |

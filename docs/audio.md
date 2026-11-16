@@ -1,73 +1,73 @@
-# Paisagem sonora da radiação
+# Radiation soundscape
 
-O som de fundo do jogo é gerado a partir de **medições reais de radiação** feitas pelo detector RAD do rover Curiosity, na superfície de Marte. O que o jogador ouve acompanha o que o instrumento mediu.
+The game's background sound is generated from **real radiation measurements** taken by the RAD detector on the Curiosity rover, on the surface of Mars. What the player hears follows what the instrument measured.
 
-- **Dados e fontes:** [references/datasets/msl-rad/](../references/datasets/msl-rad/README.md)
-- **Gerador:** `tools/audio/` (regras em [AGENTS.md](../AGENTS.md), seção 7)
-- **Arquivos gerados:** `assets/audio/`, com o `manifest.json`
+- **Data and sources:** [references/datasets/msl-rad/](../references/datasets/msl-rad/README.md)
+- **Generator:** `tools/audio/` (rules in [AGENTS.md](../AGENTS.md), section 7)
+- **Generated files:** `assets/audio/`, with the `manifest.json`
 
-O áudio é gerado **antes**, fora do jogo. No jogo só tocamos os arquivos e ajustamos volume. Assim tudo funciona igual na versão web.
+The audio is generated **ahead of time**, outside the game. The game only plays the files and sets the volume, so everything works the same in the web version.
 
 ---
 
-## Os sons
+## The sounds
 
-### Fundo da superfície: `rad_surface_bed.wav` (loop de 40 s)
+### Surface ambience: `rad_surface_bed.wav` (40 s loop)
 
-São 4 sóis calmos (1 a 5 de maio de 2024) comprimidos em 40 s, ou seja, 1 sol a cada 10 s.
+Four quiet sols (1 to 5 May 2024) compressed into 40 s, that is, one sol every 10 s.
 
-| Dado | Som |
+| Data | Sound |
 |---|---|
-| Dose suavizada do detector B (tendência lenta) | Brilho do drone e quantas notas do acorde soam: mais dose, acorde mais aberto |
-| A mesma curva | Abertura e volume do chiado de fundo. Dá para ouvir o ciclo de cada sol, porque a dose varia com a pressão do ar ao longo do dia |
-| Cada medida bem acima da tendência (> 1,25 desvio) | Uma nota tipo sino. Quanto maior o desvio, mais aguda. Detector B (silício) toca agudo, à esquerda; detector E (plástico) mais grave, à direita |
+| Smoothed dose from detector B (slow trend) | Brightness of the drone and how many notes of the chord sound: more dose, a more open chord |
+| The same curve | Cutoff and volume of the background hiss. You can hear the cycle of each sol, because the dose changes with air pressure through the day |
+| Each reading well above the trend (> 1.25 standard deviations) | A bell-like note. The bigger the deviation, the higher the note. Detector B (silicon) plays high, on the left; detector E (plastic) plays lower, on the right |
 
-### Tempestade solar: `rad_storm_2024_05_20.wav` (32 s, toca uma vez)
+### Solar storm: `rad_storm_2024_05_20.wav` (32 s, plays once)
 
-São 48 horas reais (20 e 21 de maio de 2024) em 32 s, ou seja, 1 s = 1,5 h. É o maior evento de radiação que o Curiosity registrou: a dose subiu ~79 vezes em menos de uma hora.
+Forty-eight real hours (20 and 21 May 2024) in 32 s, that is, 1 s = 1.5 h. It is the largest radiation event Curiosity has recorded: the dose rose ~79-fold in under an hour.
 
-| Dado | Som |
+| Data | Sound |
 |---|---|
-| Dose medida (linear entre medidas) | Taxa de estalos (um contador Geiger embutido, discreto): 0,4 por segundo antes do evento, proporcional à dose depois (~31 por segundo no pico) |
-| Dose em escala logarítmica | Volume e brilho do ruído, dissonância e tremor do drone |
-| O maior salto entre duas medidas | O impacto grave, em ~3,7 s |
+| Measured dose (linear between readings) | Click rate (a built-in, discreet Geiger counter): 0.4 per second before the event, proportional to the dose after it (~31 per second at the peak) |
+| Dose on a log scale | Volume and brightness of the noise, dissonance and flutter of the drone |
+| The largest jump between two readings | The deep impact, at ~3.7 s |
 
-Toca por cima do fundo, no mesmo tom (Ré).
+It plays over the ambience, in the same key (D).
 
-### Contador Geiger: `geiger_click_1…4.wav`
+### Geiger counter: `geiger_click_1…4.wav`
 
-Os cliques são disparados pelo jogo:
+The game fires the clicks:
 
-- **Taxa:** `clicksPerSecondAtQuiet × dose / quietDoseRateUgyPerDay`, limitada a `maxClicksPerSecond`. Os números estão no `manifest.json`: a dose calma é real, e a taxa de cliques é `game-balance`.
-- **Intervalos:** aleatórios (sorteio exponencial), como num contador de verdade.
-- **Variedade:** sorteie um dos 4 cliques a cada disparo.
-
----
-
-## Como o jogo deve usar
-
-- **Superfície de Marte:** `rad_surface_bed` em loop. O loop já vem marcado no WAV, sem configuração de importação.
-- **Evento de tempestade** (por exemplo, o minigame M-S5 "Abrigo!"):
-  - toque `rad_storm_2024_05_20` por cima do fundo;
-  - se quiser, baixe o fundo ~6 dB enquanto ela toca;
-  - para sincronizar o medidor de dose e os cliques com o som, use `stems[1].envelope`: a dose (µGy/dia) a cada `stepS` segundos do arquivo.
-- **Multiplayer:** a dose é estado do jogo e quem decide é o host (ver [multiplayer.md](multiplayer.md)). O som é local: cada cliente toca o seu a partir do estado recebido.
-- **Web:** o jogo só toca os WAV prontos e ajusta o volume; nada de síntese ou efeitos em tempo real.
+- **Rate:** `clicksPerSecondAtQuiet × dose / quietDoseRateUgyPerDay`, capped at `maxClicksPerSecond`. The numbers are in the `manifest.json`: the quiet dose is real, and the click rate is `game-balance`.
+- **Intervals:** random (exponential draw), as in a real counter.
+- **Variety:** pick one of the 4 clicks at random each time.
 
 ---
 
-## Card "Fato real" (pronto para usar)
+## How the game should use them
 
-> "Em 20 de maio de 2024, uma tempestade solar fez a radiação medida pelo rover Curiosity, na superfície de Marte, subir cerca de 79 vezes em menos de uma hora."
-
-**Fonte:** detector RAD, dados `MSL_RAD_OBS-L2` (NASA SPDF). Calculado em [references/datasets/msl-rad/](../references/datasets/msl-rad/README.md): de 92,8 para 7.295,7 µGy/dia; última medida normal às 05:22 UTC e pico às 06:15 UTC.
-
-Os números de imprensa ("8.100 microgray") não batem com os dados. Veja os ⚠ no README antes de usá-los.
+- **Surface of Mars:** `rad_surface_bed` on loop. The loop is already marked in the WAV, with no import settings.
+- **Storm event** (for example, the M-S5 "Shelter!" minigame):
+  - play `rad_storm_2024_05_20` over the ambience;
+  - optionally, lower the ambience by ~6 dB while it plays;
+  - to sync the dose meter and the clicks with the sound, use `stems[1].envelope`: the dose (µGy/day) every `stepS` seconds of the file.
+- **Multiplayer:** the dose is game state and the host decides it (see [multiplayer.md](multiplayer.md)). The sound is local: each client plays its own from the state it receives.
+- **Web:** the game only plays the finished WAVs and sets the volume; no real-time synthesis or effects.
 
 ---
 
-## O que falta
+## "Real fact" card (ready to use)
 
-- **Integração no jogo:** o `index.html` toca o fundo e os cliques na superfície (`radAudio`); a tempestade ainda não entra.
-- **Viagem até Marte:** o CDAWeb não tem os dados do RAD do cruzeiro (2011–2012). Se o jogo quiser um som de viagem, os dados vêm do arquivo PDS.
-- **Ouvir e ajustar:** a validação confere formato, volume e emenda do loop, não se o som ficou bom. Os volumes e o tom são `game-balance` e podem mudar à vontade.
+> "On 20 May 2024, a solar storm made the radiation measured by the Curiosity rover, on the surface of Mars, rise about 79-fold in under an hour."
+
+**Source:** RAD detector, `MSL_RAD_OBS-L2` data (NASA SPDF). Calculated in [references/datasets/msl-rad/](../references/datasets/msl-rad/README.md): from 92.8 to 7,295.7 µGy/day; last normal reading at 05:22 UTC and peak at 06:15 UTC.
+
+The press figures ("8,100 micrograys") do not match the data. Check the ⚠ marks in the README before using them.
+
+---
+
+## What is missing
+
+- **Game integration:** `index.html` plays the ambience and the clicks on the surface (`radAudio`); the storm is not in yet.
+- **Trip to Mars:** CDAWeb has no RAD data from the cruise (2011–2012). If the game wants a cruise sound, the data has to come from the PDS archive.
+- **Listen and tune:** validation checks format, volume and the loop seam, not whether it sounds good. The volumes and the key are `game-balance` and can change freely.

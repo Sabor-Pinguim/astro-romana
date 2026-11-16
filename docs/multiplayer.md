@@ -1,188 +1,188 @@
 # Multiplayer
 
-Partida cooperativa online de 1 a 4 jogadores. O **servidor de salas** já está pronto em [multiplayer/](../multiplayer/README.md) (protocolo, testes e deploy numa VM do GCP com Caddy). Este documento é o **plano do que muda no cliente** (`index.html` e `web/`) para ligar o jogo a ele. Os itens marcados com ✅ já estão no jogo; os outros ainda são plano.
+Online cooperative play for 1 to 4 players. The **room server** is ready in [multiplayer/](../multiplayer/README.md) (protocol, tests and deploy on a GCP VM with Caddy). This document is the **plan of what changes in the client** (`index.html` and `web/`) to connect the game to it. Items marked ✅ are already in the game; the others are still a plan.
 
-## Princípios
+## Principles
 
-- **O host decide.** Quem cria a sala é o host e fica com a vaga da Helena. O navegador dele roda as regras que já existem: `flightTick`, `surfaceTick`, `completeSurfaceTask` e `showResults`.
-- **Os convidados mandam intenções** (`act`) e desenham o estado que recebem (`state`). Eles não rodam os loops de regra.
-- **Cada um move o próprio astronauta** na superfície e manda a pose (`pose`).
-- **Um minigame roda no navegador do dono da vaga**, e só o resultado vai para o host, como `act`. Essa regra vale para os minigames de hoje e para os que vierem.
-- **Vaga sem jogador fica com a IA**, como hoje. O solo é um host sem convidados, e sem servidor o jogo funciona igual a agora.
-- **O servidor carimba quem enviou** cada `act` (`from.seat`). O host confere o dono por esse carimbo, nunca pelo que o cliente diz.
+- **The host decides.** Whoever creates the room is the host and takes Helena's seat. The host's browser runs the rules that already exist: `flightTick`, `surfaceTick`, `completeSurfaceTask` and `showResults`.
+- **Guests send intentions** (`act`) and draw the state they receive (`state`). They do not run the rule loops.
+- **Each player moves their own astronaut** on the surface and sends its pose (`pose`).
+- **A minigame runs in the browser of the seat's owner**, and only the result goes to the host, as an `act`. This rule applies to today's minigames and to future ones.
+- **A seat without a player stays with the AI**, as today. Solo play is a host without guests, and without a server the game works just as it does now.
+- **The server stamps who sent** each `act` (`from.seat`). The host checks the owner by that stamp, never by what the client says.
 
-## Fluxo atual → canais
+## Current flow → channels
 
-| Tela (`state.screen`) | Hoje | No multiplayer |
+| Screen (`state.screen`) | Today | In multiplayer |
 |---|---|---|
-| `menu`, `orbit` | `selectWorld` local | O host anda pelas telas e manda `phase`. O destino vai em `state setup` |
-| `lobby` | Vagas falsas (`state.friends`), `site`, `difficulty` | Vagas reais (`peers`). `site` e `difficulty` são do host e vão em `state setup` |
-| `planner` | `togglePart`, `addStage`, `removeStage` mudam `state.rocket` | Convidado manda `act`; o host aplica e manda `state setup` |
-| `cockpit` | `startFlight` + `flightTick`; ações em `handleCockpitAction` | O host roda o voo e manda `state flight` (~10 Hz); as ações dos convidados chegam por `act` |
-| `surface` | `surfaceTick` (timer) + `step()` em `views.js`; a IA move os colegas | O host manda `state surface` (locais, timer, feitos, quem controla quem, ~2 Hz) e roda a IA; cada um manda `pose` (~10 Hz) dos astronautas que controla |
-| `results` | `showResults` | O host manda `event results`; cada cliente roda o mesmo `showResults` |
+| `menu`, `orbit` | Local `selectWorld` | The host moves through the screens and sends `phase`. The destination goes in `state setup` |
+| `lobby` | Fake seats (`state.friends`), `site`, `difficulty` | Real seats (`peers`). `site` and `difficulty` belong to the host and go in `state setup` |
+| `planner` | `togglePart`, `addStage`, `removeStage` change `state.rocket` | The guest sends `act`; the host applies it and sends `state setup` |
+| `cockpit` | `startFlight` + `flightTick`; actions in `handleCockpitAction` | The host runs the flight and sends `state flight` (~10 Hz); the guests' actions arrive by `act` |
+| `surface` | `surfaceTick` (timer) + `step()` in `views.js`; the AI moves the crewmates | The host sends `state surface` (sites, timer, completed tasks, who controls whom, ~2 Hz) and runs the AI; each player sends the `pose` (~10 Hz) of the astronauts they control |
+| `results` | `showResults` | The host sends `event results`; each client runs the same `showResults` |
 
-Só dá para **entrar** na sala até o `planner`. Depois do lançamento, só volta quem caiu (`resume`). Essas fases são os padrões do servidor, e o host pode mudá-las no `create`.
+Players can only **join** the room up to the `planner`. After the launch, only someone who dropped can come back (`resume`). These phases are the server's defaults, and the host can change them in `create`.
 
-## O que muda, por arquivo
+## What changes, by file
 
-### 1. Carregar o cliente: `index.html` e `web/net.js` ✅
-- O `index.html` carrega `multiplayer/client/room-client.js` e depois `web/net.js`, os dois **antes** de `web/app.js`. São scripts clássicos e funcionam em `file://`.
-- O `web/net.js` liga o `RoomClient` ao jogo e expõe `window.ASTRO_NET`:
-  - `mode` (`'solo'`, `'host'` ou `'guest'`), `isHost`, `isGuest`, `seat`, `peers`, `code` e `link`;
-  - `act(name, ...args)`, `setPhase`, `setState`, `emit`, `pose`, `send` e `setSeat`; cada um só envia no papel certo (host ou convidado);
-  - `owns(seat)`: a vaga é minha, ou é da IA e eu sou o host;
-  - `on(tipo, fn)` repassa os eventos da sala para o jogo.
-- **Endereço do servidor:**
-  - uma página servida pelo site (a VM com Caddy) usa o mesmo endereço da página, `wss://<host>/ws`;
-  - em `localhost`, usa `ws://localhost:8787/ws`;
-  - em `file://`, usa a constante `NET_SERVER` (`wss://<domínio>/ws`, preenchida depois do deploy) ou, enquanto ela está vazia, o servidor local;
-  - qualquer página aceita `?server=`.
-- **GitHub Pages (`*.github.io`):** o multiplayer fica desligado, porque lá não há servidor de salas, e o painel de sala some do lobby. Com `?server=wss://<domínio da VM>/ws` ele liga, desde que a origem do Pages esteja nas origens permitidas da VM (`EXTRA_ORIGINS` no [setup.sh](../multiplayer/deploy/setup.sh)).
-- **Sem servidor,** "Create room" mostra um toast, e o jogo continua no solo.
-- **Ao abrir a página:** com sessão salva, volta para a sala (`rejoin`); com `?room=CODE`, entra nela; sem nenhum dos dois, fica no solo.
+### 1. Loading the client: `index.html` and `web/net.js` ✅
+- `index.html` loads `multiplayer/client/room-client.js` and then `web/net.js`, both **before** `web/app.js`. They are classic scripts and work on `file://`.
+- `web/net.js` connects the `RoomClient` to the game and exposes `window.ASTRO_NET`:
+  - `mode` (`'solo'`, `'host'` or `'guest'`), `isHost`, `isGuest`, `seat`, `peers`, `code` and `link`;
+  - `act(name, ...args)`, `setPhase`, `setState`, `emit`, `pose`, `send` and `setSeat`; each one only sends in the right role (host or guest);
+  - `owns(seat)`: the seat is mine, or it belongs to the AI and I am the host;
+  - `on(type, fn)` passes the room's events on to the game.
+- **Server address:**
+  - a page served by the site (the VM with Caddy) uses the page's own address, `wss://<host>/ws`;
+  - on `localhost`, it uses `ws://localhost:8787/ws`;
+  - on `file://`, it uses the `NET_SERVER` constant (`wss://<domain>/ws`, filled in after the deploy) or, while it is empty, the local server;
+  - any page accepts `?server=`.
+- **GitHub Pages (`*.github.io`):** multiplayer is off, because there is no room server there, and the room panel disappears from the lobby. With `?server=wss://<VM domain>/ws` it turns on, as long as the Pages origin is among the VM's allowed origins (`EXTRA_ORIGINS` in [setup.sh](../multiplayer/deploy/setup.sh)).
+- **Without a server,** "Create room" shows a toast, and the game stays solo.
+- **On opening the page:** with a saved session, it returns to the room (`rejoin`); with `?room=CODE`, it joins that room; with neither, it stays solo.
 
 ### 2. Lobby: `web/app.js` (`renderLobby`, `renderRoom`) ✅
-- **Painel da sala**, embaixo da tripulação:
-  - no solo: "Create room", ou um código e "Join";
-  - na sala: o código, "Copy invite link" e "Leave".
-- O status de cada card vem de `peers` (`seatStatus`): `HOST`, `PLAYER`, `(OFFLINE)` e `· YOU`, ou `AI (NPC)` numa vaga livre. `#crew-count` conta quem está online.
-- **Convidado:** cada vaga livre ganha o botão "Take seat" (`room.setSeat`) enquanto a sala está numa fase de entrada.
-- **Destino, local de pouso e dificuldade são controles do host.** A tela já dizia "Host control". O convidado vê os botões desativados e pode abrir os detalhes de cada local.
-- O resumo do lançamento ("Crew: N players · M AI") usa `peers`.
+- **Room panel**, below the crew:
+  - solo: "Create room", or a code and "Join";
+  - in a room: the code, "Copy invite link" and "Leave".
+- The status of each card comes from `peers` (`seatStatus`): `HOST`, `PLAYER`, `(OFFLINE)` and `· YOU`, or `AI (NPC)` on a free seat. `#crew-count` counts who is online.
+- **Guest:** each free seat gets a "Take seat" button (`room.setSeat`) while the room is in a joinable phase.
+- **Destination, landing site and difficulty are host controls.** The screen already said "Host control". The guest sees the buttons disabled and can open the details of each site.
+- The launch summary ("Crew: N players · M AI") uses `peers`.
 
-### 3. Telas: `showScreen` ✅
-- **No host**, `showScreen(id)` também chama `setPhase(id)`.
-- **No convidado:**
-  - a tela segue o `phase` recebido (`guestScreen`), por enquanto até o `planner`;
-  - os botões que trocam de tela ou lançam (`#orbit-back`, `#objective-next`, `#lobby-back`, `#to-assembly`, `#planner-back`, `#launch-button`) ficam desativados, com o texto "Waiting for host";
-  - quando o host lança, o convidado vê um toast e espera; o cockpit e a superfície vêm nos itens 5 e 6.
-- **Host que recarrega a página** volta para a mesma sala, com a montagem e a tela guardadas no servidor.
+### 3. Screens: `showScreen` ✅
+- **On the host**, `showScreen(id)` also calls `setPhase(id)`.
+- **On the guest:**
+  - the screen follows the `phase` received (`guestScreen`), for now up to the `planner`;
+  - the buttons that change screens or launch (`#orbit-back`, `#objective-next`, `#lobby-back`, `#to-assembly`, `#planner-back`, `#launch-button`) are disabled, with the text "Waiting for host";
+  - when the host launches, the guest sees a toast and waits; the cockpit and the surface come in items 5 and 6.
+- **A host who reloads the page** returns to the same room, with the assembly and the screen stored on the server.
 
-### 4. Planner e montagem compartilhados: `web/app.js` ✅
-- **Estado `setup`:** o host manda `{world, site, difficulty, rocket}` sempre que algo muda (`syncSetup`), e o convidado copia (`applySetup`). Continuam locais em cada tela: `sel`, `tab` e `detail`.
-- **Ações do foguete (`ROCKET_ACTIONS`):** `addStage(index)`, `removeStage(index)`, `stageType(index, tipo)` e `togglePart(id, sel, tab)`. Cada uma confere os argumentos e devolve um texto de erro quando não se aplica.
-  - `plan(nome, ...args)`: no solo e no host, aplica e redesenha; no convidado, manda `act('rocket', nome, ...args)`.
-  - O host só aceita nomes da tabela, e só no lobby e no planner. Um erro volta só para quem enviou, como toast (`send`).
-  - `togglePart` leva o módulo e a aba de quem clicou, porque a seleção é de cada um.
-- Depois de uma mudança de outro jogador, se o estágio selecionado sumiu, a seleção cai no booster (`fitSelection`).
+### 4. Shared planner and assembly: `web/app.js` ✅
+- **`setup` state:** the host sends `{world, site, difficulty, rocket}` whenever something changes (`syncSetup`), and the guest copies it (`applySetup`). These stay local on each screen: `sel`, `tab` and `detail`.
+- **Rocket actions (`ROCKET_ACTIONS`):** `addStage(index)`, `removeStage(index)`, `stageType(index, type)` and `togglePart(id, sel, tab)`. Each one checks its arguments and returns an error text when it does not apply.
+  - `plan(name, ...args)`: solo and on the host, it applies and redraws; on the guest, it sends `act('rocket', name, ...args)`.
+  - The host only accepts names from the table, and only in the lobby and the planner. An error goes back only to the sender, as a toast (`send`).
+  - `togglePart` carries the module and tab of whoever clicked, because the selection belongs to each player.
+- After a change by another player, if the selected stage is gone, the selection falls back to the booster (`fitSelection`).
 
-### 5. Lançamento e cockpit: `web/app.js` (`SIM`) ✅
-- **Lançamento:** ao confirmar, o host manda `event {k:'launch', lift}`. O convidado vê a mesma plataforma e contagem (`ASTRO_LAUNCHPAD`). Se o foguete não sai do chão, cada um mostra o mesmo debrief (`failLaunch`). Num aborto por Δv, o host manda `event {k:'abort', info}`, e todos veem a amerissagem.
-- **O host roda o voo** como no solo e manda `state flight` a cada 100 ms e a cada mudança de etapa ou de controles (`flightSnapshot`). Vão os campos de `flight`, os minigames de manter na faixa como números, as linhas do log e o tempo restante das faíscas.
-- **O convidado não roda o `flightTick`.** Ele copia o snapshot para dentro do próprio `ASTRO_SIM.flight`, que o cockpit 3D (`web/flight.js`) já lê a cada quadro. Depois redesenha o painel (`renderFlightUI`) se a etapa ou os controles mudaram, ou só o HUD (`updateCockpitHUD`). O `flight.design` sai do mesmo foguete e da mesma dificuldade (`captureDesign`).
-- **Quem pilota cada etapa (`STEP_CREW`):**
+### 5. Launch and cockpit: `web/app.js` (`SIM`) ✅
+- **Launch:** on confirming, the host sends `event {k:'launch', lift}`. The guest sees the same pad and countdown (`ASTRO_LAUNCHPAD`). If the rocket does not leave the ground, each one shows the same debrief (`failLaunch`). On a Δv abort, the host sends `event {k:'abort', info}`, and everyone sees the splashdown.
+- **The host runs the flight** as in solo play and sends `state flight` every 100 ms and at each change of stage or controls (`flightSnapshot`). It carries the `flight` fields, the keep-in-range minigames as numbers, the log lines and the time left on the sparks.
+- **The guest does not run `flightTick`.** It copies the snapshot into its own `ASTRO_SIM.flight`, which the 3D cockpit (`web/flight.js`) already reads every frame. Then it redraws the panel (`renderFlightUI`) if the stage or the controls changed, or only the HUD (`updateCockpitHUD`). `flight.design` comes from the same rocket and the same difficulty (`captureDesign`).
+- **Who flies each stage (`STEP_CREW`):**
 
-  | Etapa | Quem age e pilota |
+  | Stage | Who acts and flies |
   |---|---|
   | 0 · Liftoff & Max-Q | Helena |
-  | 1 · Acoplagem da cabine | Helena |
-  | 2 · Acoplagem orbital e transferência | Oscar ou Maya |
-  | 3 · Pouso em Marte | Helena |
+  | 1 · Cabin docking | Helena |
+  | 2 · Orbital docking and transfer | Oscar or Maya |
+  | 3 · Mars landing | Helena |
 
-  Exceções (`ACTION_CREW`): `breaker` e `stage_sep` são do Lucas; `shield_storm`, da Maya. Um personagem da IA vale para o host (`owns`).
-- **Ações:** `handleCockpitAction` continua sendo a entrada única (botões, teclas e cliques 3D). Quem não é dono vê um toast ("Helena does that."). O convidado dono manda `act('cockpit', ação, arg)`, e o host confere a vaga carimbada e aplica (`applyCockpitAction`).
-- **Pilotagem:** o convidado dono manda as teclas de pilotagem e o direcional na tela (`act('input', teclas, hold)`) quando mudam. O host junta as dele com as de quem pilota a etapa (`inputOf`).
-- **Quem não pilota** vê os controles desativados e o aviso "Helena flies this phase: watch the crew work.".
-- Os toasts da missão (estrelas do liftoff, acoplagem, pouso, experimentos, tempo esgotado) vão para todos (`crewToast` → `event {k:'toast'}`).
+  Exceptions (`ACTION_CREW`): `breaker` and `stage_sep` belong to Lucas; `shield_storm`, to Maya. An AI character counts as the host's (`owns`).
+- **Actions:** `handleCockpitAction` is still the single entry point (buttons, keys and 3D clicks). Someone who is not the owner sees a toast ("Helena does that."). A guest who is the owner sends `act('cockpit', action, arg)`, and the host checks the stamped seat and applies it (`applyCockpitAction`).
+- **Piloting:** the guest who owns the stage sends the piloting keys and the on-screen d-pad (`act('input', keys, hold)`) when they change. The host merges its own with those of whoever flies the stage (`inputOf`).
+- **Those who are not flying** see the controls disabled and the message "Helena flies this phase: watch the crew work.".
+- The mission toasts (liftoff stars, docking, landing, experiments, time up) go to everyone (`crewToast` → `event {k:'toast'}`).
 
-### 6. Superfície (mundo aberto): `web/views.js` e `web/app.js` ✅
-**Problema que motivou o desenho:** cada navegador rodava a IA dos colegas e sorteava os locais dos experimentos com `Math.random`, então cada tela mostraria os NPCs e os blocos em lugares diferentes. A regra passou a ser: **a IA roda só no host, e os locais vêm de uma semente do host.**
+### 6. Surface (open world): `web/views.js` and `web/app.js` ✅
+**The problem behind the design:** each browser ran the crewmates' AI and drew the experiment sites with `Math.random`, so each screen would show the NPCs and the blocks in different places. The rule became: **the AI runs only on the host, and the sites come from a seed set by the host.**
 
-O servidor não mudou. A `pose` é livre e fica guardada por participante, então o host manda num só pacote o astronauta dele e os da IA.
+The server did not change. The `pose` is free-form and stored per participant, so the host sends its own astronaut and the AI's in a single packet.
 
-**Quem move cada astronauta (`driverOf`):**
+**Who moves each astronaut (`driverOf`):**
 
-| Valor | Quem | Como se move |
+| Value | Who | How it moves |
 |---|---|---|
-| `me` | O meu (`world.avatar`) | `step()` com teclado e toque, como no solo |
-| `ai` | No solo, ou no host para quem não tem jogador | A IA de sempre (passear, `action_loop`, acenar de volta) |
-| `player` | Outro jogador, ou a IA vista de um convidado | Desliza até a última pose recebida (`followRemote`) |
+| `me` | Mine (`world.avatar`) | `step()` with keyboard and touch, as in solo play |
+| `ai` | Solo, or on the host for those without a player | The usual AI (wandering, `action_loop`, waving back) |
+| `player` | Another player, or the AI as seen by a guest | Glides to the last pose received (`followRemote`) |
 
-O mapa `surf.control` (personagem → id do peer, ou `null` para a IA) vem do host em `state surface`.
+The `surf.control` map (character → peer id, or `null` for the AI) comes from the host in `state surface`.
 
-**Entrada.**
-- O host roda `startSurface()` e sorteia `surf.seed`. Os locais dos blocos saem dessa semente (`placeBlocks(seed)`), então todos os blocos ficam iguais sem esperar o host.
-- O host manda `state surface {site, seed, timerSec, completed, control, active}` a cada 500 ms e a cada mudança.
-- O convidado entra pela fase `surface` com esse estado (`applySurface`). Cada um começa no próprio astronauta.
-- **O timer só começa quando todos carregaram o terreno.** Cada convidado manda `act('loaded')`, e o host espera no máximo 20 s (`LOAD_WAIT_MS`).
+**Entering.**
+- The host runs `startSurface()` and draws `surf.seed`. The block sites come from that seed (`placeBlocks(seed)`), so every block is in the same place without waiting for the host.
+- The host sends `state surface {site, seed, timerSec, completed, control, active}` every 500 ms and on every change.
+- The guest enters through the `surface` phase with that state (`applySurface`). Each player starts on their own astronaut.
+- **The timer only starts when everyone has loaded the terrain.** Each guest sends `act('loaded')`, and the host waits at most 20 s (`LOAD_WAIT_MS`).
 
 **Pose (~10 Hz).**
-- Cada tela manda `pose {av: {<personagem>: {x, y, z, yaw, anim, spd}}}` com os astronautas que move. O host inclui os da IA.
-- `anim` é `idle`, `walk`, `wave` ou `action`. Vale para os emotes do jogador e para os estados da IA.
-- A pose só sai quando muda, e no mínimo 1 vez por segundo.
-- Quem entra ou volta aplica as últimas poses guardadas (`ASTRO_NET.poses`).
+- Each screen sends `pose {av: {<character>: {x, y, z, yaw, anim, spd}}}` with the astronauts it moves. The host includes the AI's.
+- `anim` is `idle`, `walk`, `wave` or `action`. It covers the player's emotes and the AI's states.
+- The pose is only sent when it changes, and at least once per second.
+- Whoever joins or comes back applies the last stored poses (`ASTRO_NET.poses`).
 
-**Movimento dos outros (`player`):**
-- O astronauta desliza até a última pose (`FOLLOW_RATE`). Um salto maior que `SNAP_M` (5 m) acontece de uma vez.
-- A animação segue o `anim` da pose.
-- Ao trocar quem move um astronauta, a pose antiga é descartada.
+**Movement of the others (`player`):**
+- The astronaut glides to the last pose (`FOLLOW_RATE`). A jump larger than `SNAP_M` (5 m) happens at once.
+- The animation follows the pose's `anim`.
+- When the one moving an astronaut changes, the old pose is discarded.
 
-**Trocar de personagem (teclas 1–4 e barra da tripulação).**
-- No multiplayer, o pedido vai para o host (`requestCrew` → `act('control', id)`). O host só entrega um personagem livre ou da IA (`grantCrew`), e o que você largou volta para a IA no lugar onde estava.
-- Os botões dos personagens de outros jogadores ficam desativados ("player").
-- Quem sai da sala de vez devolve o personagem para a IA (`onPeers`).
+**Switching characters (keys 1–4 and the crew bar).**
+- In multiplayer, the request goes to the host (`requestCrew` → `act('control', id)`). The host only hands over a free or AI character (`grantCrew`), and the one you let go returns to the AI where it was.
+- The buttons of other players' characters are disabled ("player").
+- Whoever leaves the room for good returns their character to the AI (`onPeers`).
 
-**Minigames sem congelar o mundo.**
-- Com o minigame aberto, o meu astronauta fica parado (`step(dt, false)`), e os outros e a IA continuam se mexendo.
-- **Timer (regra nova, `game-balance`):** no multiplayer, o timer da janela de retorno não pausa durante os minigames. No solo, continua pausando.
+**Minigames without freezing the world.**
+- With the minigame open, my astronaut stands still (`step(dt, false)`), and the others and the AI keep moving.
+- **Timer (new rule, `game-balance`):** in multiplayer, the return-window timer does not pause during minigames. In solo play, it still pauses.
 
-**Experimentos.**
-- O minigame roda no navegador de quem move o dono do experimento.
-- Ao terminar, o convidado manda `act('task', id)` e já vê o bloco concluído. O host confere pelo `control` (`completeSurfaceTask(id, from.id)`).
-- O bloco concluído por outro jogador aparece como feito em todas as telas (`markDone`).
+**Experiments.**
+- The minigame runs in the browser of whoever moves the experiment's owner.
+- When it ends, the guest sends `act('task', id)` and already sees the block as done. The host checks it against `control` (`completeSurfaceTask(id, from.id)`).
+- A block completed by another player shows as done on every screen (`markDone`).
 
-**Embarque (regra do time, `game-balance`).**
-- **Só embarca com todos os jogadores online no lander**, a até `BOARD_REACH` mais `BOARD_SLACK_M` (1,5 m), porque o host vê os outros com um pequeno atraso.
-- O E no lander, ou o botão "Board & depart", pede o embarque (`act('board')` no convidado). Se alguém está longe, quem pediu vê "Waiting for the crew at the lander: Oscar.".
-- **Se o tempo acabar, fica em Marte quem não voltou:** quem está a mais de 35 m do lander, jogador ou IA, como no solo.
+**Boarding (team rule, `game-balance`).**
+- **Boarding only happens with every online player at the lander**, within `BOARD_REACH` plus `BOARD_SLACK_M` (1.5 m), because the host sees the others with a small delay.
+- E at the lander, or the "Board & depart" button, requests boarding (`act('board')` on the guest). If someone is far away, the requester sees "Waiting for the crew at the lander: Oscar.".
+- **If time runs out, whoever did not come back stays on Mars:** anyone more than 35 m from the lander, player or AI, as in solo play.
 
-**Fica local em cada tela:** câmera, capacete, bússola, objetivos, etiquetas, emote wheel e movimento reduzido.
+**Stays local on each screen:** camera, helmet, compass, objectives, labels, emote wheel and reduced motion.
 
-**Ficou para depois:** o aceno de volta dos NPCs quando um convidado olha para eles (hoje só reage à câmera do host) e as etiquetas com o nome dos jogadores.
+**Left for later:** the NPCs waving back when a guest looks at them (today they only react to the host's camera) and the labels with the players' names.
 
-### 7. Resultados ✅
-- O host manda `event {k:'results', forced, flight, surf}` com os números finais. O convidado copia esses números e roda o mesmo `showResults`, que não tem sorteio.
-- "Retry" e "Replay" são do host. Eles limpam `state flight` e `state surface` na sala e levam todos de volta ao planner ou ao lobby. A sala continua aberta.
+### 7. Results ✅
+- The host sends `event {k:'results', forced, flight, surf}` with the final numbers. The guest copies those numbers and runs the same `showResults`, which has no randomness.
+- "Retry" and "Replay" belong to the host. They clear `state flight` and `state surface` in the room and take everyone back to the planner or the lobby. The room stays open.
 
-### 8. Áudio
-- Cada cliente toca o próprio som: o fundo da superfície ao entrar nela. Os tons do cockpit tocam só no host, por enquanto.
-- Os arquivos continuam os mesmos ([audio.md](audio.md)).
+### 8. Audio
+- Each client plays its own sound: the surface ambience on entering it. The cockpit tones play only on the host, for now.
+- The files stay the same ([audio.md](audio.md)).
 
-### 9. Quedas e erros
-- **Convidado cai:** o `RoomClient` reconecta e retoma a vaga sozinho. Se não voltar em 30 s, a vaga fica livre, e no host o personagem volta para a IA.
-- **Host cai:** se não voltar em 30 s, a sala fecha para todos (`closed host-left`). O convidado vê um toast e volta ao menu.
-- **Erros de entrada** viram toasts em inglês:
+### 9. Drops and errors
+- **A guest drops:** the `RoomClient` reconnects and takes the seat back on its own. If it does not return within 30 s, the seat becomes free, and on the host the character returns to the AI.
+- **The host drops:** if it does not return within 30 s, the room closes for everyone (`closed host-left`). The guest sees a toast and returns to the menu.
+- **Join errors** become toasts in English:
 
-  | Código | Toast |
+  | Code | Toast |
   |---|---|
   | `room-not-found` | "Room not found" |
   | `room-full` | "This crew is full" |
   | `in-progress` | "The mission already launched" |
 
-- Sem servidor, "Create room" mostra um toast, e o jogo continua no solo.
+- Without a server, "Create room" shows a toast, and the game stays solo.
 
-## Minigames novos
+## New minigames
 
-1. O minigame pertence a uma vaga e roda no navegador de quem tem essa vaga. Se a vaga é da IA, roda no host.
-2. Ao terminar, manda `act` com o resultado (por exemplo `{name: 'task', args: [id, stars]}`). O host confere o dono pelo carimbo e aplica.
-3. Se os outros precisam ver o minigame enquanto ele acontece, o dono manda o progresso por `send` com `to: 'others'`. Esse progresso não muda regra nenhuma.
+1. A minigame belongs to a seat and runs in the browser of whoever has that seat. If the seat belongs to the AI, it runs on the host.
+2. When it ends, it sends an `act` with the result (for example `{name: 'task', args: [id, stars]}`). The host checks the owner by the stamp and applies it.
+3. If the others need to see the minigame while it happens, the owner sends the progress by `send` with `to: 'others'`. That progress does not change any rule.
 
-## Ordem sugerida e testes
+## Suggested order and tests
 
-1. Itens 1 e 2: entrar na sala e ver as vagas. 3 e 4: planner compartilhado. 5: cockpit. 6 em duas partes (primeiro astronautas, poses e IA no host; depois experimentos, minigames e embarque). 7: resultados. Cada um num commit, jogável.
-2. A cada passo, testar com o servidor local (`cd multiplayer && npm start`) e duas janelas:
-   - o host em `index.html`;
-   - o convidado em `index.html?room=CODE&server=ws://localhost:8787/ws`.
-3. No fim, um roteiro no Playwright com dois contextos:
-   - o convidado pega o Lucas;
-   - o planner fica igual nos dois;
-   - o Lucas reseta os breakers e a Helena pilota;
-   - cada um anda e o outro vê;
-   - os NPCs (Oscar e Maya, da IA) estão no mesmo lugar e no mesmo estado nas duas telas;
-   - com o minigame aberto num navegador, o outro continua vendo todos se mexerem;
-   - L-S1 só fecha pelo Lucas;
-   - o embarque só acontece com os dois no lander, e no timeout fica em Marte quem estiver longe;
-   - o placar fica igual.
+1. Items 1 and 2: join the room and see the seats. 3 and 4: shared planner. 5: cockpit. 6 in two parts (first astronauts, poses and AI on the host; then experiments, minigames and boarding). 7: results. Each one in its own commit, playable.
+2. At each step, test with the local server (`cd multiplayer && npm start`) and two windows:
+   - the host on `index.html`;
+   - the guest on `index.html?room=CODE&server=ws://localhost:8787/ws`.
+3. At the end, a Playwright script with two contexts:
+   - the guest takes Lucas;
+   - the planner is the same in both;
+   - Lucas resets the breakers and Helena flies;
+   - each one walks and the other sees it;
+   - the NPCs (Oscar and Maya, run by the AI) are in the same place and the same state on both screens;
+   - with the minigame open in one browser, the other still sees everyone moving;
+   - L-S1 can only be closed by Lucas;
+   - boarding only happens with both at the lander, and on timeout whoever is far away stays on Mars;
+   - the scoreboard is the same.
 
-   Sem erros no console em 1440 e 390 px e com movimento reduzido. O solo em `file://`, sem servidor, continua como hoje.
+   No console errors at 1440 and 390 px and with reduced motion. Solo play on `file://`, without a server, stays as it is today.
